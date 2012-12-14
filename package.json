@@ -1,0 +1,14 @@
+{
+  "name": "jsmoo",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "express": "*",
+    "jade": "*",
+    "less-middleware": "*",
+    "socket.io": "*",
+    "connect-coffee-script": "*",
+    "telnet": "*",
+    "colors": "*"
+  }
+}
