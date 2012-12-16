@@ -8,7 +8,6 @@
     "less-middleware": "*",
     "socket.io": "*",
     "connect-coffee-script": "*",
-    "telnet": "*",
-    "colors": "*"
+    "telnet": "*"
   }
 }

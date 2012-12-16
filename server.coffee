@@ -18,14 +18,16 @@ xp.configure ->
   xp.set 'view engine', 'jade'
   xp.use express.favicon()
   xp.use less
-    src: __dirname + '/public'
+    src: __dirname + '/public_src'
+    dest: __dirname + '/public'
   xp.use coffeescript_middleware
-    src: __dirname + '/public'
+    src: __dirname + '/public_src'
+    dest: __dirname + '/public'
     bare: true
   xp.use express.static __dirname + '/public'
 
 xp.get '/', (req, res) ->
-  res.render 'index', title: 'Test'
+  res.render 'index'
 
 http_server = http.createServer(xp).listen xp.get('port'), ->
   console.log "jsmoo http server listening on port " + xp.get 'port'
@@ -46,7 +48,6 @@ ws_server.sockets.on 'connection', (socket) ->
 # Telnet server #
 #################
 
-colors = require 'colors'
 telnet = require 'telnet'
 ts = telnet.createServer (socket) ->
   connections.add_telnet socket
