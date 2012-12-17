@@ -1,80 +1,45 @@
+@import 'color';
+
 body {
   font-family: 'Source Code Pro', sans-serif;
   background-color: black;
   color: white;
+  margin: 0;
 }
 
 li {
-	list-style-type: none;
+  list-style-type: none;
 }
 
-@white: #D3D7CF;
-@grey: #555753;
-@black: #2E3436;
-@blue: #3465A4;
-@cyan: #06989A;
-@green: #4E9A06;
-@magenta: #75507B;
-@red: #CC0000;
-@yellow: #C4A000;
+.screen {
+  overflow: auto;
 
-@light_white: #EEEEEC;
-@light_grey: #555753;
-@light_black: #555753;
-@light_blue: #729FCF;
-@light_cyan: #34E2E2;
-@light_green: #8AE234;
-@light_magenta: #AD7FA8;
-@light_red: #EF2929;
-@light_yellow: #FCE94F;
+  table {
+    border-collapse: collapse;
 
-.white { color: @white; }
-.grey { color: @grey; }
-.black { color: @black; }
-.blue { color: @blue; }
-.cyan { color: @cyan; }
-.green { color: @green; }
-.magenta { color: @magenta; }
-.red { color: @red; }
-.yellow { color: @yellow; }
-
-.bold {
-	font-weight: bold;
-
-	&.white { color: @light_white; }
-	&.grey { color: @light_grey; }
-	&.black { color: @light_black; }
-	&.blue { color: @light_blue; }
-	&.cyan { color: @light_cyan; }
-	&.green { color: @light_green; }
-	&.magenta { color: @light_magenta; }
-	&.red { color: @light_red; }
-	&.yellow { color: @light_yellow; }
-
-	&.inverse {
-		&.white { color: black; background-color: @light_white; }
-		&.grey { color: black; background-color: @light_grey; }
-		&.black { color: black; background-color: @light_black; }
-		&.blue { color: black; background-color: @light_blue; }
-		&.cyan { color: black; background-color: @light_cyan; }
-		&.green { color: black; background-color: @light_green; }
-		&.magenta { color: black; background-color: @light_magenta; }
-		&.red { color: black; background-color: @light_red; }
-		&.yellow { color: black; background-color: @light_yellow; }
-	}
+    td.name {
+      border-right: 2px solid @black;
+      padding-right: 4px;
+      vertical-align: top;
+    }
+    td.line {
+      padding-left: 4px;
+    }
+  }
 }
 
-.inverse {
-	&.white { color: black; background-color: @white; }
-	&.grey { color: black; background-color: @grey; }
-	&.black { color: black; background-color: @black; }
-	&.blue { color: black; background-color: @blue; }
-	&.cyan { color: black; background-color: @cyan; }
-	&.green { color: black; background-color: @green; }
-	&.magenta { color: black; background-color: @magenta; }
-	&.red { color: black; background-color: @red; }
-	&.yellow { color: black; background-color: @yellow; }
-}
+.command {
+  height: 25px;
 
-.italic { font-style: italic; }
-.underline { text-decoration: underline; }
+  input {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 21px;
+    border: 2px solid @black;
+    background-color: black;
+    color: white;
+    font-family: 'Source Code Pro', sans-serif;
+  }
+}

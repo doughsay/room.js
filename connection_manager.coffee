@@ -22,15 +22,17 @@ class ConnectionManager
     console.log "web connection removed"
 
   @broadcast_web: (socket, data) ->
-    socket.broadcast.emit 'chat', data
+    data.name = socket.name
+    for s in web
+      s.emit 'chat', data
     for s in telnet
-      s.write data.msg+"\n"
+      s.write "#{data.name}> #{data.msg}\n"
 
   @broadcast_telnet: (socket, msg) ->
     for s in web
-      s.emit 'chat', {msg: msg.slice(0,msg.length-1)}
+      s.emit 'chat', {msg: msg.slice(0,msg.length-1), name: socket.name}
     for s in telnet
       if s != socket
-        s.write msg
+        s.write "#{socket.name}> msg"
 
 module.exports = ConnectionManager

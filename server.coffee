@@ -9,6 +9,7 @@ less = require 'less-middleware'
 coffeescript = require 'coffee-script'
 coffeescript_middleware = require 'connect-coffee-script'
 connections = require './connection_manager'
+name = require './name'
 
 xp = express()
 
@@ -35,6 +36,7 @@ http_server = http.createServer(xp).listen xp.get('port'), ->
 ws_server = io.listen(http_server)
 
 ws_server.sockets.on 'connection', (socket) ->
+  socket.name = name.generate()
   connections.add_web socket
 
   socket.on 'disconnect', ->
@@ -50,6 +52,7 @@ ws_server.sockets.on 'connection', (socket) ->
 
 telnet = require 'telnet'
 ts = telnet.createServer (socket) ->
+  socket.name = name.generate()
   connections.add_telnet socket
 
   socket.do.transmit_binary()
