@@ -22,18 +22,18 @@ body {
 	color: @white;
 }
 
-.white { color: @white; }
-.grey { color: @grey; }
-.black { color: @black; }
-.blue { color: @blue; }
-.cyan { color: @cyan; }
-.green { color: @green; }
-.magenta { color: @magenta; }
-.red { color: @red; }
-.yellow { color: @yellow; }
+.white { color: @white; &.bold, .bold { color: @light_white; } &.inverse, .inverse { color: black; background-color: @white; } }
+.grey { color: @grey; &.bold, .bold { color: @light_grey; } &.inverse, .inverse { color: black; background-color: @grey; } }
+.black { color: @black; &.bold, .bold { color: @light_black; } &.inverse, .inverse { color: black; background-color: @black; } }
+.blue { color: @blue; &.bold, .bold { color: @light_blue; } &.inverse, .inverse { color: black; background-color: @blue; } }
+.cyan { color: @cyan; &.bold, .bold { color: @light_cyan; } &.inverse, .inverse { color: black; background-color: @cyan; } }
+.green { color: @green; &.bold, .bold { color: @light_green; } &.inverse, .inverse { color: black; background-color: @green; } }
+.magenta { color: @magenta; &.bold, .bold { color: @light_magenta; } &.inverse, .inverse { color: black; background-color: @magenta; } }
+.red { color: @red; &.bold, .bold { color: @light_red; } &.inverse, .inverse { color: black; background-color: @red; } }
+.yellow { color: @yellow; &.bold, .bold { color: @light_yellow; } &.inverse, .inverse { color: black; background-color: @yellow; } }
 
 .bold {
-	color: @light_white;
+	//color: @light_white;
 	font-weight: bold;
 
 	&.white, .white { color: @light_white; }
@@ -73,3 +73,4 @@ body {
 
 .italic { font-style: italic; }
 .underline { text-decoration: underline; }
+.inverse { color: black; background-color: @white; }
