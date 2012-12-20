@@ -31,6 +31,9 @@ xp.configure ->
 xp.get '/', (req, res) ->
   res.render 'index'
 
+xp.get '/colors', (req, res) ->
+  res.render 'color_test'
+
 http_server = http.createServer(xp).listen xp.get('port'), ->
   console.log "jsmoo http server listening on port " + xp.get 'port'
 

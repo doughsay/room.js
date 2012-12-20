@@ -3,57 +3,93 @@ extends layout
 block content
   h1 jsmoo color test
   ul
-    li: span.white white
-    li: span.grey grey
-    li: span.black black
-    li: span.blue blue
-    li: span.cyan cyan
-    li: span.green green
-    li: span.magenta magenta
-    li: span.red red
-    li: span.yellow yellow
-    li: span.bold.white bold white
-    li: span.bold.grey bold grey
-    li: span.bold.black bold black
-    li: span.bold.blue bold blue
-    li: span.bold.cyan bold cyan
-    li: span.bold.green bold green
-    li: span.bold.magenta bold magenta
-    li: span.bold.red bold red
-    li: span.bold.yellow bold yellow
-    li: span.underline.white underline white
-    li: span.underline.grey underline grey
-    li: span.underline.black underline black
-    li: span.underline.blue underline blue
-    li: span.underline.cyan underline cyan
-    li: span.underline.green underline green
-    li: span.underline.magenta underline magenta
-    li: span.underline.red underline red
-    li: span.underline.yellow underline yellow
-    li: span.italic.white italic white
-    li: span.italic.grey italic grey
-    li: span.italic.black italic black
-    li: span.italic.blue italic blue
-    li: span.italic.cyan italic cyan
-    li: span.italic.green italic green
-    li: span.italic.magenta italic magenta
-    li: span.italic.red italic red
-    li: span.italic.yellow italic yellow
-    li: span.inverse.white inverse white
-    li: span.inverse.grey inverse grey
-    li: span.inverse.black inverse black
-    li: span.inverse.blue inverse blue
-    li: span.inverse.cyan inverse cyan
-    li: span.inverse.green inverse green
-    li: span.inverse.magenta inverse magenta
-    li: span.inverse.red inverse red
-    li: span.inverse.yellow inverse yellow
-    li: span.bold.inverse.white bold inverse white
-    li: span.bold.inverse.grey bold inverse grey
-    li: span.bold.inverse.black bold inverse black
-    li: span.bold.inverse.blue bold inverse blue
-    li: span.bold.inverse.cyan bold inverse cyan
-    li: span.bold.inverse.green bold inverse green
-    li: span.bold.inverse.magenta bold inverse magenta
-    li: span.bold.inverse.red bold inverse red
-    li: span.bold.inverse.yellow bold inverse yellow
+    li!= "white".white
+    li!= "grey".grey
+    li!= "black".black
+    li!= "blue".blue
+    li!= "cyan".cyan
+    li!= "green".green
+    li!= "magenta".magenta
+    li!= "red".red
+    li!= "yellow".yellow
+    li!= "bold white".bold.white
+    li!= "bold grey".bold.grey
+    li!= "bold black".bold.black
+    li!= "bold blue".bold.blue
+    li!= "bold cyan".bold.cyan
+    li!= "bold green".bold.green
+    li!= "bold magenta".bold.magenta
+    li!= "bold red".bold.red
+    li!= "bold yellow".bold.yellow
+    li!= "underline white".underline.white
+    li!= "underline grey".underline.grey
+    li!= "underline black".underline.black
+    li!= "underline blue".underline.blue
+    li!= "underline cyan".underline.cyan
+    li!= "underline green".underline.green
+    li!= "underline magenta".underline.magenta
+    li!= "underline red".underline.red
+    li!= "underline yellow".underline.yellow
+    li!= "italic white".italic.white
+    li!= "italic grey".italic.grey
+    li!= "italic black".italic.black
+    li!= "italic blue".italic.blue
+    li!= "italic cyan".italic.cyan
+    li!= "italic green".italic.green
+    li!= "italic magenta".italic.magenta
+    li!= "italic red".italic.red
+    li!= "italic yellow".italic.yellow
+    li!= "inverse white".inverse.white
+    li!= "inverse grey".inverse.grey
+    li!= "inverse black".inverse.black
+    li!= "inverse blue".inverse.blue
+    li!= "inverse cyan".inverse.cyan
+    li!= "inverse green".inverse.green
+    li!= "inverse magenta".inverse.magenta
+    li!= "inverse red".inverse.red
+    li!= "inverse yellow".inverse.yellow
+    li!= "bold inverse white".bold.inverse.white
+    li!= "bold inverse grey".bold.inverse.grey
+    li!= "bold inverse black".bold.inverse.black
+    li!= "bold inverse blue".bold.inverse.blue
+    li!= "bold inverse cyan".bold.inverse.cyan
+    li!= "bold inverse green".bold.inverse.green
+    li!= "bold inverse magenta".bold.inverse.magenta
+    li!= "bold inverse red".bold.inverse.red
+    li!= "bold inverse yellow".bold.inverse.yellow
+    li!= ("bold > " + "white".white).bold
+    li!= ("bold > " + "grey".grey).bold
+    li!= ("bold > " + "black".black).bold
+    li!= ("bold > " + "blue".blue).bold
+    li!= ("bold > " + "cyan".cyan).bold
+    li!= ("bold > " + "green".green).bold
+    li!= ("bold > " + "magenta".magenta).bold
+    li!= ("bold > " + "red".red).bold
+    li!= ("bold > " + "yellow".yellow).bold
+    li!= ("underline > " + "white".white).underline
+    li!= ("underline > " + "grey".grey).underline
+    li!= ("underline > " + "black".black).underline
+    li!= ("underline > " + "blue".blue).underline
+    li!= ("underline > " + "cyan".cyan).underline
+    li!= ("underline > " + "green".green).underline
+    li!= ("underline > " + "magenta".magenta).underline
+    li!= ("underline > " + "red".red).underline
+    li!= ("underline > " + "yellow".yellow).underline
+    li!= ("italic > " + "white".white).italic
+    li!= ("italic > " + "grey".grey).italic
+    li!= ("italic > " + "black".black).italic
+    li!= ("italic > " + "blue".blue).italic
+    li!= ("italic > " + "cyan".cyan).italic
+    li!= ("italic > " + "green".green).italic
+    li!= ("italic > " + "magenta".magenta).italic
+    li!= ("italic > " + "red".red).italic
+    li!= ("italic > " + "yellow".yellow).italic
+    li!= ("inverse > " + "white".white).inverse
+    li!= ("inverse > " + "grey".grey).inverse
+    li!= ("inverse > " + "black".black).inverse
+    li!= ("inverse > " + "blue".blue).inverse
+    li!= ("inverse > " + "cyan".cyan).inverse
+    li!= ("inverse > " + "green".green).inverse
+    li!= ("inverse > " + "magenta".magenta).inverse
+    li!= ("inverse > " + "red".red).inverse
+    li!= ("inverse > " + "yellow".yellow).inverse

@@ -18,6 +18,10 @@
 @light_red: #EF2929;
 @light_yellow: #FCE94F;
 
+body {
+	color: @white;
+}
+
 .white { color: @white; }
 .grey { color: @grey; }
 .black { color: @black; }
@@ -29,41 +33,42 @@
 .yellow { color: @yellow; }
 
 .bold {
+	color: @light_white;
 	font-weight: bold;
 
-	&.white { color: @light_white; }
-	&.grey { color: @light_grey; }
-	&.black { color: @light_black; }
-	&.blue { color: @light_blue; }
-	&.cyan { color: @light_cyan; }
-	&.green { color: @light_green; }
-	&.magenta { color: @light_magenta; }
-	&.red { color: @light_red; }
-	&.yellow { color: @light_yellow; }
+	&.white, .white { color: @light_white; }
+	&.grey, .grey { color: @light_grey; }
+	&.black, .black { color: @light_black; }
+	&.blue, .blue { color: @light_blue; }
+	&.cyan, .cyan { color: @light_cyan; }
+	&.green, .green { color: @light_green; }
+	&.magenta, .magenta { color: @light_magenta; }
+	&.red, .red { color: @light_red; }
+	&.yellow, .yellow { color: @light_yellow; }
 
-	&.inverse {
-		&.white { color: black; background-color: @light_white; }
-		&.grey { color: black; background-color: @light_grey; }
-		&.black { color: black; background-color: @light_black; }
-		&.blue { color: black; background-color: @light_blue; }
-		&.cyan { color: black; background-color: @light_cyan; }
-		&.green { color: black; background-color: @light_green; }
-		&.magenta { color: black; background-color: @light_magenta; }
-		&.red { color: black; background-color: @light_red; }
-		&.yellow { color: black; background-color: @light_yellow; }
+	&.inverse, .inverse {
+		&.white, .white { color: black; background-color: @light_white; }
+		&.grey, .grey { color: black; background-color: @light_grey; }
+		&.black, .black { color: black; background-color: @light_black; }
+		&.blue, .blue { color: black; background-color: @light_blue; }
+		&.cyan, .cyan { color: black; background-color: @light_cyan; }
+		&.green, .green { color: black; background-color: @light_green; }
+		&.magenta, .magenta { color: black; background-color: @light_magenta; }
+		&.red, .red { color: black; background-color: @light_red; }
+		&.yellow, .yellow { color: black; background-color: @light_yellow; }
 	}
 }
 
 .inverse {
-	&.white { color: black; background-color: @white; }
-	&.grey { color: black; background-color: @grey; }
-	&.black { color: black; background-color: @black; }
-	&.blue { color: black; background-color: @blue; }
-	&.cyan { color: black; background-color: @cyan; }
-	&.green { color: black; background-color: @green; }
-	&.magenta { color: black; background-color: @magenta; }
-	&.red { color: black; background-color: @red; }
-	&.yellow { color: black; background-color: @yellow; }
+	&.white, .white { color: black; background-color: @white; }
+	&.grey, .grey { color: black; background-color: @grey; }
+	&.black, .black { color: black; background-color: @black; }
+	&.blue, .blue { color: black; background-color: @blue; }
+	&.cyan, .cyan { color: black; background-color: @cyan; }
+	&.green, .green { color: black; background-color: @green; }
+	&.magenta, .magenta { color: black; background-color: @magenta; }
+	&.red, .red { color: black; background-color: @red; }
+	&.yellow, .yellow { color: black; background-color: @yellow; }
 }
 
 .italic { font-style: italic; }
