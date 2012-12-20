@@ -10,6 +10,7 @@ coffeescript = require 'coffee-script'
 coffeescript_middleware = require 'connect-coffee-script'
 connections = require './connection_manager'
 name = require './name'
+require './color'
 
 xp = express()
 
@@ -45,30 +46,4 @@ ws_server.sockets.on 'connection', (socket) ->
   socket.on 'chat', (data) ->
     connections.broadcast_web socket, data
 
-
-#################
-# Telnet server #
-#################
-
-telnet = require 'telnet'
-ts = telnet.createServer (socket) ->
-  socket.name = name.generate()
-  connections.add_telnet socket
-
-  socket.do.transmit_binary()
-  socket.do.window_size()
-
-  socket.on 'close', ->
-    connections.remove_telnet socket
-
-  socket.on 'window size', (e) ->
-    if e.command == 'sb'
-      console.log "telnet window resized to #{e.width} x #{e.height}"
-
-  socket.on 'data', (b) ->
-    connections.broadcast_telnet socket, b.toString()
-
-  socket.write '\nConnected to Telnet server!\n'
-
-ts.listen 9999
-console.log "jsmoo telnet server listening on port 9999"
+  socket.emit 'chat', {name: 'system'.cyan.toString(), msg: "Welcome to #{"jsmoo".blue.bold}!"}

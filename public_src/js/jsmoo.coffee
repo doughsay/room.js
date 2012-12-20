@@ -1,8 +1,8 @@
 socket = io.connect 'http://localhost'
 
 setLayout = ->
-  $('.screen').css
-    height: "#{$(window).height()-25}px"
+  $('.command input').width $(window).width() - 4
+  $('.screen').height $(window).height() - 27
 
 scrollToBottom = ->
   $('.screen').scrollTop($('.screen')[0].scrollHeight);
@@ -29,6 +29,7 @@ moo = new Moo
 moo.addLine "<span class='cyan'>system</span>", "connecting..."
 
 socket.on 'chat', (data) ->
+  console.log data
   moo.addLine data.name, data.msg
 
 $ ->
