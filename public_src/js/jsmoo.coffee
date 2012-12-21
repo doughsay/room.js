@@ -1,8 +1,10 @@
 socket = io.connect 'http://localhost'
 
 setLayout = ->
-  $('.command input').width $(window).width() - 4
-  $('.screen').height $(window).height() - 27
+  input = $ '.command input'
+  inputWidthDiff = input.outerWidth() - input.width()
+  input.width $(window).width() - inputWidthDiff
+  $('.screen').height $(window).height() - input.outerHeight()
 
 scrollToBottom = ->
   $('.screen').scrollTop($('.screen')[0].scrollHeight);
@@ -12,25 +14,26 @@ $(window).resize setLayout
 class Moo
 
   lines: ko.observableArray []
+  maxLines: ko.observable 1000
 
-  addLine: (name, line) ->
-    @lines.push
-      name: name
-      line: line
+  addLine: (line) ->
+    @lines.push line
+    if @lines().length > @maxLines()
+      @lines.shift()
     scrollToBottom()
 
   command: ko.observable ""
 
   sendCommand: ->
-    socket.emit 'chat', {msg: @command()}
-    @command ""
+    if @command()
+      socket.emit 'chat', {msg: @command()}
+      @command ""
 
 moo = new Moo
-moo.addLine "<span class='cyan'>system</span>", "connecting..."
+moo.addLine "connecting..."
 
 socket.on 'chat', (data) ->
-  console.log data
-  moo.addLine data.name, data.msg
+  moo.addLine data.msg
 
 $ ->
   setLayout()

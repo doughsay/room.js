@@ -1,12 +1,8 @@
 extends layout
 
 block content
-  .screen
-    table
-      tbody(data-bind='foreach: lines')
-        tr
-          td.name(data-bind='html: name')
-          td.line(data-bind='html: line')
+  .screen(data-bind='foreach: lines')
+    div(data-bind='html: $data')
   .command
     form(data-bind='submit: sendCommand')
       input(type='text', data-bind="value: command")
