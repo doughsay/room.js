@@ -1,87 +1,73 @@
-@white: #D3D7CF;
-@grey: #555753;
-@black: #2E3436;
-@blue: #3465A4;
-@cyan: #06989A;
-@green: #4E9A06;
-@magenta: #75507B;
-@red: #CC0000;
-@yellow: #C4A000;
+@white: #D3D7CF;   @light_white: #EEEEEC;
+@grey: #555753;    @light_grey: #555753;
+@black: #2E3436;   @light_black: #555753;
+@blue: #3465A4;    @light_blue: #729FCF;
+@cyan: #06989A;    @light_cyan: #34E2E2;
+@green: #4E9A06;   @light_green: #8AE234;
+@magenta: #75507B; @light_magenta: #AD7FA8;
+@red: #CC0000;     @light_red: #EF2929;
+@yellow: #C4A000;  @light_yellow: #FCE94F;
 
-@light_white: #EEEEEC;
-@light_grey: #555753;
-@light_black: #555753;
-@light_blue: #729FCF;
-@light_cyan: #34E2E2;
-@light_green: #8AE234;
-@light_magenta: #AD7FA8;
-@light_red: #EF2929;
-@light_yellow: #FCE94F;
-
-/* this is what we need:
-  .white.bold.inverse,
-  .white .bold.inverse,
-  .white .bold .inverse,
-  //.white.inverse.bold,
-  .white .inverse.bold,
-  .white .inverse .bold,
-  //.bold.white.inverse,
-  .bold .white.inverse,
-  .bold .white, .inverse,
-  //.bold.inverse.white,
-  .bold .inverse.white,
-  .bold .inverse .white,
-  //.inverse.white.bold,
-  .inverse .white.bold,
-  .inverse .white .bold,
-  //.inverse.bold.white,
-  .inverse .bold.white,
-  .inverse .bold .white {
-    color: black;
-    background-color: #eeeeec;
+.boldify(@light_color) {
+  &.bold, .bold, .bold & {
+    color: @light_color;
   }
-*/
-
-body {
-  color: @white;
 }
 
-.invert (@color) {
+.invert(@color) {
   &.inverse, .inverse, .inverse & {
     color: black;
     background-color: @color;
   }
 }
 
-.boldify (@light_color) {
-  &.bold, .bold, .bold & {
-    color: @light_color;
-    .invert(@light_color);
+.bold_invert(@light_color) {
+  &.bold.inverse,
+  & .bold.inverse,
+  & .bold .inverse,
+  & .inverse .bold,
+  .bold &.inverse,
+  .bold & .inverse,
+  .bold .inverse &,
+  .bold.inverse &,
+  .inverse &.bold,
+  .inverse & .bold,
+  .inverse .bold & {
+    color: black;
+    background-color: @light_color;
   }
 }
 
-.bold {
-  font-weight: bold;
-  color: @light_white;
-}
-
-.inverse {
-  color: black;
-  background-color: @white;
-  &.bold, .bold, .bold & {
-    background-color: @light_white;
-  }
+body {
+  color: @white;
 }
 
 .italic { font-style: italic; }
 .underline { text-decoration: underline; }
 
-.white   { color: @white;   .invert(@white);   .boldify(@light_white); }
-.grey    { color: @grey;    .invert(@grey);    .boldify(@light_grey); }
-.black   { color: @black;   .invert(@black);   .boldify(@light_black); }
-.blue    { color: @blue;    .invert(@blue);    .boldify(@light_blue); }
-.cyan    { color: @cyan;    .invert(@cyan);    .boldify(@light_cyan); }
-.green   { color: @green;   .invert(@green);   .boldify(@light_green); }
-.magenta { color: @magenta; .invert(@magenta); .boldify(@light_magenta); }
-.red     { color: @red;     .invert(@red);     .boldify(@light_red); }
-.yellow  { color: @yellow;  .invert(@yellow);  .boldify(@light_yellow); }
+.bold {
+  color: @light_white;
+  font-weight: bold;
+}
+
+.inverse {
+  color: black;
+  background-color: @white;
+}
+
+.bold.inverse,
+.bold .inverse,
+.inverse .bold {
+  color: black;
+  background-color: @light_white;
+}
+
+.white   { color: @white;   .invert(@white);   .boldify(@light_white);   .bold_invert(@light_white);   }
+.grey    { color: @grey;    .invert(@grey);    .boldify(@light_grey);    .bold_invert(@light_grey);    }
+.black   { color: @black;   .invert(@black);   .boldify(@light_black);   .bold_invert(@light_black);   }
+.blue    { color: @blue;    .invert(@blue);    .boldify(@light_blue);    .bold_invert(@light_blue);    }
+.cyan    { color: @cyan;    .invert(@cyan);    .boldify(@light_cyan);    .bold_invert(@light_cyan);    }
+.green   { color: @green;   .invert(@green);   .boldify(@light_green);   .bold_invert(@light_green);   }
+.magenta { color: @magenta; .invert(@magenta); .boldify(@light_magenta); .bold_invert(@light_magenta); }
+.red     { color: @red;     .invert(@red);     .boldify(@light_red);     .bold_invert(@light_red);     }
+.yellow  { color: @yellow;  .invert(@yellow);  .boldify(@light_yellow);  .bold_invert(@light_yellow);  }
