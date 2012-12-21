@@ -18,59 +18,70 @@
 @light_red: #EF2929;
 @light_yellow: #FCE94F;
 
+/* this is what we need:
+  .white.bold.inverse,
+  .white .bold.inverse,
+  .white .bold .inverse,
+  //.white.inverse.bold,
+  .white .inverse.bold,
+  .white .inverse .bold,
+  //.bold.white.inverse,
+  .bold .white.inverse,
+  .bold .white, .inverse,
+  //.bold.inverse.white,
+  .bold .inverse.white,
+  .bold .inverse .white,
+  //.inverse.white.bold,
+  .inverse .white.bold,
+  .inverse .white .bold,
+  //.inverse.bold.white,
+  .inverse .bold.white,
+  .inverse .bold .white {
+    color: black;
+    background-color: #eeeeec;
+  }
+*/
+
 body {
-	color: @white;
+  color: @white;
 }
 
-.white { color: @white; &.bold, .bold { color: @light_white; } &.inverse, .inverse { color: black; background-color: @white; } }
-.grey { color: @grey; &.bold, .bold { color: @light_grey; } &.inverse, .inverse { color: black; background-color: @grey; } }
-.black { color: @black; &.bold, .bold { color: @light_black; } &.inverse, .inverse { color: black; background-color: @black; } }
-.blue { color: @blue; &.bold, .bold { color: @light_blue; } &.inverse, .inverse { color: black; background-color: @blue; } }
-.cyan { color: @cyan; &.bold, .bold { color: @light_cyan; } &.inverse, .inverse { color: black; background-color: @cyan; } }
-.green { color: @green; &.bold, .bold { color: @light_green; } &.inverse, .inverse { color: black; background-color: @green; } }
-.magenta { color: @magenta; &.bold, .bold { color: @light_magenta; } &.inverse, .inverse { color: black; background-color: @magenta; } }
-.red { color: @red; &.bold, .bold { color: @light_red; } &.inverse, .inverse { color: black; background-color: @red; } }
-.yellow { color: @yellow; &.bold, .bold { color: @light_yellow; } &.inverse, .inverse { color: black; background-color: @yellow; } }
+.invert (@color) {
+  &.inverse, .inverse, .inverse & {
+    color: black;
+    background-color: @color;
+  }
+}
+
+.boldify (@light_color) {
+  &.bold, .bold, .bold & {
+    color: @light_color;
+    .invert(@light_color);
+  }
+}
 
 .bold {
-	//color: @light_white;
-	font-weight: bold;
-
-	&.white, .white { color: @light_white; }
-	&.grey, .grey { color: @light_grey; }
-	&.black, .black { color: @light_black; }
-	&.blue, .blue { color: @light_blue; }
-	&.cyan, .cyan { color: @light_cyan; }
-	&.green, .green { color: @light_green; }
-	&.magenta, .magenta { color: @light_magenta; }
-	&.red, .red { color: @light_red; }
-	&.yellow, .yellow { color: @light_yellow; }
-
-	&.inverse, .inverse {
-		&.white, .white { color: black; background-color: @light_white; }
-		&.grey, .grey { color: black; background-color: @light_grey; }
-		&.black, .black { color: black; background-color: @light_black; }
-		&.blue, .blue { color: black; background-color: @light_blue; }
-		&.cyan, .cyan { color: black; background-color: @light_cyan; }
-		&.green, .green { color: black; background-color: @light_green; }
-		&.magenta, .magenta { color: black; background-color: @light_magenta; }
-		&.red, .red { color: black; background-color: @light_red; }
-		&.yellow, .yellow { color: black; background-color: @light_yellow; }
-	}
+  font-weight: bold;
+  color: @light_white;
 }
 
 .inverse {
-	&.white, .white { color: black; background-color: @white; }
-	&.grey, .grey { color: black; background-color: @grey; }
-	&.black, .black { color: black; background-color: @black; }
-	&.blue, .blue { color: black; background-color: @blue; }
-	&.cyan, .cyan { color: black; background-color: @cyan; }
-	&.green, .green { color: black; background-color: @green; }
-	&.magenta, .magenta { color: black; background-color: @magenta; }
-	&.red, .red { color: black; background-color: @red; }
-	&.yellow, .yellow { color: black; background-color: @yellow; }
+  color: black;
+  background-color: @white;
+  &.bold, .bold, .bold & {
+    background-color: @light_white;
+  }
 }
 
 .italic { font-style: italic; }
 .underline { text-decoration: underline; }
-.inverse { color: black; background-color: @white; }
+
+.white   { color: @white;   .invert(@white);   .boldify(@light_white); }
+.grey    { color: @grey;    .invert(@grey);    .boldify(@light_grey); }
+.black   { color: @black;   .invert(@black);   .boldify(@light_black); }
+.blue    { color: @blue;    .invert(@blue);    .boldify(@light_blue); }
+.cyan    { color: @cyan;    .invert(@cyan);    .boldify(@light_cyan); }
+.green   { color: @green;   .invert(@green);   .boldify(@light_green); }
+.magenta { color: @magenta; .invert(@magenta); .boldify(@light_magenta); }
+.red     { color: @red;     .invert(@red);     .boldify(@light_red); }
+.yellow  { color: @yellow;  .invert(@yellow);  .boldify(@light_yellow); }
