@@ -5,4 +5,4 @@ block content
     div(data-bind='html: $data')
   .command
     form(data-bind='submit: sendCommand')
-      input(type='text', data-bind="value: command")
+      input(type='text', data-bind="value: command, event: {keyup: recall}")
