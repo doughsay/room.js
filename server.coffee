@@ -39,7 +39,7 @@ ws_server = io.listen(http_server)
 
 ws_server.sockets.on 'connection', (socket) ->
   socket.emit 'output', {msg: "Welcome to #{"jsmoo".blue.bold}!"}
-  socket.emit 'output', {msg: "Type 'help' for a list of available commands."}
+  socket.emit 'output', {msg: "Type '#{"help".magenta.bold}' for a list of available commands."}
 
   socket.on 'disconnect', ->
     # TODO (or not?  we don't care if an anonymous socket leaves...)
@@ -49,16 +49,19 @@ ws_server.sockets.on 'connection', (socket) ->
     console.log "received: #{str}"
     switch str
       when "help"
-        socket.emit 'output', {msg: "Available commands:"}
-        socket.emit 'output', {msg: "* login  - login to an existing account"}
-        socket.emit 'output', {msg: "* create - create a new account"}
-        socket.emit 'output', {msg: "* delete - delete an existing account"}
-        socket.emit 'output', {msg: "* help   - show this message"}
+        msg = """
+        \nAvailable commands:
+        * #{"login".magenta.bold}  - login to an existing account
+        * #{"create".magenta.bold} - create a new account
+        * #{"delete".magenta.bold} - delete an existing account
+        * #{"help".magenta.bold}   - show this message
+        """
+        socket.emit 'output', {msg: msg}
       when "login"
-        socket.emit 'output', {msg: "not yet implemented"}
+        socket.emit 'output', {msg: "\nnot yet implemented".red.inverse.bold.toString()}
       when "create"
-        socket.emit 'output', {msg: "not yet implemented"}
+        socket.emit 'output', {msg: "\nnot yet implemented".red.inverse.bold.toString()}
       when "delete"
-        socket.emit 'output', {msg: "not yet implemented"}
+        socket.emit 'output', {msg: "\nnot yet implemented".red.inverse.bold.toString()}
       else
-        socket.emit 'output', {msg: "unknown command"}
+        socket.emit 'output', {msg: "\nunknown command".grey.toString()}
