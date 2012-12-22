@@ -1,16 +1,3 @@
-socket = io.connect 'http://localhost'
-
-setLayout = ->
-  input = $ '.command input'
-  inputWidthDiff = input.outerWidth() - input.width()
-  input.width $(window).width() - inputWidthDiff
-  $('.screen').height $(window).height() - input.outerHeight()
-
-scrollToBottom = ->
-  $('.screen').scrollTop($('.screen')[0].scrollHeight);
-
-$(window).resize setLayout
-
 class Moo
 
   lines: ko.observableArray []
@@ -20,13 +7,33 @@ class Moo
   maxHistory: ko.observable 1000
   currentHistory: -1
 
+  command: ko.observable ""
+
+  socket: null
+
+  constructor: ->
+    address = location.href
+    @socket = io.connect address
+    @addLine "websocket connecting to #{address}"
+    $(window).resize @setLayout
+
+    @socket.on 'chat', (data) =>
+      @addLine data.msg
+
+  setLayout: ->
+    input = $ '.command input'
+    inputWidthDiff = input.outerWidth() - input.width()
+    input.width $(window).width() - inputWidthDiff
+    $('.screen').height $(window).height() - input.outerHeight()
+
+  scrollToBottom: ->
+    $('.screen').scrollTop($('.screen')[0].scrollHeight);
+
   addLine: (line) ->
     @lines.push line
     if @lines().length > @maxLines()
       @lines.shift()
-    scrollToBottom()
-
-  command: ko.observable ""
+    @scrollToBottom()
 
   sendCommand: ->
     c = @command()
@@ -35,7 +42,7 @@ class Moo
       if @history.length > @maxHistory()
         @history.pop()
       @currentHistory = -1
-      socket.emit 'chat', {msg: c}
+      @socket.emit 'chat', {msg: c}
       @command ""
 
   recall: (_, e) ->
@@ -57,11 +64,7 @@ class Moo
           @command ""
 
 moo = new Moo
-moo.addLine "connecting..."
-
-socket.on 'chat', (data) ->
-  moo.addLine data.msg
 
 $ ->
-  setLayout()
+  moo.setLayout()
   ko.applyBindings moo
