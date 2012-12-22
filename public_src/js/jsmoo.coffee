@@ -17,8 +17,11 @@ class Moo
     @addLine "websocket connecting to #{address}"
     $(window).resize @setLayout
 
-    @socket.on 'chat', (data) =>
+    @socket.on 'output', (data) =>
       @addLine data.msg
+
+    @socket.on 'disconnect', =>
+      @addLine 'Disconnected from server.  Attemping to reconnect...'
 
   setLayout: ->
     input = $ '.command input'
@@ -42,7 +45,7 @@ class Moo
       if @history.length > @maxHistory()
         @history.pop()
       @currentHistory = -1
-      @socket.emit 'chat', {msg: c}
+      @socket.emit 'input', {msg: c}
       @command ""
 
   recall: (_, e) ->

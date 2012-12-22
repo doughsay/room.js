@@ -8,8 +8,6 @@ io = require 'socket.io'
 less = require 'less-middleware'
 coffeescript = require 'coffee-script'
 coffeescript_middleware = require 'connect-coffee-script'
-connections = require './connection_manager'
-name = require './name'
 require './color'
 
 xp = express()
@@ -40,13 +38,27 @@ http_server = http.createServer(xp).listen xp.get('port'), ->
 ws_server = io.listen(http_server)
 
 ws_server.sockets.on 'connection', (socket) ->
-  socket.name = name.generate()
-  connections.add_web socket
+  socket.emit 'output', {msg: "Welcome to #{"jsmoo".blue.bold}!"}
+  socket.emit 'output', {msg: "Type 'help' for a list of available commands."}
 
   socket.on 'disconnect', ->
-    connections.remove_web socket
+    # TODO (or not?  we don't care if an anonymous socket leaves...)
 
-  socket.on 'chat', (data) ->
-    connections.broadcast_web socket, data
-
-  socket.emit 'chat', {name: 'system'.cyan.toString(), msg: "Welcome to #{"jsmoo".blue.bold}!"}
+  socket.on 'input', (data) ->
+    str = data.msg
+    console.log "received: #{str}"
+    switch str
+      when "help"
+        socket.emit 'output', {msg: "Available commands:"}
+        socket.emit 'output', {msg: "* login  - login to an existing account"}
+        socket.emit 'output', {msg: "* create - create a new account"}
+        socket.emit 'output', {msg: "* delete - delete an existing account"}
+        socket.emit 'output', {msg: "* help   - show this message"}
+      when "login"
+        socket.emit 'output', {msg: "not yet implemented"}
+      when "create"
+        socket.emit 'output', {msg: "not yet implemented"}
+      when "delete"
+        socket.emit 'output', {msg: "not yet implemented"}
+      else
+        socket.emit 'output', {msg: "unknown command"}
