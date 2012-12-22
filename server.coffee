@@ -39,7 +39,7 @@ ws_server = io.listen(http_server)
 
 ws_server.sockets.on 'connection', (socket) ->
   socket.emit 'output', {msg: "Welcome to #{"jsmoo".blue.bold}!"}
-  socket.emit 'output', {msg: "Type '#{"help".magenta.bold}' for a list of available commands."}
+  socket.emit 'output', {msg: "Type #{"help".magenta.bold} for a list of available commands."}
 
   socket.on 'disconnect', ->
     # TODO (or not?  we don't care if an anonymous socket leaves...)
@@ -58,10 +58,10 @@ ws_server.sockets.on 'connection', (socket) ->
         """
         socket.emit 'output', {msg: msg}
       when "login"
-        socket.emit 'output', {msg: "\nnot yet implemented".red.inverse.bold.toString()}
+        socket.emit 'output', {msg: "\n"+"not yet implemented".red.inverse.bold}
       when "create"
-        socket.emit 'output', {msg: "\nnot yet implemented".red.inverse.bold.toString()}
+        socket.emit 'output', {msg: "\n"+"not yet implemented".red.inverse.bold}
       when "delete"
-        socket.emit 'output', {msg: "\nnot yet implemented".red.inverse.bold.toString()}
+        socket.emit 'output', {msg: "\n"+"not yet implemented".red.inverse.bold}
       else
-        socket.emit 'output', {msg: "\nunknown command".grey.toString()}
+        socket.emit 'output', {msg: "\n"+"unknown command".grey}
