@@ -9,6 +9,7 @@ less = require 'less-middleware'
 coffeescript = require 'coffee-script'
 coffeescript_middleware = require 'connect-coffee-script'
 require './color'
+parse = require('./parser').parse
 
 xp = express()
 
@@ -46,7 +47,6 @@ ws_server.sockets.on 'connection', (socket) ->
 
   socket.on 'input', (data) ->
     str = data.msg
-    console.log "received: #{str}"
     switch str
       when "help"
         msg = """
@@ -64,4 +64,28 @@ ws_server.sockets.on 'connection', (socket) ->
       when "delete"
         socket.emit 'output', {msg: "\n"+"not yet implemented".red.inverse.bold}
       else
-        socket.emit 'output', {msg: "\n"+"unknown command".grey}
+        command = parse str
+        msg = "\n"+"unknown command: ".grey
+        msg += "{ ".bold.white
+        msg += "verb: ".yellow
+        msg += command.verb.blue
+        msg += " , ".bold.white
+        msg += "directObject: ".yellow
+        if command.do != undefined
+          msg += command.do.blue
+        else
+          msg += "undefined".grey
+        msg += " , ".bold.white
+        msg += "preposition: ".yellow
+        if command.prep != undefined
+          msg += command.prep.blue
+        else
+          msg += "undefined".grey
+        msg += " , ".bold.white
+        msg += "indirectObject: ".yellow
+        if command.io != undefined
+          msg += command.io.blue
+        else
+          msg += "undefined".grey
+        msg += " }".bold.white
+        socket.emit 'output', {msg: msg}
