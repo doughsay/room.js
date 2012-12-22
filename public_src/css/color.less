@@ -8,7 +8,7 @@
 @red: #CC0000;     @light_red: #EF2929;
 @yellow: #C4A000;  @light_yellow: #FCE94F;
 
-.boldify(@light_color) {
+.embolden(@light_color) {
   &.bold, .bold, .bold & {
     color: @light_color;
   }
@@ -61,12 +61,12 @@ body {
   background-color: @light_white;
 }
 
-.white   { color: @white;   .invert(@white);   .boldify(@light_white);   .bold_invert(@light_white);   }
-.grey    { color: @grey;    .invert(@grey);    .boldify(@light_grey);    .bold_invert(@light_grey);    }
-.black   { color: @black;   .invert(@black);   .boldify(@light_black);   .bold_invert(@light_black);   }
-.blue    { color: @blue;    .invert(@blue);    .boldify(@light_blue);    .bold_invert(@light_blue);    }
-.cyan    { color: @cyan;    .invert(@cyan);    .boldify(@light_cyan);    .bold_invert(@light_cyan);    }
-.green   { color: @green;   .invert(@green);   .boldify(@light_green);   .bold_invert(@light_green);   }
-.magenta { color: @magenta; .invert(@magenta); .boldify(@light_magenta); .bold_invert(@light_magenta); }
-.red     { color: @red;     .invert(@red);     .boldify(@light_red);     .bold_invert(@light_red);     }
-.yellow  { color: @yellow;  .invert(@yellow);  .boldify(@light_yellow);  .bold_invert(@light_yellow);  }
+.white   { color: @white;   .invert(@white);   .embolden(@light_white);   .bold_invert(@light_white);   }
+.grey    { color: @grey;    .invert(@grey);    .embolden(@light_grey);    .bold_invert(@light_grey);    }
+.black   { color: @black;   .invert(@black);   .embolden(@light_black);   .bold_invert(@light_black);   }
+.blue    { color: @blue;    .invert(@blue);    .embolden(@light_blue);    .bold_invert(@light_blue);    }
+.cyan    { color: @cyan;    .invert(@cyan);    .embolden(@light_cyan);    .bold_invert(@light_cyan);    }
+.green   { color: @green;   .invert(@green);   .embolden(@light_green);   .bold_invert(@light_green);   }
+.magenta { color: @magenta; .invert(@magenta); .embolden(@light_magenta); .bold_invert(@light_magenta); }
+.red     { color: @red;     .invert(@red);     .embolden(@light_red);     .bold_invert(@light_red);     }
+.yellow  { color: @yellow;  .invert(@yellow);  .embolden(@light_yellow);  .bold_invert(@light_yellow);  }
