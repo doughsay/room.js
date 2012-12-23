@@ -66,26 +66,26 @@ ws_server.sockets.on 'connection', (socket) ->
       else
         command = parse str
         msg = "\n"+"unknown command: ".grey
-        msg += "{ ".bold.white
+        msg += "{".bold.white
         msg += "verb: ".yellow
-        msg += command.verb.blue
-        msg += " , ".bold.white
+        msg += command.verb.blue.bold
+        msg += ", ".bold.white
         msg += "directObject: ".yellow
         if command.do != undefined
-          msg += command.do.blue
+          msg += command.do.blue.bold
         else
           msg += "undefined".grey
-        msg += " , ".bold.white
+        msg += ", ".bold.white
         msg += "preposition: ".yellow
         if command.prep != undefined
-          msg += command.prep.blue
+          msg += command.prep.blue.bold
         else
           msg += "undefined".grey
-        msg += " , ".bold.white
+        msg += ", ".bold.white
         msg += "indirectObject: ".yellow
         if command.io != undefined
-          msg += command.io.blue
+          msg += command.io.blue.bold
         else
           msg += "undefined".grey
-        msg += " }".bold.white
+        msg += "}".bold.white
         socket.emit 'output', {msg: msg}

@@ -25,6 +25,9 @@
 #   prep: 'in'
 #   io:   'cuckoo clock'
 
+# warning: prepositions containing other prepositions as
+# substrings (using word boundaries) must precede them.
+# e.g. 'on top of' comes before 'on', but 'onto' doesn't have to precede 'on'.
 prepositions = [
   'with', 'using',
   'at', 'to',
@@ -40,35 +43,31 @@ prepositions = [
   'for', 'about',
   'is',
   'as',
-  'off', 'off of'
+  'off of', 'off'
 ]
+
+prepex = new RegExp '\\b(' + prepositions.join('|') + ')\\b'
 
 sanitize = (text) -> text.trim().replace /\s+/g, ' '
 
+# return [first_word, rest]
 chomp = (s) ->
-  if s.indexOf(' ') != -1
-    [s[0..s.indexOf(' ')-1], s[s.indexOf(' ')+1..-1]]
+  i = s.indexOf(' ')
+  if i != -1
+    [s[0..i-1], s[i+1..-1]]
   else
     [s, undefined]
 
 parse_preposition = (text) ->
-  prepsFound = []
-  for prep in prepositions
-    index = text.indexOf(" #{prep} ")
-    if index != -1
-      length = prep.length
-      if prepsFound[index] == undefined
-        prepsFound[index] = {prep: prep, length: length}
-      else if prepsFound[index].length < length
-        prepsFound[index] = {prep: prep, length: length}
-  for o in prepsFound
-    if o != undefined
-      {prep, length} = o
-      i = text.indexOf(prep)
-      directObject = text[0..(i-2)]
-      indirectObject = text[(i+prep.length+1)..-1]
-      return [directObject, prep, indirectObject]
-  false
+  search = text.match prepex
+  if search?
+    prep = search[0]
+    i = search.index
+    directObject = if i == 0 then undefined else text[0..(i-1)]
+    indirectObject = text[(i+prep.length+1)..-1]
+    [directObject, prep, indirectObject]
+  else
+    false
 
 parse_command = (text) ->
   text = sanitize text
