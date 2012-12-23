@@ -36,7 +36,7 @@ xp.get '/colors', (req, res) ->
 http_server = http.createServer(xp).listen xp.get('port'), ->
   console.log "jsmoo http server listening on port " + xp.get 'port'
 
-ws_server = io.listen(http_server)
+ws_server = io.listen(http_server, {log: false})
 
 ws_server.sockets.on 'connection', (socket) ->
   socket.emit 'output', {msg: "Welcome to #{"jsmoo".blue.bold}!"}

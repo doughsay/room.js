@@ -14,8 +14,15 @@ class Moo
   constructor: ->
     address = location.href
     @socket = io.connect address
+
     @addLine "websocket connecting to #{address}"
+
     $(window).resize @setLayout
+    @setLayout()
+
+    $('.screen').click ->
+      $('.command input').focus()
+    $('.command input').focus()
 
     @socket.on 'output', (data) =>
       @addLine data.msg
@@ -66,8 +73,5 @@ class Moo
         else
           @command ""
 
-moo = new Moo
-
 $ ->
-  moo.setLayout()
-  ko.applyBindings moo
+  ko.applyBindings new Moo
