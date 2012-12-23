@@ -2,13 +2,19 @@
 @import 'spiffy';
 
 body {
-  font-family: 'Source Code Pro', sans-serif;
-  font-size: 12pt;
-  background-color: black;
   margin: 0;
 }
 
+html {
+  background-color: #222;
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAGklEQVQIW2NkYGD4D8SMQAwGcAY2AbBKDBUAVuYCBQPd34sAAAAASUVORK5CYII=);
+  background-repeat: repeat;
+}
+
 .screen {
+  font-family: 'Source Code Pro', sans-serif;
+  font-size: 12pt;
+  background-color: black;
   overflow: auto;
   padding-left: 4px;
   div {
@@ -23,9 +29,14 @@ body {
     position: absolute;
     bottom: 0;
     left: 0;
-    border: 2px solid @black;
+    border: none;
+    padding: 2px 4px;
     background-color: black;
     color: white;
     font-family: 'Source Code Pro', sans-serif;
+
+    &:focus {
+      outline: none;
+    }
   }
 }

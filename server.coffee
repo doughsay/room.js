@@ -53,16 +53,22 @@ ws_server.sockets.on 'connection', (socket) ->
         \nAvailable commands:
         * #{"login".magenta.bold}  - login to an existing account
         * #{"create".magenta.bold} - create a new account
-        * #{"delete".magenta.bold} - delete an existing account
         * #{"help".magenta.bold}   - show this message
         """
         socket.emit 'output', {msg: msg}
       when "login"
-        socket.emit 'output', {msg: "\n"+"not yet implemented".red.inverse.bold}
+        socket.emit 'requestFormInput', [
+          {type: 'string', name: 'username', label: 'Username'},
+          {type: 'password', name: 'password', label: 'Password'},
+          {type: 'button', label: 'Login'}
+        ]
       when "create"
-        socket.emit 'output', {msg: "\n"+"not yet implemented".red.inverse.bold}
-      when "delete"
-        socket.emit 'output', {msg: "\n"+"not yet implemented".red.inverse.bold}
+        socket.emit 'requestFormInput', [
+          {type: 'string', name: 'username', label: 'Username'},
+          {type: 'password', name: 'password', label: 'Password'},
+          {type: 'password', name: 'password2', label: 'Confirm Password'},
+          {type: 'button', label: 'Create'}
+        ]
       else
         command = parse str
         msg = "\n"+"unknown command: ".grey

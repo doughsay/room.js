@@ -30,6 +30,10 @@ class Moo
     @socket.on 'disconnect', =>
       @addLine 'Disconnected from server.  Attemping to reconnect...'
 
+    @socket.on 'requestFormInput', (data) =>
+      Avgrund.show "#default-popup"
+      $('.command input').blur()
+
   setLayout: ->
     input = $ '.command input'
     inputWidthDiff = input.outerWidth() - input.width()
