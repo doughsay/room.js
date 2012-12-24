@@ -1,4 +1,4 @@
-class Moo
+class MooViewModel
 
   lines: ko.observableArray []
   maxLines: ko.observable 1000
@@ -78,4 +78,4 @@ class Moo
           @command ""
 
 $ ->
-  ko.applyBindings new Moo
+  ko.applyBindings new MooViewModel
