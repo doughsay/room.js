@@ -61,11 +61,11 @@ chomp = (s) ->
 parse_preposition = (text) ->
   search = text.match prepex
   if search?
-    prep = search[0]
+    prepstr = search[0]
     i = search.index
-    directObject = if i == 0 then undefined else text[0..(i-1)]
-    indirectObject = text[(i+prep.length+1)..-1]
-    [directObject, prep, indirectObject]
+    dobjstr = if i == 0 then undefined else text[0..(i-2)]
+    iobjstr = text[(i+prepstr.length+1)..-1]
+    [dobjstr, prepstr, iobjstr]
   else
     false
 
@@ -74,15 +74,15 @@ parse_command = (text) ->
   [verb, rest] = chomp text
   if rest != undefined
     if x = parse_preposition rest
-      [directObject, preposition, indirectObject] = x
+      [dobjstr, prepstr, iobjstr] = x
     else
-      directObject = rest
+      dobjstr = rest
   {
-    verb: verb
-    do:   directObject
-    prep: preposition
-    io:   indirectObject
-    args: rest
+    verb:    verb
+    argstr:  rest
+    dobjstr: dobjstr
+    prepstr: prepstr
+    iobjstr: iobjstr
   }
 
 exports.parse = parse_command

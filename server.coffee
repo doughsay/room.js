@@ -87,13 +87,11 @@ ws_server.sockets.on 'connection', (socket) ->
         if socket.player?
           player = socket.player
           command = parse str
-          matches = db.findCommandObjects player, command
-          socket.emit 'output', {msg: c("\nmatched objects:", 'green') + util.print matches}
-          verb = db.findVerb command, matches
+          [verb, context] = db.buildContextForCommand player, command
           if verb?
-            vm.runInNewContext verb.code, {player: player}
+            vm.runInNewContext verb.code, context
           else
-            msg = c("\nunknown command:", 'grey') + util.print command
+            msg = c("\nI didn't understand that.", 'grey')# + util.print command
             socket.emit 'output', {msg: msg}
         else
           socket.emit 'output', {msg: "\nUnrecognized command. Type #{c 'help', 'magenta bold'} for a list of available commands."}
