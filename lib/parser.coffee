@@ -82,6 +82,7 @@ parse_command = (text) ->
     do:   directObject
     prep: preposition
     io:   indirectObject
+    args: rest
   }
 
 exports.parse = parse_command

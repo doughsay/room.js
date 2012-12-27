@@ -13,28 +13,43 @@ class MooDB
         newMooObj.addVerb v.name, v.aliases, v.do, v.prep, v.io, v.code
       @objects.push newMooObj
 
-  getById: (id) ->
+  findById: (id) ->
     for o in @objects
       return o if o.id == id
     return null
 
-  # simple matching.  TODO: more complex matching.
-  findNearbyByName: (name, player) ->
-    room = @getById player.location
-    for oid in player.contents
-      o = @getById oid
-      return o if o.name == name
-    for oid in room.contents
-      o = @getById oid
-      return o if o.name == name
-    return null
+  findByNum: (numStr) ->
+    @findById parseInt numStr.match(/^#([0-9]+)$/)[1]
 
   # find the objects matched by the command
-  findMatchedObjects: (player, command) ->
+  findCommandObjects: (player, command) ->
     player: player
-    room: if player.location? then @getById player.location else null
-    do: if command.do? then @findNearbyByName command.do, player else null
-    io: if command.io? then @findNearbyByName command.io, player else null
+    room: if player.location? then @findById player.location else null
+    do: if command.do? then @findObject command.do, player else null
+    io: if command.io? then @findObject command.io, player else null
+
+  # search string can be:
+  # 'me', 'here', '#123' (an object number),
+  # or an object name or alias, in which case we search "nearby"
+  findObject: (search, player) ->
+    return player if search == 'me'
+    return @findById player.location if search == 'here'
+    return @findByNum search if search.match /^#[0-9]+$/
+    @findNearby search, player
+
+
+  # find objects "nearby"
+  # i.e. objects the player is holding, or objects in the room
+  findNearby: (search, player) ->
+    room = @findById player.location
+    return room if room.matches search
+    for oid in player.contents
+      o = @findById oid
+      return o if o.matches search
+    for oid in room.contents
+      o = @findById oid
+      return o if o.matches search
+    return null
 
   findVerb: (command, matches) ->
     if matches.player.respondsTo command
@@ -61,6 +76,9 @@ class MooObject
 
   constructor: (@id, @parent, @name, @aliases, @location, @contents, @properties = [], @verbs = []) ->
 
+  toString: ->
+    @name
+
   addProperty: (key, value) ->
     @properties.push new MooProperty key, value
 
@@ -69,6 +87,13 @@ class MooObject
 
   respondsTo: (command) ->
     @findVerb(command)?
+
+  # does this object match the search string?
+  matches: (search) ->
+    match = (x, y) -> x == y || y.indexOf(x) == 0
+    return true if match search, @name
+    for alias in @aliases
+      return true if match search, alias
 
   # TODO: fix this
   findVerb: (command) ->
@@ -94,7 +119,7 @@ class MooProperty
   # @value: String|Int|Float|Array[String|Int|Float|Array]
   constructor: (@key, @value) ->
 
-# A Moo Verb is a coffeescript function which runs in a sandboxed context
+# A Moo Verb is a js function which runs in a sandboxed context
 class MooVerb
   # @name: String
   # @aliases: Array[String]
