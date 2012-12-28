@@ -78,6 +78,8 @@ class MooViewModel
           @command @history[@currentHistory]
         else
           @command ""
+      else
+        true
 
 $ ->
   ko.applyBindings new MooViewModel

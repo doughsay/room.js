@@ -57,8 +57,7 @@ ws_server.sockets.on 'connection', (socket) ->
       if verb?
         vm.runInNewContext verb.code, context
       else
-        msg = c("\nI didn't understand that.", 'grey')# + util.print command
-        socket.emit 'output', {msg: msg}
+        player.send c("\nI didn't understand that.", 'grey')# + util.print command
     else
       switch str
         when "help"
