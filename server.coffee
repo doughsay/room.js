@@ -50,48 +50,48 @@ ws_server.sockets.on 'connection', (socket) ->
 
   socket.on 'input', (data) ->
     str = data.msg
-    switch str
-      when "help"
-        msg = """
-        \nAvailable commands:
-        * #{c 'login', 'magenta bold'}  - login to an existing account
-        * #{c 'create', 'magenta bold'} - create a new account
-        * #{c 'help', 'magenta bold'}   - show this message
-        """
-        socket.emit 'output', {msg: msg}
-      when "login"
-        socket.emit 'requestFormInput', [
-          {type: 'string', name: 'username', label: 'Username'},
-          {type: 'password', name: 'password', label: 'Password'},
-          {type: 'button', label: 'Login'}
-        ]
-      when "create"
-        socket.emit 'requestFormInput', [
-          {type: 'string', name: 'username', label: 'Username'},
-          {type: 'password', name: 'password', label: 'Password'},
-          {type: 'password', name: 'password2', label: 'Confirm Password'},
-          {type: 'button', label: 'Create'}
-        ]
-      when "root"
-        rootUser = db.findById(2)
-
-        if rootUser.socket
-          rootUser.send c "\nDisconnected by another login.", 'red bold'
-          rootUser.disconnect()
-
-        socket.player = rootUser
-        rootUser.socket = socket
-
-        rootUser.send c "\nConnected as ROOT.", 'red bold'
+    if socket.player?
+      player = socket.player
+      command = parse str
+      [verb, context] = db.buildContextForCommand player, command
+      if verb?
+        vm.runInNewContext verb.code, context
       else
-        if socket.player?
-          player = socket.player
-          command = parse str
-          [verb, context] = db.buildContextForCommand player, command
-          if verb?
-            vm.runInNewContext verb.code, context
-          else
-            msg = c("\nI didn't understand that.", 'grey')# + util.print command
-            socket.emit 'output', {msg: msg}
+        msg = c("\nI didn't understand that.", 'grey')# + util.print command
+        socket.emit 'output', {msg: msg}
+    else
+      switch str
+        when "help"
+          msg = """
+          \nAvailable commands:
+          * #{c 'login', 'magenta bold'}  - login to an existing account
+          * #{c 'create', 'magenta bold'} - create a new account
+          * #{c 'help', 'magenta bold'}   - show this message
+          """
+          socket.emit 'output', {msg: msg}
+        when "login"
+          socket.emit 'requestFormInput', [
+            {type: 'string', name: 'username', label: 'Username'},
+            {type: 'password', name: 'password', label: 'Password'},
+            {type: 'button', label: 'Login'}
+          ]
+        when "create"
+          socket.emit 'requestFormInput', [
+            {type: 'string', name: 'username', label: 'Username'},
+            {type: 'password', name: 'password', label: 'Password'},
+            {type: 'password', name: 'password2', label: 'Confirm Password'},
+            {type: 'button', label: 'Create'}
+          ]
+        when "root"
+          rootUser = db.findById(2)
+
+          if rootUser.socket
+            rootUser.send c "\nDisconnected by another login.", 'red bold'
+            rootUser.disconnect()
+
+          socket.player = rootUser
+          rootUser.socket = socket
+
+          rootUser.send c "\nConnected as ROOT.", 'red bold'
         else
           socket.emit 'output', {msg: "\nUnrecognized command. Type #{c 'help', 'magenta bold'} for a list of available commands."}

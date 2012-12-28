@@ -138,7 +138,7 @@ class MooObject
   respondsTo: (context) ->
     @findVerb(context)?
 
-  # TODO: fix this
+  # look for a verb on this object (or it's parents) that matches the given context
   findVerb: (context) ->
     for verb in @verbs
       if verb.matchesContext context
@@ -198,7 +198,7 @@ class MooVerb
   matches: (search) ->
     search == @name
 
-  # does this verb match the command?
+  # does this verb match the context?
   matchesContext: (context) ->
     return false if not @matches context.verb
     switch @dobjarg

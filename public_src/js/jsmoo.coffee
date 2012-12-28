@@ -1,3 +1,6 @@
+c = (str, styles) ->
+  "<span class='#{styles}'>#{str}</span>"
+
 class MooViewModel
 
   lines: ko.observableArray []
@@ -15,7 +18,7 @@ class MooViewModel
     address = location.href
     @socket = io.connect address
 
-    @addLine "websocket connecting to #{address}"
+    @addLine c "websocket connecting to #{address}", 'grey'
 
     $(window).resize @setLayout
     @setLayout()
@@ -28,11 +31,10 @@ class MooViewModel
       @addLine data.msg
 
     @socket.on 'disconnect', =>
-      @addLine 'Disconnected from server.  Attemping to reconnect...'
+      @addLine c 'Disconnected from server.  Attemping to reconnect...', 'bold red'
 
     @socket.on 'requestFormInput', (data) =>
-      Avgrund.show "#default-popup"
-      $('.command input').blur()
+      console.log "form input requested!"
 
   setLayout: ->
     input = $ '.command input'

@@ -1,11 +1,8 @@
 extends layout
 
 block content
-  aside#default-popup.avgrund-popup
-    p this is a test!
-  .avgrund-contents
-    .screen(data-bind='foreach: lines')
-      div(data-bind='html: $data')
-    .command
-      form(data-bind='submit: sendCommand')
-        input(type='text', data-bind="value: command, event: {keyup: recall}")
+  .screen(data-bind='foreach: lines')
+    div(data-bind='html: $data')
+  .command
+    form(data-bind='submit: sendCommand')
+      input(type='text', data-bind="value: command, event: {keyup: recall}")
