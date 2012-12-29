@@ -1,3 +1,7 @@
+#= require js/jquery-ui-1.9.2.custom.min
+#= require js/jquery.layout.min
+#= require js/knockout
+
 c = (str, styles) ->
   "<span class='#{styles}'>#{str}</span>"
 

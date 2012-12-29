@@ -5,10 +5,10 @@
   "dependencies": {
     "express": "*",
     "jade": "*",
-    "less-middleware": "*",
     "socket.io": "*",
     "coffee-script": "*",
-    "connect-coffee-script": "*",
-    "underscore": "*"
+    "less": "*",
+    "underscore": "*",
+    "mincer": "*"
   }
 }

@@ -6,13 +6,16 @@ vm = require 'vm'
 express = require 'express'
 http = require 'http'
 io = require 'socket.io'
-less = require 'less-middleware'
-coffeescript = require 'coffee-script'
-coffeescript_middleware = require 'connect-coffee-script'
+Mincer  = require 'mincer'
+
 c = require('./lib/color').color
 parse = require('./lib/parser').parse
 db = require('./lib/moo').db
 util = require './lib/util'
+
+environment = new Mincer.Environment()
+environment.appendPath 'assets'
+environment.appendPath 'vendor/assets'
 
 xp = express()
 
@@ -21,14 +24,7 @@ xp.configure ->
   xp.set 'views', __dirname + '/views'
   xp.set 'view engine', 'jade'
   xp.use express.favicon()
-  xp.use less
-    src: __dirname + '/public_src'
-    dest: __dirname + '/public'
-  xp.use coffeescript_middleware
-    src: __dirname + '/public_src'
-    dest: __dirname + '/public'
-    bare: true
-  xp.use express.static __dirname + '/public'
+  xp.use '/assets', Mincer.createServer environment
 
 xp.get '/', (req, res) ->
   res.render 'index'
