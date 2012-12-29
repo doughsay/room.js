@@ -25,10 +25,24 @@ class MooViewModel
     @input = $('.command input')
 
     @body.layout
-      center__onresize: @setSizes
-      west__maxSize: 500
-      west__minSize: 50
-      west__slidable: false
+      livePaneResizing: true
+      west:
+        maxSize: '50%'
+        minSize: 100
+        slidable: false
+        initHidden: true
+      center:
+        childOptions:
+          livePaneResizing: true
+          north:
+            paneSelector: '.ui-layout-inner-north'
+            maxSize: '50%'
+            minSize: 200
+            slidable: false
+            initHidden: true
+          center:
+            paneSelector: '.ui-layout-inner-center'
+            onresize: @setSizes
 
     @setSizes()
 
@@ -48,8 +62,8 @@ class MooViewModel
   setSizes: ->
     input = $('.command input')
     inputWidthDiff = input.outerWidth() - input.width()
-    input.width($('.ui-layout-center').width() - inputWidthDiff)
-    $('.screen').height($('.ui-layout-center').height() - input.outerHeight())
+    input.width($('.ui-layout-inner-center').width() - inputWidthDiff)
+    $('.screen').height($('.ui-layout-inner-center').height() - input.outerHeight())
 
   scrollToBottom: ->
     $('.screen').scrollTop($('.screen')[0].scrollHeight);

@@ -2,10 +2,17 @@ extends layout
 
 block content
   .ui-layout-center
-    .screen(data-bind='foreach: lines')
-      div(data-bind='html: $data')
-    .command
-      form(data-bind='submit: sendCommand')
-        input(type='text', data-bind="value: command, event: {keydown: recall}")
+    .ui-layout-inner-center
+      .screen(data-bind='foreach: lines')
+        div(data-bind='html: $data')
+      .command
+        form(data-bind='submit: sendCommand')
+          input(type='text', data-bind="value: command, event: {keydown: recall}")
+    .ui-layout-inner-north
+      p this is the property and code editing area
   .ui-layout-west
-    p foo?
+    ul
+      li this
+      li is the
+      li list of
+      li moo objects
