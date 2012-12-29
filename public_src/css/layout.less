@@ -1,0 +1,26 @@
+.ui-layout-pane {
+  background-color: black;
+  color: @light_white;
+  overflow: hidden;
+}
+
+.ui-layout-resizer {
+  background: @grey;
+
+  &.ui-layout-resizer-open-hover,
+  &.ui-layout-resizer-dragging {
+    background-color: @light_blue;
+
+    &.ui-layout-resizer-dragging-limit {
+      background-color: @light_red;
+    }
+  }
+
+  .ui-layout-toggler {
+    background-color: @light_white;
+
+    &.ui-layout-toggler-hover {
+      background-color: @light_yellow;
+    }
+  }
+}

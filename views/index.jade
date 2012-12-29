@@ -1,8 +1,11 @@
 extends layout
 
 block content
-  .screen(data-bind='foreach: lines')
-    div(data-bind='html: $data')
-  .command
-    form(data-bind='submit: sendCommand')
-      input(type='text', data-bind="value: command, event: {keydown: recall}")
+  .ui-layout-center
+    .screen(data-bind='foreach: lines')
+      div(data-bind='html: $data')
+    .command
+      form(data-bind='submit: sendCommand')
+        input(type='text', data-bind="value: command, event: {keydown: recall}")
+  .ui-layout-west
+    p foo?

@@ -20,12 +20,21 @@ class MooViewModel
 
     @addLine c "websocket connecting to #{address}", 'grey'
 
-    $(window).resize @setLayout
-    @setLayout()
+    @body = $('body')
+    @screen = $('.screen')
+    @input = $('.command input')
 
-    $('.screen').click ->
-      $('.command input').focus()
-    $('.command input').focus()
+    @body.layout
+      center__onresize: @setSizes
+      west__maxSize: 500
+      west__minSize: 50
+      west__slidable: false
+
+    @setSizes()
+
+    @screen.click =>
+      @input.focus()
+    @input.focus()
 
     @socket.on 'output', (data) =>
       @addLine data.msg
@@ -36,11 +45,11 @@ class MooViewModel
     @socket.on 'requestFormInput', (data) =>
       console.log "form input requested!"
 
-  setLayout: ->
-    input = $ '.command input'
+  setSizes: ->
+    input = $('.command input')
     inputWidthDiff = input.outerWidth() - input.width()
-    input.width $(window).width() - inputWidthDiff
-    $('.screen').height $(window).height() - input.outerHeight()
+    input.width($('.ui-layout-center').width() - inputWidthDiff)
+    $('.screen').height($('.ui-layout-center').height() - input.outerHeight())
 
   scrollToBottom: ->
     $('.screen').scrollTop($('.screen')[0].scrollHeight);
