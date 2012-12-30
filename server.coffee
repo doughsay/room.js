@@ -14,8 +14,13 @@ db = require('./lib/moo').db
 util = require './lib/util'
 
 environment = new Mincer.Environment()
-environment.appendPath 'assets'
-environment.appendPath 'vendor/assets'
+environment.appendPath 'assets/js'
+environment.appendPath 'assets/css'
+environment.appendPath 'assets/img'
+environment.appendPath 'vendor/assets/js'
+environment.appendPath 'vendor/assets/css'
+environment.appendPath 'vendor/assets/css/bootstrap'
+environment.appendPath 'vendor/assets/img'
 
 xp = express()
 
