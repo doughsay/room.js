@@ -1,3 +1,5 @@
+fs = require 'fs'
+sys = require 'sys'
 _ = require 'underscore'
 
 # A MOO DB is a collection of Moo Objects
@@ -6,14 +8,28 @@ class MooDB
 
   constructor: (@objects = {}) ->
 
-  load: (db) ->
-    for o in db
+  loadSync: (filename) ->
+    sys.puts "loading..."
+    db = JSON.parse fs.readFileSync filename
+    for id,o of db
       newMooObj = new MooObject o.id, o.parent_id, o.name, o.aliases, o.location_id, o.contents_ids
-      for key, value of o.properties
-        newMooObj.addProperty key, value
+      for prop in o.properties
+        newMooObj.addProperty prop.key, prop.value
       for v in o.verbs
         newMooObj.addVerb v.name, v.dobjarg, v.preparg, v.iobjarg, v.code
       @objects[parseInt(o.id)] = newMooObj
+    sys.puts "done."
+
+  save: (filename) ->
+    sys.puts "saving... not!"
+
+  saveSync: (filename) ->
+    sys.puts "saving..."
+    fs.writeFileSync filename, db.serialize()
+    sys.puts "done."
+
+  serialize: ->
+    JSON.stringify @objects
 
   findById: (id) ->
     if @objects[id] then @objects[id] else null
@@ -80,6 +96,11 @@ class MooObject
 
   toString: ->
     "[MooObject #{@name}]"
+
+  toJSON: ->
+    clone = _.clone @
+    clone.socket = undefined
+    return clone
 
   addProperty: (key, value) ->
     @properties.push new MooProperty key, value
@@ -233,141 +254,7 @@ class MooVerb
         return false if context.prepstr != @preparg
     true
 
-serializedDb = [
-  {
-    id: 1
-    parent_id: null
-    name: 'root'
-    aliases: []
-    location_id: null
-    contents_ids: []
-    properties: {}
-    verbs: []
-  },
-  {
-    id: 2
-    parent_id: 1
-    name: 'root user'
-    aliases: []
-    location_id: 5
-    contents_ids: []
-    properties: {}
-    verbs: []
-  },
-  {
-    id: 3
-    parent_id: 1
-    name: 'generic room'
-    aliases: ['room']
-    location_id: null
-    contents_ids: []
-    properties: {
-      description: 'A generic room.'
-    }
-    verbs: [
-      {
-        name: 'look'
-        dobjarg: 'none'
-        preparg: 'none'
-        iobjarg: 'none'
-        code:"""
-          var loc = player.location();
-          player.send("\\n"+c(loc.name, 'yellow bold'));
-          player.send(loc.prop('description'));
-          player.send(c('You see here:', 'cyan'));
-          var contents = loc.contents();
-          for(var i = 0; i < contents.length; i++) {
-            player.send(c(contents[i].name, 'cyan'));
-          }
-        """
-      }
-    ]
-  },
-  {
-    id: 4
-    parent_id: 1
-    name: 'generic item'
-    aliases: ['item']
-    location_id: null
-    contents_ids: []
-    properties: {
-      description: 'A generic item.'
-    }
-    verbs: [
-      {
-        name: 'examine'
-        dobjarg: 'this'
-        preparg: 'none'
-        iobjarg: 'none'
-        code:"""
-          player.send("\\n" + self.prop('description'));
-        """
-      },
-      {
-        name: 'get'
-        dobjarg: 'this'
-        preparg: 'none'
-        iobjarg: 'none'
-        code:"""
-          self.moveTo(player);
-          player.send("\\nYou pick up the " + self.name);
-        """
-      },
-      {
-        name: 'drop'
-        dobjarg: 'this'
-        preparg: 'none'
-        iobjarg: 'none'
-        code:"""
-          self.moveTo(player.location());
-          player.send("\\nYou drop the " + self.name);
-        """
-      }
-    ]
-  },
-  {
-    id: 5
-    parent_id: 3
-    name: 'A forest clearing'
-    aliases: ['clearing']
-    location_id: null
-    contents_ids: [2, 6]
-    properties: {
-      description: 'The forest thins out here a bit.'
-    }
-    verbs: []
-  },
-  {
-    id: 6
-    parent_id: 4
-    name: 'wooden sword'
-    aliases: ['sword']
-    location_id: 5
-    contents_ids: []
-    properties: {
-      description: 'A simple wooden sword.'
-    }
-    verbs: [
-      {
-        name: 'swing'
-        dobjarg: 'this'
-        preparg: 'none'
-        iobjarg: 'none'
-        code:"""
-          if(self.location() == player) {
-            var loc = player.location();
-            player.send("\\nYou swing the wooden sword around. You look a bit silly.");
-          }
-          else {
-            player.send("\\nYou're not holding the sword.");
-          }
-        """
-      }
-    ]
-  }
-]
-
 db = new MooDB
-db.load serializedDb
+db.loadSync 'db.json'
 
 exports.db = db

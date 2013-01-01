@@ -95,3 +95,7 @@ ws_server.sockets.on 'connection', (socket) ->
           rootUser.send c "\nConnected as ROOT.", 'red bold'
         else
           socket.emit 'output', {msg: "\nUnrecognized command. Type #{c 'help', 'magenta bold'} for a list of available commands."}
+
+process.on 'SIGINT', ->
+  db.saveSync('db.json')
+  process.exit()
