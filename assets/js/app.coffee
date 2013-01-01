@@ -5,10 +5,10 @@
 #= require knockout
 #= require codemirror
 
-c = (str, styles) ->
-  "<span class='#{styles}'>#{str}</span>"
-
 class MooViewModel
+
+  c = (str, styles) ->
+    "<span class='#{styles}'>#{str}</span>"
 
   lines: ko.observableArray []
   maxLines: ko.observable 1000
@@ -82,13 +82,13 @@ class MooViewModel
     @scrollToBottom()
 
   sendCommand: ->
-    c = @command()
-    if c
+    command = @command()
+    if command
       @history.unshift c
       if @history.length > @maxHistory()
         @history.pop()
       @currentHistory = -1
-      @socket.emit 'input', {msg: c}
+      @socket.emit 'input', {msg: command}
       @command ""
 
   recall: (_, e) ->
