@@ -1,17 +1,15 @@
-##############
-# Web server #
-##############
-
 vm = require 'vm'
 express = require 'express'
 http = require 'http'
 io = require 'socket.io'
 Mincer  = require 'mincer'
+_ = require 'underscore'
 
 c = require('./lib/color').color
 parse = require('./lib/parser').parse
 db = require('./lib/moo').db
 util = require './lib/util'
+contextBuilder = require './lib/context'
 
 environment = new Mincer.Environment()
 environment.appendPath 'assets/js'
@@ -47,7 +45,7 @@ ws_server.sockets.on 'connection', (socket) ->
   socket.emit 'output', {msg: "Type #{c 'help', 'magenta bold'} for a list of available commands."}
 
   socket.on 'disconnect', ->
-    # TODO (or not?  we don't care if an anonymous socket leaves...)
+    # TODO (when a socket disconnects, put the player in limbo)
 
   socket.on 'input', (data) ->
     str = data.msg
@@ -55,6 +53,8 @@ ws_server.sockets.on 'connection', (socket) ->
       player = socket.player
       command = parse str
       [verb, context] = db.buildContextForCommand player, command
+      baseContext = contextBuilder.buildBaseContext()
+      context = _(baseContext).extend context
       if verb?
         vm.runInNewContext verb.code, context
       else

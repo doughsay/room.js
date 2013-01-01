@@ -1,5 +1,4 @@
 _ = require 'underscore'
-c = require('./color').color
 
 # A MOO DB is a collection of Moo Objects
 class MooDB
@@ -23,8 +22,9 @@ class MooDB
     @findById parseInt numStr.match(/^#([0-9]+)$/)[1]
 
   buildContextForCommand: (player, command) ->
-    context = _({c: c}).extend @findCommandObjects(player, command), command
-    verb = @findVerb context
+    context = _({}).extend @findCommandObjects(player, command), command
+    [verb, self] = @findVerb context
+    context.self = self
     [verb, context]
 
   # find the objects matched by the command
@@ -42,7 +42,6 @@ class MooDB
     return @findByNum search if search.match /^#[0-9]+$/
     @findNearby search, player
 
-
   # find objects "nearby"
   # i.e. the room, objects the player is holding, or objects in the room
   findNearby: (search, player) ->
@@ -56,15 +55,15 @@ class MooDB
 
   findVerb: (context) ->
     if context.player.respondsTo context
-      context.player.findVerb context
+      [context.player.findVerb(context), context.player]
     if context.player.location_id? && context.player.location().respondsTo context
-      context.player.location().findVerb context
+      [context.player.location().findVerb(context), context.player.location()]
     else if context.dobj? && context.dobj.respondsTo context
-      context.dobj.findVerb context
+      [context.dobj.findVerb(context), context.dobj]
     else if context.iobj? && context.iobj.respondsTo context
-      context.iobj.findVerb context
+      [context.iobj.findVerb(context), context.iobj]
     else
-      null
+      [null, null]
 
 # A Moo Object has properties and verbs
 class MooObject
@@ -99,6 +98,13 @@ class MooObject
       db.findById @location_id
     else
       null
+
+  moveTo: (target) ->
+    loc = @location()
+    loc.contents_ids = loc.contents_ids.filter (id) =>
+      id != @id
+    target.contents_ids.push @id
+    @location_id = target.id
 
   contents: ->
     @contents_ids.map (id) -> db.findById id
@@ -143,8 +149,8 @@ class MooObject
     for verb in @verbs
       if verb.matchesContext context
         return verb
-      else if @parent_id
-        return @parent().findVerb context
+    if @parent_id
+      return @parent().findVerb context
     return null
 
   # player specific methods
@@ -208,7 +214,7 @@ class MooVerb
         return false if not context.dobj?
       when 'this'
         # TODO
-        return false
+        return true
     switch @iobjarg
       when 'none'
         return false if context.iobj?
@@ -216,7 +222,7 @@ class MooVerb
         return false if not context.dobj?
       when 'this'
         # TODO
-        return false
+        return true
     switch @preparg
       when 'none'
         return false if context.prepstr?
@@ -236,24 +242,14 @@ serializedDb = [
     location_id: null
     contents_ids: []
     properties: {}
-    verbs: [
-      {
-        name: 'examine'
-        dobjarg: 'any'
-        preparg: 'none'
-        iobjarg: 'none'
-        code:"""
-          player.send("\\nIt looks uninteresting.")
-        """
-      }
-    ]
+    verbs: []
   },
   {
     id: 2
     parent_id: 1
     name: 'root user'
     aliases: []
-    location_id: 3
+    location_id: 5
     contents_ids: []
     properties: {}
     verbs: []
@@ -264,7 +260,7 @@ serializedDb = [
     name: 'generic room'
     aliases: ['room']
     location_id: null
-    contents_ids: [2]
+    contents_ids: []
     properties: {
       description: 'A generic room.'
     }
@@ -275,8 +271,96 @@ serializedDb = [
         preparg: 'none'
         iobjarg: 'none'
         code:"""
-          var loc = player.location()
-          player.send("\\n"+c(loc.name, 'yellow bold') + "\\n" + loc.prop('description'))
+          var loc = player.location();
+          player.send("\\n"+c(loc.name, 'yellow bold'));
+          player.send(loc.prop('description'));
+          player.send(c('You see here:', 'cyan'));
+          var contents = loc.contents();
+          for(var i = 0; i < contents.length; i++) {
+            player.send(c(contents[i].name, 'cyan'));
+          }
+        """
+      }
+    ]
+  },
+  {
+    id: 4
+    parent_id: 1
+    name: 'generic item'
+    aliases: ['item']
+    location_id: null
+    contents_ids: []
+    properties: {
+      description: 'A generic item.'
+    }
+    verbs: [
+      {
+        name: 'examine'
+        dobjarg: 'this'
+        preparg: 'none'
+        iobjarg: 'none'
+        code:"""
+          player.send("\\n" + self.prop('description'));
+        """
+      },
+      {
+        name: 'get'
+        dobjarg: 'this'
+        preparg: 'none'
+        iobjarg: 'none'
+        code:"""
+          self.moveTo(player);
+          player.send("\\nYou pick up the " + self.name);
+        """
+      },
+      {
+        name: 'drop'
+        dobjarg: 'this'
+        preparg: 'none'
+        iobjarg: 'none'
+        code:"""
+          self.moveTo(player.location());
+          player.send("\\nYou drop the " + self.name);
+        """
+      }
+    ]
+  },
+  {
+    id: 5
+    parent_id: 3
+    name: 'A forest clearing'
+    aliases: ['clearing']
+    location_id: null
+    contents_ids: [2, 6]
+    properties: {
+      description: 'The forest thins out here a bit.'
+    }
+    verbs: []
+  },
+  {
+    id: 6
+    parent_id: 4
+    name: 'wooden sword'
+    aliases: ['sword']
+    location_id: 5
+    contents_ids: []
+    properties: {
+      description: 'A simple wooden sword.'
+    }
+    verbs: [
+      {
+        name: 'swing'
+        dobjarg: 'this'
+        preparg: 'none'
+        iobjarg: 'none'
+        code:"""
+          if(self.location() == player) {
+            var loc = player.location();
+            player.send("\\nYou swing the wooden sword around. You look a bit silly.");
+          }
+          else {
+            player.send("\\nYou're not holding the sword.");
+          }
         """
       }
     ]
