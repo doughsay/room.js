@@ -1,5 +1,5 @@
 fs = require 'fs'
-sys = require 'sys'
+util = require 'util'
 _ = require 'underscore'
 
 # A MOO DB is a collection of Moo Objects
@@ -9,7 +9,7 @@ class MooDB
   constructor: (@objects = {}) ->
 
   loadSync: (filename) ->
-    sys.puts "loading..."
+    util.print "loading... "
     db = JSON.parse fs.readFileSync filename
     for id,o of db
       newMooObj = new MooObject o.id, o.parent_id, o.name, o.aliases, o.location_id, o.contents_ids
@@ -18,15 +18,15 @@ class MooDB
       for v in o.verbs
         newMooObj.addVerb v.name, v.dobjarg, v.preparg, v.iobjarg, v.code
       @objects[parseInt(o.id)] = newMooObj
-    sys.puts "done."
+    util.puts "done."
 
   save: (filename) ->
-    sys.puts "saving... not!"
+    util.puts "saving... not!"
 
   saveSync: (filename) ->
-    sys.puts "saving..."
+    util.print "saving... "
     fs.writeFileSync filename, db.serialize()
-    sys.puts "done."
+    util.puts "done."
 
   serialize: ->
     JSON.stringify @objects

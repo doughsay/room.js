@@ -1,3 +1,4 @@
+util = require 'util'
 vm = require 'vm'
 express = require 'express'
 http = require 'http'
@@ -8,7 +9,7 @@ _ = require 'underscore'
 c = require('./lib/color').color
 parse = require('./lib/parser').parse
 db = require('./lib/moo').db
-util = require './lib/util'
+mooUtil = require './lib/util'
 contextBuilder = require './lib/context'
 
 environment = new Mincer.Environment()
@@ -31,9 +32,6 @@ xp.configure ->
 
 xp.get '/', (req, res) ->
   res.render 'index'
-
-xp.get '/colors', (req, res) ->
-  res.render 'color_test'
 
 http_server = http.createServer(xp).listen xp.get('port'), ->
   console.log "jsmoo http server listening on port " + xp.get 'port'
@@ -58,7 +56,7 @@ ws_server.sockets.on 'connection', (socket) ->
       if verb?
         vm.runInNewContext verb.code, context
       else
-        player.send c("\nI didn't understand that.", 'grey')# + util.print command
+        player.send c("\nI didn't understand that.", 'grey')# + mooUtil.print command
     else
       switch str
         when "help"
@@ -97,5 +95,6 @@ ws_server.sockets.on 'connection', (socket) ->
           socket.emit 'output', {msg: "\nUnrecognized command. Type #{c 'help', 'magenta bold'} for a list of available commands."}
 
 process.on 'SIGINT', ->
+  util.puts ""
   db.saveSync('db.json')
   process.exit()
