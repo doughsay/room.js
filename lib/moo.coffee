@@ -38,16 +38,20 @@ class MooDB
     @findById parseInt numStr.match(/^#([0-9]+)$/)[1]
 
   buildContextForCommand: (player, command) ->
-    context = _({}).extend @findCommandObjects(player, command), command
-    [verb, self] = @findVerb context
-    context.self = self
+    context = {}
+    for key,val of command
+      context["$#{key}"] = val
+    context = _.extend context, @findCommandObjects(player, command)
+    [verb, $this] = @findVerb context
+    context.$this = $this
     [verb, context]
 
   # find the objects matched by the command
   findCommandObjects: (player, command) ->
-    player: player
-    dobj: if command.dobjstr? then @findObject command.dobjstr, player else null
-    iobj: if command.iobjstr? then @findObject command.iobjstr, player else null
+    $player: player
+    $here: player.location()
+    $dobj: if command.dobjstr? then @findObject command.dobjstr, player else null
+    $iobj: if command.iobjstr? then @findObject command.iobjstr, player else null
 
   # search string can be:
   # 'me', 'here', '#123' (an object number),
@@ -70,14 +74,14 @@ class MooDB
     return null
 
   findVerb: (context) ->
-    if context.player.respondsTo context
-      [context.player.findVerb(context), context.player]
-    if context.player.location_id? && context.player.location().respondsTo context
-      [context.player.location().findVerb(context), context.player.location()]
-    else if context.dobj? && context.dobj.respondsTo context
-      [context.dobj.findVerb(context), context.dobj]
-    else if context.iobj? && context.iobj.respondsTo context
-      [context.iobj.findVerb(context), context.iobj]
+    if context.$player.respondsTo context
+      [context.$player.findVerb(context), context.$player]
+    if context.$here.respondsTo context
+      [context.$here.findVerb(context), context.$here]
+    else if context.$dobj? && context.$dobj.respondsTo context
+      [context.$dobj.findVerb(context), context.$dobj]
+    else if context.$iobj? && context.$iobj.respondsTo context
+      [context.$iobj.findVerb(context), context.$iobj]
     else
       [null, null]
 
@@ -227,31 +231,31 @@ class MooVerb
 
   # does this verb match the context?
   matchesContext: (context) ->
-    return false if not @matches context.verb
+    return false if not @matches context.$verb
     switch @dobjarg
       when 'none'
-        return false if context.dobj?
+        return false if context.$dobj?
       when 'any'
-        return false if not context.dobj?
+        return false if not context.$dobj?
       when 'this'
         # TODO
         return true
     switch @iobjarg
       when 'none'
-        return false if context.iobj?
+        return false if context.$iobj?
       when 'any'
-        return false if not context.dobj?
+        return false if not context.$dobj?
       when 'this'
         # TODO
         return true
     switch @preparg
       when 'none'
-        return false if context.prepstr?
+        return false if context.$prepstr?
       when 'any'
-        return false if not context.prepstr?
+        return false if not context.$prepstr?
       else
         # TODO: improve this?  e.g. 'with' and 'using' are interchangeable.
-        return false if context.prepstr != @preparg
+        return false if context.$prepstr != @preparg
     true
 
 db = new MooDB
