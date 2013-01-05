@@ -4,9 +4,11 @@
 #= require bootstrap
 #= require knockout
 #= require codemirror
+#= require compiled_templates
 
 class MooViewModel
 
+  # apply styles to a string using a span
   c = (str, styles) ->
     "<span class='#{styles}'>#{str}</span>"
 
@@ -14,23 +16,37 @@ class MooViewModel
   maxLines: ko.observable 1000
 
   history: []
-  maxHistory: ko.observable 1000
   currentHistory: -1
+  maxHistory: ko.observable 1000
 
   command: ko.observable ""
 
   socket: null
 
-  constructor: ->
+  # construct the view model
+  constructor: (@body, @screen, @input) ->
+    @connect()
+    @attachListeners()
+    @setLayout()
+    @setSizes()
+    @focusInput()
+
+  # connect websocket to the server
+  connect: ->
     address = location.href
     @socket = io.connect address
-
     @addLine c "websocket connecting to #{address}", 'grey'
 
-    @body = $('body')
-    @screen = $('.screen')
-    @input = $('.command input')
+  # attach the websocket event listeners
+  attachListeners: ->
+    @socket.on 'output', @output
+    @socket.on 'disconnect', @disconnect
+    @socket.on 'requestFormInput', @requestFormInput
 
+  # build the jqeury ui layout
+  # this is only used when signed in as a programmer
+  # the panes are hidden by default
+  setLayout: ->
     @body.layout
       livePaneResizing: true
       west:
@@ -51,46 +67,42 @@ class MooViewModel
             paneSelector: '.ui-layout-inner-center'
             onresize: @setSizes
 
-    @setSizes()
-
-    @screen.click =>
-      @input.focus()
-    @input.focus()
-
-    @socket.on 'output', (data) =>
-      @addLine data.msg
-
-    @socket.on 'disconnect', =>
-      @addLine c 'Disconnected from server.  Attemping to reconnect...', 'bold red'
-
-    @socket.on 'requestFormInput', (data) =>
-      console.log "form input requested!"
-
+  # apply proper sizes to the input and the screen div
   setSizes: ->
-    input = $('.command input')
-    inputWidthDiff = input.outerWidth() - input.width()
-    input.width($('.ui-layout-inner-center').width() - inputWidthDiff)
-    $('.screen').height($('.ui-layout-inner-center').height() - input.outerHeight())
+    inputWidthDiff = @input.outerWidth() - @input.width()
+    @input.width($('.ui-layout-inner-center').width() - inputWidthDiff)
+    @screen.height($('.ui-layout-inner-center').height() - @input.outerHeight())
 
+  # scroll the screen to the bottom
   scrollToBottom: ->
-    $('.screen').scrollTop($('.screen')[0].scrollHeight);
+    @screen.scrollTop(@screen[0].scrollHeight);
 
+  # add a line of output from the server to the screen
   addLine: (line) ->
     @lines.push line
     if @lines().length > @maxLines()
       @lines.shift()
     @scrollToBottom()
 
+  # give focus to the command input element
+  focusInput: ->
+    @input.focus()
+
+  # send the entered command to the server
+  # and add it to the command history
   sendCommand: ->
     command = @command()
     if command
-      @history.unshift c
+      @history.unshift command
       if @history.length > @maxHistory()
         @history.pop()
       @currentHistory = -1
       @socket.emit 'input', {msg: command}
       @command ""
 
+  # given a javascript event for the 'up' or 'down' keys
+  # scroll through history and fill the input box with
+  # the selected command
   recall: (_, e) ->
     switch e.which
       when 38 # up
@@ -111,5 +123,31 @@ class MooViewModel
       else
         true
 
+  # websocket event listeners:
+
+  # output event
+  # adds a line of output to the screen
+  output: (data) =>
+    @addLine data.msg
+
+  # disconnect event
+  disconnect: =>
+    @addLine c 'Disconnected from server.  Attemping to reconnect...', 'bold red'
+
+  # requestFormInput event
+  # the server has requested some form input
+  # so we display a modal with a dynamically
+  # constructed form
+  requestFormInput: (formDescriptor) =>
+    # precompiled jade template from views/modal_form.jade
+    form = $ jade.templates.modal_form form: formDescriptor
+    form.modal()
+    form.on 'shown', ->
+      form.find('input').first().focus()
+    form.on 'hidden', =>
+      form.remove()
+      @focusInput()
+
+# on dom ready, create the view model and apply the knockout bindings
 $ ->
-  ko.applyBindings new MooViewModel
+  ko.applyBindings new MooViewModel $('body'), $('.screen'), $('.command input')

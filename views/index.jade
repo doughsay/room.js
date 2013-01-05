@@ -3,7 +3,7 @@ extends layout
 block content
   .ui-layout-center
     .ui-layout-inner-center
-      .screen(data-bind='foreach: lines')
+      .screen(data-bind='foreach: lines, click: focusInput')
         div(data-bind='html: $data')
       .command
         form(data-bind='submit: sendCommand')

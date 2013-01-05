@@ -1,0 +1,13 @@
+.modal.fade
+  .modal-header
+    h3= form.title
+  .modal-body
+    form.form-horizontal
+      for input in form.inputs
+        .control-group
+          label.control-label(for=input.name)= input.label
+          .controls
+            input(type=input.type, placeholder=input.label)
+  .modal-footer
+    a.btn(href='#') Cancel
+    a.btn.btn-primary(href='#')= form.submit

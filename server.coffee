@@ -68,18 +68,24 @@ ws_server.sockets.on 'connection', (socket) ->
           """
           socket.emit 'output', {msg: msg}
         when "login"
-          socket.emit 'requestFormInput', [
-            {type: 'string', name: 'username', label: 'Username'},
-            {type: 'password', name: 'password', label: 'Password'},
-            {type: 'button', label: 'Login'}
-          ]
+          form =
+            title: "Login"
+            inputs: [
+              {type: 'text', name: 'username', label: 'Username'},
+              {type: 'password', name: 'password', label: 'Password'}
+            ]
+            submit: 'Login'
+          socket.emit 'requestFormInput', form
         when "create"
-          socket.emit 'requestFormInput', [
-            {type: 'string', name: 'username', label: 'Username'},
-            {type: 'password', name: 'password', label: 'Password'},
-            {type: 'password', name: 'password2', label: 'Confirm Password'},
-            {type: 'button', label: 'Create'}
-          ]
+          form =
+            title: "Create an Account"
+            inputs: [
+              {type: 'text', name: 'username', label: 'Username'},
+              {type: 'password', name: 'password', label: 'Password'},
+              {type: 'password', name: 'password2', label: 'Confirm Password'},
+            ]
+            submit: 'Create'
+          socket.emit 'requestFormInput', form
         when "root"
           rootUser = db.findById(2)
 
