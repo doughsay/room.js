@@ -28,24 +28,25 @@ class MooViewModel
 
   # construct the view model
   constructor: (@body, @screen, @input) ->
-    @connect()
+    @socket = io.connect()
     @attachListeners()
     @setLayout()
     @setSizes()
     @focusInput()
 
-  # connect websocket to the server
-  connect: ->
-    address = location.href
-    @socket = io.connect address
-    @addLine c "websocket connecting to #{address}", 'grey'
-
   # attach the websocket event listeners
   attachListeners: ->
-    @socket.on 'output', @output
+    @socket.on 'connect', @connect
+    @socket.on 'connecting', @connecting
     @socket.on 'disconnect', @disconnect
+    @socket.on 'connect_failed', @connect_failed
+    @socket.on 'error', @error
+    @socket.on 'reconnect_failed', @reconnect_failed
+    @socket.on 'reconnect', @reconnect
+    @socket.on 'reconnecting', @reconnecting
+
+    @socket.on 'output', @output
     @socket.on 'requestFormInput', @requestFormInput
-    @socket.on 'list_output', @listOutput
 
   # build the jqeury ui layout
   # this is only used when signed in as a programmer
@@ -138,14 +139,34 @@ class MooViewModel
 
   # websocket event listeners:
 
+  connect: =>
+    @addLine c 'Connected!', 'bold green'
+
+  connecting: =>
+    @addLine c "Connecting...", 'grey'
+
+  disconnect: =>
+    @addLine c 'Disconnected from server.', 'bold red'
+
+  connect_failed: =>
+    @addLine c 'Connection to server failed.', 'bold red'
+
+  error: =>
+    @addLine c 'An unknown error occurred.', 'bold red'
+
+  reconnect_failed: =>
+    @addLine c 'Unable to reconnect to server.', 'bold red'
+
+  reconnect: =>
+  #  @addLine c 'Reconnected!', 'bold green'
+
+  reconnecting: =>
+    @addLine c "Attempting to reconnect...", 'grey'
+
   # output event
   # adds a line of output to the screen
   output: (data) =>
     @addLine data.msg
-
-  # disconnect event
-  disconnect: =>
-    @addLine c 'Disconnected from server.  Attemping to reconnect...', 'bold red'
 
   # requestFormInput event
   # the server has requested some form input
