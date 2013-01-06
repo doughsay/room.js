@@ -5,6 +5,7 @@ http = require 'http'
 io = require 'socket.io'
 Mincer  = require 'mincer'
 _ = require 'underscore'
+repl = require 'repl'
 
 c = require('./lib/color').color
 parse = require('./lib/parser').parse
@@ -38,6 +39,9 @@ http_server = http.createServer(xp).listen xp.get('port'), ->
   console.log "jsmoo http server listening on port " + xp.get 'port'
 
 ws_server = io.listen(http_server, {log: false})
+
+# for debugging.  Note: Ctrl-D first to close the REPL then Ctrl-C to stop the moo.
+# repl.start().context.db = db
 
 ws_server.sockets.on 'connection', (socket) ->
   socket.emit 'output', {msg: "Welcome to #{c 'jsmoo', 'blue bold'}!"}
@@ -99,6 +103,12 @@ ws_server.sockets.on 'connection', (socket) ->
     formDescriptor = formDescriptors.createAccount()
     formDescriptor.error = 'Not yet implemented.'
     socket.emit 'requestFormInput', formDescriptor
+
+  socket.on 'request_list', (data) ->
+    socket.emit 'list_output', list: db.list()
+
+  socket.on 'request_tree', (data) ->
+    socket.emit 'tree_output', list: db.tree()
 
 process.on 'SIGINT', ->
   util.puts ""

@@ -23,6 +23,9 @@ class MooViewModel
 
   socket: null
 
+  # list of moo objects; used when signed in as a programmer
+  objects: ko.observableArray []
+
   # construct the view model
   constructor: (@body, @screen, @input) ->
     @connect()
@@ -42,6 +45,7 @@ class MooViewModel
     @socket.on 'output', @output
     @socket.on 'disconnect', @disconnect
     @socket.on 'requestFormInput', @requestFormInput
+    @socket.on 'list_output', @listOutput
 
   # build the jqeury ui layout
   # this is only used when signed in as a programmer
@@ -65,7 +69,7 @@ class MooViewModel
             initHidden: true
           center:
             paneSelector: '.ui-layout-inner-center'
-            onresize: @setSizes
+            onresize: => @setSizes()
 
   # apply proper sizes to the input and the screen div
   setSizes: ->
@@ -123,6 +127,10 @@ class MooViewModel
       else
         true
 
+  # request a refresh of the moo objects list
+  refresh_objects: ->
+    @socket.emit 'request_list'
+
   # websocket event listeners:
 
   # output event
@@ -153,6 +161,17 @@ class MooViewModel
       @socket.emit "form_input_#{formDescriptor.event}", formData: data
       modal.modal 'hide'
       false # return false to stop the form from actually submitting
+
+  # list_output event
+  # the server has sent us a list of all the moo objects
+  # put it into the observable objects array so knockout
+  # can put it in the dom
+  listOutput: (data) =>
+    @objects data.list.map (o) ->
+      id: o.id
+      name: "##{o.id} - #{o.name}"
+      load: -> # TODO
+        console.log "TODO: load object for editing:", o.id
 
 # on dom ready, create the view model and apply the knockout bindings
 $ ->

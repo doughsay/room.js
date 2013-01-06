@@ -6,18 +6,18 @@ _ = require 'underscore'
 class MooDB
   # @objects: Array[MooObject]
 
-  constructor: (@objects = {}) ->
+  constructor: (@objects = []) ->
 
   loadSync: (filename) ->
     util.print "loading... "
-    db = JSON.parse fs.readFileSync filename
-    for id,o of db
-      newMooObj = new MooObject o.id, o.parent_id, o.name, o.aliases, o.location_id, o.contents_ids
-      for prop in o.properties
-        newMooObj.addProperty prop.key, prop.value
-      for v in o.verbs
-        newMooObj.addVerb v.name, v.dobjarg, v.preparg, v.iobjarg, v.code
-      @objects[parseInt(o.id)] = newMooObj
+    for o in JSON.parse fs.readFileSync filename
+      if o?
+        newMooObj = new MooObject o.id, o.parent_id, o.name, o.aliases, o.location_id, o.contents_ids
+        for prop in o.properties
+          newMooObj.addProperty prop.key, prop.value
+        for v in o.verbs
+          newMooObj.addVerb v.name, v.dobjarg, v.preparg, v.iobjarg, v.code
+        @objects[parseInt(o.id)] = newMooObj
     util.puts "done."
 
   save: (filename) ->
@@ -32,7 +32,7 @@ class MooDB
     JSON.stringify @objects
 
   findById: (id) ->
-    if @objects[id] then @objects[id] else null
+    if @objects[id]? then @objects[id] else null
 
   findByNum: (numStr) ->
     @findById parseInt numStr.match(/^#([0-9]+)$/)[1]
@@ -84,6 +84,27 @@ class MooDB
       [context.$iobj.findVerb(context), context.$iobj]
     else
       [null, null]
+
+  list: ->
+    @objects.filter((o) -> o?).map (o) ->
+      id: o.id
+      name: o.name
+
+  tree: ->
+    children = (o) =>
+      child_os = @objects.filter (other_o) ->
+        other_o.parent_id == o.id
+      child_os.map (child_o) ->
+        id: child_o.id
+        name: child_o.name
+        children: children child_o
+
+    top = @objects.filter (o) ->
+      o? and o.parent_id == null
+    top.map (o) ->
+      id: o.id
+      name: o.name
+      children: children o
 
 # A Moo Object has properties and verbs
 class MooObject

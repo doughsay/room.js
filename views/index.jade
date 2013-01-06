@@ -11,8 +11,8 @@ block content
     .ui-layout-inner-north
       p this is the property and code editing area
   .ui-layout-west
-    ul
-      li this
-      li is the
-      li list of
-      li moo objects
+    button.btn(data-bind='click: refresh_objects')
+      i.icon-refresh
+    ul.nav.nav-list(data-bind='foreach: objects')
+      li
+        a(href='#', data-bind='text: name, click: load')
