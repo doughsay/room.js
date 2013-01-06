@@ -104,8 +104,14 @@ ws_server.sockets.on 'connection', (socket) ->
     formDescriptor.error = 'Not yet implemented.'
     socket.emit 'requestFormInput', formDescriptor
 
-  socket.on 'request_list', (data) ->
-    socket.emit 'list_output', list: db.list()
+  socket.on 'list_objects', (opts = {}, fn) ->
+    if not opts.format?
+      opts.format = 'list'
+    switch opts.format
+      when 'list'
+        fn db.list()
+      when 'tree'
+        fn db.tree()
 
   socket.on 'request_tree', (data) ->
     socket.emit 'tree_output', list: db.tree()

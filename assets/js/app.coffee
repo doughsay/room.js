@@ -127,9 +127,14 @@ class MooViewModel
       else
         true
 
-  # request a refresh of the moo objects list
+  # refresh the moo objects list
   refresh_objects: ->
-    @socket.emit 'request_list'
+    @socket.emit 'list_objects', format: 'list', (list) =>
+      @objects list.map (o) ->
+        id: o.id
+        name: "##{o.id} - #{o.name}"
+        load: -> # TODO
+          console.log "TODO: load object for editing:", o.id
 
   # websocket event listeners:
 
@@ -161,17 +166,6 @@ class MooViewModel
       @socket.emit "form_input_#{formDescriptor.event}", formData: data
       modal.modal 'hide'
       false # return false to stop the form from actually submitting
-
-  # list_output event
-  # the server has sent us a list of all the moo objects
-  # put it into the observable objects array so knockout
-  # can put it in the dom
-  listOutput: (data) =>
-    @objects data.list.map (o) ->
-      id: o.id
-      name: "##{o.id} - #{o.name}"
-      load: -> # TODO
-        console.log "TODO: load object for editing:", o.id
 
 # on dom ready, create the view model and apply the knockout bindings
 $ ->
