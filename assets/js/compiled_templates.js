@@ -189,45 +189,63 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div class="modal fade"><div class="modal-header"><h3>');
+buf.push('<div class="modal fade"><div class="modal-header"><button data-dismiss="modal" class="close">×</button><h3>');
 var __val__ = form.title
 buf.push(escape(null == __val__ ? "" : __val__));
-buf.push('</h3></div><div class="modal-body"><form class="form-horizontal">');
+buf.push('</h3></div><div class="modal-body">');
+if ( form.error)
+{
+buf.push('<div class="alert alert-error"><button data-dismiss="alert" class="close">×</button>');
+var __val__ = form.error
+buf.push(escape(null == __val__ ? "" : __val__));
+buf.push('</div>');
+}
+buf.push('<form id="modalForm" class="form-horizontal">');
 // iterate form.inputs
 ;(function(){
   if ('number' == typeof form.inputs.length) {
     for (var $index = 0, $$l = form.inputs.length; $index < $$l; $index++) {
       var input = form.inputs[$index];
 
-buf.push('<div class="control-group"><label');
+buf.push('<div');
+buf.push(attrs({ "class": (input.error ? 'control-group error' : 'control-group') }, {"class":true}));
+buf.push('><label');
 buf.push(attrs({ 'for':(input.name), "class": ('control-label') }, {"for":true}));
 buf.push('>');
 var __val__ = input.label
 buf.push(escape(null == __val__ ? "" : __val__));
 buf.push('</label><div class="controls"><input');
-buf.push(attrs({ 'type':(input.type), 'placeholder':(input.label) }, {"type":true,"placeholder":true}));
-buf.push('/></div></div>');
+buf.push(attrs({ 'id':(input.name), 'name':(input.name), 'type':(input.type), 'placeholder':(input.label), 'value':(input.value) }, {"id":true,"name":true,"type":true,"placeholder":true,"value":true}));
+buf.push('/><span class="help-inline">');
+var __val__ = input.error
+buf.push(escape(null == __val__ ? "" : __val__));
+buf.push('</span></div></div>');
     }
   } else {
     for (var $index in form.inputs) {
       var input = form.inputs[$index];
 
-buf.push('<div class="control-group"><label');
+buf.push('<div');
+buf.push(attrs({ "class": (input.error ? 'control-group error' : 'control-group') }, {"class":true}));
+buf.push('><label');
 buf.push(attrs({ 'for':(input.name), "class": ('control-label') }, {"for":true}));
 buf.push('>');
 var __val__ = input.label
 buf.push(escape(null == __val__ ? "" : __val__));
 buf.push('</label><div class="controls"><input');
-buf.push(attrs({ 'type':(input.type), 'placeholder':(input.label) }, {"type":true,"placeholder":true}));
-buf.push('/></div></div>');
+buf.push(attrs({ 'id':(input.name), 'name':(input.name), 'type':(input.type), 'placeholder':(input.label), 'value':(input.value) }, {"id":true,"name":true,"type":true,"placeholder":true,"value":true}));
+buf.push('/><span class="help-inline">');
+var __val__ = input.error
+buf.push(escape(null == __val__ ? "" : __val__));
+buf.push('</span></div></div>');
    }
   }
 }).call(this);
 
-buf.push('</form></div><div class="modal-footer"><a href="#" class="btn">Cancel</a><a href="#" class="btn btn-primary">');
+buf.push('</form></div><div class="modal-footer"><button data-dismiss="modal" class="btn">Cancel</button><button type="submit" form="modalForm" class="btn btn-primary">');
 var __val__ = form.submit
 buf.push(escape(null == __val__ ? "" : __val__));
-buf.push('</a></div></div>');
+buf.push('</button></div></div>');
 }
 return buf.join("");
 }

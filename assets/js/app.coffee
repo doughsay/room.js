@@ -140,13 +140,19 @@ class MooViewModel
   # constructed form
   requestFormInput: (formDescriptor) =>
     # precompiled jade template from views/modal_form.jade
-    form = $ jade.templates.modal_form form: formDescriptor
-    form.modal()
-    form.on 'shown', ->
-      form.find('input').first().focus()
-    form.on 'hidden', =>
-      form.remove()
+    modal = $ jade.templates.modal_form form: formDescriptor
+    modal.modal()
+    modal.on 'shown', ->
+      modal.find('input').first().focus()
+    modal.on 'hidden', =>
+      modal.remove()
       @focusInput()
+    form = modal.find('form')
+    form.on 'submit', =>
+      data = form.serializeArray().reduce ((o,c) -> o[c.name] = c.value; o), {}
+      @socket.emit "form_input_#{formDescriptor.event}", formData: data
+      modal.modal 'hide'
+      false # return false to stop the form from actually submitting
 
 # on dom ready, create the view model and apply the knockout bindings
 $ ->

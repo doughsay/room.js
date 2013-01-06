@@ -11,6 +11,7 @@ parse = require('./lib/parser').parse
 db = require('./lib/moo').db
 mooUtil = require './lib/util'
 contextBuilder = require './lib/context'
+formDescriptors = require './lib/forms'
 
 environment = new Mincer.Environment()
 environment.appendPath 'assets/js'
@@ -68,37 +69,36 @@ ws_server.sockets.on 'connection', (socket) ->
           """
           socket.emit 'output', {msg: msg}
         when "login"
-          form =
-            title: "Login"
-            inputs: [
-              {type: 'text', name: 'username', label: 'Username'},
-              {type: 'password', name: 'password', label: 'Password'}
-            ]
-            submit: 'Login'
-          socket.emit 'requestFormInput', form
+          socket.emit 'requestFormInput', formDescriptors.login()
         when "create"
-          form =
-            title: "Create an Account"
-            inputs: [
-              {type: 'text', name: 'username', label: 'Username'},
-              {type: 'password', name: 'password', label: 'Password'},
-              {type: 'password', name: 'password2', label: 'Confirm Password'},
-            ]
-            submit: 'Create'
-          socket.emit 'requestFormInput', form
-        when "root"
-          rootUser = db.findById(2)
-
-          if rootUser.socket
-            rootUser.send c "\nDisconnected by another login.", 'red bold'
-            rootUser.disconnect()
-
-          socket.player = rootUser
-          rootUser.socket = socket
-
-          rootUser.send c "\nConnected as ROOT.", 'red bold'
+          socket.emit 'requestFormInput', formDescriptors.createAccount()
         else
           socket.emit 'output', {msg: "\nUnrecognized command. Type #{c 'help', 'magenta bold'} for a list of available commands."}
+
+  socket.on 'form_input_login', (data) ->
+    formData = data.formData
+    if formData.username == 'root' and formData.password == 'p@ssw0rd'
+      rootUser = db.findById(2)
+
+      if rootUser.socket
+        rootUser.send c "\nDisconnected by another login.", 'red bold'
+        rootUser.disconnect()
+
+      socket.player = rootUser
+      rootUser.socket = socket
+
+      rootUser.send c "\nConnected as ROOT.", 'red bold'
+    else
+      formDescriptor = formDescriptors.login()
+      formDescriptor.inputs[0].value = formData.username
+      formDescriptor.error = 'Invalid username or password.'
+      socket.emit 'requestFormInput', formDescriptor
+
+  socket.on 'form_input_create', (data) ->
+    formData = data.formData
+    formDescriptor = formDescriptors.createAccount()
+    formDescriptor.error = 'Not yet implemented.'
+    socket.emit 'requestFormInput', formDescriptor
 
 process.on 'SIGINT', ->
   util.puts ""

@@ -1,13 +1,19 @@
 .modal.fade
   .modal-header
+    button.close(data-dismiss='modal') ×
     h3= form.title
   .modal-body
-    form.form-horizontal
+    if form.error
+      .alert.alert-error
+        button.close(data-dismiss='alert') ×
+        = form.error
+    form#modalForm.form-horizontal
       for input in form.inputs
-        .control-group
+        div(class=input.error ? 'control-group error' : 'control-group')
           label.control-label(for=input.name)= input.label
           .controls
-            input(type=input.type, placeholder=input.label)
+            input(id=input.name, name=input.name, type=input.type, placeholder=input.label, value=input.value)
+            span.help-inline= input.error
   .modal-footer
-    a.btn(href='#') Cancel
-    a.btn.btn-primary(href='#')= form.submit
+    button.btn(data-dismiss='modal') Cancel
+    button.btn.btn-primary(type='submit', form='modalForm')= form.submit
