@@ -6,6 +6,7 @@ io = require 'socket.io'
 Mincer  = require 'mincer'
 _ = require 'underscore'
 repl = require 'repl'
+coffee = require 'coffee-script'
 
 c = require('./lib/color').color
 parse = require('./lib/parser').parse
@@ -56,20 +57,29 @@ ws_server.sockets.on 'connection', (socket) ->
       player = socket.player
 
       command = parse str
-      switch command.verb
-        when 'eval'
-          context = contextBuilder.buildBaseContext()
-          context.db = db
-          context.$ = (id) -> db.findById(id)
-          player.send vm.runInNewContext command.argstr, context
+
+      if command.verb == 'eval' and player.is_programmer()
+        context = contextBuilder.buildBaseContext()
+        context.db = db
+        context.$ = (id) -> db.findById(id)
+        try
+          code = coffee.compile command.argstr, bare: true
+          output = vm.runInNewContext code, context
+          player.send mooUtil.print output
+        catch error
+          player.send c error.toString(), 'inverse bold red'
+      else
+        [verb, context] = db.buildContextForCommand player, command
+        baseContext = contextBuilder.buildBaseContext()
+        context = _(baseContext).extend context
+        if verb?
+          try
+            code = coffee.compile verb.code, bare: true
+            vm.runInNewContext code, context
+          catch error
+            player.send c error.toString(), 'inverse bold red'
         else
-          [verb, context] = db.buildContextForCommand player, command
-          baseContext = contextBuilder.buildBaseContext()
-          context = _(baseContext).extend context
-          if verb?
-            vm.runInNewContext verb.code, context
-          else
-            player.send c("\nI didn't understand that.", 'grey')# + mooUtil.print command
+          player.send c("\nI didn't understand that.", 'gray')# + mooUtil.print command
     else
       switch str
         when "help"

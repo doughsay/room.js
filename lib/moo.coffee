@@ -213,6 +213,9 @@ class MooObject
       @socket.disconnect()
       @socket = null
 
+  is_programmer: ->
+    true
+
 # A Moo Property is basically a single key value store
 class MooProperty
   # @key: String

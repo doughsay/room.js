@@ -184,7 +184,7 @@ class MooViewModel
     @addLine c 'Connected!', 'bold green'
 
   connecting: =>
-    @addLine c "Connecting...", 'grey'
+    @addLine c "Connecting...", 'gray'
 
   disconnect: =>
     @hideObjectList()
@@ -203,7 +203,7 @@ class MooViewModel
   #  @addLine c 'Reconnected!', 'bold green'
 
   reconnecting: =>
-    @addLine c "Attempting to reconnect...", 'grey'
+    @addLine c "Attempting to reconnect...", 'gray'
 
   # output event
   # adds a line of output to the screen
