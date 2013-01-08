@@ -9,10 +9,27 @@ block content
         form(data-bind='submit: sendCommand')
           input(type='text', data-bind="value: command, event: {keydown: recall}")
     .ui-layout-inner-north
-      p this is the property and code editing area
+      textarea function(foo) { console.log("bar" + foo); }
   .ui-layout-west
     button.btn(data-bind='click: refresh_objects')
       i.icon-refresh
     ul.nav.nav-list(data-bind='foreach: objects')
       li
-        a(href='#', data-bind='text: name, click: load')
+        a(href='#', data-bind='text: name, click: $root.load_object(id)')
+        div(data-bind='if: $root.loadedObject() !== null && $root.loadedObject().id === id')
+          div(data-bind='with: $root.loadedObject()')
+            ul.nav.nav-list
+              li
+                a(href='#', data-bind='click: $root.edit_name') name
+              li
+                a(href='#', data-bind='click: $root.edit_aliases') aliases
+              li.nav-header(data-bind='visible: properties.length > 0') properties
+              // ko foreach: properties
+              li
+                a(href='#', data-bind='text: key, click: $root.edit_property(key)')
+              // /ko
+              li.nav-header(data-bind='visible: verbs.length > 0') verbs
+              // ko foreach: verbs
+              li
+                a(href='#', data-bind='text: name, click: $root.edit_verb(name)')
+              // /ko

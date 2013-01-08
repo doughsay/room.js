@@ -85,6 +85,7 @@ ws_server.sockets.on 'connection', (socket) ->
       rootUser = db.findById(2)
 
       if rootUser.socket
+        rootUser.socket.emit 'deactivate_editor'
         rootUser.send c "\nDisconnected by another login.", 'red bold'
         rootUser.disconnect()
 
@@ -92,6 +93,7 @@ ws_server.sockets.on 'connection', (socket) ->
       rootUser.socket = socket
 
       rootUser.send c "\nConnected as ROOT.", 'red bold'
+      socket.emit 'activate_editor'
     else
       formDescriptor = formDescriptors.login()
       formDescriptor.inputs[0].value = formData.username
@@ -113,8 +115,8 @@ ws_server.sockets.on 'connection', (socket) ->
       when 'tree'
         fn db.tree()
 
-  socket.on 'request_tree', (data) ->
-    socket.emit 'tree_output', list: db.tree()
+  socket.on 'object_details', (id, fn) ->
+    fn db.details(id)
 
 process.on 'SIGINT', ->
   util.puts ""

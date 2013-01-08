@@ -106,6 +106,9 @@ class MooDB
       name: o.name
       children: children o
 
+  details: (id) ->
+    @findById id
+
 # A Moo Object has properties and verbs
 class MooObject
   # @id: Int

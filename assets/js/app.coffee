@@ -4,6 +4,7 @@
 #= require bootstrap
 #= require knockout
 #= require codemirror
+#= require codemirror_modes/javascript
 #= require compiled_templates
 
 class MooViewModel
@@ -26,6 +27,9 @@ class MooViewModel
   # list of moo objects; used when signed in as a programmer
   objects: ko.observableArray []
 
+  # the details of the currently loaded object
+  loadedObject: ko.observable null
+
   # construct the view model
   constructor: (@body, @screen, @input) ->
     @socket = io.connect()
@@ -33,6 +37,9 @@ class MooViewModel
     @setLayout()
     @setSizes()
     @focusInput()
+
+    # sign in as root for now for convenience
+    @socket.emit 'form_input_login', formData: {username: 'root', password: 'p@ssw0rd'}
 
   # attach the websocket event listeners
   attachListeners: ->
@@ -47,12 +54,14 @@ class MooViewModel
 
     @socket.on 'output', @output
     @socket.on 'requestFormInput', @requestFormInput
+    @socket.on 'activate_editor', @showObjectList
+    @socket.on 'deactivate_editor', @hideObjectList
 
   # build the jqeury ui layout
   # this is only used when signed in as a programmer
   # the panes are hidden by default
   setLayout: ->
-    @body.layout
+    @layout = @body.layout
       livePaneResizing: true
       west:
         maxSize: '50%'
@@ -68,6 +77,7 @@ class MooViewModel
             minSize: 200
             slidable: false
             initHidden: true
+            onresize: => @setCodeMirrorSize()
           center:
             paneSelector: '.ui-layout-inner-center'
             onresize: => @setSizes()
@@ -77,6 +87,10 @@ class MooViewModel
     inputWidthDiff = @input.outerWidth() - @input.width()
     @input.width($('.ui-layout-inner-center').width() - inputWidthDiff)
     @screen.height($('.ui-layout-inner-center').height() - @input.outerHeight())
+
+  # if a codemirror editor is present, resize it when the north pane is resized
+  setCodeMirrorSize: ->
+    $('.CodeMirror').height $('.ui-layout-inner-north').height()
 
   # scroll the screen to the bottom
   scrollToBottom: ->
@@ -134,8 +148,35 @@ class MooViewModel
       @objects list.map (o) ->
         id: o.id
         name: "##{o.id} - #{o.name}"
-        load: -> # TODO
-          console.log "TODO: load object for editing:", o.id
+
+  # return a loader function for knockout
+  load_object: (id) ->
+    # load the details of an object from the server
+    =>
+      @socket.emit 'object_details', id, (details) =>
+        @loadedObject details
+
+  edit_name: ->
+    console.log 'edit name'
+
+  edit_aliases: ->
+    console.log 'edit aliases'
+
+  edit_property: (property) ->
+    =>
+      console.log 'edit property:', property
+
+  edit_verb: (verb) ->
+    =>
+      console.log 'edit verb:', verb
+
+  # show the moo objects list
+  showObjectList: =>
+    @refresh_objects()
+    @layout.show 'west'
+
+  # hide the moo objects list
+  hideObjectList: => @layout.hide 'west'
 
   # websocket event listeners:
 
@@ -146,6 +187,7 @@ class MooViewModel
     @addLine c "Connecting...", 'grey'
 
   disconnect: =>
+    @hideObjectList()
     @addLine c 'Disconnected from server.', 'bold red'
 
   connect_failed: =>
