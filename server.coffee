@@ -54,14 +54,22 @@ ws_server.sockets.on 'connection', (socket) ->
     str = data.msg
     if socket.player?
       player = socket.player
+
       command = parse str
-      [verb, context] = db.buildContextForCommand player, command
-      baseContext = contextBuilder.buildBaseContext()
-      context = _(baseContext).extend context
-      if verb?
-        vm.runInNewContext verb.code, context
-      else
-        player.send c("\nI didn't understand that.", 'grey')# + mooUtil.print command
+      switch command.verb
+        when 'eval'
+          context = contextBuilder.buildBaseContext()
+          context.db = db
+          context.$ = (id) -> db.findById(id)
+          player.send vm.runInNewContext command.argstr, context
+        else
+          [verb, context] = db.buildContextForCommand player, command
+          baseContext = contextBuilder.buildBaseContext()
+          context = _(baseContext).extend context
+          if verb?
+            vm.runInNewContext verb.code, context
+          else
+            player.send c("\nI didn't understand that.", 'grey')# + mooUtil.print command
     else
       switch str
         when "help"
