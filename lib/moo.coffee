@@ -35,7 +35,7 @@ class MooDB
     if @objects[id]? then @objects[id] else null
 
   findByNum: (numStr) ->
-    @findById parseInt numStr.match(/^#([0-9]+)$/)[1]
+    @findById parseInt numStr.match(/^#([0-9]+)$/)?[1]
 
   buildContextForCommand: (player, command) ->
     context = {}
@@ -171,6 +171,18 @@ class MooObject
         return prop.value if prop.key == key
       return undefined
 
+  saveVerb: (newVerb) ->
+    for verb in @verbs
+      if verb.name == newVerb.original_name
+        verb.name = newVerb.name
+        verb.dobjarg = newVerb.dobjarg
+        verb.preparg = newVerb.preparg
+        verb.iobjarg = newVerb.iobjarg
+        verb.code = newVerb.code
+        return true
+    @addverb newVerb.name, newVerb.dobjarg, newVerb.preparg, newVerb.iobjarg, newVerb.code
+    return true
+
   # does this object match the search string?
   # TODO: make it work like this:
   # FROM THE LAMBDAMOO MANUAL:
@@ -206,7 +218,7 @@ class MooObject
 
   send: (msg) ->
     if @socket
-      @socket.emit 'output', {msg: msg}
+      @socket.emit 'output', {msg: "\n#{msg}"}
 
   disconnect: ->
     if @socket
