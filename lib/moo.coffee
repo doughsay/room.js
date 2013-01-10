@@ -2,22 +2,29 @@ fs = require 'fs'
 util = require 'util'
 _ = require 'underscore'
 
+connections = require './connection_manager'
+
 # A MOO DB is a collection of Moo Objects
 class MooDB
   # @objects: Array[MooObject]
 
-  constructor: (@objects = []) ->
+  constructor: (@objects = [], @players = []) ->
 
   loadSync: (filename) ->
     util.print "loading... "
     for o in JSON.parse fs.readFileSync filename
       if o?
-        newMooObj = new MooObject o.id, o.parent_id, o.name, o.aliases, o.location_id, o.contents_ids
+        if o.player
+          newMooObj = new MooPlayer o.id, o.parent_id, o.name, o.aliases, o.location_id, o.contents_ids
+        else
+          newMooObj = new MooObject o.id, o.parent_id, o.name, o.aliases, o.location_id, o.contents_ids
         for prop in o.properties
           newMooObj.addProperty prop.key, prop.value
         for v in o.verbs
           newMooObj.addVerb v.name, v.dobjarg, v.preparg, v.iobjarg, v.code
         @objects[parseInt(o.id)] = newMooObj
+        if newMooObj.is_player()
+          @players.push newMooObj
     util.puts "done."
 
   save: (filename) ->
@@ -136,11 +143,6 @@ class MooObject
   toString: ->
     "[MooObject #{@name}]"
 
-  toJSON: ->
-    clone = _.clone @
-    clone.socket = undefined
-    return clone
-
   addProperty: (key, value) ->
     @properties.push new MooProperty key, value
 
@@ -225,16 +227,26 @@ class MooObject
       return @parent().findVerb context
     return null
 
-  # player specific methods
+  is_player: -> false
+
+# a Moo Player is just a slightly more specialized Moo Object
+class MooPlayer extends MooObject
+
+  toJSON: ->
+    clone = _.clone @
+    clone.socket = undefined
+    clone.player = true
+    return clone
+
+  is_player: -> true
 
   send: (msg) ->
-    if @socket
-      @socket.emit 'output', {msg: "\n#{msg}"}
-
-  disconnect: ->
-    if @socket
-      @socket.disconnect()
-      @socket = null
+    socket = connections.socketFor @
+    if socket?
+      socket.emit 'output', {msg: "\n#{msg}"}
+      true
+    else
+      false
 
   is_programmer: ->
     true

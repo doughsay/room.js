@@ -65,6 +65,7 @@ print = (x, indent = '', prefix = '', color = true) ->
               '[ ' + ((x.map (y) -> print y, '', '', color).join ', ') + ' ]'
           else
             xs = (x.map (y) -> print y, indent + '  ', '', color)
+            xs[0] = (k 'undefined', 'gray') if not xs[0]? # why is this needed?
             xs[0] = '[ ' + (xs[0].replace indent + '  ', '')
             xs[xs.length-1] += ' ]'
             if prefix != ''
@@ -91,11 +92,14 @@ print = (x, indent = '', prefix = '', color = true) ->
             xs = []
             for key, value of x
               xs.push print value, indent + '  ', (k key, 'blue') + ': ', color
+            xs[0] = (k 'undefined', 'gray') if not xs[0]? # why is this needed?
             xs[0] = '{ ' + (xs[0].replace indent + '  ', '')
             xs[xs.length-1] += ' }'
             if prefix != ''
               xs[0] = '\n' + indent + xs[0]
             xs.join ',\n'
+    else
+      k "what is this!?", 'bold red inverse'
 
   return indent + prefix + output
 

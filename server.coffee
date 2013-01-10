@@ -8,6 +8,7 @@ _ = require 'underscore'
 repl = require 'repl'
 coffee = require 'coffee-script'
 
+connections = require './lib/connection_manager'
 c = require('./lib/color').color
 parse = require('./lib/parser').parse
 db = require('./lib/moo').db
@@ -50,11 +51,12 @@ ws_server.sockets.on 'connection', (socket) ->
 
   socket.on 'disconnect', ->
     # TODO (when a socket disconnects, put the player in limbo)
+    connections.remove socket
 
   socket.on 'input', (data) ->
     str = data.msg
-    if socket.player?
-      player = socket.player
+    player = connections.playerFor socket
+    if player?
 
       command = parse str
 
@@ -108,16 +110,17 @@ ws_server.sockets.on 'connection', (socket) ->
           socket.emit 'output', {msg: "Unrecognized command. Type #{c 'help', 'magenta bold'} for a list of available commands."}
 
   socket.on 'form_input_login', (data) ->
+    # TODO handle logins for real
     formData = data.formData
     if formData.username == 'root' and formData.password == 'p@ssw0rd'
       rootUser = db.findById(2)
 
-      if rootUser.socket
+      other_socket = connections.socketFor rootUser
+      if other_socket?
         rootUser.send c "Disconnected by another login.", 'red bold'
-        rootUser.disconnect()
+        other_socket.disconnect()
 
-      socket.player = rootUser
-      rootUser.socket = socket
+      connections.add rootUser, socket
 
       rootUser.send c "Connected as ROOT.", 'red bold'
     else
