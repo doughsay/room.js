@@ -3,9 +3,27 @@
 #= require jquery-layout
 #= require bootstrap
 #= require knockout
-#= require codemirror
-#= require codemirror_modes/javascript
+#= require knockout-ace
 #= require compiled_templates
+
+class Verb
+  constructor: (verb) ->
+    @oid = verb.oid
+    @original_name = verb.name
+    @name = ko.observable verb.name
+    @dobjarg = ko.observable verb.dobjarg
+    @iobjarg = ko.observable verb.iobjarg
+    @preparg = ko.observable verb.preparg
+    @code = ko.observable verb.code
+
+  serialize: ->
+    oid: @oid
+    original_name: @original_name
+    name: @name()
+    dobjarg: @dobjarg()
+    iobjarg: @iobjarg()
+    preparg: @preparg()
+    code: @code()
 
 class MooViewModel
 
@@ -25,10 +43,12 @@ class MooViewModel
   socket: null
 
   # list of moo objects; used when signed in as a programmer
-  objects: ko.observableArray []
+  # objects: ko.observableArray []
 
   # the details of the currently loaded object
-  loadedObject: ko.observable null
+  # loadedObject: ko.observable null
+
+  loadedVerb: ko.observable null
 
   # construct the view model
   constructor: (@body, @screen, @input) ->
@@ -38,8 +58,12 @@ class MooViewModel
     @setSizes()
     @focusInput()
 
-    # sign in as root for now for convenience
-    @socket.emit 'form_input_login', formData: {username: 'root', password: 'p@ssw0rd'}
+    # TODO can we move this somewhere better?
+    @loadedVerb.subscribe (verb) =>
+      if verb == null
+        @layout.hide 'north'
+      else
+        @layout.show 'north'
 
   # attach the websocket event listeners
   attachListeners: ->
@@ -53,9 +77,12 @@ class MooViewModel
     @socket.on 'reconnecting', @reconnecting
 
     @socket.on 'output', @output
-    @socket.on 'requestFormInput', @requestFormInput
-    @socket.on 'activate_editor', @showObjectList
-    @socket.on 'deactivate_editor', @hideObjectList
+    @socket.on 'request_form_input', @request_form_input
+
+    @socket.on 'edit_verb', @edit_verb
+
+    # @socket.on 'activate_editor', @showObjectList
+    # @socket.on 'deactivate_editor', @hideObjectList
 
   # build the jqeury ui layout
   # this is only used when signed in as a programmer
@@ -63,34 +90,37 @@ class MooViewModel
   setLayout: ->
     @layout = @body.layout
       livePaneResizing: true
-      west:
+      onresize: => @setSizes()
+      north:
         maxSize: '50%'
-        minSize: 100
+        minSize: 200
         slidable: false
-        initHidden: true
-      center:
-        childOptions:
-          livePaneResizing: true
-          north:
-            paneSelector: '.ui-layout-inner-north'
-            maxSize: '50%'
-            minSize: 200
-            slidable: false
-            initHidden: true
-            onresize: => @setCodeMirrorSize()
-          center:
-            paneSelector: '.ui-layout-inner-center'
-            onresize: => @setSizes()
+    @layout.hide 'north'
 
   # apply proper sizes to the input and the screen div
   setSizes: ->
     inputWidthDiff = @input.outerWidth() - @input.width()
-    @input.width($('.ui-layout-inner-center').width() - inputWidthDiff)
-    @screen.height($('.ui-layout-inner-center').height() - @input.outerHeight())
+    @input.width($('.ui-layout-center').width() - inputWidthDiff)
+    @screen.height($('.ui-layout-center').height() - @input.outerHeight())
 
-  # if a codemirror editor is present, resize it when the north pane is resized
-  setCodeMirrorSize: ->
-    $('.CodeMirror').height $('.ui-layout-inner-north').height()
+    # if an ace editor is present, call it's resize function
+    # and set sizes for all the form elements to make them look prettier
+    editorDiv = $ '.ace_editor'
+    console.log 'setting size'
+    if editorDiv.length != 0
+      console.log 'setting editor sizes too!'
+      editor = ace.edit editorDiv[0]
+      editor.resize()
+
+      editor = $ '.editor'
+      actions = $ '.editor .actions'
+      widthToSplit = editor.width() - actions.width()
+      input = editor.find 'input'
+      inputWidthDiff = input.outerWidth() - input.width() + 2
+      select = editor.find 'select'
+      selectWidthDiff = select.outerWidth() - select.width() + 2
+      input.width (widthToSplit / 4) - inputWidthDiff
+      select.width (widthToSplit / 4) - selectWidthDiff
 
   # scroll the screen to the bottom
   scrollToBottom: ->
@@ -123,6 +153,7 @@ class MooViewModel
   # scroll through history and fill the input box with
   # the selected command
   recall: (_, e) ->
+    return true if @history.length == 0
     switch e.which
       when 38 # up
         if @currentHistory < @history.length - 1
@@ -142,53 +173,66 @@ class MooViewModel
       else
         true
 
+  save_verb: =>
+    @socket.emit 'save_verb', @loadedVerb().serialize()
+
+  unload_verb: =>
+    # TODO: prompt if changes have been made
+    @loadedVerb null
+
   # refresh the moo objects list
-  refresh_objects: ->
-    @socket.emit 'list_objects', format: 'list', (list) =>
-      @objects list.map (o) ->
-        id: o.id
-        name: "##{o.id} - #{o.name}"
+  # refresh_objects: ->
+  #   @socket.emit 'list_objects', format: 'list', (list) =>
+  #     @objects list.map (o) ->
+  #       id: o.id
+  #       name: "##{o.id} - #{o.name}"
 
   # return a loader function for knockout
-  load_object: (id) ->
-    # load the details of an object from the server
-    =>
-      @socket.emit 'object_details', id, (details) =>
-        @loadedObject details
+  # load_object: (id) ->
+  #   # load the details of an object from the server
+  #   =>
+  #     @socket.emit 'object_details', id, (details) =>
+  #       @loadedObject details
 
-  edit_name: ->
-    console.log 'edit name'
+  # edit_name: ->
+  #   console.log 'edit name'
 
-  edit_aliases: ->
-    console.log 'edit aliases'
+  # edit_aliases: ->
+  #   console.log 'edit aliases'
 
-  edit_property: (property) ->
-    =>
-      console.log 'edit property:', property
+  # edit_property: (property) ->
+  #   =>
+  #     console.log 'edit property:', property
 
-  edit_verb: (verb) ->
-    =>
-      console.log 'edit verb:', verb
+  # edit_verb: (verb) ->
+  #   =>
+  #     console.log 'edit verb:', verb
 
   # show the moo objects list
-  showObjectList: =>
-    @refresh_objects()
-    @layout.show 'west'
+  # showObjectList: =>
+  #   @refresh_objects()
+  #   @layout.show 'west'
 
   # hide the moo objects list
-  hideObjectList: => @layout.hide 'west'
+  # hideObjectList: => @layout.hide 'west'
 
   # websocket event listeners:
 
   connect: =>
     @addLine c 'Connected!', 'bold green'
 
+    # sign in as root for now for convenience
+    @socket.emit 'form_input_login', formData: {username: 'root', password: 'p@ssw0rd'}
+
+    # send the edit command for the get verb on the generic item object
+    #@socket.emit 'input', {msg: 'edit #4.get'}
+
   connecting: =>
-    @addLine c "Connecting...", 'grey'
+    @addLine c "Connecting...", 'gray'
 
   disconnect: =>
-    @hideObjectList()
     @addLine c 'Disconnected from server.', 'bold red'
+    @loadedVerb null
 
   connect_failed: =>
     @addLine c 'Connection to server failed.', 'bold red'
@@ -203,18 +247,18 @@ class MooViewModel
   #  @addLine c 'Reconnected!', 'bold green'
 
   reconnecting: =>
-    @addLine c "Attempting to reconnect...", 'grey'
+    @addLine c "Attempting to reconnect...", 'gray'
 
   # output event
   # adds a line of output to the screen
   output: (data) =>
     @addLine data.msg
 
-  # requestFormInput event
+  # request_form_input event
   # the server has requested some form input
   # so we display a modal with a dynamically
   # constructed form
-  requestFormInput: (formDescriptor) =>
+  request_form_input: (formDescriptor) =>
     # precompiled jade template from views/modal_form.jade
     modal = $ jade.templates.modal_form form: formDescriptor
     modal.modal()
@@ -229,6 +273,10 @@ class MooViewModel
       @socket.emit "form_input_#{formDescriptor.event}", formData: data
       modal.modal 'hide'
       false # return false to stop the form from actually submitting
+
+  edit_verb: (verb) =>
+    @loadedVerb new Verb verb
+    @setSizes()
 
 # on dom ready, create the view model and apply the knockout bindings
 $ ->

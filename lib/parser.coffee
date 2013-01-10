@@ -50,6 +50,18 @@ prepex = new RegExp '\\b(' + prepositions.join('|') + ')\\b'
 
 sanitize = (text) -> text.trim().replace /\s+/g, ' '
 
+replaceSpecials = (text) ->
+  if text.indexOf('"') == 0
+    text.replace '"', 'say '
+  else if text.indexOf(':') == 0
+    text.replace ':', 'emote '
+  else if text.indexOf(';') == 0
+    text.replace ';', 'eval '
+  else if text.indexOf('#') == 0
+    text = "edit #{text}"
+  else
+    text
+
 # return [first_word, rest]
 chomp = (s) ->
   i = s.indexOf(' ')
@@ -71,6 +83,7 @@ parse_preposition = (text) ->
 
 parse_command = (text) ->
   text = sanitize text
+  text = replaceSpecials text
   [verb, rest] = chomp text
   if rest != undefined
     if x = parse_preposition rest

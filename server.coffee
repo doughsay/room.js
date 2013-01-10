@@ -6,6 +6,7 @@ io = require 'socket.io'
 Mincer  = require 'mincer'
 _ = require 'underscore'
 repl = require 'repl'
+coffee = require 'coffee-script'
 
 c = require('./lib/color').color
 parse = require('./lib/parser').parse
@@ -54,30 +55,57 @@ ws_server.sockets.on 'connection', (socket) ->
     str = data.msg
     if socket.player?
       player = socket.player
+
       command = parse str
-      [verb, context] = db.buildContextForCommand player, command
-      baseContext = contextBuilder.buildBaseContext()
-      context = _(baseContext).extend context
-      if verb?
-        vm.runInNewContext verb.code, context
+
+      if command.verb == 'eval' and player.is_programmer()
+        context = contextBuilder.buildBaseContext()
+        context.db = db
+        context.$ = (id) -> db.findById(id)
+        try
+          code = coffee.compile command.argstr, bare: true
+          output = vm.runInNewContext code, context
+          player.send mooUtil.print output
+        catch error
+          player.send c error.toString(), 'inverse bold red'
+      else if command.verb == 'edit' and player.is_programmer()
+        [oNum, verbName] = command.argstr.split('.')
+        o = db.findByNum oNum
+        if o?
+          verb = (o.verbs.filter (v) -> v.name == verbName)[0]
+        if verb?
+          verb.oid = o.id
+          socket.emit 'edit_verb', verb
+        else
+          player.send c "No such object or verb.", 'red'
       else
-        player.send c("\nI didn't understand that.", 'grey')# + mooUtil.print command
+        [verb, context] = db.buildContextForCommand player, command
+        baseContext = contextBuilder.buildBaseContext()
+        context = _(baseContext).extend context
+        if verb?
+          try
+            code = coffee.compile verb.code, bare: true
+            vm.runInNewContext code, context
+          catch error
+            player.send c error.toString(), 'inverse bold red'
+        else
+          player.send c("I didn't understand that.", 'gray')# + mooUtil.print command
     else
       switch str
         when "help"
           msg = """
-          \nAvailable commands:
+          Available commands:
           * #{c 'login', 'magenta bold'}  - login to an existing account
           * #{c 'create', 'magenta bold'} - create a new account
           * #{c 'help', 'magenta bold'}   - show this message
           """
           socket.emit 'output', {msg: msg}
         when "login"
-          socket.emit 'requestFormInput', formDescriptors.login()
+          socket.emit 'request_form_input', formDescriptors.login()
         when "create"
-          socket.emit 'requestFormInput', formDescriptors.createAccount()
+          socket.emit 'request_form_input', formDescriptors.createAccount()
         else
-          socket.emit 'output', {msg: "\nUnrecognized command. Type #{c 'help', 'magenta bold'} for a list of available commands."}
+          socket.emit 'output', {msg: "Unrecognized command. Type #{c 'help', 'magenta bold'} for a list of available commands."}
 
   socket.on 'form_input_login', (data) ->
     formData = data.formData
@@ -85,38 +113,50 @@ ws_server.sockets.on 'connection', (socket) ->
       rootUser = db.findById(2)
 
       if rootUser.socket
-        rootUser.socket.emit 'deactivate_editor'
-        rootUser.send c "\nDisconnected by another login.", 'red bold'
+        # rootUser.socket.emit 'deactivate_editor'
+        rootUser.send c "Disconnected by another login.", 'red bold'
         rootUser.disconnect()
 
       socket.player = rootUser
       rootUser.socket = socket
 
-      rootUser.send c "\nConnected as ROOT.", 'red bold'
-      socket.emit 'activate_editor'
+      rootUser.send c "Connected as ROOT.", 'red bold'
+      # socket.emit 'activate_editor'
     else
       formDescriptor = formDescriptors.login()
       formDescriptor.inputs[0].value = formData.username
       formDescriptor.error = 'Invalid username or password.'
-      socket.emit 'requestFormInput', formDescriptor
+      socket.emit 'request_form_input', formDescriptor
 
   socket.on 'form_input_create', (data) ->
     formData = data.formData
     formDescriptor = formDescriptors.createAccount()
     formDescriptor.error = 'Not yet implemented.'
-    socket.emit 'requestFormInput', formDescriptor
+    socket.emit 'request_form_input', formDescriptor
 
-  socket.on 'list_objects', (opts = {}, fn) ->
-    if not opts.format?
-      opts.format = 'list'
-    switch opts.format
-      when 'list'
-        fn db.list()
-      when 'tree'
-        fn db.tree()
+  socket.on 'save_verb', (verb) ->
+    if socket.player?
+      player = socket.player
 
-  socket.on 'object_details', (id, fn) ->
-    fn db.details(id)
+      if player.is_programmer()
+        id = verb.oid
+        object = db.findById(id) # TODO could be null
+        object.saveVerb verb # TODO could fail?
+        player.send c "Verb saved!", 'green'
+      else
+        player.send c "You are not allowed to do that.", 'red'
+
+  # socket.on 'list_objects', (opts = {}, fn) ->
+  #   if not opts.format?
+  #     opts.format = 'list'
+  #   switch opts.format
+  #     when 'list'
+  #       fn db.list()
+  #     when 'tree'
+  #       fn db.tree()
+
+  # socket.on 'object_details', (id, fn) ->
+  #   fn db.details(id)
 
 process.on 'SIGINT', ->
   util.puts ""
