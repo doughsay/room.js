@@ -127,6 +127,9 @@ class MooDB
       name: o.name
       contents: contents o
 
+  toString: ->
+    "[MooDB]"
+
 # A Moo Object has properties and verbs
 class MooObject
   # @id: Int
@@ -139,9 +142,6 @@ class MooObject
   # @verbs: Array[MooVerb]
 
   constructor: (@id, @parent_id, @name, @aliases, @location_id, @contents_ids, @properties = [], @verbs = []) ->
-
-  toString: ->
-    "[MooObject #{@name}]"
 
   addProperty: (key, value) ->
     @properties.push new MooProperty key, value
@@ -229,6 +229,9 @@ class MooObject
 
   is_player: -> false
 
+  toString: ->
+    "[MooObject #{@name}]"
+
 # a Moo Player is just a slightly more specialized Moo Object
 class MooPlayer extends MooObject
 
@@ -251,11 +254,17 @@ class MooPlayer extends MooObject
   is_programmer: ->
     true
 
+  toString: ->
+    "[MooPlayer #{@name}]"
+
 # A Moo Property is basically a single key value store
 class MooProperty
   # @key: String
   # @value: String|Int|Float|Array[String|Int|Float|Array]
   constructor: (@key, @value) ->
+
+  toString: ->
+    "[MooProperty #{@key}]"
 
 # A Moo Verb is a js function which runs in a sandboxed context
 class MooVerb
@@ -319,6 +328,9 @@ class MooVerb
         # TODO: improve this?  e.g. 'with' and 'using' are interchangeable.
         return false if context.$prepstr != @preparg
     true
+
+  toString: ->
+    "[MooVerb #{@name}]"
 
 db = new MooDB
 db.loadSync 'db.json'

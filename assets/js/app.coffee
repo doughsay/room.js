@@ -185,7 +185,7 @@ class MooViewModel
     @addLine c 'Connected!', 'bold green'
 
     # sign in as root for now for convenience
-    @socket.emit 'form_input_login', formData: {username: 'root', password: 'p@ssw0rd'}
+    #@socket.emit 'form_input_login', formData: {username: 'root', password: 'p@ssw0rd'}
 
     # send the edit command for the get verb on the generic item object
     #@socket.emit 'input', {msg: 'edit #4.get'}
