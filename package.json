@@ -10,6 +10,7 @@
     "less": "*",
     "underscore": "*",
     "mincer": "*",
-    "should": "*"
+    "should": "*",
+    "mocha": "*"
   }
 }
