@@ -9,6 +9,7 @@ repl = require 'repl'
 coffee = require 'coffee-script'
 
 connections = require './lib/connection_manager'
+phash = require('./lib/hash').phash
 c = require('./lib/color').color
 parse = require('./lib/parser').parse
 db = require('./lib/moo').db
@@ -96,7 +97,7 @@ ws_server.sockets.on 'connection', (socket) ->
       switch str
         when "help"
           msg = """
-          Available commands:
+          \nAvailable commands:
           * #{c 'login', 'magenta bold'}  - login to an existing account
           * #{c 'create', 'magenta bold'} - create a new account
           * #{c 'help', 'magenta bold'}   - show this message
@@ -107,22 +108,23 @@ ws_server.sockets.on 'connection', (socket) ->
         when "create"
           socket.emit 'request_form_input', formDescriptors.createAccount()
         else
-          socket.emit 'output', {msg: "Unrecognized command. Type #{c 'help', 'magenta bold'} for a list of available commands."}
+          socket.emit 'output', {msg: "\nUnrecognized command. Type #{c 'help', 'magenta bold'} for a list of available commands."}
 
   socket.on 'form_input_login', (data) ->
-    # TODO handle logins for real
     formData = data.formData
-    if formData.username == 'root' and formData.password == 'p@ssw0rd'
-      rootUser = db.findById(2)
+    matches = db.players.filter (player) ->
+      player.prop('username') == formData.username and player.prop('password') == phash formData.password
+    if matches.length == 1
+      player = matches[0]
 
-      other_socket = connections.socketFor rootUser
+      other_socket = connections.socketFor player
       if other_socket?
-        rootUser.send c "Disconnected by another login.", 'red bold'
+        player.send c "Disconnected by another login.", 'red bold'
         other_socket.disconnect()
 
-      connections.add rootUser, socket
+      connections.add player, socket
 
-      rootUser.send c "Connected as ROOT.", 'red bold'
+      player.send c "Welcome #{player.prop('username')}!", 'blue bold'
     else
       formDescriptor = formDescriptors.login()
       formDescriptor.inputs[0].value = formData.username
