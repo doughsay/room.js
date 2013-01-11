@@ -90,7 +90,7 @@ class MooDB
       id: o.id
       name: o.name
 
-  tree: ->
+  inheritance_tree: ->
     children = (o) =>
       child_os = @objects.filter (other_o) ->
         other_o.parent_id == o.id
@@ -106,8 +106,19 @@ class MooDB
       name: o.name
       children: children o
 
-  details: (id) ->
-    @findById id
+  location_tree: ->
+    contents = (o) =>
+      o.contents().map (p) ->
+        id: p.id
+        name: p.name
+        contents: contents p
+
+    top = @objects.filter (o) ->
+      o? and o.location_id == null
+    top.map (o) ->
+      id: o.id
+      name: o.name
+      contents: contents o
 
 # A Moo Object has properties and verbs
 class MooObject

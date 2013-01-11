@@ -42,7 +42,7 @@ http_server = http.createServer(xp).listen xp.get('port'), ->
 ws_server = io.listen(http_server, {log: false})
 
 # for debugging.  Note: Ctrl-D first to close the REPL then Ctrl-C to stop the moo.
-# repl.start().context.db = db
+# repl.start('>').context.db = db
 
 ws_server.sockets.on 'connection', (socket) ->
   socket.emit 'output', {msg: "Welcome to #{c 'jsmoo', 'blue bold'}!"}
@@ -113,7 +113,6 @@ ws_server.sockets.on 'connection', (socket) ->
       rootUser = db.findById(2)
 
       if rootUser.socket
-        # rootUser.socket.emit 'deactivate_editor'
         rootUser.send c "Disconnected by another login.", 'red bold'
         rootUser.disconnect()
 
@@ -121,7 +120,6 @@ ws_server.sockets.on 'connection', (socket) ->
       rootUser.socket = socket
 
       rootUser.send c "Connected as ROOT.", 'red bold'
-      # socket.emit 'activate_editor'
     else
       formDescriptor = formDescriptors.login()
       formDescriptor.inputs[0].value = formData.username
@@ -145,18 +143,6 @@ ws_server.sockets.on 'connection', (socket) ->
         player.send c "Verb saved!", 'green'
       else
         player.send c "You are not allowed to do that.", 'red'
-
-  # socket.on 'list_objects', (opts = {}, fn) ->
-  #   if not opts.format?
-  #     opts.format = 'list'
-  #   switch opts.format
-  #     when 'list'
-  #       fn db.list()
-  #     when 'tree'
-  #       fn db.tree()
-
-  # socket.on 'object_details', (id, fn) ->
-  #   fn db.details(id)
 
 process.on 'SIGINT', ->
   util.puts ""
