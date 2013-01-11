@@ -1,7 +1,7 @@
 c = require('./color').color
 
 # crappy util for pretty printing objects to the client
-exports.old_print = (o) ->
+old_print = (o) ->
   output = "\n"
   for key, value of o
     if value
@@ -9,9 +9,18 @@ exports.old_print = (o) ->
       output += c(value, 'blue bold') + "\n"
   output
 
+safeString = (s) ->
+  s.replace /\n/g, '\\n'
+
+truncate = (s, length = 25) ->
+  if s.length <= 25
+    s
+  else
+    s[0..length] + '...'
+
 # recursive colorful object output
 # TODO: make it work for arrays and objects
-exports.print = (x, indent = "", color = true) ->
+print = (x, indent = '', prefix = '', color = true) ->
   # possible types:
   #
   # number
@@ -25,23 +34,73 @@ exports.print = (x, indent = "", color = true) ->
   #   date
 
   # turns colors off
-  c = ((x) -> x) if color == false
+  k = if color then c else ((x) -> x)
 
   output = switch typeof x
     when 'number'
-      c x, 'yellow'
+      k x, 'yellow'
     when 'string'
-      c "'#{x}'", 'green'
+      # truncate the string if it's in an object or array
+      # TODO this doesn't quite work (misses inline arrays)
+      if indent == '' and prefix == ''
+        "'" + (k (safeString x), 'green') + "'"
+      else
+        "'" + (k (truncate safeString x), 'green') + "'"
     when 'boolean'
-      c x.toString(), 'magenta'
+      k x.toString(), 'magenta'
     when 'undefined'
-      c 'undefined', 'gray'
+      k 'undefined', 'gray'
     when 'function'
-      c '[Function]', 'cyan'
+      k '[Function]', 'cyan'
     when 'object'
       if x == null
-        c 'null', 'red'
+        k 'null', 'red'
       else
-        c '[Object]', 'blue'
+        if Array.isArray x
+          test = '[ ' + ((x.map (y) -> print y, '', '', false).join ', ') + ' ]'
+          if test.length <= 50 # arbitrary length threshold to force indented mode instead of inline
+            if x.length == 0
+              '[]'
+            else
+              '[ ' + ((x.map (y) -> print y, '', '', color).join ', ') + ' ]'
+          else
+            xs = (x.map (y) -> print y, indent + '  ', '', color)
+            xs[0] = (k 'undefined', 'gray') if not xs[0]? # why is this needed?
+            xs[0] = '[ ' + (xs[0].replace indent + '  ', '')
+            xs[xs.length-1] += ' ]'
+            if prefix != ''
+              xs[0] = '\n' + indent + xs[0]
+            xs.join ',\n'
+        else
+          xstest = []
+          for key, value of x
+            xstest.push print value, '', key + ': ', false
+          if xstest.length == 0
+            xsteststr = '{}'
+          else
+            xsteststr = "{ #{xstest.join ', '} }"
 
-  return indent + output
+          if xsteststr.length <= 50
+            xs = []
+            for key, value of x
+              xs.push print value, '', (k key, 'blue') + ': ', color
+            if xs.length == 0
+              '{}'
+            else
+              "{ #{xs.join ', '} }"
+          else
+            xs = []
+            for key, value of x
+              xs.push print value, indent + '  ', (k key, 'blue') + ': ', color
+            xs[0] = (k 'undefined', 'gray') if not xs[0]? # why is this needed?
+            xs[0] = '{ ' + (xs[0].replace indent + '  ', '')
+            xs[xs.length-1] += ' }'
+            if prefix != ''
+              xs[0] = '\n' + indent + xs[0]
+            xs.join ',\n'
+    else
+      k "what is this!?", 'bold red inverse'
+
+  return indent + prefix + output
+
+exports.print = print

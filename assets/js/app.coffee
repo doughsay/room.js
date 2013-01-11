@@ -81,9 +81,6 @@ class MooViewModel
 
     @socket.on 'edit_verb', @edit_verb
 
-    # @socket.on 'activate_editor', @showObjectList
-    # @socket.on 'deactivate_editor', @hideObjectList
-
   # build the jqeury ui layout
   # this is only used when signed in as a programmer
   # the panes are hidden by default
@@ -180,49 +177,15 @@ class MooViewModel
     # TODO: prompt if changes have been made
     @loadedVerb null
 
-  # refresh the moo objects list
-  # refresh_objects: ->
-  #   @socket.emit 'list_objects', format: 'list', (list) =>
-  #     @objects list.map (o) ->
-  #       id: o.id
-  #       name: "##{o.id} - #{o.name}"
-
-  # return a loader function for knockout
-  # load_object: (id) ->
-  #   # load the details of an object from the server
-  #   =>
-  #     @socket.emit 'object_details', id, (details) =>
-  #       @loadedObject details
-
-  # edit_name: ->
-  #   console.log 'edit name'
-
-  # edit_aliases: ->
-  #   console.log 'edit aliases'
-
-  # edit_property: (property) ->
-  #   =>
-  #     console.log 'edit property:', property
-
-  # edit_verb: (verb) ->
-  #   =>
-  #     console.log 'edit verb:', verb
-
-  # show the moo objects list
-  # showObjectList: =>
-  #   @refresh_objects()
-  #   @layout.show 'west'
-
-  # hide the moo objects list
-  # hideObjectList: => @layout.hide 'west'
-
-  # websocket event listeners:
+  #############################
+  # websocket event listeners #
+  #############################
 
   connect: =>
     @addLine c 'Connected!', 'bold green'
 
     # sign in as root for now for convenience
-    @socket.emit 'form_input_login', formData: {username: 'root', password: 'p@ssw0rd'}
+    #@socket.emit 'form_input_login', formData: {username: 'root', password: 'p@ssw0rd'}
 
     # send the edit command for the get verb on the generic item object
     #@socket.emit 'input', {msg: 'edit #4.get'}

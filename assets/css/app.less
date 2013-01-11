@@ -3,6 +3,7 @@
 @import 'color';
 @import 'spiffy';
 @import 'layout';
+@import 'editor';
 
 body {
   margin: 0;
@@ -37,99 +38,6 @@ body {
 
     &:focus {
       outline: none;
-    }
-  }
-}
-
-.ace_editor {
-  top: 27px;
-  right: 0;
-  bottom: 0;
-  left: 0;
-}
-
-.editor {
-  input {
-    margin: 0;
-    margin-right: 2px;
-    padding: 4px;
-    height: 15px;
-    font-family: 'Source Code Pro', sans-serif;
-    font-size: 12pt;
-    border: 2px solid @gray;
-    color: @light_blue;
-    background-color: @black;
-    border-radius: 0;
-    text-shadow: 1px 1px 1px black;
-    &:focus { border-color: @light_blue; }
-  }
-
-  select {
-    margin: 0;
-    margin-right: 2px;
-    padding: 0;
-    height: 27px;
-    font-family: 'Source Code Pro', sans-serif;
-    font-size: 12pt;
-    background-color: @black;
-    border: 2px solid @gray;
-    border-radius: 0;
-    text-shadow: 1px 1px 1px black;
-    -webkit-transition: border linear .2s;
-    -moz-transition: border linear .2s;
-    transition: border linear .2s;
-    &.dobjarg {
-      color: @light_green;
-      &:focus { border-color: @light_green; }
-    }
-    &.preparg {
-      color: @light_yellow;
-      &:focus { border-color: @light_yellow; }
-    }
-    &.iobjarg {
-      color: @light_magenta;
-      &:focus { border-color: @light_magenta; }
-    }
-    option {
-      background-color: @black;
-    }
-  }
-
-  .actions {
-    position: absolute;
-    top: 0;
-    right: 0;
-
-    a {
-      display: inline-block;
-      margin: 0;
-      padding: 0 4px;
-      height: 23px;
-      font-family: 'Source Code Pro', sans-serif;
-      font-size: 12pt;
-      border: 2px solid @gray;
-      text-shadow: 1px 1px 1px @black;
-      color: @white;
-      cursor: pointer;
-      &:hover {
-        text-decoration: none;
-      }
-      &.save {
-        background-color: @blue;
-        &:hover {
-          background-color: @light_blue;
-        }
-      }
-      &.closeEditor {
-        margin-left: 2px;
-        background-color: @black;
-        &:hover {
-          background-color: @light_black;
-        }
-      }
-      i {
-        margin-top: 4px;
-      }
     }
   }
 }

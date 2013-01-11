@@ -8,6 +8,8 @@ _ = require 'underscore'
 repl = require 'repl'
 coffee = require 'coffee-script'
 
+connections = require './lib/connection_manager'
+phash = require('./lib/hash').phash
 c = require('./lib/color').color
 parse = require('./lib/parser').parse
 db = require('./lib/moo').db
@@ -42,7 +44,7 @@ http_server = http.createServer(xp).listen xp.get('port'), ->
 ws_server = io.listen(http_server, {log: false})
 
 # for debugging.  Note: Ctrl-D first to close the REPL then Ctrl-C to stop the moo.
-# repl.start().context.db = db
+# repl.start('>').context.db = db
 
 ws_server.sockets.on 'connection', (socket) ->
   socket.emit 'output', {msg: "Welcome to #{c 'jsmoo', 'blue bold'}!"}
@@ -50,11 +52,12 @@ ws_server.sockets.on 'connection', (socket) ->
 
   socket.on 'disconnect', ->
     # TODO (when a socket disconnects, put the player in limbo)
+    connections.remove socket
 
   socket.on 'input', (data) ->
     str = data.msg
-    if socket.player?
-      player = socket.player
+    player = connections.playerFor socket
+    if player?
 
       command = parse str
 
@@ -94,7 +97,7 @@ ws_server.sockets.on 'connection', (socket) ->
       switch str
         when "help"
           msg = """
-          Available commands:
+          \nAvailable commands:
           * #{c 'login', 'magenta bold'}  - login to an existing account
           * #{c 'create', 'magenta bold'} - create a new account
           * #{c 'help', 'magenta bold'}   - show this message
@@ -105,23 +108,23 @@ ws_server.sockets.on 'connection', (socket) ->
         when "create"
           socket.emit 'request_form_input', formDescriptors.createAccount()
         else
-          socket.emit 'output', {msg: "Unrecognized command. Type #{c 'help', 'magenta bold'} for a list of available commands."}
+          socket.emit 'output', {msg: "\nUnrecognized command. Type #{c 'help', 'magenta bold'} for a list of available commands."}
 
   socket.on 'form_input_login', (data) ->
     formData = data.formData
-    if formData.username == 'root' and formData.password == 'p@ssw0rd'
-      rootUser = db.findById(2)
+    matches = db.players.filter (player) ->
+      player.prop('username') == formData.username and player.prop('password') == phash formData.password
+    if matches.length == 1
+      player = matches[0]
 
-      if rootUser.socket
-        # rootUser.socket.emit 'deactivate_editor'
-        rootUser.send c "Disconnected by another login.", 'red bold'
-        rootUser.disconnect()
+      other_socket = connections.socketFor player
+      if other_socket?
+        player.send c "Disconnected by another login.", 'red bold'
+        other_socket.disconnect()
 
-      socket.player = rootUser
-      rootUser.socket = socket
+      connections.add player, socket
 
-      rootUser.send c "Connected as ROOT.", 'red bold'
-      # socket.emit 'activate_editor'
+      player.send c "Welcome #{player.prop('username')}!", 'blue bold'
     else
       formDescriptor = formDescriptors.login()
       formDescriptor.inputs[0].value = formData.username
@@ -145,18 +148,6 @@ ws_server.sockets.on 'connection', (socket) ->
         player.send c "Verb saved!", 'green'
       else
         player.send c "You are not allowed to do that.", 'red'
-
-  # socket.on 'list_objects', (opts = {}, fn) ->
-  #   if not opts.format?
-  #     opts.format = 'list'
-  #   switch opts.format
-  #     when 'list'
-  #       fn db.list()
-  #     when 'tree'
-  #       fn db.tree()
-
-  # socket.on 'object_details', (id, fn) ->
-  #   fn db.details(id)
 
 process.on 'SIGINT', ->
   util.puts ""

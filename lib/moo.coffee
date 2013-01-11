@@ -2,22 +2,29 @@ fs = require 'fs'
 util = require 'util'
 _ = require 'underscore'
 
+connections = require './connection_manager'
+
 # A MOO DB is a collection of Moo Objects
 class MooDB
   # @objects: Array[MooObject]
 
-  constructor: (@objects = []) ->
+  constructor: (@objects = [], @players = []) ->
 
   loadSync: (filename) ->
     util.print "loading... "
     for o in JSON.parse fs.readFileSync filename
       if o?
-        newMooObj = new MooObject o.id, o.parent_id, o.name, o.aliases, o.location_id, o.contents_ids
+        if o.player
+          newMooObj = new MooPlayer o.id, o.parent_id, o.name, o.aliases, o.location_id, o.contents_ids
+        else
+          newMooObj = new MooObject o.id, o.parent_id, o.name, o.aliases, o.location_id, o.contents_ids
         for prop in o.properties
           newMooObj.addProperty prop.key, prop.value
         for v in o.verbs
           newMooObj.addVerb v.name, v.dobjarg, v.preparg, v.iobjarg, v.code
         @objects[parseInt(o.id)] = newMooObj
+        if newMooObj.is_player()
+          @players.push newMooObj
     util.puts "done."
 
   save: (filename) ->
@@ -90,7 +97,7 @@ class MooDB
       id: o.id
       name: o.name
 
-  tree: ->
+  inheritance_tree: ->
     children = (o) =>
       child_os = @objects.filter (other_o) ->
         other_o.parent_id == o.id
@@ -106,8 +113,22 @@ class MooDB
       name: o.name
       children: children o
 
-  details: (id) ->
-    @findById id
+  location_tree: ->
+    contents = (o) =>
+      o.contents().map (p) ->
+        id: p.id
+        name: p.name
+        contents: contents p
+
+    top = @objects.filter (o) ->
+      o? and o.location_id == null
+    top.map (o) ->
+      id: o.id
+      name: o.name
+      contents: contents o
+
+  toString: ->
+    "[MooDB]"
 
 # A Moo Object has properties and verbs
 class MooObject
@@ -121,14 +142,6 @@ class MooObject
   # @verbs: Array[MooVerb]
 
   constructor: (@id, @parent_id, @name, @aliases, @location_id, @contents_ids, @properties = [], @verbs = []) ->
-
-  toString: ->
-    "[MooObject #{@name}]"
-
-  toJSON: ->
-    clone = _.clone @
-    clone.socket = undefined
-    return clone
 
   addProperty: (key, value) ->
     @properties.push new MooProperty key, value
@@ -214,25 +227,44 @@ class MooObject
       return @parent().findVerb context
     return null
 
-  # player specific methods
+  is_player: -> false
+
+  toString: ->
+    "[MooObject #{@name}]"
+
+# a Moo Player is just a slightly more specialized Moo Object
+class MooPlayer extends MooObject
+
+  toJSON: ->
+    clone = _.clone @
+    clone.socket = undefined
+    clone.player = true
+    return clone
+
+  is_player: -> true
 
   send: (msg) ->
-    if @socket
-      @socket.emit 'output', {msg: "\n#{msg}"}
-
-  disconnect: ->
-    if @socket
-      @socket.disconnect()
-      @socket = null
+    socket = connections.socketFor @
+    if socket?
+      socket.emit 'output', {msg: "\n#{msg}"}
+      true
+    else
+      false
 
   is_programmer: ->
     true
+
+  toString: ->
+    "[MooPlayer #{@name}]"
 
 # A Moo Property is basically a single key value store
 class MooProperty
   # @key: String
   # @value: String|Int|Float|Array[String|Int|Float|Array]
   constructor: (@key, @value) ->
+
+  toString: ->
+    "[MooProperty #{@key}]"
 
 # A Moo Verb is a js function which runs in a sandboxed context
 class MooVerb
@@ -296,6 +328,9 @@ class MooVerb
         # TODO: improve this?  e.g. 'with' and 'using' are interchangeable.
         return false if context.$prepstr != @preparg
     true
+
+  toString: ->
+    "[MooVerb #{@name}]"
 
 db = new MooDB
 db.loadSync 'db.json'
