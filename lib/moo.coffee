@@ -185,9 +185,10 @@ class MooObject
       return undefined
 
   saveVerb: (newVerb) ->
+    # TODO validation & sanitization
     for verb in @verbs
       if verb.name == newVerb.original_name
-        verb.name = newVerb.name
+        verb.name = newVerb.name.trim()
         verb.dobjarg = newVerb.dobjarg
         verb.preparg = newVerb.preparg
         verb.iobjarg = newVerb.iobjarg

@@ -77,8 +77,9 @@ ws_server.sockets.on 'connection', (socket) ->
         if o?
           verb = (o.verbs.filter (v) -> v.name == verbName)[0]
         if verb?
-          verb.oid = o.id
-          socket.emit 'edit_verb', verb
+          clonedVerb = _.clone verb
+          clonedVerb.oid = o.id
+          socket.emit 'edit_verb', clonedVerb
         else
           player.send c "No such object or verb.", 'red'
       else
