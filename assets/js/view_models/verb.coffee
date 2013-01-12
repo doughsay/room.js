@@ -1,0 +1,19 @@
+class VerbView
+  constructor: (verb) ->
+    @oid = verb.oid
+    @original_name = verb.name
+    @name = ko.observable verb.name
+    @dobjarg = ko.observable verb.dobjarg
+    @iobjarg = ko.observable verb.iobjarg
+    @preparg = ko.observable verb.preparg
+    @code = ko.observable verb.code
+    @dirty = ko.observable false
+
+  serialize: ->
+    oid: @oid
+    original_name: @original_name
+    name: @name()
+    dobjarg: @dobjarg()
+    iobjarg: @iobjarg()
+    preparg: @preparg()
+    code: @code()
