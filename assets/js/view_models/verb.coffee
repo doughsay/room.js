@@ -7,7 +7,7 @@ class VerbView
     @iobjarg = ko.observable verb.iobjarg
     @preparg = ko.observable verb.preparg
     @code = ko.observable verb.code
-    @dirty = ko.observable false
+    @dirty = ko.observable false # TODO dirty needs to apply to ALL properties, not just code
 
   serialize: ->
     oid: @oid

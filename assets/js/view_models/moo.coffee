@@ -132,11 +132,11 @@ class MooView
       else
         true
 
-  # TODO this could fail
-  # TODO if the name is updated, we need to update the loaded verbs "original_name"
   save_verb: =>
-    @socket.emit 'save_verb', @loadedVerb().serialize()
-    @loadedVerb().dirty false
+    @socket.emit 'save_verb', @loadedVerb().serialize(), (response) =>
+      if !response.error
+        @loadedVerb().dirty false
+        @loadedVerb().original_name = response.verb.name
 
   unload_verb: =>
     if @loadedVerb().dirty()

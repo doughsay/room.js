@@ -194,7 +194,7 @@ ws_server.sockets.on 'connection', (socket) ->
       socket.emit 'output', "\n#{c 'Account created!', 'bold green'}  You may now #{c 'login', 'bold magenta'}."
       fn null
 
-  socket.on 'save_verb', (userVerb) ->
+  socket.on 'save_verb', (userVerb, fn) ->
     sanitize = (userVerb) ->
       oid: userVerb.oid || null,
       original_name: userVerb.original_name || ""
@@ -260,13 +260,19 @@ ws_server.sockets.on 'connection', (socket) ->
         if errors.length > 0
           errors.unshift 'There were errors in your verb code submission:'
           player.send c (errors.join '\n'), 'red'
+          fn {error: true, verb: verb}
         else
           id = verb.oid
           object = db.findById(id)
           object.saveVerb verb
           player.send c "Verb saved!", 'green'
+          fn {error: false, verb: verb}
       else
         player.send c "You are not allowed to do that.", 'red'
+        fn {error: true}
+    else
+      socket.emit 'output', c "You are not logged in.", 'red'
+      fn {error: true}
 
 process.on 'SIGINT', ->
   util.puts ""
