@@ -15,7 +15,7 @@ class MooDB
     for o in JSON.parse fs.readFileSync filename
       if o?
         if o.player
-          newMooObj = new MooPlayer o.id, o.parent_id, o.name, o.aliases, o.location_id, o.contents_ids
+          newMooObj = new MooPlayer o.id, o.parent_id, o.name, o.aliases, o.location_id, o.contents_ids, o.username, o.password, true, o.programmer
         else
           newMooObj = new MooObject o.id, o.parent_id, o.name, o.aliases, o.location_id, o.contents_ids
         for prop in o.properties
@@ -23,7 +23,7 @@ class MooDB
         for v in o.verbs
           newMooObj.addVerb v.name, v.dobjarg, v.preparg, v.iobjarg, v.code
         @objects[parseInt(o.id)] = newMooObj
-        if newMooObj.is_player()
+        if newMooObj.player
           @players.push newMooObj
     util.puts "done."
 
@@ -228,21 +228,21 @@ class MooObject
       return @parent().findVerb context
     return null
 
-  is_player: -> false
-
   toString: ->
     "[MooObject #{@name}]"
 
 # a Moo Player is just a slightly more specialized Moo Object
 class MooPlayer extends MooObject
+  # MooObject fields +
+  # @username: String
+  # @password: String
+  # @player: Boolean
+  # @programmer: Boolean
 
-  toJSON: ->
-    clone = _.clone @
-    clone.socket = undefined
-    clone.player = true
-    return clone
+  constructor: (@id, @parent_id, @name, @aliases, @location_id, @contents_ids, @username, @password, @player = true, @programmer = false, @properties = [], @verbs = []) ->
 
-  is_player: -> true
+  authenticates: (username, passwordHash) ->
+    @username == username and @password == passwordHash
 
   send: (msg) ->
     socket = connections.socketFor @
@@ -251,9 +251,6 @@ class MooPlayer extends MooObject
       true
     else
       false
-
-  is_programmer: ->
-    true
 
   toString: ->
     "[MooPlayer #{@name}]"

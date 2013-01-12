@@ -61,7 +61,7 @@ ws_server.sockets.on 'connection', (socket) ->
 
       command = parse str
 
-      if command.verb == 'eval' and player.is_programmer()
+      if command.verb == 'eval' and player.programmer
         context = contextBuilder.buildBaseContext()
         context.db = db
         context.$ = (id) -> db.findById(id)
@@ -71,7 +71,7 @@ ws_server.sockets.on 'connection', (socket) ->
           player.send mooUtil.print output
         catch error
           player.send c error.toString(), 'inverse bold red'
-      else if command.verb == 'edit' and player.is_programmer()
+      else if command.verb == 'edit' and player.programmer
         [oNum, verbName] = command.argstr.split('.')
         o = db.findByNum oNum
         if o?
@@ -113,8 +113,10 @@ ws_server.sockets.on 'connection', (socket) ->
 
   socket.on 'form_input_login', (data, fn) ->
     formData = data.formData
+
     matches = db.players.filter (player) ->
-      player.prop('username') == formData.username and player.prop('password') == phash formData.password
+      player.authenticates(formData.username, phash formData.password)
+
     if matches.length == 1
       player = matches[0]
 
@@ -125,7 +127,7 @@ ws_server.sockets.on 'connection', (socket) ->
 
       connections.add player, socket
 
-      player.send c "Welcome #{player.prop('username')}!", 'blue bold'
+      player.send c "Welcome #{player.username}!", 'blue bold'
       fn null
     else
       formDescriptor = formDescriptors.login()
@@ -142,7 +144,7 @@ ws_server.sockets.on 'connection', (socket) ->
   socket.on 'save_verb', (verb) ->
     player = connections.playerFor socket
     if player?
-      if player.is_programmer()
+      if player.programmer
         id = verb.oid
         object = db.findById(id) # TODO could be null
         object.saveVerb verb # TODO could fail?
