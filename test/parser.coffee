@@ -1,5 +1,5 @@
 should = require 'should'
-parser = require '../lib/parser'
+parser = if process.env.MOO_COV then require '../lib-cov/parser' else require '../lib/parser'
 
 describe 'parser', ->
   describe 'parse', ->

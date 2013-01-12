@@ -1,5 +1,5 @@
 should = require 'should'
-connections = require '../lib/connection_manager'
+connections = if process.env.MOO_COV then require '../lib-cov/connection_manager' else require '../lib/connection_manager'
 
 describe 'connection_manager', ->
   describe 'add', ->

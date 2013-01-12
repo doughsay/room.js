@@ -1,14 +1,5 @@
 c = require('./color').color
 
-# crappy util for pretty printing objects to the client
-old_print = (o) ->
-  output = "\n"
-  for key, value of o
-    if value
-      output += "  " + c "#{key}: ", 'yellow'
-      output += c(value, 'blue bold') + "\n"
-  output
-
 safeString = (s) ->
   s.replace /\n/g, '\\n'
 
