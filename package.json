@@ -9,6 +9,8 @@
     "coffee-script": "*",
     "less": "*",
     "underscore": "*",
-    "mincer": "*"
+    "mincer": "*",
+    "should": "*",
+    "mocha": "*"
   }
 }

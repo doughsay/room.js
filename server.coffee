@@ -110,7 +110,7 @@ ws_server.sockets.on 'connection', (socket) ->
         else
           socket.emit 'output', {msg: "\nUnrecognized command. Type #{c 'help', 'magenta bold'} for a list of available commands."}
 
-  socket.on 'form_input_login', (data) ->
+  socket.on 'form_input_login', (data, fn) ->
     formData = data.formData
     matches = db.players.filter (player) ->
       player.prop('username') == formData.username and player.prop('password') == phash formData.password
@@ -125,17 +125,18 @@ ws_server.sockets.on 'connection', (socket) ->
       connections.add player, socket
 
       player.send c "Welcome #{player.prop('username')}!", 'blue bold'
+      fn null
     else
       formDescriptor = formDescriptors.login()
       formDescriptor.inputs[0].value = formData.username
       formDescriptor.error = 'Invalid username or password.'
-      socket.emit 'request_form_input', formDescriptor
+      fn formDescriptor
 
-  socket.on 'form_input_create', (data) ->
+  socket.on 'form_input_create', (data, fn) ->
     formData = data.formData
     formDescriptor = formDescriptors.createAccount()
     formDescriptor.error = 'Not yet implemented.'
-    socket.emit 'request_form_input', formDescriptor
+    fn formDescriptor
 
   socket.on 'save_verb', (verb) ->
     if socket.player?

@@ -8,7 +8,7 @@ block content
       form(data-bind='submit: sendCommand')
         input(type='text', data-bind="value: command, event: {keydown: recall}")
   .ui-layout-north(data-bind='if: loadedVerb')
-    div.editor(data-bind='with: loadedVerb')
+    .editor(data-bind='with: loadedVerb')
       input.name(type='text', data-bind='value: name')
       select.dobjarg(data-bind='value: dobjarg')
         option none
@@ -44,3 +44,21 @@ block content
           i.icon-remove.icon-white
           span  close
       div(data-bind='ace: {mode: "coffee", theme: "twilight", value: code, css: {fontSize: "12pt", fontFamily: "\'Source Code Pro\', sans-serif"}}')
+  .modal.hide.fade(data-bind='modal: form')
+    .modal-header
+      button.close(data-dismiss='modal') ×
+      h3(data-bind='text: title')
+    .modal-body
+      div(data-bind='if: error')
+        .alert.alert-error
+          button.close(data-dismiss='alert') ×
+          span(data-bind='text: error')
+      form#modalForm.form-horizontal(data-bind='foreach: inputs, submit: doSubmit')
+        div.control-group(data-bind='css: {error: !!error()}')
+          label.control-label(data-bind='text: label, attr: {for: name}')
+          .controls
+            input(data-bind='value: value, attr: {id: name, name: name, type: type, placeholder: label}')
+            span.help-inline(data-bind='visible: error, text: error')
+    .modal-footer
+      button.btn(data-dismiss='modal') Cancel
+      button.btn.btn-primary(type='submit', form='modalForm', data-bind='text: submit')
