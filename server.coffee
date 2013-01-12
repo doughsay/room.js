@@ -135,11 +135,44 @@ ws_server.sockets.on 'connection', (socket) ->
       formDescriptor.error = 'Invalid username or password.'
       fn formDescriptor
 
+  # TODO (better) validation and sanitization
   socket.on 'form_input_create', (data, fn) ->
     formData = data.formData
     formDescriptor = formDescriptors.createAccount()
-    formDescriptor.error = 'Not yet implemented.'
-    fn formDescriptor
+    formDescriptor.inputs[0].value = formData.name
+    formDescriptor.inputs[1].value = formData.username
+    valid = true
+
+    if formData.name.length < 2
+      valid = false
+      formDescriptor.inputs[0].error = "Not long enough"
+
+    if db.playerNameTaken formData.name
+      valid = false
+      formDescriptor.inputs[0].error = "Already taken"
+
+    if formData.username.length < 2
+      valid = false
+      formDescriptor.inputs[1].error = "Not long enough"
+
+    if db.usernameTaken formData.username
+      valid = false
+      formDescriptor.inputs[1].error = "Already taken"
+
+    if formData.password.length < 8
+      valid = false
+      formDescriptor.inputs[2].error = "Not long enough"
+
+    if formData.password != formData.password2
+      valid = false
+      formDescriptor.inputs[3].error = "Doesn't match"
+
+    if not valid
+      fn formDescriptor
+    else
+      db.createNewPlayer formData.name, formData.username, phash formData.password
+      socket.emit 'output', {msg: "\n#{c 'Account created!', 'bold green'}  You may now #{c 'login', 'bold magenta'}."}
+      fn null
 
   socket.on 'save_verb', (verb) ->
     player = connections.playerFor socket

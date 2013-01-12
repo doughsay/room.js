@@ -127,6 +127,28 @@ class MooDB
       name: o.name
       contents: contents o
 
+  usernameTaken: (username) ->
+    !!(@players.filter (player) -> player.username == username).length
+
+  playerNameTaken: (name) ->
+    !!(@players.filter (player) -> player.name == name).length
+
+  createNewPlayer: (name, username, password, programmer = false) ->
+    nextId = @nextId()
+    newPlayer = new MooPlayer nextId, 1, name, [], 5, [], username, password, true, programmer
+    @objects[nextId] = newPlayer
+    @players.push newPlayer
+    true
+
+  # terrible way to get the next available id in the DB
+  nextId: ->
+    nextId = 0
+    for i in [0..@objects.length+1]
+      if !@objects[i]
+        break
+      nextId++
+    nextId
+
   toString: ->
     "[MooDB]"
 
