@@ -4,7 +4,7 @@
 #= require bootstrap
 #= require knockout
 #= require knockout-ace
-#= require compiled_templates
+#= require knockout-modal
 
 class Verb
   constructor: (verb) ->
@@ -24,6 +24,46 @@ class Verb
     iobjarg: @iobjarg()
     preparg: @preparg()
     code: @code()
+
+class ModalForm
+
+  class Input
+    constructor: (inputDescriptor) ->
+      @type = ko.observable inputDescriptor.type
+      @name = ko.observable inputDescriptor.name
+      @label = ko.observable inputDescriptor.label
+      @error = ko.observable inputDescriptor.error || false
+      @value = ko.observable inputDescriptor.value || ""
+
+  constructor: (formDescriptor, @socket) ->
+    @event = ko.observable formDescriptor.event
+    @title = ko.observable formDescriptor.title
+    @submit = ko.observable formDescriptor.submit
+    @error = ko.observable formDescriptor.error || false
+    @inputs = ko.observableArray formDescriptor.inputs.map (inputDescriptor) -> new Input(inputDescriptor)
+
+  updateObservables: (newFormDescriptor) ->
+    @error newFormDescriptor.error || false
+    @inputs newFormDescriptor.inputs.map (inputDescriptor) -> new Input(inputDescriptor)
+    $('.modal').find('input').first().trigger('focus')
+
+  doSubmit: ->
+    modal = $('.modal')
+    form = modal.find('form')
+    data = form.serializeArray().reduce ((o,c) -> o[c.name] = c.value; o), {}
+    @socket.emit "form_input_#{@event()}", formData: data, (response) =>
+      if response?
+        @updateObservables response
+      else
+        modal.modal 'hide'
+    false
+
+  shown: (element, valueAccessor) ->
+    $(element).find('input').first().trigger('focus')
+
+  hidden: (element, valueAccessor) ->
+    valueAccessor()(null)
+    # TODO: also re-focus command input
 
 class MooViewModel
 
@@ -49,6 +89,8 @@ class MooViewModel
   # loadedObject: ko.observable null
 
   loadedVerb: ko.observable null
+
+  form: ko.observable null
 
   # construct the view model
   constructor: (@body, @screen, @input) ->
@@ -184,18 +226,13 @@ class MooViewModel
   connect: =>
     @addLine c 'Connected!', 'bold green'
 
-    # sign in as root for now for convenience
-    #@socket.emit 'form_input_login', formData: {username: 'root', password: 'p@ssw0rd'}
-
-    # send the edit command for the get verb on the generic item object
-    #@socket.emit 'input', {msg: 'edit #4.get'}
-
   connecting: =>
     @addLine c "Connecting...", 'gray'
 
   disconnect: =>
     @addLine c 'Disconnected from server.', 'bold red'
     @loadedVerb null
+    @form null
 
   connect_failed: =>
     @addLine c 'Connection to server failed.', 'bold red'
@@ -222,20 +259,7 @@ class MooViewModel
   # so we display a modal with a dynamically
   # constructed form
   request_form_input: (formDescriptor) =>
-    # precompiled jade template from views/modal_form.jade
-    modal = $ jade.templates.modal_form form: formDescriptor
-    modal.modal()
-    modal.on 'shown', ->
-      modal.find('input').first().focus()
-    modal.on 'hidden', =>
-      modal.remove()
-      @focusInput()
-    form = modal.find('form')
-    form.on 'submit', =>
-      data = form.serializeArray().reduce ((o,c) -> o[c.name] = c.value; o), {}
-      @socket.emit "form_input_#{formDescriptor.event}", formData: data
-      modal.modal 'hide'
-      false # return false to stop the form from actually submitting
+    @form new ModalForm formDescriptor, @socket
 
   edit_verb: (verb) =>
     @loadedVerb new Verb verb

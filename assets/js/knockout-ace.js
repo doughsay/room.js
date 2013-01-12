@@ -13,6 +13,7 @@ ko.bindingHandlers.ace = {
 
     editor.on('blur', function(e) {
       // on change was screwy, use on blur to update the viewmodel
+      // NOTE: this updates the view model value even when it hasn't changed
       value(editor.getValue())
     });
 
