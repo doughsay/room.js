@@ -137,11 +137,11 @@ class MooView
     @loadedVerb().dirty false
 
   unload_verb: =>
-    unload = true
     if @loadedVerb().dirty()
-      unload = confirm 'Are you sure you want to unload this verb?  Your changes will be lost.'
-
-    @loadedVerb null if unload
+      bootbox.confirm 'Are you sure you want to unload this verb?  Your changes will be lost.', (unload) =>
+        @loadedVerb null if unload
+    else
+      @loadedVerb null
 
   verb_change: (verb) =>
     if verb == null
