@@ -139,9 +139,8 @@ ws_server.sockets.on 'connection', (socket) ->
     fn formDescriptor
 
   socket.on 'save_verb', (verb) ->
-    if socket.player?
-      player = socket.player
-
+    player = connections.playerFor socket
+    if player?
       if player.is_programmer()
         id = verb.oid
         object = db.findById(id) # TODO could be null

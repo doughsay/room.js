@@ -15,6 +15,7 @@ class Verb
     @iobjarg = ko.observable verb.iobjarg
     @preparg = ko.observable verb.preparg
     @code = ko.observable verb.code
+    @dirty = ko.observable false
 
   serialize: ->
     oid: @oid
@@ -59,11 +60,11 @@ class ModalForm
     false
 
   shown: (element, valueAccessor) ->
-    $(element).find('input').first().trigger('focus')
+    $(element).find('input').first().focus()
 
   hidden: (element, valueAccessor) ->
     valueAccessor()(null)
-    # TODO: also re-focus command input
+    $('.command input').focus()
 
 class MooViewModel
 
@@ -82,12 +83,6 @@ class MooViewModel
 
   socket: null
 
-  # list of moo objects; used when signed in as a programmer
-  # objects: ko.observableArray []
-
-  # the details of the currently loaded object
-  # loadedObject: ko.observable null
-
   loadedVerb: ko.observable null
 
   form: ko.observable null
@@ -100,12 +95,7 @@ class MooViewModel
     @setSizes()
     @focusInput()
 
-    # TODO can we move this somewhere better?
-    @loadedVerb.subscribe (verb) =>
-      if verb == null
-        @layout.hide 'north'
-      else
-        @layout.show 'north'
+    @loadedVerb.subscribe @verb_change
 
   # attach the websocket event listeners
   attachListeners: ->
@@ -145,9 +135,7 @@ class MooViewModel
     # if an ace editor is present, call it's resize function
     # and set sizes for all the form elements to make them look prettier
     editorDiv = $ '.ace_editor'
-    console.log 'setting size'
     if editorDiv.length != 0
-      console.log 'setting editor sizes too!'
       editor = ace.edit editorDiv[0]
       editor.resize()
 
@@ -214,10 +202,20 @@ class MooViewModel
 
   save_verb: =>
     @socket.emit 'save_verb', @loadedVerb().serialize()
+    @loadedVerb().dirty false
 
   unload_verb: =>
-    # TODO: prompt if changes have been made
-    @loadedVerb null
+    unload = true
+    if @loadedVerb().dirty()
+      unload = confirm 'Are you sure you want to unload this verb?  Your changes will be lost.'
+
+    @loadedVerb null if unload
+
+  verb_change: (verb) =>
+    if verb == null
+      @layout.hide 'north'
+    else
+      @layout.show 'north'
 
   #############################
   # websocket event listeners #
