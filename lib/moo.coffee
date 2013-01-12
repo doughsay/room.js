@@ -269,7 +269,7 @@ class MooPlayer extends MooObject
   send: (msg) ->
     socket = connections.socketFor @
     if socket?
-      socket.emit 'output', {msg: "\n#{msg}"}
+      socket.emit 'output', "\n#{msg}"
       true
     else
       false

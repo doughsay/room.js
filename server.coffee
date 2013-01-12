@@ -17,6 +17,9 @@ mooUtil = require './lib/util'
 contextBuilder = require './lib/context'
 formDescriptors = require './lib/forms'
 
+# TODO write this and put it somewhere
+sanitize = (x) -> x
+
 environment = new Mincer.Environment()
 environment.appendPath 'assets/js'
 environment.appendPath 'assets/css'
@@ -47,15 +50,14 @@ ws_server = io.listen(http_server, {log: false})
 # repl.start('>').context.db = db
 
 ws_server.sockets.on 'connection', (socket) ->
-  socket.emit 'output', {msg: "Welcome to #{c 'jsmoo', 'blue bold'}!"}
-  socket.emit 'output', {msg: "Type #{c 'help', 'magenta bold'} for a list of available commands."}
+  socket.emit 'output', "Welcome to #{c 'jsmoo', 'blue bold'}!"
+  socket.emit 'output', "Type #{c 'help', 'magenta bold'} for a list of available commands."
 
   socket.on 'disconnect', ->
     # TODO (when a socket disconnects, put the player in limbo)
     connections.remove socket
 
-  socket.on 'input', (data) ->
-    str = data.msg
+  socket.on 'input', (str) ->
     player = connections.playerFor socket
     if player?
 
@@ -103,16 +105,16 @@ ws_server.sockets.on 'connection', (socket) ->
           * #{c 'create', 'magenta bold'} - create a new account
           * #{c 'help', 'magenta bold'}   - show this message
           """
-          socket.emit 'output', {msg: msg}
+          socket.emit 'output', msg
         when "login"
           socket.emit 'request_form_input', formDescriptors.login()
         when "create"
           socket.emit 'request_form_input', formDescriptors.createAccount()
         else
-          socket.emit 'output', {msg: "\nUnrecognized command. Type #{c 'help', 'magenta bold'} for a list of available commands."}
+          socket.emit 'output', "\nUnrecognized command. Type #{c 'help', 'magenta bold'} for a list of available commands."
 
-  socket.on 'form_input_login', (data, fn) ->
-    formData = data.formData
+  socket.on 'form_input_login', (userData, fn) ->
+    formData = sanitize userData
 
     matches = db.players.filter (player) ->
       player.authenticates(formData.username, phash formData.password)
@@ -136,8 +138,9 @@ ws_server.sockets.on 'connection', (socket) ->
       fn formDescriptor
 
   # TODO (better) validation and sanitization
-  socket.on 'form_input_create', (data, fn) ->
-    formData = data.formData
+  socket.on 'form_input_create', (userData, fn) ->
+    formData = sanitize userData
+
     formDescriptor = formDescriptors.createAccount()
     formDescriptor.inputs[0].value = formData.name
     formDescriptor.inputs[1].value = formData.username
@@ -171,7 +174,7 @@ ws_server.sockets.on 'connection', (socket) ->
       fn formDescriptor
     else
       db.createNewPlayer formData.name, formData.username, phash formData.password
-      socket.emit 'output', {msg: "\n#{c 'Account created!', 'bold green'}  You may now #{c 'login', 'bold magenta'}."}
+      socket.emit 'output', "\n#{c 'Account created!', 'bold green'}  You may now #{c 'login', 'bold magenta'}."
       fn null
 
   socket.on 'save_verb', (verb) ->

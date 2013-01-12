@@ -51,8 +51,8 @@ class ModalForm
   doSubmit: ->
     modal = $('.modal')
     form = modal.find('form')
-    data = form.serializeArray().reduce ((o,c) -> o[c.name] = c.value; o), {}
-    @socket.emit "form_input_#{@event()}", formData: data, (response) =>
+    formData = form.serializeArray().reduce ((o,c) -> o[c.name] = c.value; o), {}
+    @socket.emit "form_input_#{@event()}", formData, (response) =>
       if response?
         @updateObservables response
       else
@@ -173,7 +173,7 @@ class MooViewModel
       if @history.length > @maxHistory()
         @history.pop()
       @currentHistory = -1
-      @socket.emit 'input', {msg: command}
+      @socket.emit 'input', command
       @command ""
 
   # given a javascript event for the 'up' or 'down' keys
@@ -249,8 +249,8 @@ class MooViewModel
 
   # output event
   # adds a line of output to the screen
-  output: (data) =>
-    @addLine data.msg
+  output: (msg) =>
+    @addLine msg
 
   # request_form_input event
   # the server has requested some form input
