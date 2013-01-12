@@ -13,7 +13,7 @@ remove = (socket) ->
   player = playerFor socket
   delete sockets[player.id] if player?
   delete players[socket.id] if socket?
-  console.log "#{player.username} disconnected" if process.env.NODE_ENV != 'test'
+  console.log "#{player.username} disconnected" if process.env.NODE_ENV != 'test' and player? and player.username?
 
 socketFor = (player) ->
   throw new Error 'invalid player passed to socketFor' if not player? or not player.id?

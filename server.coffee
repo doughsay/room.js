@@ -51,10 +51,11 @@ ws_server.sockets.on 'connection', (socket) ->
   socket.emit 'output', "Type #{c 'help', 'magenta bold'} for a list of available commands."
 
   socket.on 'disconnect', ->
-    # TODO (when a socket disconnects, put the player in limbo)
+    # TODO (when a player socket disconnects, put the player in limbo)
     connections.remove socket
 
-  socket.on 'input', (str) ->
+  socket.on 'input', (userStr) ->
+    str = userStr || ""
     player = connections.playerFor socket
     if player?
 
@@ -193,6 +194,7 @@ ws_server.sockets.on 'connection', (socket) ->
       socket.emit 'output', "\n#{c 'Account created!', 'bold green'}  You may now #{c 'login', 'bold magenta'}."
       fn null
 
+  # TODO sanitize and validate
   socket.on 'save_verb', (verb) ->
     player = connections.playerFor socket
     if player?
