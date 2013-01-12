@@ -17,9 +17,6 @@ mooUtil = require './lib/util'
 contextBuilder = require './lib/context'
 formDescriptors = require './lib/forms'
 
-# TODO write this and put it somewhere
-sanitize = (x) -> x
-
 environment = new Mincer.Environment()
 environment.appendPath 'assets/js'
 environment.appendPath 'assets/css'
@@ -114,6 +111,10 @@ ws_server.sockets.on 'connection', (socket) ->
           socket.emit 'output', "\nUnrecognized command. Type #{c 'help', 'magenta bold'} for a list of available commands."
 
   socket.on 'form_input_login', (userData, fn) ->
+    sanitize = (userData) ->
+      username: (userData.username || "").trim()
+      password: userData.password || ""
+
     formData = sanitize userData
 
     matches = db.players.filter (player) ->
@@ -139,36 +140,51 @@ ws_server.sockets.on 'connection', (socket) ->
 
   # TODO (better) validation and sanitization
   socket.on 'form_input_create', (userData, fn) ->
+    sanitize = (userData) ->
+      name: (userData.name || "").trim()
+      username: (userData.username || "").trim()
+      password: userData.password || ""
+      password2: userData.password2 || ""
+
+    validate = (formData) ->
+      formDescriptor = formDescriptors.createAccount()
+      formDescriptor.inputs[0].value = formData.name
+      formDescriptor.inputs[1].value = formData.username
+
+      valid = true
+
+      if formData.name.length < 2
+        valid = false
+        formDescriptor.inputs[0].error = "Not long enough"
+
+      if db.playerNameTaken formData.name
+        valid = false
+        formDescriptor.inputs[0].error = "Already taken"
+
+      if formData.username.length < 2
+        valid = false
+        formDescriptor.inputs[1].error = "Not long enough"
+
+      if not formData.username.match /^[_a-zA-Z0-9]+$/
+        valid = false
+        formDescriptor.inputs[1].error = "Alphanumeric only"
+
+      if db.usernameTaken formData.username
+        valid = false
+        formDescriptor.inputs[1].error = "Already taken"
+
+      if formData.password.length < 8
+        valid = false
+        formDescriptor.inputs[2].error = "Not long enough"
+
+      if formData.password != formData.password2
+        valid = false
+        formDescriptor.inputs[3].error = "Doesn't match"
+
+      [valid, formDescriptor]
+
     formData = sanitize userData
-
-    formDescriptor = formDescriptors.createAccount()
-    formDescriptor.inputs[0].value = formData.name
-    formDescriptor.inputs[1].value = formData.username
-    valid = true
-
-    if formData.name.length < 2
-      valid = false
-      formDescriptor.inputs[0].error = "Not long enough"
-
-    if db.playerNameTaken formData.name
-      valid = false
-      formDescriptor.inputs[0].error = "Already taken"
-
-    if formData.username.length < 2
-      valid = false
-      formDescriptor.inputs[1].error = "Not long enough"
-
-    if db.usernameTaken formData.username
-      valid = false
-      formDescriptor.inputs[1].error = "Already taken"
-
-    if formData.password.length < 8
-      valid = false
-      formDescriptor.inputs[2].error = "Not long enough"
-
-    if formData.password != formData.password2
-      valid = false
-      formDescriptor.inputs[3].error = "Doesn't match"
+    [valid, formDescriptor] = validate formData
 
     if not valid
       fn formDescriptor
