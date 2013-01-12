@@ -132,6 +132,8 @@ class MooView
       else
         true
 
+  # TODO this could fail
+  # TODO if the name is updated, we need to update the loaded verbs "original_name"
   save_verb: =>
     @socket.emit 'save_verb', @loadedVerb().serialize()
     @loadedVerb().dirty false
@@ -146,6 +148,7 @@ class MooView
   verb_change: (verb) =>
     if verb == null
       @layout.hide 'north'
+      @focusInput()
     else
       @layout.show 'north'
 

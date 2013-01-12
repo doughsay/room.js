@@ -194,15 +194,77 @@ ws_server.sockets.on 'connection', (socket) ->
       socket.emit 'output', "\n#{c 'Account created!', 'bold green'}  You may now #{c 'login', 'bold magenta'}."
       fn null
 
-  # TODO sanitize and validate
-  socket.on 'save_verb', (verb) ->
+  socket.on 'save_verb', (userVerb) ->
+    sanitize = (userVerb) ->
+      oid: userVerb.oid || null,
+      original_name: userVerb.original_name || ""
+      name: (userVerb.name || "").trim().split(' ').filter((s) -> s != '').map((s) -> s.trim().toLowerCase()).join ' '
+      dobjarg: userVerb.dobjarg || null
+      preparg: userVerb.preparg || null
+      iobjarg: userVerb.iobjarg || null
+      code: (userVerb.code || "").trim()
+
+    validate = (verb) ->
+      errors = []
+
+      if not verb.oid?
+        errors.push "missing oid"
+      else
+        o = db.findById(verb.oid)
+        if !o?
+          errors.push "the object doesn't exist"
+
+      if verb.original_name == ""
+        errors.push "missing original name"
+
+      if verb.name == ""
+        errors.push "name can't be empty"
+      else
+        verbNames = verb.name.split ' '
+        for name in verbNames
+          if name == '*' and verbNames.length != 1
+            errors.push "* can only be by itself"
+          else if name == '*'
+            break
+          else if name.indexOf('*') == 0 and name.length > 1
+            errors.push "* can't appear at the beginning of a verb's name"
+          else if not name.match /^[a-z]+\*?[a-z]*$/
+            errors.push "verb names can be alphanumeric and contain * only once"
+
+      if not verb.dobjarg?
+        errors.push "missing direct object argument specifier"
+      else if verb.dobjarg not in ['none', 'this', 'any']
+        errors.push 'invalid direct object argument specifier'
+
+      if not verb.preparg?
+        errors.push "missing preposition argument specifier"
+      else if verb.preparg not in ['none', 'any', 'with/using', 'at/to', 'in front of', 'in/inside/into', 'on top of/on/onto/upon', 'out of/from inside/from', 'over', 'through', 'under/underneath/beneath', 'behind', 'beside', 'for/about', 'is', 'as', 'off/off of']
+        errors.push 'invalid preposition argument specifier'
+
+      if not verb.iobjarg?
+        errors.push "missing indirect object argument specifier"
+      else if verb.iobjarg not in ['none', 'this', 'any']
+        errors.push 'invalid indirect object argument specifier'
+
+      if verb.code == ''
+        errors.push "missing code"
+
+      errors
+
     player = connections.playerFor socket
     if player?
       if player.programmer
-        id = verb.oid
-        object = db.findById(id) # TODO could be null
-        object.saveVerb verb # TODO could fail?
-        player.send c "Verb saved!", 'green'
+        verb = sanitize userVerb
+        errors = validate verb
+
+        if errors.length > 0
+          errors.unshift 'There were errors in your verb code submission:'
+          player.send c (errors.join '\n'), 'red'
+        else
+          id = verb.oid
+          object = db.findById(id)
+          object.saveVerb verb
+          player.send c "Verb saved!", 'green'
       else
         player.send c "You are not allowed to do that.", 'red'
 
