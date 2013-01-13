@@ -8,39 +8,5 @@ block content
       form(data-bind='submit: sendCommand')
         input(type='text', data-bind="value: command, event: {keydown: recall}")
   .ui-layout-north(data-bind='if: loadedVerb')
-    div.editor(data-bind='with: loadedVerb')
-      input.name(type='text', data-bind='value: name')
-      select.dobjarg(data-bind='value: dobjarg')
-        option none
-        option this
-        option any
-      select.preparg(data-bind='value: preparg')
-        option none
-        option any
-        option with/using
-        option at/to
-        option in front of
-        option in/inside/into
-        option on top of/on/onto/upon
-        option out of/from inside/from
-        option over
-        option through
-        option under/underneath/beneath
-        option behind
-        option beside
-        option for/about
-        option is
-        option as
-        option off/off of
-      select.iobjarg(data-bind='value: iobjarg')
-        option none
-        option this
-        option any
-      span.actions
-        a.save(data-bind='click: $root.save_verb')
-          i.icon-ok.icon-white
-          span  save
-        a.closeEditor(data-bind='click: $root.unload_verb')
-          i.icon-remove.icon-white
-          span  close
-      div(data-bind='ace: {mode: "coffee", theme: "twilight", value: code, css: {fontSize: "12pt", fontFamily: "\'Source Code Pro\', sans-serif"}}')
+    include includes/editor
+  include includes/modal

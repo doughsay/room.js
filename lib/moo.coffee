@@ -15,7 +15,7 @@ class MooDB
     for o in JSON.parse fs.readFileSync filename
       if o?
         if o.player
-          newMooObj = new MooPlayer o.id, o.parent_id, o.name, o.aliases, o.location_id, o.contents_ids
+          newMooObj = new MooPlayer o.id, o.parent_id, o.name, o.aliases, o.location_id, o.contents_ids, o.username, o.password, true, o.programmer
         else
           newMooObj = new MooObject o.id, o.parent_id, o.name, o.aliases, o.location_id, o.contents_ids
         for prop in o.properties
@@ -23,7 +23,7 @@ class MooDB
         for v in o.verbs
           newMooObj.addVerb v.name, v.dobjarg, v.preparg, v.iobjarg, v.code
         @objects[parseInt(o.id)] = newMooObj
-        if newMooObj.is_player()
+        if newMooObj.player
           @players.push newMooObj
     util.puts "done."
 
@@ -127,6 +127,31 @@ class MooDB
       name: o.name
       contents: contents o
 
+  usernameTaken: (username) ->
+    !!(@players.filter (player) -> player.username == username).length
+
+  playerNameTaken: (name) ->
+    !!(@players.filter (player) -> player.name == name).length
+
+  createNewPlayer: (name, username, password, programmer = false) ->
+    nextId = @nextId()
+    newPlayer = new MooPlayer nextId, 1, name, [], null, [], username, password, true, programmer
+    @objects[nextId] = newPlayer
+    @players.push newPlayer
+    root = @findById 0
+    startLocation = @findById root.prop 'start_location_id'
+    newPlayer.moveTo startLocation
+    true
+
+  # terrible way to get the next available id in the DB
+  nextId: ->
+    nextId = 0
+    for i in [0..@objects.length+1]
+      if !@objects[i]
+        break
+      nextId++
+    nextId
+
   toString: ->
     "[MooDB]"
 
@@ -163,10 +188,14 @@ class MooObject
 
   moveTo: (target) ->
     loc = @location()
-    loc.contents_ids = loc.contents_ids.filter (id) =>
-      id != @id
-    target.contents_ids.push @id
-    @location_id = target.id
+    if loc?
+      loc.contents_ids = loc.contents_ids.filter (id) =>
+        id != @id
+    if target?
+      target.contents_ids.push @id
+      @location_id = target.id
+    else
+      @location_id = null
 
   contents: ->
     @contents_ids.map (id) -> db.findById id
@@ -185,9 +214,10 @@ class MooObject
       return undefined
 
   saveVerb: (newVerb) ->
+    # TODO validation & sanitization
     for verb in @verbs
       if verb.name == newVerb.original_name
-        verb.name = newVerb.name
+        verb.name = newVerb.name.trim()
         verb.dobjarg = newVerb.dobjarg
         verb.preparg = newVerb.preparg
         verb.iobjarg = newVerb.iobjarg
@@ -227,32 +257,29 @@ class MooObject
       return @parent().findVerb context
     return null
 
-  is_player: -> false
-
   toString: ->
     "[MooObject #{@name}]"
 
 # a Moo Player is just a slightly more specialized Moo Object
 class MooPlayer extends MooObject
+  # MooObject fields +
+  # @username: String
+  # @password: String
+  # @player: Boolean
+  # @programmer: Boolean
 
-  toJSON: ->
-    clone = _.clone @
-    clone.socket = undefined
-    clone.player = true
-    return clone
+  constructor: (@id, @parent_id, @name, @aliases, @location_id, @contents_ids, @username, @password, @player = true, @programmer = false, @properties = [], @verbs = []) ->
 
-  is_player: -> true
+  authenticates: (username, passwordHash) ->
+    @username == username and @password == passwordHash
 
   send: (msg) ->
     socket = connections.socketFor @
     if socket?
-      socket.emit 'output', {msg: "\n#{msg}"}
+      socket.emit 'output', "\n#{msg}"
       true
     else
       false
-
-  is_programmer: ->
-    true
 
   toString: ->
     "[MooPlayer #{@name}]"

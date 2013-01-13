@@ -47,21 +47,21 @@ ws_server = io.listen(http_server, {log: false})
 # repl.start('>').context.db = db
 
 ws_server.sockets.on 'connection', (socket) ->
-  socket.emit 'output', {msg: "Welcome to #{c 'jsmoo', 'blue bold'}!"}
-  socket.emit 'output', {msg: "Type #{c 'help', 'magenta bold'} for a list of available commands."}
+  socket.emit 'output', "Welcome to #{c 'jsmoo', 'blue bold'}!"
+  socket.emit 'output', "Type #{c 'help', 'magenta bold'} for a list of available commands."
 
   socket.on 'disconnect', ->
-    # TODO (when a socket disconnects, put the player in limbo)
+    # TODO (when a player socket disconnects, put the player in limbo)
     connections.remove socket
 
-  socket.on 'input', (data) ->
-    str = data.msg
+  socket.on 'input', (userStr) ->
+    str = userStr || ""
     player = connections.playerFor socket
     if player?
 
       command = parse str
 
-      if command.verb == 'eval' and player.is_programmer()
+      if command.verb == 'eval' and player.programmer
         context = contextBuilder.buildBaseContext()
         context.db = db
         context.$ = (id) -> db.findById(id)
@@ -71,14 +71,15 @@ ws_server.sockets.on 'connection', (socket) ->
           player.send mooUtil.print output
         catch error
           player.send c error.toString(), 'inverse bold red'
-      else if command.verb == 'edit' and player.is_programmer()
+      else if command.verb == 'edit' and player.programmer
         [oNum, verbName] = command.argstr.split('.')
         o = db.findByNum oNum
         if o?
           verb = (o.verbs.filter (v) -> v.name == verbName)[0]
         if verb?
-          verb.oid = o.id
-          socket.emit 'edit_verb', verb
+          clonedVerb = _.clone verb
+          clonedVerb.oid = o.id
+          socket.emit 'edit_verb', clonedVerb
         else
           player.send c "No such object or verb.", 'red'
       else
@@ -102,18 +103,24 @@ ws_server.sockets.on 'connection', (socket) ->
           * #{c 'create', 'magenta bold'} - create a new account
           * #{c 'help', 'magenta bold'}   - show this message
           """
-          socket.emit 'output', {msg: msg}
+          socket.emit 'output', msg
         when "login"
           socket.emit 'request_form_input', formDescriptors.login()
         when "create"
           socket.emit 'request_form_input', formDescriptors.createAccount()
         else
-          socket.emit 'output', {msg: "\nUnrecognized command. Type #{c 'help', 'magenta bold'} for a list of available commands."}
+          socket.emit 'output', "\nUnrecognized command. Type #{c 'help', 'magenta bold'} for a list of available commands."
 
-  socket.on 'form_input_login', (data) ->
-    formData = data.formData
+  socket.on 'form_input_login', (userData, fn) ->
+    sanitize = (userData) ->
+      username: (userData.username || "").trim()
+      password: userData.password || ""
+
+    formData = sanitize userData
+
     matches = db.players.filter (player) ->
-      player.prop('username') == formData.username and player.prop('password') == phash formData.password
+      player.authenticates(formData.username, phash formData.password)
+
     if matches.length == 1
       player = matches[0]
 
@@ -124,30 +131,148 @@ ws_server.sockets.on 'connection', (socket) ->
 
       connections.add player, socket
 
-      player.send c "Welcome #{player.prop('username')}!", 'blue bold'
+      player.send c "Welcome #{player.username}!", 'blue bold'
+      fn null
     else
       formDescriptor = formDescriptors.login()
       formDescriptor.inputs[0].value = formData.username
       formDescriptor.error = 'Invalid username or password.'
-      socket.emit 'request_form_input', formDescriptor
+      fn formDescriptor
 
-  socket.on 'form_input_create', (data) ->
-    formData = data.formData
-    formDescriptor = formDescriptors.createAccount()
-    formDescriptor.error = 'Not yet implemented.'
-    socket.emit 'request_form_input', formDescriptor
+  # TODO (better) validation and sanitization
+  socket.on 'form_input_create', (userData, fn) ->
+    sanitize = (userData) ->
+      name: (userData.name || "").trim()
+      username: (userData.username || "").trim()
+      password: userData.password || ""
+      password2: userData.password2 || ""
 
-  socket.on 'save_verb', (verb) ->
-    if socket.player?
-      player = socket.player
+    validate = (formData) ->
+      formDescriptor = formDescriptors.createAccount()
+      formDescriptor.inputs[0].value = formData.name
+      formDescriptor.inputs[1].value = formData.username
 
-      if player.is_programmer()
-        id = verb.oid
-        object = db.findById(id) # TODO could be null
-        object.saveVerb verb # TODO could fail?
-        player.send c "Verb saved!", 'green'
+      valid = true
+
+      if formData.name.length < 2
+        valid = false
+        formDescriptor.inputs[0].error = "Not long enough"
+
+      if db.playerNameTaken formData.name
+        valid = false
+        formDescriptor.inputs[0].error = "Already taken"
+
+      if formData.username.length < 2
+        valid = false
+        formDescriptor.inputs[1].error = "Not long enough"
+
+      if not formData.username.match /^[_a-zA-Z0-9]+$/
+        valid = false
+        formDescriptor.inputs[1].error = "Alphanumeric only"
+
+      if db.usernameTaken formData.username
+        valid = false
+        formDescriptor.inputs[1].error = "Already taken"
+
+      if formData.password.length < 8
+        valid = false
+        formDescriptor.inputs[2].error = "Not long enough"
+
+      if formData.password != formData.password2
+        valid = false
+        formDescriptor.inputs[3].error = "Doesn't match"
+
+      [valid, formDescriptor]
+
+    formData = sanitize userData
+    [valid, formDescriptor] = validate formData
+
+    if not valid
+      fn formDescriptor
+    else
+      db.createNewPlayer formData.name, formData.username, phash formData.password
+      socket.emit 'output', "\n#{c 'Account created!', 'bold green'}  You may now #{c 'login', 'bold magenta'}."
+      fn null
+
+  socket.on 'save_verb', (userVerb, fn) ->
+    sanitize = (userVerb) ->
+      oid: userVerb.oid || null,
+      original_name: userVerb.original_name || ""
+      name: (userVerb.name || "").trim().split(' ').filter((s) -> s != '').map((s) -> s.trim().toLowerCase()).join ' '
+      dobjarg: userVerb.dobjarg || null
+      preparg: userVerb.preparg || null
+      iobjarg: userVerb.iobjarg || null
+      code: (userVerb.code || "").trim()
+
+    validate = (verb) ->
+      errors = []
+
+      if not verb.oid?
+        errors.push "missing oid"
+      else
+        o = db.findById(verb.oid)
+        if !o?
+          errors.push "the object doesn't exist"
+
+      if verb.original_name == ""
+        errors.push "missing original name"
+
+      if verb.name == ""
+        errors.push "name can't be empty"
+      else
+        verbNames = verb.name.split ' '
+        for name in verbNames
+          if name == '*' and verbNames.length != 1
+            errors.push "* can only be by itself"
+          else if name == '*'
+            break
+          else if name.indexOf('*') == 0 and name.length > 1
+            errors.push "* can't appear at the beginning of a verb's name"
+          else if not name.match /^[a-z]+\*?[a-z]*$/
+            errors.push "verb names can be alphanumeric and contain * only once"
+
+      if not verb.dobjarg?
+        errors.push "missing direct object argument specifier"
+      else if verb.dobjarg not in ['none', 'this', 'any']
+        errors.push 'invalid direct object argument specifier'
+
+      if not verb.preparg?
+        errors.push "missing preposition argument specifier"
+      else if verb.preparg not in ['none', 'any', 'with/using', 'at/to', 'in front of', 'in/inside/into', 'on top of/on/onto/upon', 'out of/from inside/from', 'over', 'through', 'under/underneath/beneath', 'behind', 'beside', 'for/about', 'is', 'as', 'off/off of']
+        errors.push 'invalid preposition argument specifier'
+
+      if not verb.iobjarg?
+        errors.push "missing indirect object argument specifier"
+      else if verb.iobjarg not in ['none', 'this', 'any']
+        errors.push 'invalid indirect object argument specifier'
+
+      if verb.code == ''
+        errors.push "missing code"
+
+      errors
+
+    player = connections.playerFor socket
+    if player?
+      if player.programmer
+        verb = sanitize userVerb
+        errors = validate verb
+
+        if errors.length > 0
+          errors.unshift 'There were errors in your verb code submission:'
+          player.send c (errors.join '\n'), 'red'
+          fn {error: true, verb: verb}
+        else
+          id = verb.oid
+          object = db.findById(id)
+          object.saveVerb verb
+          player.send c "Verb saved!", 'green'
+          fn {error: false, verb: verb}
       else
         player.send c "You are not allowed to do that.", 'red'
+        fn {error: true}
+    else
+      socket.emit 'output', c "You are not logged in.", 'red'
+      fn {error: true}
 
 process.on 'SIGINT', ->
   util.puts ""
