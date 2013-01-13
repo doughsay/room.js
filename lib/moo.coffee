@@ -135,9 +135,12 @@ class MooDB
 
   createNewPlayer: (name, username, password, programmer = false) ->
     nextId = @nextId()
-    newPlayer = new MooPlayer nextId, 1, name, [], 5, [], username, password, true, programmer
+    newPlayer = new MooPlayer nextId, 1, name, [], null, [], username, password, true, programmer
     @objects[nextId] = newPlayer
     @players.push newPlayer
+    root = @findById 0
+    startLocation = @findById root.prop 'start_location_id'
+    newPlayer.moveTo startLocation
     true
 
   # terrible way to get the next available id in the DB
@@ -185,10 +188,14 @@ class MooObject
 
   moveTo: (target) ->
     loc = @location()
-    loc.contents_ids = loc.contents_ids.filter (id) =>
-      id != @id
-    target.contents_ids.push @id
-    @location_id = target.id
+    if loc?
+      loc.contents_ids = loc.contents_ids.filter (id) =>
+        id != @id
+    if target?
+      target.contents_ids.push @id
+      @location_id = target.id
+    else
+      @location_id = null
 
   contents: ->
     @contents_ids.map (id) -> db.findById id
