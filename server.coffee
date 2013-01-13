@@ -14,7 +14,7 @@ c = require('./lib/color').color
 parse = require('./lib/parser').parse
 db = require('./lib/moo').db
 mooUtil = require './lib/util'
-contextBuilder = require './lib/context'
+contextFor = require './lib/context'
 formDescriptors = require './lib/forms'
 
 environment = new Mincer.Environment()
@@ -62,9 +62,7 @@ ws_server.sockets.on 'connection', (socket) ->
       command = parse str
 
       if command.verb == 'eval' and player.programmer
-        context = contextBuilder.buildBaseContext()
-        context.db = db
-        context.$ = (id) -> db.findById(id)
+        context = contextFor.eval()
         try
           code = coffee.compile command.argstr, bare: true
           output = vm.runInNewContext code, context
@@ -76,15 +74,19 @@ ws_server.sockets.on 'connection', (socket) ->
         o = db.findByNum oNum
         if o?
           verb = (o.verbs.filter (v) -> v.name == verbName)[0]
-        if verb?
-          clonedVerb = _.clone verb
-          clonedVerb.oid = o.id
-          socket.emit 'edit_verb', clonedVerb
+          if verb?
+            clonedVerb = _.clone verb
+            clonedVerb.oid = o.id
+            socket.emit 'edit_verb', clonedVerb
+          else
+            newVerb = {oid: o.id, name: verbName, dobjarg: 'none', preparg: 'none', iobjarg: 'none', code: ''}
+            player.send c "Creating new verb '#{verbName}' on '#{o.name}'.", 'cyan'
+            socket.emit 'edit_verb', newVerb
         else
-          player.send c "No such object or verb.", 'red'
+          player.send c "No such object.", 'red'
       else
         [verb, context] = db.buildContextForCommand player, command
-        baseContext = contextBuilder.buildBaseContext()
+        baseContext = contextFor.base()
         context = _(baseContext).extend context
         if verb?
           try

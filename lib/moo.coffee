@@ -217,13 +217,13 @@ class MooObject
     # TODO validation & sanitization
     for verb in @verbs
       if verb.name == newVerb.original_name
-        verb.name = newVerb.name.trim()
+        verb.name = newVerb.name
         verb.dobjarg = newVerb.dobjarg
         verb.preparg = newVerb.preparg
         verb.iobjarg = newVerb.iobjarg
         verb.code = newVerb.code
         return true
-    @addverb newVerb.name, newVerb.dobjarg, newVerb.preparg, newVerb.iobjarg, newVerb.code
+    @addVerb newVerb.name, newVerb.dobjarg, newVerb.preparg, newVerb.iobjarg, newVerb.code
     return true
 
   # does this object match the search string?
@@ -280,6 +280,12 @@ class MooPlayer extends MooObject
       true
     else
       false
+
+  broadcast: (msg) ->
+    loc = @location()
+    if loc?
+      for o in loc.contents()
+        o.send msg if o.player and o != @
 
   toString: ->
     "[MooPlayer #{@name}]"

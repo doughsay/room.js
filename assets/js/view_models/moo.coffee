@@ -56,6 +56,8 @@ class MooView
         maxSize: '50%'
         minSize: 200
         slidable: false
+        onshow: => @scrollToBottom()
+        onhide: => @scrollToBottom()
     @layout.hide 'north'
 
   # apply proper sizes to the input and the screen div
@@ -105,8 +107,17 @@ class MooView
       if @history.length > @maxHistory()
         @history.pop()
       @currentHistory = -1
-      @socket.emit 'input', command
+      if not @clientCommand command
+        @socket.emit 'input', command
       @command ""
+
+  # simple client-side commands
+  clientCommand: (command) ->
+    if command == 'clear'
+      @lines []
+      true
+    else
+      false
 
   # given a javascript event for the 'up' or 'down' keys
   # scroll through history and fill the input box with
@@ -151,6 +162,8 @@ class MooView
       @focusInput()
     else
       @layout.show 'north'
+      # TODO FIXME this is stupid, but the onshow handler doesn't fire for some reason
+      window.setTimeout((=> @scrollToBottom()), 500)
 
   #############################
   # websocket event listeners #
