@@ -274,7 +274,8 @@ ws_server.sockets.on 'connection', (socket) ->
       socket.emit 'output', c "You are not logged in.", 'red'
       fn {error: true}
 
-process.on 'SIGINT', ->
+process.on 'SIGINT', -> process.exit()
+process.on 'SIGTERM', -> process.exit()
+process.on 'exit', ->
   util.puts ""
   db.saveSync('db.json')
-  process.exit()
