@@ -222,6 +222,7 @@ ws_server.sockets.on 'connection', (socket) ->
       if verb.name == ""
         errors.push "name can't be empty"
       else
+        # TODO the new name can't be the name of an existing verb
         verbNames = verb.name.split ' '
         for name in verbNames
           if name == '*' and verbNames.length != 1
