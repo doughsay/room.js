@@ -175,13 +175,13 @@ class MooObject
     @verbs.push new MooVerb name, dobjarg, preparg, iobjarg, code
 
   parent: ->
-    if @parent_id
+    if @parent_id isnt null
       db.findById @parent_id
     else
       null
 
   location: ->
-    if @location_id
+    if @location_id isnt null
       db.findById @location_id
     else
       null
@@ -285,6 +285,9 @@ class MooPlayer extends MooObject
     if loc?
       for o in loc.contents()
         o.send msg if o.player and o != @
+      true
+    else
+      false
 
   toString: ->
     "[MooPlayer #{@name}]"
