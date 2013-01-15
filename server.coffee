@@ -1,3 +1,4 @@
+#!/usr/bin/env coffee
 util = require 'util'
 vm = require 'vm'
 express = require 'express'
@@ -14,7 +15,7 @@ c = require('./lib/color').color
 parse = require('./lib/parser').parse
 db = require('./lib/moo').db
 mooUtil = require './lib/util'
-contextFor = require './lib/context'
+contextFor = require('./lib/context').for
 formDescriptors = require './lib/forms'
 
 environment = new Mincer.Environment()
@@ -62,7 +63,7 @@ ws_server.sockets.on 'connection', (socket) ->
       command = parse str
 
       if command.verb == 'eval' and player.programmer
-        context = contextFor.eval()
+        context = contextFor('eval', {$me: player, $here: player.location()})
         try
           code = coffee.compile command.argstr, bare: true
           output = vm.runInNewContext code, context
@@ -86,8 +87,7 @@ ws_server.sockets.on 'connection', (socket) ->
           player.send c "No such object.", 'red'
       else
         [verb, context] = db.buildContextForCommand player, command
-        baseContext = contextFor.base()
-        context = _(baseContext).extend context
+        context = contextFor('verb', context)
         if verb?
           try
             code = coffee.compile verb.code, bare: true
