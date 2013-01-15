@@ -141,7 +141,6 @@ ws_server.sockets.on 'connection', (socket) ->
       formDescriptor.error = 'Invalid username or password.'
       fn formDescriptor
 
-  # TODO (better) validation and sanitization
   socket.on 'form_input_create', (userData, fn) ->
     sanitize = (userData) ->
       name: (userData.name || "").trim()
@@ -222,17 +221,20 @@ ws_server.sockets.on 'connection', (socket) ->
       if verb.name == ""
         errors.push "name can't be empty"
       else
-        # TODO the new name can't be the name of an existing verb
-        verbNames = verb.name.split ' '
-        for name in verbNames
-          if name == '*' and verbNames.length != 1
-            errors.push "* can only be by itself"
-          else if name == '*'
-            break
-          else if name.indexOf('*') == 0 and name.length > 1
-            errors.push "* can't appear at the beginning of a verb's name"
-          else if not name.match /^[a-z]+\*?[a-z]*$/
-            errors.push "verb names can be alphanumeric and contain * only once"
+        o = db.findById(verb.oid)
+        if verb.name in (o.verbs.map (v) -> v.name)
+          errors.push "that verb name already exists on that object"
+        else
+          verbNames = verb.name.split ' '
+          for name in verbNames
+            if name == '*' and verbNames.length != 1
+              errors.push "* can only be by itself"
+            else if name == '*'
+              break
+            else if name.indexOf('*') == 0 and name.length > 1
+              errors.push "* can't appear at the beginning of a verb's name"
+            else if not name.match /^[a-z]+\*?[a-z]*$/
+              errors.push "verb names can be alphanumeric and contain * only once"
 
       if not verb.dobjarg?
         errors.push "missing direct object argument specifier"

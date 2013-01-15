@@ -51,13 +51,13 @@ class MooView
   setLayout: ->
     @layout = @body.layout
       livePaneResizing: true
-      onresize: => @setSizes()
+      onresize: =>
+        @setSizes()
+        @scrollToBottom()
       north:
         maxSize: '50%'
         minSize: 200
         slidable: false
-        onshow: => @scrollToBottom()
-        onhide: => @scrollToBottom()
     @layout.hide 'north'
 
   # apply proper sizes to the input and the screen div
@@ -162,8 +162,6 @@ class MooView
       @focusInput()
     else
       @layout.show 'north'
-      # TODO FIXME this is stupid, but the onshow handler doesn't fire for some reason
-      window.setTimeout((=> @scrollToBottom()), 500)
 
   #############################
   # websocket event listeners #

@@ -214,7 +214,6 @@ class MooObject
       return undefined
 
   saveVerb: (newVerb) ->
-    # TODO validation & sanitization
     for verb in @verbs
       if verb.name == newVerb.original_name
         verb.name = newVerb.name

@@ -10,7 +10,6 @@ truncate = (s, length = 25) ->
     s[0..length] + '...'
 
 # recursive colorful object output
-# TODO: make it work for arrays and objects
 print = (x, indent = '', prefix = '', color = true) ->
   # possible types:
   #
