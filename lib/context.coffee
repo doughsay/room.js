@@ -57,12 +57,11 @@ contextFor = (type, context) ->
         programmer:
           get: -> !!object.programmer
 
-      # TODO object.prop acts a little squirrely sometimes...
       for key, value of object.getAllProperties()
         do (key, value) =>
           params = {}
           params["#{key}"] =
-            get: -> value
+            get: -> object.prop key
             set: (newValue) -> object.prop key, newValue
           defineProperties @, params
 
@@ -104,6 +103,15 @@ contextFor = (type, context) ->
 
     prop: (key, value) ->
       $(@id).prop key, value
+
+      # if a new property was added, add the getter and setter for it
+      if not @[key]?
+        params = {}
+        object = $(@id)
+        params["#{key}"] =
+          get: -> object.prop key
+          set: (newValue) -> object.prop key, newValue
+        defineProperties @, params
 
     chparent: (id) ->
       throw new Error 'TODO'

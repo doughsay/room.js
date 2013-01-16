@@ -251,7 +251,7 @@ class MooObject
     for prop in @properties
       if prop.key == key
         return prop.value
-    if @parent_id
+    if @parent_id?
       return @parent().getProp key
     return undefined
 
