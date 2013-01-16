@@ -143,6 +143,23 @@ class MooDB
     newPlayer.moveTo startLocation
     true
 
+  # TODO also clone it's own properties and verbs?
+  clone: (object, newName, newAliases) ->
+    nextId = @nextId()
+    newObject = new MooObject nextId, object.parent_id, newName, newAliases
+    newObject.moveTo @findById object.location_id
+    @objects[nextId] = newObject
+    true
+
+  # Create a child of object
+  # this child will inherit any of it's parent's properties and verbs
+  createChild: (object, newName, newAliases) ->
+    nextId = @nextId()
+    newObject = new MooObject nextId, object.id, newName, newAliases
+    newObject.moveTo @findById object.location_id
+    @objects[nextId] = newObject
+    true
+
   # terrible way to get the next available id in the DB
   nextId: ->
     nextId = 0
@@ -166,7 +183,7 @@ class MooObject
   # @properties: Array[MooProperty]
   # @verbs: Array[MooVerb]
 
-  constructor: (@id, @parent_id, @name, @aliases, @location_id, @contents_ids, @properties = [], @verbs = []) ->
+  constructor: (@id, @parent_id, @name, @aliases = [], @location_id = null, @contents_ids = [], @properties = [], @verbs = []) ->
 
   addProperty: (key, value) ->
     @properties.push new MooProperty key, value
@@ -175,13 +192,13 @@ class MooObject
     @verbs.push new MooVerb name, dobjarg, preparg, iobjarg, code
 
   parent: ->
-    if @parent_id
+    if @parent_id isnt null
       db.findById @parent_id
     else
       null
 
   location: ->
-    if @location_id
+    if @location_id isnt null
       db.findById @location_id
     else
       null
@@ -200,18 +217,52 @@ class MooObject
   contents: ->
     @contents_ids.map (id) -> db.findById id
 
-  prop: (key, newValue = undefined) ->
-    if newValue?
+  # if value is defined and not null
+  #   if key exists on this object
+  #     update value
+  #   else
+  #     create new property with value
+  # else if value is null
+  #   if key exists on this object
+  #     remove this key
+  #   else
+  #     throw error: property doesn't exist on this object
+  # else
+  #   recursivly search for key in self and parents or undefined
+  prop: (key, value) ->
+    if typeof value != 'undefined' and value?
       for prop in @properties
         if prop.key == key
-          prop.value = newValue
-          return newValue
-      @addProperty key, newValue
-      return newValue
+          prop.value = value
+          return value
+      @addProperty key, value
+      return value
+    else if value is null
+      if key in (prop.key for prop in @properties)
+        @properties = @properties.filter (prop) ->
+          prop.key != key
+        return true
+      else
+        throw new Error "property '#{key}' doesn't exist on this object."
     else
-      for prop in @properties
-        return prop.value if prop.key == key
-      return undefined
+      @getProp key
+
+  getProp: (key) ->
+    for prop in @properties
+      if prop.key == key
+        return prop.value
+    if @parent_id
+      return @parent().getProp key
+    return undefined
+
+  chparent: (id) ->
+    throw new Error 'TODO'
+
+  rename: (name) ->
+    throw new Error 'TODO'
+
+  updateAliases: (aliases) ->
+    throw new Error 'TODO'
 
   saveVerb: (newVerb) ->
     for verb in @verbs
@@ -224,6 +275,32 @@ class MooObject
         return true
     @addVerb newVerb.name, newVerb.dobjarg, newVerb.preparg, newVerb.iobjarg, newVerb.code
     return true
+
+  # recursively get all properties of an object and it's parent objects
+  getAllProperties: (map = {}) ->
+    if @parent_id?
+      @parent().getAllProperties(map)
+    @properties.reduce(((map, prop) ->
+      map[prop.key] = prop.value
+      map
+    ), map)
+
+  # an array version of the above
+  getAllPropertiesArray: ->
+    ({key: key, value: value} for key, value of @getAllProperties())
+
+  # recursively get all verbs of an object and it's parent objects
+  getAllVerbs: (map = {}) ->
+    if @parent_id?
+      @parent().getAllVerbs(map)
+    @verbs.reduce(((map, verb) ->
+      map[verb.name] = verb
+      map
+    ), map)
+
+  # an array version of the above
+  getAllVerbsArray: ->
+    (verb for verbName, verb of @getAllVerbs())
 
   # does this object match the search string?
   # TODO: make it work like this:
@@ -285,6 +362,9 @@ class MooPlayer extends MooObject
     if loc?
       for o in loc.contents()
         o.send msg if o.player and o != @
+      true
+    else
+      false
 
   toString: ->
     "[MooPlayer #{@name}]"
