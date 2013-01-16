@@ -1,10 +1,22 @@
 color = require('./color').color
 db = require('./moo').db
+coffee = require 'coffee-script'
+vm = require 'vm'
 
 $ = (id) -> db.findById id
 
-exports.for = (type, context) ->
+defineProperties = (object, opts) =>
+  for property, accessors of opts
+    do (property, accessors) ->
+      Object.defineProperty object, property, {
+        enumerable: true
+        get: accessors.get or -> throw new Error "No getter for #{property}"
+        set: accessors.set or -> throw new Error "No setter for #{property}"
+      }
 
+contextFor = (type, context) ->
+
+  # wrap real objects in context wrappers and memoize
   contextify = (o) ->
     if o? and o.id?
       if context["$#{o.id}"]?
@@ -23,14 +35,52 @@ exports.for = (type, context) ->
   class ContextMooObject
 
     constructor: (object) ->
-      @id = object.id
-      @parent_id = object.parent_id
-      @name = object.name
-      @aliases = object.aliases
-      @location_id = object.location_id
-      @contents_ids = object.contents_ids
-      @player = !!object.player
-      @programmer = !!object.programmer
+
+      defineProperties @,
+        id:
+          get: -> object.id
+        parent_id:
+          get: -> object.parent_id
+          set: (id) -> object.chparent id
+        name:
+          get: -> object.name
+          set: (name) -> object.rename name
+        aliases:
+          get: -> object.aliases
+          set: (aliases) -> object.updateAliases aliases
+        location_id:
+          get: -> object.location_id
+        contents_ids:
+          get: -> object.contents_ids
+        player:
+          get: -> !!object.player
+        programmer:
+          get: -> !!object.programmer
+
+      # TODO object.prop acts a little squirrely sometimes...
+      for key, value of object.getAllProperties()
+        do (key, value) =>
+          params = {}
+          params["#{key}"] =
+            get: -> value
+            set: (newValue) -> object.prop key, newValue
+          defineProperties @, params
+
+      for verb in object.getAllVerbsArray()
+        do (verb) =>
+          f = =>
+            try
+              verbContext = contextFor('verb', context)
+              verbContext.$this = @
+              verbContext.$verb = verb.name
+              verbContext.$args = arguments
+              verbContext.$argstr = Array.prototype.slice.call(arguments).join ' '
+              code = coffee.compile verb.code, bare: true
+              vm.runInNewContext code, verbContext
+            catch error
+              context.$player.send color error.toString(), 'inverse bold red'
+          f.verb = true
+          @[verb.name] = f
 
     parent: -> contextify $ @parent_id
 
@@ -52,18 +102,31 @@ exports.for = (type, context) ->
       self = $ @id
       self.moveTo target
 
-    prop: (key, newValue = undefined) ->
-      $(@id).prop key, newValue
+    prop: (key, value) ->
+      $(@id).prop key, value
 
-    # TODO call: (verb, args...) ->
+    chparent: (id) ->
+      throw new Error 'TODO'
 
-    # TODO rename: (newName) ->
+    rename: (name) ->
+      throw new Error 'TODO'
 
-    # TODO chparent: (newParentId) ->
+    updateAliases: (aliases) ->
+      throw new Error 'TODO'
 
-    # TODO (maybe)
-    # add each verb as a callable function here
-    # add each property as a getter and setter here
+    addAlias: (alias) ->
+      throw new Error 'TODO'
+
+    rmAlias: (alias) ->
+      throw new Error 'TODO'
+
+    clone: (name, aliases = []) ->
+      contextify db.clone $(@id), name, aliases
+      true
+
+    createChild: (name, aliases = []) ->
+      contextify db.createChild $(@id), name, aliases
+      true
 
     toString: ->
       "[ContextMooObject #{@name}]"
@@ -72,6 +135,8 @@ exports.for = (type, context) ->
 
     constructor: (object) ->
       super object
+      # hack to hide 'constructor' in object printout for players
+      delete @__proto__.constructor
 
     send: (msg) ->
       $(@id).send msg
@@ -99,5 +164,7 @@ exports.for = (type, context) ->
     when 'eval'
       c:         color
       $: (id) -> contextify $ id
-      $me:       contextify context.$me
+      $player:   contextify context.$player
       $here:     contextify context.$here
+
+exports.for = contextFor

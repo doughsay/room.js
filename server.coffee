@@ -63,7 +63,7 @@ ws_server.sockets.on 'connection', (socket) ->
       command = parse str
 
       if command.verb == 'eval' and player.programmer
-        context = contextFor('eval', {$me: player, $here: player.location()})
+        context = contextFor('eval', {$player: player, $here: player.location()})
         try
           code = coffee.compile command.argstr, bare: true
           output = vm.runInNewContext code, context
@@ -222,7 +222,7 @@ ws_server.sockets.on 'connection', (socket) ->
         errors.push "name can't be empty"
       else
         o = db.findById(verb.oid)
-        if verb.name in (o.verbs.map (v) -> v.name)
+        if verb.name != verb.original_name and verb.name in (o.verbs.map (v) -> v.name)
           errors.push "that verb name already exists on that object"
         else
           verbNames = verb.name.split ' '
