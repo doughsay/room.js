@@ -3,26 +3,25 @@ util = require 'util'
 _ = require 'underscore'
 
 connections = require './connection_manager'
+c = require('./color').color
 
 # A MOO DB is a collection of Moo Objects
 class MooDB
   # @objects: Array[MooObject]
+  # @players: Array[MooPlayer]
 
-  constructor: (@objects = [], @players = []) ->
+  objects: []
+  players: []
 
-  loadSync: (filename) ->
+  constructor: (filename) ->
     util.print "loading... "
-    for o in JSON.parse fs.readFileSync filename
-      if o?
-        if o.player
-          newMooObj = new MooPlayer o.id, o.parent_id, o.name, o.aliases, o.location_id, o.contents_ids, o.username, o.password, true, o.programmer
+    for dbObject in JSON.parse fs.readFileSync filename
+      if dbObject?
+        if dbObject.player
+          newMooObj = new MooPlayer dbObject, @
         else
-          newMooObj = new MooObject o.id, o.parent_id, o.name, o.aliases, o.location_id, o.contents_ids
-        for prop in o.properties
-          newMooObj.addProperty prop.key, prop.value
-        for v in o.verbs
-          newMooObj.addVerb v.name, v.dobjarg, v.preparg, v.iobjarg, v.code
-        @objects[parseInt(o.id)] = newMooObj
+          newMooObj = new MooObject dbObject, @
+        @objects[parseInt(dbObject.id)] = newMooObj
         if newMooObj.player
           @players.push newMooObj
     util.puts "done."
@@ -32,7 +31,7 @@ class MooDB
 
   saveSync: (filename) ->
     util.print "saving... "
-    fs.writeFileSync filename, db.serialize()
+    fs.writeFileSync filename, @serialize()
     util.puts "done."
 
   serialize: ->
@@ -133,32 +132,32 @@ class MooDB
   playerNameTaken: (name) ->
     !!(@players.filter (player) -> player.name == name).length
 
-  createNewPlayer: (name, username, password, programmer = false) ->
-    nextId = @nextId()
-    newPlayer = new MooPlayer nextId, 1, name, [], null, [], username, password, true, programmer
-    @objects[nextId] = newPlayer
-    @players.push newPlayer
-    root = @findById 0
-    startLocation = @findById root.prop 'start_location_id'
-    newPlayer.moveTo startLocation
-    true
+  # createNewPlayer: (name, username, password, programmer = false) ->
+  #   nextId = @nextId()
+  #   newPlayer = new MooPlayer nextId, 1, name, [], null, [], username, password, true, programmer
+  #   @objects[nextId] = newPlayer
+  #   @players.push newPlayer
+  #   root = @findById 0
+  #   startLocation = @findById root.prop 'start_location_id'
+  #   newPlayer.moveTo startLocation
+  #   true
 
   # TODO also clone it's own properties and verbs?
-  clone: (object, newName, newAliases) ->
-    nextId = @nextId()
-    newObject = new MooObject nextId, object.parent_id, newName, newAliases
-    newObject.moveTo @findById object.location_id
-    @objects[nextId] = newObject
-    true
+  # clone: (object, newName, newAliases) ->
+  #   nextId = @nextId()
+  #   newObject = new MooObject nextId, object.parent_id, newName, newAliases
+  #   newObject.moveTo @findById object.location_id
+  #   @objects[nextId] = newObject
+  #   true
 
   # Create a child of object
   # this child will inherit any of it's parent's properties and verbs
-  createChild: (object, newName, newAliases) ->
-    nextId = @nextId()
-    newObject = new MooObject nextId, object.id, newName, newAliases
-    newObject.moveTo @findById object.location_id
-    @objects[nextId] = newObject
-    true
+  # createChild: (object, newName, newAliases) ->
+  #   nextId = @nextId()
+  #   newObject = new MooObject nextId, object.id, newName, newAliases
+  #   newObject.moveTo @findById object.location_id
+  #   @objects[nextId] = newObject
+  #   true
 
   # terrible way to get the next available id in the DB
   nextId: ->
@@ -183,23 +182,26 @@ class MooObject
   # @properties: Array[MooProperty]
   # @verbs: Array[MooVerb]
 
-  constructor: (@id, @parent_id, @name, @aliases = [], @location_id = null, @contents_ids = [], @properties = [], @verbs = []) ->
+  constructor: (dbObject, @db) ->
+    @id = dbObject.id
+    @parent_id = dbObject.parent_id
+    @name = dbObject.name
+    @aliases = dbObject.aliases
+    @location_id = dbObject.location_id
+    @contents_ids = dbObject.contents_ids
+    @player = !!dbObject.player
+    @programmer = !!dbObject.programmer
 
-  addProperty: (key, value) ->
-    @properties.push new MooProperty key, value
+    @properties = dbObject.properties
 
-  addVerb: (name, dobjarg, preparg, iobjarg, code) ->
-    @verbs.push new MooVerb name, dobjarg, preparg, iobjarg, code
+    @verbs = dbObject.verbs.map (verb) -> new MooVerb verb
 
   parent: ->
-    if @parent_id isnt null
-      db.findById @parent_id
-    else
-      null
+    @db.findById @parent_id
 
   location: ->
     if @location_id isnt null
-      db.findById @location_id
+      @db.findById @location_id
     else
       null
 
@@ -215,45 +217,35 @@ class MooObject
       @location_id = null
 
   contents: ->
-    @contents_ids.map (id) -> db.findById id
+    @contents_ids.map (id) => @db.findById id
 
-  # if value is defined and not null
-  #   if key exists on this object
-  #     update value
-  #   else
-  #     create new property with value
-  # else if value is null
-  #   if key exists on this object
-  #     remove this key
-  #   else
-  #     throw error: property doesn't exist on this object
-  # else
-  #   recursivly search for key in self and parents or undefined
-  prop: (key, value) ->
-    if typeof value != 'undefined' and value?
-      for prop in @properties
-        if prop.key == key
-          prop.value = value
-          return value
-      @addProperty key, value
-      return value
-    else if value is null
-      if key in (prop.key for prop in @properties)
-        @properties = @properties.filter (prop) ->
-          prop.key != key
-        return true
-      else
-        throw new Error "property '#{key}' doesn't exist on this object."
+  addProp: (key, value) ->
+    @properties.push {key: key, value: value}
+
+  addVerb: (verb) ->
+    @verbs.push new MooVerb verb
+
+  rmProp: (key) ->
+    if key in (prop.key for prop in @properties)
+      @properties = @properties.filter (prop) ->
+        prop.key != key
+      return true
     else
-      @getProp key
+      throw new Error "property '#{key}' doesn't exist on this object."
 
   getProp: (key) ->
     for prop in @properties
       if prop.key == key
         return prop.value
-    if @parent_id?
-      return @parent().getProp key
-    return undefined
+    return @parent()?.getProp key
+
+  setProp: (key, value) ->
+    for prop in @properties
+      if prop.key == key
+        prop.value = value
+        return value
+    @addProp key, value
+    return value
 
   chparent: (id) ->
     throw new Error 'TODO'
@@ -273,10 +265,11 @@ class MooObject
         verb.iobjarg = newVerb.iobjarg
         verb.code = newVerb.code
         return true
-    @addVerb newVerb.name, newVerb.dobjarg, newVerb.preparg, newVerb.iobjarg, newVerb.code
+    @addVerb newVerb
     return true
 
   # recursively get all properties of an object and it's parent objects
+  # as a hash
   getAllProperties: (map = {}) ->
     if @parent_id?
       @parent().getAllProperties(map)
@@ -284,10 +277,6 @@ class MooObject
       map[prop.key] = prop.value
       map
     ), map)
-
-  # an array version of the above
-  getAllPropertiesArray: ->
-    ({key: key, value: value} for key, value of @getAllProperties())
 
   # recursively get all verbs of an object and it's parent objects
   getAllVerbs: (map = {}) ->
@@ -297,10 +286,6 @@ class MooObject
       map[verb.name] = verb
       map
     ), map)
-
-  # an array version of the above
-  getAllVerbsArray: ->
-    (verb for verbName, verb of @getAllVerbs())
 
   # does this object match the search string?
   # TODO: make it work like this:
@@ -344,7 +329,12 @@ class MooPlayer extends MooObject
   # @player: Boolean
   # @programmer: Boolean
 
-  constructor: (@id, @parent_id, @name, @aliases, @location_id, @contents_ids, @username, @password, @player = true, @programmer = false, @properties = [], @verbs = []) ->
+  constructor: (player, db) ->
+    super player, db
+    @username = player.username
+    @password = player.password
+    @player = true
+    @programmer = player.programmer
 
   authenticates: (username, passwordHash) ->
     @username == username and @password == passwordHash
@@ -369,15 +359,6 @@ class MooPlayer extends MooObject
   toString: ->
     "[MooPlayer #{@name}]"
 
-# A Moo Property is basically a single key value store
-class MooProperty
-  # @key: String
-  # @value: String|Int|Float|Array[String|Int|Float|Array]
-  constructor: (@key, @value) ->
-
-  toString: ->
-    "[MooProperty #{@key}]"
-
 # A Moo Verb is a js function which runs in a sandboxed context
 class MooVerb
   # @name: String
@@ -386,7 +367,12 @@ class MooVerb
   # @preparg: String
   # @iobjarg: String
   # @code: String
-  constructor: (@name, @dobjarg, @preparg, @iobjarg, @code) ->
+  constructor: (verb) ->
+    @name = verb.name
+    @dobjarg = verb.dobjarg
+    @preparg = verb.preparg
+    @iobjarg = verb.iobjarg
+    @code = verb.code
 
   # does this verb match the search string?
   # TODO: make it work like this:
@@ -437,14 +423,10 @@ class MooVerb
       when 'any'
         return false if not context.$prepstr?
       else
-        # TODO: improve this?  e.g. 'with' and 'using' are interchangeable.
-        return false if context.$prepstr != @preparg
+        return false if context.$prepstr not in @preparg.split('/')
     true
 
   toString: ->
     "[MooVerb #{@name}]"
 
-db = new MooDB
-db.loadSync 'db.json'
-
-exports.db = db
+exports.db = new MooDB('db.json')

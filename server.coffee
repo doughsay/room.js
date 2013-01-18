@@ -69,7 +69,8 @@ ws_server.sockets.on 'connection', (socket) ->
           output = vm.runInNewContext code, context
           player.send mooUtil.print output
         catch error
-          player.send c error.toString(), 'inverse bold red'
+          #player.send c error.toString(), 'inverse bold red'
+          player.send error.stack.split('\n').map((line) -> c line, 'inverse bold red').join('\n')
       else if command.verb == 'edit' and player.programmer
         [oNum, verbName] = command.argstr.split('.')
         o = db.findByNum oNum
@@ -93,7 +94,8 @@ ws_server.sockets.on 'connection', (socket) ->
             code = coffee.compile verb.code, bare: true
             vm.runInNewContext code, context
           catch error
-            player.send c error.toString(), 'inverse bold red'
+            #player.send c error.toString(), 'inverse bold red'
+            player.send error.stack.split('\n').map((line) -> c line, 'inverse bold red').join('\n')
         else
           player.send c("I didn't understand that.", 'gray')# + mooUtil.print command
     else
