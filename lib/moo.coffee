@@ -285,12 +285,14 @@ class MooObject
 
   chparent: (id) ->
     if not id?
-      throw new Error "Invalid ID"
-    object = @db.findById id
-    if not object?
-      throw new Error "Invalid object"
-    @parent_id = id
-    true
+      @parent_id = null
+      true
+    else
+      object = @db.findById id
+      if not object?
+        throw new Error "Invalid object"
+      @parent_id = id
+      true
 
   rename: (name) ->
     if not (name? and name.toString?)

@@ -23,12 +23,14 @@ Clone this repo, copy the example db, and launch the server:
     cp db.example.json db.json
     ./server.coffee
 
-Connect to is using a web browser by going to [http://localhost:8888/](http://localhost:8888/).
+Connect to it using a web browser by going to [http://localhost:8888/](http://localhost:8888/).
+
+The provided example db has one user who is also a programmer: username=root, password=p@ssw0rd.
 
 Programming
 -----------
 
-If you are signed in as a programmer, you can evaluate any CoffeeScript code by using the *eval* command ( *;* shorthand).
+If you are signed in as a programmer, you can evaluate any CoffeeScript code by using the *eval* command (; shorthand).
 
     eval 2 + 2
     -> 4
@@ -54,23 +56,23 @@ Retrieve the object with the given `id`.
 Returns a list all objects in the database with their `id` and `name` fields.
 
 
-#### `tree([id])`
+#### `tree(id = undefined)`
 
 Returns the object inheritance tree.
 
-* `id` - (optional) Use object `id` as the root.
+* `id` - (int) (optional) Use object `id` as the root.
 
-#### `locations([id])`
+#### `locations(id = undefined)`
 
 Return a tree representing objects' locations.  Top level objects in this tree are 'nowhere', and inner nodes are contained within their parents.
 
-* `id` - (optional) Only show object `id` and it's contents.
+* `id` - (int) (optional) Only show object `id` and it's contents.
 
 ### Object methods
 
 Calling methods on objects is simple:
 
-    $(6).location()
+    $player.parent()
 
 These methods are available on moo objects:
 
@@ -86,7 +88,7 @@ Returns the location object of this object, or `null` if this object is 'nowhere
 
 Moves this object to be contained inside the target object.
 
-* `target` - The target object
+* `target` - (object) The target object
 
 #### `contents`
 
@@ -97,25 +99,58 @@ Returns an array of objects that are contained in this object.
 Adds a new property to this object.
 
 * `key` - (string) The key to store the property under.  If it already exists it will be overwritten.
-* `value` - The value to store.  Can be any type.
+* `value` - (any) The value to store.  Can be any type.
 
 #### `rmProp(key)`
 
 Removes a property from an object.
 
+* `key` - (string) The key to remove.
+
 #### `getProp(key)`
+
+Retrieve the value of a property.
+
+* `key` - (string) The key to retrieve.
 
 #### `setProp(key, value)`
 
+Same as `setProp`.
+
+* `key` - (string) The key to store the property under.  If it already exists it will be overwritten.
+* `value` - (any) The value to store.  Can be any type.
+
 #### `chparent(id)`
+
+Change the parent object that this object inherits from.
+
+* `id` - (int) The id of the object to be the new parent, or `null` for no parent.
 
 #### `rename(name)`
 
+Renames the object.
+
+* `name` - (string) The new name for the object.
+
 #### `updateAliases(aliases)`
+
+Chnages the list of aliases for this obect.
+
+* `aliases` - (array[string]) The list of new aliases for this object.
 
 #### `clone(newName, newAliases = [])`
 
+Creates a clone of this object, copying all its properties and verbs.
+
+* `newName` - (string) The name of the new object.
+* `newAliases` - (array[string]) (optional) The list of aliases for the new object.
+
 #### `createChild(newName, newAliases = [])`
+
+Creates a child of this object.  The child inherits all of its properties and verbs.
+
+* `newName` - (string) The name of the new object.
+* `newAliases` - (array[string]) (optional) The list of aliases for the new object.
 
 ### Verbs
 
