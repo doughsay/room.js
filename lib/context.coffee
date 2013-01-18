@@ -112,6 +112,21 @@ ContextMooObject = (object, context) ->
   @setProp = (key, value) ->
     object.setProp key, value
 
+  @chparent = (id) ->
+    object.chparent id
+
+  @rename = (name) ->
+    object.rename name
+
+  @updateAliases = (aliases) ->
+    object.updateAliases aliases
+
+  @clone = (newName, newAliases = []) ->
+    db.clone(object, newName, newAliases)
+
+  @createChild = (newName, newAliases = []) ->
+    db.createChild(object, newName, newAliases)
+
   # player specific methods
   if object.player
     @send = (msg) ->
@@ -150,5 +165,8 @@ contextFor = (type, context) ->
       $:         (id) -> contextify db.findById(id), context
       $player:   contextify context.$player, context
       $here:     contextify context.$here, context
+      list:      -> db.list()
+      tree:      (root_id) -> db.inheritance_tree(root_id)
+      locations: (root_id) -> db.location_tree(root_id)
 
 exports.for = contextFor

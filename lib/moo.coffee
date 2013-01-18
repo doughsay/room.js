@@ -96,7 +96,7 @@ class MooDB
       id: o.id
       name: o.name
 
-  inheritance_tree: ->
+  inheritance_tree: (root_id) ->
     children = (o) =>
       child_os = @objects.filter (other_o) ->
         other_o.parent_id == o.id
@@ -105,22 +105,36 @@ class MooDB
         name: child_o.name
         children: children child_o
 
-    top = @objects.filter (o) ->
-      o? and o.parent_id == null
+    if root_id?
+      root = @findById root_id
+      if root?
+        top = [root]
+      else
+        throw new Error "Invalid root object"
+    else
+      top = @objects.filter (o) ->
+        o? and o.parent_id == null
     top.map (o) ->
       id: o.id
       name: o.name
       children: children o
 
-  location_tree: ->
+  location_tree: (root_id) ->
     contents = (o) =>
       o.contents().map (p) ->
         id: p.id
         name: p.name
         contents: contents p
 
-    top = @objects.filter (o) ->
-      o? and o.location_id == null
+    if root_id?
+      root = @findById root_id
+      if root?
+        top = [root]
+      else
+        throw new Error "Invalid root object"
+    else
+      top = @objects.filter (o) ->
+        o? and o.location_id == null
     top.map (o) ->
       id: o.id
       name: o.name
@@ -142,22 +156,44 @@ class MooDB
   #   newPlayer.moveTo startLocation
   #   true
 
-  # TODO also clone it's own properties and verbs?
-  # clone: (object, newName, newAliases) ->
-  #   nextId = @nextId()
-  #   newObject = new MooObject nextId, object.parent_id, newName, newAliases
-  #   newObject.moveTo @findById object.location_id
-  #   @objects[nextId] = newObject
-  #   true
+  # create a clone of this object with copies of all it's properties and verbs
+  clone: (object, newName, newAliases) ->
+    if not (newName? and newName.toString?)
+      throw new Error "Invalid name for new object"
+    for alias in newAliases
+      if not (alias? and alias.toString?)
+        throw new Error "Invalid alias '#{alias}'"
+    nextId = @nextId()
+    rawObject = JSON.parse JSON.stringify object
+    rawObject.id = nextId
+    rawObject.parent_id = object.parent_id
+    rawObject.name = newName
+    rawObject.aliases = newAliases
+    newObject = new MooObject rawObject, @
+    newObject.moveTo object.location()
+    @objects[nextId] = newObject
+    @players.push newObject if newObject.player
+    true
 
   # Create a child of object
   # this child will inherit any of it's parent's properties and verbs
-  # createChild: (object, newName, newAliases) ->
-  #   nextId = @nextId()
-  #   newObject = new MooObject nextId, object.id, newName, newAliases
-  #   newObject.moveTo @findById object.location_id
-  #   @objects[nextId] = newObject
-  #   true
+  createChild: (object, newName, newAliases) ->
+    if not (newName? and newName.toString?)
+      throw new Error "Invalid name for new object"
+    for alias in newAliases
+      if not (alias? and alias.toString?)
+        throw new Error "Invalid alias '#{alias}'"
+    nextId = @nextId()
+    rawObject = JSON.parse JSON.stringify object
+    rawObject.id = nextId
+    rawObject.parent_id = object.id
+    rawObject.name = newName
+    rawObject.aliases = newAliases
+    newObject = new MooObject rawObject, @
+    newObject.moveTo object.location()
+    @objects[nextId] = newObject
+    @players.push newObject if newObject.player
+    true
 
   # terrible way to get the next available id in the DB
   nextId: ->
@@ -248,13 +284,28 @@ class MooObject
     return value
 
   chparent: (id) ->
-    throw new Error 'TODO'
+    if not id?
+      throw new Error "Invalid ID"
+    object = @db.findById id
+    if not object?
+      throw new Error "Invalid object"
+    @parent_id = id
+    true
 
   rename: (name) ->
-    throw new Error 'TODO'
+    if not (name? and name.toString?)
+      throw new Error "Invalid name"
+    nameStr = name.toString()
+    if @player and @db.playerNameTaken nameStr
+      throw new Error "That player name is already taken"
+    else
+      @name = nameStr
 
   updateAliases: (aliases) ->
-    throw new Error 'TODO'
+    for alias in aliases
+      if not (alias? and alias.toString?)
+        throw new Error "Invalid alias '#{alias}'"
+    @aliases = (alias.toString() for alias in aliases)
 
   saveVerb: (newVerb) ->
     for verb in @verbs
