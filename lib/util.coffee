@@ -10,7 +10,6 @@ truncate = (s, length = 25) ->
     s[0..length] + '...'
 
 # recursive colorful object output
-# TODO: make it work for arrays and objects
 print = (x, indent = '', prefix = '', color = true) ->
   # possible types:
   #
@@ -42,7 +41,10 @@ print = (x, indent = '', prefix = '', color = true) ->
     when 'undefined'
       k 'undefined', 'gray'
     when 'function'
-      k '[Function]', 'cyan'
+      if x.verb
+        k '[MooVerb]', 'cyan'
+      else
+        k '[Function]', 'cyan'
     when 'object'
       if x == null
         k 'null', 'red'
@@ -74,7 +76,8 @@ print = (x, indent = '', prefix = '', color = true) ->
           if xsteststr.length <= 50
             xs = []
             for key, value of x
-              xs.push print value, '', (k key, 'blue') + ': ', color
+              keyColor = 'blue' #if x.hasOwnProperty(key) then 'blue' else 'gray'
+              xs.push print value, '', (k key, keyColor) + ': ', color
             if xs.length == 0
               '{}'
             else
@@ -82,7 +85,8 @@ print = (x, indent = '', prefix = '', color = true) ->
           else
             xs = []
             for key, value of x
-              xs.push print value, indent + '  ', (k key, 'blue') + ': ', color
+              keyColor = 'blue' #if x.hasOwnProperty(key) then 'blue' else 'gray'
+              xs.push print value, indent + '  ', (k key, keyColor) + ': ', color
             xs[0] = (k 'undefined', 'gray') if not xs[0]? # why is this needed?
             xs[0] = '{ ' + (xs[0].replace indent + '  ', '')
             xs[xs.length-1] += ' }'

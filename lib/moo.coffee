@@ -3,26 +3,25 @@ util = require 'util'
 _ = require 'underscore'
 
 connections = require './connection_manager'
+c = require('./color').color
 
 # A MOO DB is a collection of Moo Objects
 class MooDB
   # @objects: Array[MooObject]
+  # @players: Array[MooPlayer]
 
-  constructor: (@objects = [], @players = []) ->
+  objects: []
+  players: []
 
-  loadSync: (filename) ->
+  constructor: (filename) ->
     util.print "loading... "
-    for o in JSON.parse fs.readFileSync filename
-      if o?
-        if o.player
-          newMooObj = new MooPlayer o.id, o.parent_id, o.name, o.aliases, o.location_id, o.contents_ids, o.username, o.password, true, o.programmer
+    for dbObject in JSON.parse fs.readFileSync filename
+      if dbObject?
+        if dbObject.player
+          newMooObj = new MooPlayer dbObject, @
         else
-          newMooObj = new MooObject o.id, o.parent_id, o.name, o.aliases, o.location_id, o.contents_ids
-        for prop in o.properties
-          newMooObj.addProperty prop.key, prop.value
-        for v in o.verbs
-          newMooObj.addVerb v.name, v.dobjarg, v.preparg, v.iobjarg, v.code
-        @objects[parseInt(o.id)] = newMooObj
+          newMooObj = new MooObject dbObject, @
+        @objects[parseInt(dbObject.id)] = newMooObj
         if newMooObj.player
           @players.push newMooObj
     util.puts "done."
@@ -32,7 +31,7 @@ class MooDB
 
   saveSync: (filename) ->
     util.print "saving... "
-    fs.writeFileSync filename, db.serialize()
+    fs.writeFileSync filename, @serialize()
     util.puts "done."
 
   serialize: ->
@@ -92,12 +91,20 @@ class MooDB
     else
       [null, null]
 
+  objectsWithVar: ->
+    @objects.filter (object) ->
+      object.var?
+
   list: ->
     @objects.filter((o) -> o?).map (o) ->
-      id: o.id
-      name: o.name
+      x =
+        id: o.id
+        name: o.name
+      if o.var?
+        x.var = o.var
+      x
 
-  inheritance_tree: ->
+  inheritance_tree: (root_id) ->
     children = (o) =>
       child_os = @objects.filter (other_o) ->
         other_o.parent_id == o.id
@@ -106,22 +113,36 @@ class MooDB
         name: child_o.name
         children: children child_o
 
-    top = @objects.filter (o) ->
-      o? and o.parent_id == null
+    if root_id?
+      root = @findById root_id
+      if root?
+        top = [root]
+      else
+        throw new Error "Invalid root object"
+    else
+      top = @objects.filter (o) ->
+        o? and o.parent_id == null
     top.map (o) ->
       id: o.id
       name: o.name
       children: children o
 
-  location_tree: ->
+  location_tree: (root_id) ->
     contents = (o) =>
       o.contents().map (p) ->
         id: p.id
         name: p.name
         contents: contents p
 
-    top = @objects.filter (o) ->
-      o? and o.location_id == null
+    if root_id?
+      root = @findById root_id
+      if root?
+        top = [root]
+      else
+        throw new Error "Invalid root object"
+    else
+      top = @objects.filter (o) ->
+        o? and o.location_id == null
     top.map (o) ->
       id: o.id
       name: o.name
@@ -133,14 +154,56 @@ class MooDB
   playerNameTaken: (name) ->
     !!(@players.filter (player) -> player.name == name).length
 
-  createNewPlayer: (name, username, password, programmer = false) ->
+  varTaken: (varStr) ->
+    !!(@objects.filter (object) -> object.var == varStr).length
+
+  # createNewPlayer: (name, username, password, programmer = false) ->
+  #   nextId = @nextId()
+  #   newPlayer = new MooPlayer nextId, 1, name, [], null, [], username, password, true, programmer
+  #   @objects[nextId] = newPlayer
+  #   @players.push newPlayer
+  #   root = @findById 0
+  #   startLocation = @findById root.prop 'start_location_id'
+  #   newPlayer.moveTo startLocation
+  #   true
+
+  # create a clone of this object with copies of all it's properties and verbs
+  clone: (object, newName, newAliases) ->
+    if not (newName? and newName.toString?)
+      throw new Error "Invalid name for new object"
+    for alias in newAliases
+      if not (alias? and alias.toString?)
+        throw new Error "Invalid alias '#{alias}'"
     nextId = @nextId()
-    newPlayer = new MooPlayer nextId, 1, name, [], null, [], username, password, true, programmer
-    @objects[nextId] = newPlayer
-    @players.push newPlayer
-    root = @findById 0
-    startLocation = @findById root.prop 'start_location_id'
-    newPlayer.moveTo startLocation
+    rawObject = JSON.parse JSON.stringify object
+    rawObject.id = nextId
+    rawObject.parent_id = object.parent_id
+    rawObject.name = newName
+    rawObject.aliases = newAliases
+    newObject = new MooObject rawObject, @
+    newObject.moveTo object.location()
+    @objects[nextId] = newObject
+    @players.push newObject if newObject.player
+    true
+
+  # Create a child of object
+  # this child will inherit any of it's parent's properties and verbs
+  createChild: (object, newName, newAliases) ->
+    if not (newName? and newName.toString?)
+      throw new Error "Invalid name for new object"
+    for alias in newAliases
+      if not (alias? and alias.toString?)
+        throw new Error "Invalid alias '#{alias}'"
+    nextId = @nextId()
+    rawObject = JSON.parse JSON.stringify object
+    rawObject.id = nextId
+    rawObject.parent_id = object.id
+    rawObject.name = newName
+    rawObject.aliases = newAliases
+    newObject = new MooObject rawObject, @
+    newObject.moveTo object.location()
+    @objects[nextId] = newObject
+    @players.push newObject if newObject.player
     true
 
   # terrible way to get the next available id in the DB
@@ -158,6 +221,7 @@ class MooDB
 # A Moo Object has properties and verbs
 class MooObject
   # @id: Int
+  # @var: String
   # @parent_id: Int
   # @name: String
   # @aliases: Array[String]
@@ -166,23 +230,27 @@ class MooObject
   # @properties: Array[MooProperty]
   # @verbs: Array[MooVerb]
 
-  constructor: (@id, @parent_id, @name, @aliases, @location_id, @contents_ids, @properties = [], @verbs = []) ->
+  constructor: (dbObject, @db) ->
+    @id = dbObject.id
+    @var = dbObject.var
+    @parent_id = dbObject.parent_id
+    @name = dbObject.name
+    @aliases = dbObject.aliases
+    @location_id = dbObject.location_id
+    @contents_ids = dbObject.contents_ids
+    @player = !!dbObject.player
+    @programmer = !!dbObject.programmer
 
-  addProperty: (key, value) ->
-    @properties.push new MooProperty key, value
+    @properties = dbObject.properties
 
-  addVerb: (name, dobjarg, preparg, iobjarg, code) ->
-    @verbs.push new MooVerb name, dobjarg, preparg, iobjarg, code
+    @verbs = dbObject.verbs.map (verb) -> new MooVerb verb
 
   parent: ->
-    if @parent_id
-      db.findById @parent_id
-    else
-      null
+    @db.findById @parent_id
 
   location: ->
-    if @location_id
-      db.findById @location_id
+    if @location_id isnt null
+      @db.findById @location_id
     else
       null
 
@@ -198,33 +266,104 @@ class MooObject
       @location_id = null
 
   contents: ->
-    @contents_ids.map (id) -> db.findById id
+    @contents_ids.map (id) => @db.findById id
 
-  prop: (key, newValue = undefined) ->
-    if newValue?
-      for prop in @properties
-        if prop.key == key
-          prop.value = newValue
-          return newValue
-      @addProperty key, newValue
-      return newValue
+  addProp: (key, value) ->
+    @properties.push {key: key, value: value}
+
+  addVerb: (verb) ->
+    @verbs.push new MooVerb verb
+
+  rmProp: (key) ->
+    if key in (prop.key for prop in @properties)
+      @properties = @properties.filter (prop) ->
+        prop.key != key
+      return true
     else
-      for prop in @properties
-        return prop.value if prop.key == key
-      return undefined
+      throw new Error "property '#{key}' doesn't exist on this object."
+
+  getProp: (key) ->
+    for prop in @properties
+      if prop.key == key
+        return prop.value
+    return @parent()?.getProp key
+
+  setProp: (key, value) ->
+    for prop in @properties
+      if prop.key == key
+        prop.value = value
+        return value
+    @addProp key, value
+    return value
+
+  chparent: (id) ->
+    if not id?
+      @parent_id = null
+      true
+    else
+      object = @db.findById id
+      if not object?
+        throw new Error "Invalid object"
+      @parent_id = id
+      true
+
+  rename: (name) ->
+    if not (name? and name.toString?)
+      throw new Error "Invalid name"
+    nameStr = name.toString()
+    if @player and @db.playerNameTaken nameStr
+      throw new Error "That player name is already taken"
+    else
+      @name = nameStr
+
+  updateAliases: (aliases) ->
+    for alias in aliases
+      if not (alias? and alias.toString?)
+        throw new Error "Invalid alias '#{alias}'"
+    @aliases = (alias.toString() for alias in aliases)
+
+  setVar: (newvar) ->
+    if newvar == null
+      @var = null
+      return null
+    if not (newvar? and newvar.toString? and !!newvar.toString().match /^[a-zA-Z_\$][0-9a-zA-Z_\$]*$/)
+      throw new Error "Invalid var"
+    newVarStr = newvar.toString()
+    if @db.varTaken newVarStr
+      throw new Error "That var is already taken"
+    else
+      @var = newVarStr
 
   saveVerb: (newVerb) ->
-    # TODO validation & sanitization
     for verb in @verbs
       if verb.name == newVerb.original_name
-        verb.name = newVerb.name.trim()
+        verb.name = newVerb.name
         verb.dobjarg = newVerb.dobjarg
         verb.preparg = newVerb.preparg
         verb.iobjarg = newVerb.iobjarg
         verb.code = newVerb.code
         return true
-    @addverb newVerb.name, newVerb.dobjarg, newVerb.preparg, newVerb.iobjarg, newVerb.code
+    @addVerb newVerb
     return true
+
+  # recursively get all properties of an object and it's parent objects
+  # as a hash
+  getAllProperties: (map = {}) ->
+    if @parent_id?
+      @parent().getAllProperties(map)
+    @properties.reduce(((map, prop) ->
+      map[prop.key] = prop.value
+      map
+    ), map)
+
+  # recursively get all verbs of an object and it's parent objects
+  getAllVerbs: (map = {}) ->
+    if @parent_id?
+      @parent().getAllVerbs(map)
+    @verbs.reduce(((map, verb) ->
+      map[verb.name] = verb
+      map
+    ), map)
 
   # does this object match the search string?
   # TODO: make it work like this:
@@ -257,6 +396,11 @@ class MooObject
       return @parent().findVerb context
     return null
 
+  toJSON: ->
+    clone = _.clone @
+    delete clone.db
+    clone
+
   toString: ->
     "[MooObject #{@name}]"
 
@@ -268,7 +412,12 @@ class MooPlayer extends MooObject
   # @player: Boolean
   # @programmer: Boolean
 
-  constructor: (@id, @parent_id, @name, @aliases, @location_id, @contents_ids, @username, @password, @player = true, @programmer = false, @properties = [], @verbs = []) ->
+  constructor: (player, db) ->
+    super player, db
+    @username = player.username
+    @password = player.password
+    @player = true
+    @programmer = player.programmer
 
   authenticates: (username, passwordHash) ->
     @username == username and @password == passwordHash
@@ -281,17 +430,26 @@ class MooPlayer extends MooObject
     else
       false
 
+  broadcast: (msg) ->
+    loc = @location()
+    if loc?
+      for o in loc.contents()
+        o.send msg if o.player and o != @
+      true
+    else
+      false
+
+  input: (msg, fn) ->
+    socket = connections.socketFor @
+    if socket?
+      socket.emit 'request_input', "\n#{msg}", (response) ->
+        fn(response)
+      true
+    else
+      false
+
   toString: ->
     "[MooPlayer #{@name}]"
-
-# A Moo Property is basically a single key value store
-class MooProperty
-  # @key: String
-  # @value: String|Int|Float|Array[String|Int|Float|Array]
-  constructor: (@key, @value) ->
-
-  toString: ->
-    "[MooProperty #{@key}]"
 
 # A Moo Verb is a js function which runs in a sandboxed context
 class MooVerb
@@ -301,7 +459,12 @@ class MooVerb
   # @preparg: String
   # @iobjarg: String
   # @code: String
-  constructor: (@name, @dobjarg, @preparg, @iobjarg, @code) ->
+  constructor: (verb) ->
+    @name = verb.name
+    @dobjarg = verb.dobjarg
+    @preparg = verb.preparg
+    @iobjarg = verb.iobjarg
+    @code = verb.code
 
   # does this verb match the search string?
   # TODO: make it work like this:
@@ -352,14 +515,10 @@ class MooVerb
       when 'any'
         return false if not context.$prepstr?
       else
-        # TODO: improve this?  e.g. 'with' and 'using' are interchangeable.
-        return false if context.$prepstr != @preparg
+        return false if context.$prepstr not in @preparg.split('/')
     true
 
   toString: ->
     "[MooVerb #{@name}]"
 
-db = new MooDB
-db.loadSync 'db.json'
-
-exports.db = db
+exports.db = new MooDB('db.json')

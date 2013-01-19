@@ -1,3 +1,4 @@
+#!/usr/bin/env coffee
 util = require 'util'
 vm = require 'vm'
 express = require 'express'
@@ -14,7 +15,7 @@ c = require('./lib/color').color
 parse = require('./lib/parser').parse
 db = require('./lib/moo').db
 mooUtil = require './lib/util'
-contextBuilder = require './lib/context'
+contextFor = require './lib/context'
 formDescriptors = require './lib/forms'
 
 environment = new Mincer.Environment()
@@ -62,36 +63,39 @@ ws_server.sockets.on 'connection', (socket) ->
       command = parse str
 
       if command.verb == 'eval' and player.programmer
-        context = contextBuilder.buildBaseContext()
-        context.db = db
-        context.$ = (id) -> db.findById(id)
+        context = contextFor.eval({$player: player, $here: player.location()})
         try
           code = coffee.compile command.argstr, bare: true
           output = vm.runInNewContext code, context
           player.send mooUtil.print output
         catch error
           player.send c error.toString(), 'inverse bold red'
+          #player.send error.stack.split('\n').map((line) -> c line, 'inverse bold red').join('\n')
       else if command.verb == 'edit' and player.programmer
         [oNum, verbName] = command.argstr.split('.')
         o = db.findByNum oNum
         if o?
           verb = (o.verbs.filter (v) -> v.name == verbName)[0]
-        if verb?
-          clonedVerb = _.clone verb
-          clonedVerb.oid = o.id
-          socket.emit 'edit_verb', clonedVerb
+          if verb?
+            clonedVerb = _.clone verb
+            clonedVerb.oid = o.id
+            socket.emit 'edit_verb', clonedVerb
+          else
+            newVerb = {oid: o.id, name: verbName, dobjarg: 'none', preparg: 'none', iobjarg: 'none', code: ''}
+            player.send c "Creating new verb '#{verbName}' on '#{o.name}'.", 'cyan'
+            socket.emit 'edit_verb', newVerb
         else
-          player.send c "No such object or verb.", 'red'
+          player.send c "No such object.", 'red'
       else
         [verb, context] = db.buildContextForCommand player, command
-        baseContext = contextBuilder.buildBaseContext()
-        context = _(baseContext).extend context
+        context = contextFor.verb(context)
         if verb?
           try
             code = coffee.compile verb.code, bare: true
             vm.runInNewContext code, context
           catch error
             player.send c error.toString(), 'inverse bold red'
+            #player.send error.stack.split('\n').map((line) -> c line, 'inverse bold red').join('\n')
         else
           player.send c("I didn't understand that.", 'gray')# + mooUtil.print command
     else
@@ -139,7 +143,6 @@ ws_server.sockets.on 'connection', (socket) ->
       formDescriptor.error = 'Invalid username or password.'
       fn formDescriptor
 
-  # TODO (better) validation and sanitization
   socket.on 'form_input_create', (userData, fn) ->
     sanitize = (userData) ->
       name: (userData.name || "").trim()
@@ -196,7 +199,7 @@ ws_server.sockets.on 'connection', (socket) ->
 
   socket.on 'save_verb', (userVerb, fn) ->
     sanitize = (userVerb) ->
-      oid: userVerb.oid || null,
+      oid: if userVerb.oid? then userVerb.oid else null,
       original_name: userVerb.original_name || ""
       name: (userVerb.name || "").trim().split(' ').filter((s) -> s != '').map((s) -> s.trim().toLowerCase()).join ' '
       dobjarg: userVerb.dobjarg || null
@@ -220,16 +223,20 @@ ws_server.sockets.on 'connection', (socket) ->
       if verb.name == ""
         errors.push "name can't be empty"
       else
-        verbNames = verb.name.split ' '
-        for name in verbNames
-          if name == '*' and verbNames.length != 1
-            errors.push "* can only be by itself"
-          else if name == '*'
-            break
-          else if name.indexOf('*') == 0 and name.length > 1
-            errors.push "* can't appear at the beginning of a verb's name"
-          else if not name.match /^[a-z]+\*?[a-z]*$/
-            errors.push "verb names can be alphanumeric and contain * only once"
+        o = db.findById(verb.oid)
+        if verb.name != verb.original_name and verb.name in (o.verbs.map (v) -> v.name)
+          errors.push "that verb name already exists on that object"
+        else
+          verbNames = verb.name.split ' '
+          for name in verbNames
+            if name == '*' and verbNames.length != 1
+              errors.push "* can only be by itself"
+            else if name == '*'
+              break
+            else if name.indexOf('*') == 0 and name.length > 1
+              errors.push "* can't appear at the beginning of a verb's name"
+            else if not name.match /^[a-z]+\*?[a-z]*$/
+              errors.push "verb names can be alphanumeric and contain * only once"
 
       if not verb.dobjarg?
         errors.push "missing direct object argument specifier"
