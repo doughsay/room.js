@@ -353,6 +353,29 @@ class MooObject
     else
       @var = newVarStr
 
+  addVerbPublic: (socket, verbName, dobjarg, preparg, iobjarg) ->
+    verb = (@verbs.filter (v) -> v.name == verbName)[0]
+    if verb?
+      throw new Error "That verb already exists on this object."
+    else
+      newVerb = {oid: @id, name: verbName, dobjarg: dobjarg, preparg: preparg, iobjarg: iobjarg, code: ''}
+      socket.emit 'edit_verb', newVerb
+      true
+
+  editVerb: (socket, verbName) ->
+    verb = (@verbs.filter (v) -> v.name == verbName)[0]
+    if verb?
+      clonedVerb = _.clone verb
+      clonedVerb.oid = @id
+      socket.emit 'edit_verb', clonedVerb
+      true
+    else
+      throw new Error "That verb does not exist on this object."
+
+  rmVerb: (verbName) ->
+    @verbs = (@verbs.filter (v) -> v.name != verbName)
+    true
+
   saveVerb: (newVerb) ->
     for verb in @verbs
       if verb.name == newVerb.original_name

@@ -4,6 +4,7 @@ _ = require 'underscore'
 
 color = require('./color').color
 db = require('./moo').db
+connections = require './connection_manager'
 
 # memoize all the context objects
 memo = {}
@@ -128,6 +129,15 @@ ContextMooObject = (object, context) ->
 
   @updateAliases = (aliases) ->
     object.updateAliases aliases
+
+  @editVerb = (verbName) ->
+    object.editVerb connections.socketFor(context.$player), verbName
+
+  @addVerb = (verbName, dobjarg = 'none', preparg = 'none', iobjarg = 'none') ->
+    object.addVerbPublic connections.socketFor(context.$player), verbName, dobjarg, preparg, iobjarg
+
+  @rmVerb = (verbName) ->
+    object.rmVerb verbName
 
   @clone = (newName, newAliases = []) ->
     db.clone(object, newName, newAliases)

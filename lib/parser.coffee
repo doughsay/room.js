@@ -57,8 +57,6 @@ replaceSpecials = (text) ->
     text.replace ':', 'emote '
   else if text.indexOf(';') == 0
     text.replace ';', 'eval '
-  else if text.indexOf('#') == 0
-    text = "edit #{text}"
   else
     text
 
