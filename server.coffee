@@ -71,21 +71,6 @@ ws_server.sockets.on 'connection', (socket) ->
         catch error
           player.send c error.toString(), 'inverse bold red'
           #player.send error.stack.split('\n').map((line) -> c line, 'inverse bold red').join('\n')
-      else if command.verb == 'edit' and player.programmer
-        [oNum, verbName] = command.argstr.split('.')
-        o = db.findByNum oNum
-        if o?
-          verb = (o.verbs.filter (v) -> v.name == verbName)[0]
-          if verb?
-            clonedVerb = _.clone verb
-            clonedVerb.oid = o.id
-            socket.emit 'edit_verb', clonedVerb
-          else
-            newVerb = {oid: o.id, name: verbName, dobjarg: 'none', preparg: 'none', iobjarg: 'none', code: ''}
-            player.send c "Creating new verb '#{verbName}' on '#{o.name}'.", 'cyan'
-            socket.emit 'edit_verb', newVerb
-        else
-          player.send c "No such object.", 'red'
       else
         [verb, context] = db.buildContextForCommand player, command
         context = contextFor.verb(context)
