@@ -77,8 +77,8 @@ ContextMooObject = (object, context) ->
                 code = coffee.compile verb.code, bare: true
                 vm.runInNewContext code, verbContext
               catch error
-                #context.$player.send c error.toString(), 'inverse bold red'
-                player.send error.stack.split('\n').map((line) -> color line, 'inverse bold red').join('\n')
+                player.send color error.toString(), 'inverse bold red'
+                #player.send error.stack.split('\n').map((line) -> color line, 'inverse bold red').join('\n')
             fn.verb = true
             verbs[verb.name] = fn
         verbs

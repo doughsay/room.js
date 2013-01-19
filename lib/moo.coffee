@@ -396,6 +396,11 @@ class MooObject
       return @parent().findVerb context
     return null
 
+  toJSON: ->
+    clone = _.clone @
+    delete clone.db
+    clone
+
   toString: ->
     "[MooObject #{@name}]"
 
