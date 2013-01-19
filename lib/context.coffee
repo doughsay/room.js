@@ -1,5 +1,6 @@
 vm = require 'vm'
 coffee = require 'coffee-script'
+_ = require 'underscore'
 
 color = require('./color').color
 db = require('./moo').db
@@ -24,6 +25,10 @@ ContextMooObject = (object, context) ->
       enumerable: true
       get: -> object.id
       set: -> throw new Error "No setter for 'id'"
+    var:
+      enumerable: true
+      get: -> object.var
+      set: (newvar) -> object.setVar newvar
     parent_id:
       enumerable: true
       get: -> object.parent_id
@@ -118,6 +123,9 @@ ContextMooObject = (object, context) ->
   @rename = (name) ->
     object.rename name
 
+  @setVar = (newvar) ->
+    object.setVar newvar
+
   @updateAliases = (aliases) ->
     object.updateAliases aliases
 
@@ -147,29 +155,47 @@ ContextMooObject = (object, context) ->
   # return so coffeescript doesn't screw up the object creation
   return
 
-contextFor = (type, context) ->
+verbContext = (context) ->
+  vars = db.objectsWithVar().reduce ((map, object) ->
+    map["$#{object.var}"] = contextify object, context
+    map
+  ), {}
 
-  switch type
-    when 'verb'
-      c:         color
-      $:         (id) -> contextify db.findById(id), context
-      $this:     contextify context.$this, context
-      $player:   contextify context.$player, context
-      $here:     contextify context.$here, context
-      $dobj:     contextify context.$dobj, context
-      $iobj:     contextify context.$iobj, context
-      $verb:     context.$verb
-      $argstr:   context.$argstr
-      $dobjstr:  context.$dobjstr
-      $prepstr:  context.$prepstr
-      $iobjstr:  context.$iobjstr
-    when 'eval'
-      c:         color
-      $:         (id) -> contextify db.findById(id), context
-      $player:   contextify context.$player, context
-      $here:     contextify context.$here, context
-      list:      -> db.list()
-      tree:      (root_id) -> db.inheritance_tree(root_id)
-      locations: (root_id) -> db.location_tree(root_id)
+  base =
+    eval:      undefined
+    c:         color
+    $:         (id) -> contextify db.findById(id), context
+    $this:     contextify context.$this, context
+    $player:   contextify context.$player, context
+    $here:     contextify context.$here, context
+    $dobj:     contextify context.$dobj, context
+    $iobj:     contextify context.$iobj, context
+    $verb:     context.$verb
+    $argstr:   context.$argstr
+    $dobjstr:  context.$dobjstr
+    $prepstr:  context.$prepstr
+    $iobjstr:  context.$iobjstr
 
-exports.for = contextFor
+  _.extend vars, base
+
+
+evalContext = (context) ->
+  vars = db.objectsWithVar().reduce ((map, object) ->
+    map["$#{object.var}"] = contextify object, context
+    map
+  ), {}
+
+  base =
+    eval:      undefined
+    c:         color
+    $:         (id) -> contextify db.findById(id), context
+    $player:   contextify context.$player, context
+    $here:     contextify context.$here, context
+    list:      -> db.list()
+    tree:      (root_id) -> db.inheritance_tree(root_id)
+    locations: (root_id) -> db.location_tree(root_id)
+
+  _.extend vars, base
+
+exports.verb = verbContext
+exports.eval = evalContext

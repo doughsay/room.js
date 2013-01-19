@@ -91,10 +91,18 @@ class MooDB
     else
       [null, null]
 
+  objectsWithVar: ->
+    @objects.filter (object) ->
+      object.var?
+
   list: ->
     @objects.filter((o) -> o?).map (o) ->
-      id: o.id
-      name: o.name
+      x =
+        id: o.id
+        name: o.name
+      if o.var?
+        x.var = o.var
+      x
 
   inheritance_tree: (root_id) ->
     children = (o) =>
@@ -145,6 +153,9 @@ class MooDB
 
   playerNameTaken: (name) ->
     !!(@players.filter (player) -> player.name == name).length
+
+  varTaken: (varStr) ->
+    !!(@objects.filter (object) -> object.var == varStr).length
 
   # createNewPlayer: (name, username, password, programmer = false) ->
   #   nextId = @nextId()
@@ -210,6 +221,7 @@ class MooDB
 # A Moo Object has properties and verbs
 class MooObject
   # @id: Int
+  # @var: String
   # @parent_id: Int
   # @name: String
   # @aliases: Array[String]
@@ -220,6 +232,7 @@ class MooObject
 
   constructor: (dbObject, @db) ->
     @id = dbObject.id
+    @var = dbObject.var
     @parent_id = dbObject.parent_id
     @name = dbObject.name
     @aliases = dbObject.aliases
@@ -308,6 +321,18 @@ class MooObject
       if not (alias? and alias.toString?)
         throw new Error "Invalid alias '#{alias}'"
     @aliases = (alias.toString() for alias in aliases)
+
+  setVar: (newvar) ->
+    if newvar == null
+      @var = null
+      return null
+    if not (newvar? and newvar.toString? and !!newvar.toString().match /^[a-zA-Z_\$][0-9a-zA-Z_\$]*$/)
+      throw new Error "Invalid var"
+    newVarStr = newvar.toString()
+    if @db.varTaken newVarStr
+      throw new Error "That var is already taken"
+    else
+      @var = newVarStr
 
   saveVerb: (newVerb) ->
     for verb in @verbs
