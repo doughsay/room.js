@@ -13,8 +13,8 @@ jsmoo is different from other MOOs because:
 2. You connect using a web browser, not a telnet or mud client.
 3. You can edit the game code in the browser, using a fairly decent in-browser code editor ([Ace](http://ace.ajax.org/)).
 
-Usage
------
+Running the Server
+------------------
 
 Clone this repo, copy the example db, and launch the server:
 
@@ -38,7 +38,8 @@ If you are signed in as a programmer, you can evaluate any CoffeeScript code by 
     ;Math.pow 2, 4
     -> 16
 
-### Eval context
+Eval Context
+------------
 
 The eval context contains these global variables:
 
@@ -47,28 +48,36 @@ The eval context contains these global variables:
 
 You also have access to some global functions:
 
-#### `$(id)`
+### `$(id)`
 
 Retrieve the object with the given `id`.
 
-#### `list()`
+### `list`
 
-Returns a list all objects in the database with their `id` and `name` fields.
+Returns a list all objects in the database with their `id`, `name` and `var` fields.
 
-
-#### `tree(id = undefined)`
+### `tree(id = undefined)`
 
 Returns the object inheritance tree.
 
 * `id` - (int) (optional) Use object `id` as the root.
 
-#### `locations(id = undefined)`
+### `locations(id = undefined)`
 
 Return a tree representing objects' locations.  Top level objects in this tree are 'nowhere', and inner nodes are contained within their parents.
 
 * `id` - (int) (optional) Only show object `id` and it's contents.
 
-### Object methods
+Objects
+-------
+
+You can find objects in two ways.  The above $() method will retrieve objects if you know their `id`.  Some objects have `var` names associated with them.  To access these objects (e.g. object 0, the root object) just type it's var name after a $:
+
+    $root
+
+
+Object methods
+--------------
 
 Calling methods on objects is simple:
 
@@ -76,83 +85,90 @@ Calling methods on objects is simple:
 
 These methods are available on moo objects:
 
-#### `parent`
+### `parent`
 
 Returns the parent object of this object, or `null` if this object has no parent.
 
-#### `location`
+### `location`
 
 Returns the location object of this object, or `null` if this object is 'nowhere'.
 
-#### `moveTo(target)`
+### `moveTo(target)`
 
 Moves this object to be contained inside the target object.
 
 * `target` - (object) The target object
 
-#### `contents`
+### `contents`
 
 Returns an array of objects that are contained in this object.
 
-#### `addProp(key, value)`
+### `addProp(key, value)`
 
 Adds a new property to this object.
 
 * `key` - (string) The key to store the property under.  If it already exists it will be overwritten.
 * `value` - (any) The value to store.  Can be any type.
 
-#### `rmProp(key)`
+### `rmProp(key)`
 
 Removes a property from an object.
 
 * `key` - (string) The key to remove.
 
-#### `getProp(key)`
+### `getProp(key)`
 
 Retrieve the value of a property.
 
 * `key` - (string) The key to retrieve.
 
-#### `setProp(key, value)`
+### `setProp(key, value)`
 
 Same as `setProp`.
 
 * `key` - (string) The key to store the property under.  If it already exists it will be overwritten.
 * `value` - (any) The value to store.  Can be any type.
 
-#### `chparent(id)`
+### `chparent(id)`
 
 Change the parent object that this object inherits from.
 
 * `id` - (int) The id of the object to be the new parent, or `null` for no parent.
 
-#### `rename(name)`
+### `rename(name)`
 
 Renames the object.
 
 * `name` - (string) The new name for the object.
 
-#### `updateAliases(aliases)`
+### `setVar(varname)`
+
+Sets the var name for this object.  After setting it, you can refer to the object using `$varname`.
+
+* `varname` - (string) The new var name for this object, or `null` to unset it.
+
+### `updateAliases(aliases)`
 
 Chnages the list of aliases for this obect.
 
 * `aliases` - (array[string]) The list of new aliases for this object.
 
-#### `clone(newName, newAliases = [])`
+### `clone(newName, newAliases = [])`
 
 Creates a clone of this object, copying all its properties and verbs.
 
 * `newName` - (string) The name of the new object.
 * `newAliases` - (array[string]) (optional) The list of aliases for the new object.
 
-#### `createChild(newName, newAliases = [])`
+### `createChild(newName, newAliases = [])`
 
 Creates a child of this object.  The child inherits all of its properties and verbs.
 
 * `newName` - (string) The name of the new object.
 * `newAliases` - (array[string]) (optional) The list of aliases for the new object.
 
-### Verbs
+Verbs
+-----
 
 To edit verbs on objects, use this syntax:
 
@@ -173,7 +189,7 @@ The verb context has different variables available to it.  They are as follows:
 * `$prepstr` - the preposition string
 * `$iobjstr` - the indirect object string
 
-The verb context also has access to the `$` global function.
+The verb context also has access to the `$` global function, and any global object var names.
 
 TODO
 ----
