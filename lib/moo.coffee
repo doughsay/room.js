@@ -287,8 +287,8 @@ class MooObject
   contents: ->
     @contents_ids.map (id) => @db.findById id
 
-  addProp: (key, value) ->
-    @properties.push {key: key, value: value}
+  addProp: (key, value, mooObject) ->
+    @properties.push {key: key, value: value, mooObject: mooObject}
 
   addVerb: (verb) ->
     @verbs.push new MooVerb verb
@@ -304,15 +304,16 @@ class MooObject
   getProp: (key) ->
     for prop in @properties
       if prop.key == key
-        return prop.value
+        return [prop.value, prop.mooObject]
     return @parent()?.getProp key
 
-  setProp: (key, value) ->
+  setProp: (key, value, mooObject) ->
     for prop in @properties
       if prop.key == key
         prop.value = value
+        prop.mooObject = mooObject
         return value
-    @addProp key, value
+    @addProp key, value, mooObject
     return value
 
   chparent: (id) ->
@@ -394,7 +395,7 @@ class MooObject
     if @parent_id?
       @parent().getAllProperties(map)
     @properties.reduce(((map, prop) ->
-      map[prop.key] = prop.value
+      map[prop.key] = [prop.value, prop.mooObject]
       map
     ), map)
 

@@ -5,6 +5,7 @@ _ = require 'underscore'
 color = require('./color').color
 db = require('./moo').db
 connections = require './connection_manager'
+mooUtil = require './util'
 
 # memoize all the context objects
 memo = {}
@@ -50,6 +51,10 @@ ContextMooObject = (object, context) ->
       enumerable: true
       get: -> object.contents_ids
       set: -> throw new Error "No setter for 'contents_ids'"
+    mooObject:
+      enumerable: true
+      get: -> true
+      set: -> throw new Error "No setter for 'mooObject'"
     player:
       enumerable: true
       get: -> object.player
@@ -60,7 +65,12 @@ ContextMooObject = (object, context) ->
       set: -> throw new Error "No setter for 'programmer'"
     properties:
       enumerable: true
-      get: -> object.getAllProperties()
+      get: -> mooUtil.hmap object.getAllProperties(), (x) ->
+        [value, mooObject] = x
+        if mooObject
+          contextify db.findById(value), context
+        else
+          value
       set: -> throw new Error "No setter for 'properties'"
     verbs:
       enumerable: true
@@ -107,16 +117,26 @@ ContextMooObject = (object, context) ->
     object.contents().map (o) -> contextify o, context
 
   @addProp = (key, value) ->
-    object.addProp key, value
+    if value.mooObject
+      object.addProp key, value.id, true
+    else
+      object.addProp key, value, false
 
   @rmProp = (key) ->
     object.rmProp key
 
   @getProp = (key) ->
-    object.getProp key
+    [value, mooObject] = object.getProp key
+    if mooObject
+      contextify db.findById(value), context
+    else
+      value
 
   @setProp = (key, value) ->
-    object.setProp key, value
+    if value.mooObject
+      object.setProp key, value.id, true
+    else
+      object.setProp key, value, false
 
   @chparent = (id) ->
     object.chparent id
@@ -200,6 +220,9 @@ evalContext = (context) ->
 
   base =
     eval:      undefined
+    ls:        (x, depth = 2) ->
+                  context.$player.send(mooUtil.print x, '', '', true, depth)
+                  true
     c:         color
     $:         (id) -> contextify db.findById(id), context
     $player:   contextify context.$player, context
