@@ -135,6 +135,9 @@ ContextMooObject = (object, context) ->
     @broadcast = (msg) ->
       object.broadcast msg
 
+    @input = (msg, fn) ->
+      object.input msg, fn
+
   @toString = ->
     if object.player
       "[ContextMooPlayer #{object.name}]"

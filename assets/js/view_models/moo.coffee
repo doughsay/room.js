@@ -19,6 +19,8 @@ class MooView
 
   form: ko.observable null
 
+  inputCallback: null
+
   # construct the view model
   constructor: (@body, @screen, @input) ->
     @socket = io.connect()
@@ -42,6 +44,7 @@ class MooView
 
     @socket.on 'output', @output
     @socket.on 'request_form_input', @request_form_input
+    @socket.on 'request_input', @request_input
 
     @socket.on 'edit_verb', @edit_verb
 
@@ -108,7 +111,12 @@ class MooView
         @history.pop()
       @currentHistory = -1
       if not @clientCommand command
-        @socket.emit 'input', command
+        # if an input callback is waiting, send it to that, otherwise, send it to the server
+        if @inputCallback?
+          @inputCallback command
+          @inputCallback = null
+        else
+          @socket.emit 'input', command
       @command ""
 
   # simple client-side commands
@@ -197,6 +205,12 @@ class MooView
   # adds a line of output to the screen
   output: (msg) =>
     @addLine msg
+
+  # input was requested from the server.
+  # the next thing the user sends has to be returned to fn
+  request_input: (msg, fn) =>
+    @addLine msg
+    @inputCallback = fn
 
   # request_form_input event
   # the server has requested some form input

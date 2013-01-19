@@ -199,7 +199,7 @@ ws_server.sockets.on 'connection', (socket) ->
 
   socket.on 'save_verb', (userVerb, fn) ->
     sanitize = (userVerb) ->
-      oid: userVerb.oid || null,
+      oid: if userVerb.oid? then userVerb.oid else null,
       original_name: userVerb.original_name || ""
       name: (userVerb.name || "").trim().split(' ').filter((s) -> s != '').map((s) -> s.trim().toLowerCase()).join ' '
       dobjarg: userVerb.dobjarg || null

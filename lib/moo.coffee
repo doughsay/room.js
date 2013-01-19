@@ -409,6 +409,15 @@ class MooPlayer extends MooObject
     else
       false
 
+  input: (msg, fn) ->
+    socket = connections.socketFor @
+    if socket?
+      socket.emit 'request_input', "\n#{msg}", (response) ->
+        fn(response)
+      true
+    else
+      false
+
   toString: ->
     "[MooPlayer #{@name}]"
 
