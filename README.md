@@ -149,9 +149,48 @@ Sets the var name for this object.  After setting it, you can refer to the objec
 
 ### `updateAliases(aliases)`
 
-Chnages the list of aliases for this obect.
+Changes the list of aliases for this object.
 
 * `aliases` - (array[string]) The list of new aliases for this object.
+
+### `addVerb(name, dobjarg = 'none', preparg = 'none', iobjarg = 'none')`
+
+Loads a new verb into the verb editor.  The verb is added once you click 'save'.
+
+* `name` - (string) The name of the verb.
+* `dobjarg` - (string) The direct object argument specifier. One of ('this', 'any' or 'none')
+* `preparg` - (string) The preposition argument specifier.  One of ('this', 'any', 'none' or one of the prepositions specified below)
+* `iobjarg` - (string) The indirect object argument specifier.  One of ('this', 'any' or 'none')
+
+The following are the recognized prepositions:
+
+* with/using
+* at/to
+* in front of
+* in/inside/into
+* on top of/on/onto/upon
+* out of/from inside/from
+* over
+* through
+* under/underneath/beneath
+* behind
+* beside
+* for/about
+* is
+* as
+* off/off of
+
+### `editVerb(name)`
+
+Loads the given verb into the verb editor.  It's saved once you hit the 'save' button.
+
+* `name` - (string) The name of the verb to edit.
+
+### `rmVerb(name)`
+
+Deletes the specified verb from this object.
+
+* `name` - (string) The name of the verb to delete.
 
 ### `clone(newName, newAliases = [])`
 
@@ -170,9 +209,9 @@ Creates a child of this object.  The child inherits all of its properties and ve
 Verbs
 -----
 
-To edit verbs on objects, use this syntax:
+To edit verbs on objects, use the object methods `addVerb`, `editVerb` and `rmVerb` described above.
 
-    #4.examine
+    $(4).editVerb 'examine'
 
 This will load the verb 'examine' of object 4 into the verb editor.
 
@@ -202,5 +241,4 @@ TODO
 * Preposition argument specifiers need some work.  Some prepositions are synonymous, e.g. 'with' and 'using' should be interchangable.  "open door with key" / "open door using key"
 * There should be a fallback function to catch un-recognized commands, like the 'huh' verb in LambdaMoo.
 * Logout
-* Better verb editing syntax
 * Remove database assumptions from the server code (player creation)
