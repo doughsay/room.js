@@ -164,7 +164,7 @@ class MooDB
 
     nextId = @nextId()
 
-    newPlayer = new MooPlayer
+    object =
       id: nextId
       var: null
       parent_id: parentPlayerId
@@ -176,6 +176,10 @@ class MooDB
       password: password
       player: true
       programmer: programmer
+      properties: []
+      verbs: []
+
+    newPlayer = new MooPlayer object, @
 
     @objects[nextId] = newPlayer
     @players.push newPlayer
