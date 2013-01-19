@@ -157,15 +157,30 @@ class MooDB
   varTaken: (varStr) ->
     !!(@objects.filter (object) -> object.var == varStr).length
 
-  # createNewPlayer: (name, username, password, programmer = false) ->
-  #   nextId = @nextId()
-  #   newPlayer = new MooPlayer nextId, 1, name, [], null, [], username, password, true, programmer
-  #   @objects[nextId] = newPlayer
-  #   @players.push newPlayer
-  #   root = @findById 0
-  #   startLocation = @findById root.prop 'start_location_id'
-  #   newPlayer.moveTo startLocation
-  #   true
+  # TODO this makes several DB assumptions
+  createNewPlayer: (name, username, password, programmer = false) ->
+    parentPlayerId = 1
+    startLocationId = 5
+
+    nextId = @nextId()
+
+    newPlayer = new MooPlayer
+      id: nextId
+      var: null
+      parent_id: parentPlayerId
+      name: name
+      aliases: []
+      location_id: []
+      contents_ids: []
+      username: username
+      password: password
+      player: true
+      programmer: programmer
+
+    @objects[nextId] = newPlayer
+    @players.push newPlayer
+    newPlayer.moveTo @findById startLocationId
+    true
 
   # create a clone of this object with copies of all it's properties and verbs
   clone: (object, newName, newAliases) ->
