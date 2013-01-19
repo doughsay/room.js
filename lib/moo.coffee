@@ -467,6 +467,9 @@ class MooPlayer extends MooObject
     else
       false
 
+  setProgrammer: (programmer) ->
+    @programmer = !!programmer
+
   toString: ->
     "[MooPlayer #{@name}]"
 

@@ -146,6 +146,9 @@ ContextMooObject = (object, context) ->
     @input = (msg, fn) ->
       object.input msg, fn
 
+    @setProgrammer = (programmer) ->
+      object.setProgrammer programmer
+
   @toString = ->
     if object.player
       "[ContextMooPlayer #{object.name}]"
