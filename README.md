@@ -201,3 +201,6 @@ TODO
 * Using 'this' as the direct/indirect object argument specifier for verbs doesn't work yet
 * Preposition argument specifiers need some work.  Some prepositions are synonymous, e.g. 'with' and 'using' should be interchangable.  "open door with key" / "open door using key"
 * There should be a fallback function to catch un-recognized commands, like the 'huh' verb in LambdaMoo.
+* Logout
+* Better verb editing syntax
+* Remove database assumptions from the server code (player creation)
