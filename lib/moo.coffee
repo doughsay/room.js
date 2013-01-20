@@ -435,8 +435,17 @@ class MooObject
     for verb in @verbs
       if verb.matchesContext context
         return verb
-    if @parent_id
+    if @parent_id?
       return @parent().findVerb context
+    return null
+
+  # find a verb on this object (or it's parents) that matches the given name
+  findVerbByName: (name) ->
+    for verb in @verbs
+      if verb.name == name
+        return verb
+    if @parent_id?
+      return @parent().findVerbyName name
     return null
 
   toJSON: ->

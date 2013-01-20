@@ -80,16 +80,19 @@ ContextMooObject = (object, context) ->
           do (verb) =>
             fn = =>
               try
-                verbContext = contextFor('verb', context)
-                verbContext.$this = contextify object
-                verbContext.$verb = verb.name
-                verbContext.$args = arguments
-                verbContext.$argstr = Array.prototype.slice.call(arguments).join ' '
+                thisContext = _(context).clone()
+                thisContext.$this = contextify object
+                thisContext.$verb = verb.name
+                thisContext.$args = arguments
+                thisContext.$argstr = Array.prototype.slice.call(arguments).join ' '
+
+                thisContext = verbContext(thisContext)
+
                 code = coffee.compile verb.code, bare: true
-                vm.runInNewContext code, verbContext
+                vm.runInNewContext code, thisContext
               catch error
-                player.send color error.toString(), 'inverse bold red'
-                #player.send error.stack.split('\n').map((line) -> color line, 'inverse bold red').join('\n')
+                context.$player.send color error.toString(), 'inverse bold red'
+                #context.$player.send error.stack.split('\n').map((line) -> color line, 'inverse bold red').join('\n')
             fn.verb = true
             verbs[verb.name] = fn
         verbs
@@ -198,6 +201,18 @@ verbContext = (context) ->
     eval:      undefined
     c:         color
     $:         (id) -> contextify db.findById(id), context
+    pass:      ->
+      try
+        thisContext = verbContext(context)
+        verb = db.findById(context.$this.parent()?.id).findVerbByName context.$verb
+        if verb?
+          code = coffee.compile verb.code, bare: true
+          output = vm.runInNewContext code, thisContext
+        else
+          context.$player.send color "The verb #{context.$verb} doesn't exist", 'inverse bold red'
+      catch error
+        context.$player.send color error.toString(), 'inverse bold red'
+      output
     $this:     contextify context.$this, context
     $player:   contextify context.$player, context
     $here:     contextify context.$here, context
