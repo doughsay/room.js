@@ -67,7 +67,7 @@ ws_server.sockets.on 'connection', (socket) ->
         try
           code = coffee.compile command.argstr, bare: true
           output = vm.runInNewContext code, context
-          player.send mooUtil.print output, '', '', true, 0
+          player.send mooUtil.print output
         catch error
           player.send c error.toString(), 'inverse bold red'
           #player.send error.stack.split('\n').map((line) -> c line, 'inverse bold red').join('\n')

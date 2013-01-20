@@ -9,8 +9,13 @@ truncate = (s, length = 25) ->
   else
     s[0..length] + '...'
 
+printHelper = (x, maxdepth = 2) ->
+  print x, maxdepth
+
+visited = []
+
 # recursive colorful object output
-print = (x, indent = '', prefix = '', color = true, maxdepth = 2, depth = 0) ->
+print = (x, maxdepth, depth = 0, prefix = '') ->
   # possible types:
   #
   # number
@@ -23,84 +28,66 @@ print = (x, indent = '', prefix = '', color = true, maxdepth = 2, depth = 0) ->
   #   array
   #   date
 
-  # turns colors off
-  k = if color then c else ((x) -> x)
+  indent = ('' for i in [0..depth]).join '  '
+
+  if depth == 0
+    visited = []
 
   output = switch typeof x
     when 'number'
-      k x, 'yellow'
+      c x, 'yellow'
     when 'string'
-      # truncate the string if it's in an object or array
-      # TODO this doesn't quite work (misses inline arrays)
-      if indent == '' and prefix == ''
-        "'" + (k (safeString x), 'green') + "'"
+      if depth == 0
+        "'" + (c (safeString x), 'green') + "'"
       else
-        "'" + (k (truncate safeString x), 'green') + "'"
+        "'" + (c (truncate safeString x), 'green') + "'"
     when 'boolean'
-      k x.toString(), 'magenta'
+      c x.toString(), 'magenta'
     when 'undefined'
-      k 'undefined', 'gray'
+      c 'undefined', 'gray'
     when 'function'
       if x.verb
-        k '[MooVerb]', 'cyan'
+        c '[MooVerb]', 'cyan'
       else
-        k '[Function]', 'cyan'
+        c '[Function]', 'cyan'
     when 'object'
       if x == null
-        k 'null', 'red'
+        c 'null', 'red'
       else
-        if Array.isArray x
-          if maxdepth == depth
-            k "[Array]", 'blue'
-          else
-            test = '[ ' + ((x.map (y) -> print y, '', '', false, maxdepth, depth+1).join ', ') + ' ]'
-            if test.length <= 50 # arbitrary length threshold to force indented mode instead of inline
-              if x.length == 0
-                '[]'
-              else
-                '[ ' + ((x.map (y) -> print y, '', '', color, maxdepth, depth+1).join ', ') + ' ]'
+        if x in visited
+          c '[CircularReference]', 'yellow inverse'
+        else
+          visited.push x
+          if Array.isArray x
+            if maxdepth == depth
+              c "[Array]", 'blue'
+            else if x.length == 0
+              '[]'
             else
-              xs = (x.map (y) -> print y, indent + '  ', '', color, maxdepth, depth+1)
-              xs[0] = (k 'undefined', 'gray') if not xs[0]? # why is this needed?
+              xs = (x.map (y) -> print y, maxdepth, depth+1)
               xs[0] = '[ ' + (xs[0].replace indent + '  ', '')
               xs[xs.length-1] += ' ]'
               if prefix != ''
                 xs[0] = '\n' + indent + xs[0]
               xs.join ',\n'
-        else
-          if maxdepth == depth
-            k "[Object]", 'blue'
           else
-            xstest = []
-            for key, value of x
-              xstest.push print value, '', key + ': ', false, maxdepth, depth+1
-            if xstest.length == 0
-              xsteststr = '{}'
-            else
-              xsteststr = "{ #{xstest.join ', '} }"
-
-            if xsteststr.length <= 50
-              xs = []
-              for key, value of x
-                keyColor = 'blue' #if x.hasOwnProperty(key) then 'blue' else 'gray'
-                xs.push print value, '', (k key, keyColor) + ': ', color, maxdepth, depth+1
-              if xs.length == 0
-                '{}'
+            if maxdepth == depth
+              if x.mooObject
+                c x.toString(), 'blue'
               else
-                "{ #{xs.join ', '} }"
+                c "[Object]", 'blue'
+            else if (key for key of x).length == 0
+              '{}'
             else
               xs = []
               for key, value of x
-                keyColor = 'blue' #if x.hasOwnProperty(key) then 'blue' else 'gray'
-                xs.push print value, indent + '  ', (k key, keyColor) + ': ', color, maxdepth, depth+1
-              xs[0] = (k 'undefined', 'gray') if not xs[0]? # why is this needed?
+                keyColor = 'blue'
+                xs.push print value, maxdepth, depth+1, (c key, keyColor) + ': '
               xs[0] = '{ ' + (xs[0].replace indent + '  ', '')
               xs[xs.length-1] += ' }'
               if prefix != ''
                 xs[0] = '\n' + indent + xs[0]
               xs.join ',\n'
-    else
-      k "what is this!?", 'bold red inverse'
 
   return indent + prefix + output
 
@@ -110,5 +97,5 @@ hmap = (h, fn) ->
     result[key] = fn value
   result
 
-exports.print = print
+exports.print = printHelper
 exports.hmap = hmap

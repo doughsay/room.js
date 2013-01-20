@@ -181,9 +181,9 @@ ContextMooObject = (object, context) ->
 
   @toString = ->
     if object.player
-      "[ContextMooPlayer #{object.name}]"
+      "[MooPlayer #{object.name}]"
     else
-      "[ContextMooObject #{object.name}]"
+      "[MooObject #{object.name}]"
 
   # return so coffeescript doesn't screw up the object creation
   return
@@ -221,7 +221,7 @@ evalContext = (context) ->
   base =
     eval:      undefined
     ls:        (x, depth = 2) ->
-                  context.$player.send(mooUtil.print x, '', '', true, depth)
+                  context.$player.send(mooUtil.print x, depth)
                   true
     c:         color
     $:         (id) -> contextify db.findById(id), context
