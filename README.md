@@ -28,6 +28,15 @@ Connect to it using a web browser by going to [http://localhost:8888/](http://lo
 
 The provided example db has one user who is also a programmer: username=root, password=p@ssw0rd.
 
+The only currently implemented verbs are:
+
+* look
+* say [anything]
+* examine [object]
+* get [object]
+* drop [object]
+* swing sword
+
 Programming
 -----------
 
@@ -57,6 +66,10 @@ Retrieve the object with the given `id`.
 
 Returns a list all objects in the database with their `id`, `name` and `var` fields.
 
+### `search(str)`
+
+Returns a list of all objects whos name matches `str` in the database.
+
 ### `tree(id = undefined)`
 
 Returns the object inheritance tree.
@@ -69,40 +82,84 @@ Return a tree representing objects' locations.  Top level objects in this tree a
 
 * `id` - (int) (optional) Only show object `id` and it's contents.
 
+### `ls(x, depth = 2)`
+
+Pretty print `x` to a depth of `depth`.
+
+### `edit(object, verb)`
+
+Load the verb named `verb` of `object` into the verb editor.
+
+### `addverb(object, verb, dobjarg = 'none', preparg = 'none', iobjarg = 'none')`
+
+Add a new verb to `object` called `verb` and load it into the verb editor.  You can optionally specify the argument specifiers as well.
+
+### `rmverb(object, verb)`
+
+Remove verb named `verb` from `object`.
+
 Objects
 -------
 
-You can find objects in two ways.  The above $() method will retrieve objects if you know their `id`.  Some objects have `var` names associated with them.  To access these objects (e.g. object 0, the root object) just type it's var name after a $:
+You can find objects in two ways.  The above $() method will retrieve objects if you know their `id`.  Some objects have gobal names associated with them.  To access these objects (e.g. object 1, the root object) just type it's global name after a $:
 
     $root
 
+Object attributes
+-----------------
+
+You can access attributes on objects like this:
+
+    $thing.name
+
+### `id`
+
+(Int) {read-only} The objects unique id.
+
+### `parent`
+
+(Object) The parent of this object.  This object inherits verb and properties from it's parent, but it can be null.
+
+### `name`
+
+(String) The object's name.
+
+### `aliases`
+
+(Array[String]) Aliases that you can use to refer to this object.
+
+### `location`
+
+(Object) Where the object is located, if anywhere.
+
+### `contents`
+
+(Array[Object]) {read-only} An array of objects that are contained within this object.
+
+### `player`
+
+(Boolean) {read-only} Is this object a player?
+
+### `programmer`
+
+(Boolean) {read-only} Is this object a programmer?
+
+### `properties`
+
+(Array[Any]) {read-only} The object's custom properties.
+
+### `verbs`
+
+(Array[Verb]) {read-only} The object's verbs.
 
 Object methods
 --------------
 
 Calling methods on objects is simple:
 
-    $player.parent()
+    $player.addProp(arg1, arg2)
 
 These methods are available on moo objects:
-
-### `parent`
-
-Returns the parent object of this object, or `null` if this object has no parent.
-
-### `location`
-
-Returns the location object of this object, or `null` if this object is 'nowhere'.
-
-### `moveTo(target)`
-
-Moves this object to be contained inside the target object.
-
-* `target` - (object) The target object
-
-### `contents`
-
-Returns an array of objects that are contained in this object.
 
 ### `addProp(key, value)`
 
@@ -130,69 +187,6 @@ Same as `setProp`.
 * `key` - (string) The key to store the property under.  If it already exists it will be overwritten.
 * `value` - (any) The value to store.  Can be any type.
 
-### `chparent(id)`
-
-Change the parent object that this object inherits from.
-
-* `id` - (int) The id of the object to be the new parent, or `null` for no parent.
-
-### `rename(name)`
-
-Renames the object.
-
-* `name` - (string) The new name for the object.
-
-### `setVar(varname)`
-
-Sets the var name for this object.  After setting it, you can refer to the object using `$varname`.
-
-* `varname` - (string) The new var name for this object, or `null` to unset it.
-
-### `updateAliases(aliases)`
-
-Changes the list of aliases for this object.
-
-* `aliases` - (array[string]) The list of new aliases for this object.
-
-### `addVerb(name, dobjarg = 'none', preparg = 'none', iobjarg = 'none')`
-
-Loads a new verb into the verb editor.  The verb is added once you click 'save'.
-
-* `name` - (string) The name of the verb.
-* `dobjarg` - (string) The direct object argument specifier. One of ('this', 'any' or 'none')
-* `preparg` - (string) The preposition argument specifier.  One of ('this', 'any', 'none' or one of the prepositions specified below)
-* `iobjarg` - (string) The indirect object argument specifier.  One of ('this', 'any' or 'none')
-
-The following are the recognized prepositions:
-
-* with/using
-* at/to
-* in front of
-* in/inside/into
-* on top of/on/onto/upon
-* out of/from inside/from
-* over
-* through
-* under/underneath/beneath
-* behind
-* beside
-* for/about
-* is
-* as
-* off/off of
-
-### `editVerb(name)`
-
-Loads the given verb into the verb editor.  It's saved once you hit the 'save' button.
-
-* `name` - (string) The name of the verb to edit.
-
-### `rmVerb(name)`
-
-Deletes the specified verb from this object.
-
-* `name` - (string) The name of the verb to delete.
-
 ### `clone(newName, newAliases = [])`
 
 Creates a clone of this object, copying all its properties and verbs.
@@ -200,7 +194,7 @@ Creates a clone of this object, copying all its properties and verbs.
 * `newName` - (string) The name of the new object.
 * `newAliases` - (array[string]) (optional) The list of aliases for the new object.
 
-### `createChild(newName, newAliases = [])`
+### `create(newName, newAliases = [])`
 
 Creates a child of this object.  The child inherits all of its properties and verbs.
 
@@ -210,11 +204,11 @@ Creates a child of this object.  The child inherits all of its properties and ve
 Verbs
 -----
 
-To edit verbs on objects, use the object methods `addVerb`, `editVerb` and `rmVerb` described above.
+To edit verbs on objects, use the functions `addverb`, `edit` and `rmverb` described above.
 
-    $(4).editVerb 'examine'
+    edit $thing, 'examine'
 
-This will load the verb 'examine' of object 4 into the verb editor.
+This will load the verb 'examine' of the 'Thing Class' into the verb editor.
 
 The verb context has different variables available to it.  They are as follows:
 
@@ -229,7 +223,7 @@ The verb context has different variables available to it.  They are as follows:
 * `$prepstr` - the preposition string
 * `$iobjstr` - the indirect object string
 
-The verb context also has access to the `$` global function, and any global object var names.
+The verb context also has access to the `$` global function, and any global object names.
 
 TODO
 ----

@@ -210,7 +210,7 @@ class ContextMooObject
     @clone = (newName, newAliases = []) ->
       db.clone(object, newName, newAliases)
 
-    @createChild = (newName, newAliases = []) ->
+    @create = (newName, newAliases = []) ->
       db.createChild(object, newName, newAliases)
 
     # player specific methods

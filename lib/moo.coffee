@@ -198,8 +198,8 @@ class MooDB
 
   # TODO this makes several DB assumptions
   createNewPlayer: (name, username, password, programmer = false) ->
-    parentPlayerId = 1
-    startLocationId = 5
+    parentPlayerId = 2
+    startLocationId = 6
 
     nextId = @nextId()
 
