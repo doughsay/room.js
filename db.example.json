@@ -1,9 +1,88 @@
-[
-  {
+{
+  "0": {
     "id": 0,
-    "var": "root",
     "parent_id": null,
-    "name": "root",
+    "name": "System Object",
+    "aliases": [],
+    "location_id": null,
+    "contents_ids": [],
+    "player": false,
+    "programmer": false,
+    "properties": [
+      {
+        "key": "failed_match",
+        "value": -3,
+        "mooObject": true
+      },
+      {
+        "key": "ambiguous_match",
+        "value": -2,
+        "mooObject": true
+      },
+      {
+        "key": "nothing",
+        "value": -1,
+        "mooObject": true
+      },
+      {
+        "key": "sys",
+        "value": 0,
+        "mooObject": true
+      },
+      {
+        "key": "root",
+        "value": 1,
+        "mooObject": true
+      },
+      {
+        "key": "player_class",
+        "value": 2,
+        "mooObject": true
+      },
+      {
+        "key": "room",
+        "value": 4,
+        "mooObject": true
+      },
+      {
+        "key": "thing",
+        "value": 5,
+        "mooObject": true
+      },
+      {
+        "key": "util",
+        "value": 8,
+        "mooObject": true
+      }
+    ],
+    "verbs": [
+      {
+        "name": "server_started",
+        "dobjarg": "none",
+        "preparg": "none",
+        "iobjarg": "none",
+        "code": "console.log 'server_started called!'"
+      },
+      {
+        "name": "player_created",
+        "dobjarg": "none",
+        "preparg": "none",
+        "iobjarg": "none",
+        "code": "console.log 'player_created called!'"
+      },
+      {
+        "name": "player_connected",
+        "dobjarg": "none",
+        "preparg": "none",
+        "iobjarg": "none",
+        "code": "console.log 'player_connected called!'\nconsole.log $player.name"
+      }
+    ]
+  },
+  "1": {
+    "id": 1,
+    "parent_id": null,
+    "name": "Root Class",
     "aliases": [],
     "location_id": null,
     "contents_ids": [],
@@ -12,11 +91,10 @@
     "properties": [],
     "verbs": []
   },
-  {
-    "id": 1,
-    "var": null,
-    "parent_id": 0,
-    "name": "generic player",
+  "2": {
+    "id": 2,
+    "parent_id": 1,
+    "name": "Player Class",
     "aliases": [
       "player"
     ],
@@ -27,13 +105,12 @@
     "properties": [],
     "verbs": []
   },
-  {
-    "id": 2,
-    "var": null,
-    "parent_id": 1,
-    "name": "Dumbledore",
+  "3": {
+    "id": 3,
+    "parent_id": 2,
+    "name": "Gandalf",
     "aliases": [],
-    "location_id": 5,
+    "location_id": 6,
     "contents_ids": [],
     "player": true,
     "programmer": true,
@@ -42,11 +119,10 @@
     "username": "root",
     "password": "a075d17f3d453073853f813838c15b8023b8c487038436354fe599c3942e1f95"
   },
-  {
-    "id": 3,
-    "var": null,
-    "parent_id": 0,
-    "name": "generic room",
+  "4": {
+    "id": 4,
+    "parent_id": 1,
+    "name": "Room Class",
     "aliases": [
       "room"
     ],
@@ -57,7 +133,8 @@
     "properties": [
       {
         "key": "description",
-        "value": "A generic room."
+        "value": "A generic room.",
+        "mooObject": false
       }
     ],
     "verbs": [
@@ -74,14 +151,20 @@
         "preparg": "none",
         "iobjarg": "none",
         "code": "$player.send (c 'You say ', 'gray') + \"\\\"#{$argstr}\\\"\"\n$player.broadcast (c \"#{$player.name} says \", 'gray') + \"\\\"#{$argstr}\\\"\""
+      },
+      {
+        "name": "huh",
+        "dobjarg": "none",
+        "preparg": "none",
+        "iobjarg": "none",
+        "code": "$player.send 'huh?'"
       }
     ]
   },
-  {
-    "id": 4,
-    "var": null,
-    "parent_id": 0,
-    "name": "generic item",
+  "5": {
+    "id": 5,
+    "parent_id": 1,
+    "name": "Thing Class",
     "aliases": [
       "item"
     ],
@@ -92,7 +175,8 @@
     "properties": [
       {
         "key": "description",
-        "value": "A generic item."
+        "value": "A generic item.",
+        "mooObject": false
       }
     ],
     "verbs": [
@@ -119,45 +203,45 @@
       }
     ]
   },
-  {
-    "id": 5,
-    "var": null,
-    "parent_id": 3,
+  "6": {
+    "id": 6,
+    "parent_id": 4,
     "name": "A forest clearing",
     "aliases": [
       "clearing"
     ],
     "location_id": null,
     "contents_ids": [
-      2,
-      6
+      3,
+      7
     ],
     "player": false,
     "programmer": false,
     "properties": [
       {
         "key": "description",
-        "value": "The forest thins out here a bit."
+        "value": "The forest thins out here a bit.",
+        "mooObject": false
       }
     ],
     "verbs": []
   },
-  {
-    "id": 6,
-    "var": null,
-    "parent_id": 4,
+  "7": {
+    "id": 7,
+    "parent_id": 5,
     "name": "wooden sword",
     "aliases": [
       "sword"
     ],
-    "location_id": 5,
+    "location_id": 6,
     "contents_ids": [],
     "player": false,
     "programmer": false,
     "properties": [
       {
         "key": "description",
-        "value": "A simple wooden sword."
+        "value": "A simple wooden sword.",
+        "mooObject": false
       }
     ],
     "verbs": [
@@ -169,5 +253,17 @@
         "code": "if $this.location() == $player\n  $player.send \"You swing the wooden sword around. You look a bit silly.\"\n  $player.broadcast \"#{$player.name} swings a wooden sword around.\"\nelse\n  $player.send \"You're not holding the sword.\""
       }
     ]
+  },
+  "8": {
+    "id": 8,
+    "parent_id": null,
+    "name": "util",
+    "aliases": [],
+    "location_id": null,
+    "contents_ids": [],
+    "player": false,
+    "programmer": false,
+    "properties": [],
+    "verbs": []
   }
-]
+}

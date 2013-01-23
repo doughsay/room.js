@@ -16,10 +16,11 @@ jsmoo is different from other MOOs because:
 Running the Server
 ------------------
 
-Clone this repo, copy the example db, and launch the server:
+Assuming you have a working node.js environment: clone this repo, npm install, copy the example db, and launch the server:
 
     git clone git@github.com:doughsay/jsmoo.git
     cd jsmoo
+    npm install
     cp db.example.json db.json
     ./server.coffee
 

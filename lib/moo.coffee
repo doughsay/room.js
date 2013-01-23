@@ -10,21 +10,43 @@ class MooDB
   # @objects: Array[MooObject]
   # @players: Array[MooPlayer]
 
-  objects: []
+  objects: {}
   players: []
 
   constructor: (filename) ->
     util.print "loading... "
-    for dbObject in JSON.parse fs.readFileSync filename
-      if dbObject?
-        if dbObject.player
-          newMooObj = new MooPlayer dbObject, @
-        else
-          newMooObj = new MooObject dbObject, @
-        @objects[parseInt(dbObject.id)] = newMooObj
-        if newMooObj.player
-          @players.push newMooObj
+    for id, dbObject of JSON.parse fs.readFileSync filename
+      if dbObject.player
+        newMooObj = new MooPlayer dbObject, @
+      else
+        newMooObj = new MooObject dbObject, @
+      @objects[parseInt(dbObject.id)] = newMooObj
+      if newMooObj.player
+        @players.push newMooObj
+    @specials()
     util.puts "done."
+
+  blankObject: (id, name) ->
+    x =
+      id: id
+      parent_id: null
+      name: name
+      aliases: []
+      location_id: null
+      contents_ids: []
+      player: false
+      programmer: false
+      properties: []
+      verbs: []
+    new MooObject x, @
+
+  specials: ->
+    @objects[-1] = @blankObject -1, 'nothing'
+    @objects[-2] = @blankObject -2, 'ambiguous_match'
+    @objects[-3] = @blankObject -3, 'failed_match'
+    @nothing = @objects[-1]
+    @ambiguous_match = @objects[-2]
+    @failed_match = @objects[-3]
 
   save: (filename) ->
     util.puts "saving... not!"
@@ -35,7 +57,12 @@ class MooDB
     util.puts "done."
 
   serialize: ->
-    JSON.stringify @objects
+    # don't safe the special objects
+    objects = _.clone(@objects)
+    delete objects[-1]
+    delete objects[-2]
+    delete objects[-3]
+    JSON.stringify objects
 
   findById: (id) ->
     if @objects[id]? then @objects[id] else null
@@ -43,21 +70,19 @@ class MooDB
   findByNum: (numStr) ->
     @findById parseInt numStr.match(/^#([0-9]+)$/)?[1]
 
-  buildContextForCommand: (player, command) ->
-    context = {}
-    for key,val of command
-      context["$#{key}"] = val
-    context = _.extend context, @findCommandObjects(player, command)
-    [verb, $this] = @findVerb context
-    context.$this = $this
-    [verb, context]
+  # buildContextForCommand: (player, command) ->
+  #   context = {}
+  #   for key,val of command
+  #     context["$#{key}"] = val
+  #   context = _.extend context, @findCommandObjects(player, command)
+  #   [verb, $this] = @findVerb context
+  #   context.$this = $this
+  #   [verb, context]
 
   # find the objects matched by the command
-  findCommandObjects: (player, command) ->
-    $player: player
-    $here: player.location()
-    $dobj: if command.dobjstr? then @findObject command.dobjstr, player else null
-    $iobj: if command.iobjstr? then @findObject command.iobjstr, player else null
+  matchObjects: (player, command) ->
+    dobj: if command.dobjstr? then @findObject command.dobjstr, player else @nothing
+    iobj: if command.iobjstr? then @findObject command.iobjstr, player else @nothing
 
   # search string can be:
   # 'me', 'here', '#123' (an object number),
@@ -65,7 +90,7 @@ class MooDB
   findObject: (search, player) ->
     return player if search == 'me'
     return player.location() if search == 'here'
-    return @findByNum search if search.match /^#[0-9]+$/
+    #return @findByNum search if search.match /^#[0-9]+$/
     @findNearby search, player
 
   # find objects "nearby"
@@ -77,36 +102,53 @@ class MooDB
       return o if o.matches search
     for o in room.contents()
       return o if o.matches search
-    return null
+    return @failed_match
 
-  findVerb: (context) ->
-    if context.$player.respondsTo context
-      [context.$player.findVerb(context), context.$player]
-    if context.$here.respondsTo context
-      [context.$here.findVerb(context), context.$here]
-    else if context.$dobj? && context.$dobj.respondsTo context
-      [context.$dobj.findVerb(context), context.$dobj]
-    else if context.$iobj? && context.$iobj.respondsTo context
-      [context.$iobj.findVerb(context), context.$iobj]
+  matchVerb: (player, command, objects) ->
+    if (verb = player.findVerb command, objects)
+      verb: verb
+      self: player
+    else if (verb = player.location()?.findVerb command, objects)
+      verb: verb
+      self: player.location()
+    else if (verb = objects.dobj?.findVerb command, objects)
+      verb: verb
+      self: objects.dobj
+    else if (verb = objects.iobj?.findVerb command, objects)
+      verb: verb
+      self: objects.iobj
     else
-      [null, null]
+      null
 
-  objectsWithVar: ->
-    @objects.filter (object) ->
-      object.var?
+  # findVerb: (context) ->
+  #   if context.$player.respondsTo context
+  #     [context.$player.findVerb(context), context.$player]
+  #   if context.$here.respondsTo context
+  #     [context.$here.findVerb(context), context.$here]
+  #   else if context.$dobj? && context.$dobj.respondsTo context
+  #     [context.$dobj.findVerb(context), context.$dobj]
+  #   else if context.$iobj? && context.$iobj.respondsTo context
+  #     [context.$iobj.findVerb(context), context.$iobj]
+  #   else
+  #     [null, null]
+
+  objectsAsArray: ->
+    for id,object of @objects
+      object
 
   list: ->
-    @objects.filter((o) -> o?).map (o) ->
-      x =
-        id: o.id
-        name: o.name
-      if o.var?
-        x.var = o.var
-      x
+    for id,object of @objects
+      id: object.id
+      name: object.name
+
+  search: (search) ->
+    regex = new RegExp "#{search}", 'i'
+    @list().filter (object) ->
+      !!object.name.match regex
 
   inheritance_tree: (root_id) ->
     children = (o) =>
-      child_os = @objects.filter (other_o) ->
+      child_os = @objectsAsArray().filter (other_o) ->
         other_o.parent_id == o.id
       child_os.map (child_o) ->
         id: child_o.id
@@ -120,7 +162,7 @@ class MooDB
       else
         throw new Error "Invalid root object"
     else
-      top = @objects.filter (o) ->
+      top = @objectsAsArray().filter (o) ->
         o? and o.parent_id == null
     top.map (o) ->
       id: o.id
@@ -141,7 +183,7 @@ class MooDB
       else
         throw new Error "Invalid root object"
     else
-      top = @objects.filter (o) ->
+      top = @objectsAsArray().filter (o) ->
         o? and o.location_id == null
     top.map (o) ->
       id: o.id
@@ -154,9 +196,6 @@ class MooDB
   playerNameTaken: (name) ->
     !!(@players.filter (player) -> player.name == name).length
 
-  varTaken: (varStr) ->
-    !!(@objects.filter (object) -> object.var == varStr).length
-
   # TODO this makes several DB assumptions
   createNewPlayer: (name, username, password, programmer = false) ->
     parentPlayerId = 1
@@ -166,7 +205,6 @@ class MooDB
 
     object =
       id: nextId
-      var: null
       parent_id: parentPlayerId
       name: name
       aliases: []
@@ -227,8 +265,10 @@ class MooDB
 
   # terrible way to get the next available id in the DB
   nextId: ->
+    # the sorted keys of the object hash not including the 3 special objects (-1, -2 and -3)
+    sortedKeys = (Object.keys x).sort((a,b)->a-b)[3..]
     nextId = 0
-    for i in [0..@objects.length+1]
+    for i in [0..sortedKeys.length+1]
       if !@objects[i]
         break
       nextId++
@@ -240,7 +280,6 @@ class MooDB
 # A Moo Object has properties and verbs
 class MooObject
   # @id: Int
-  # @var: String
   # @parent_id: Int
   # @name: String
   # @aliases: Array[String]
@@ -251,7 +290,6 @@ class MooObject
 
   constructor: (dbObject, @db) ->
     @id = dbObject.id
-    @var = dbObject.var
     @parent_id = dbObject.parent_id
     @name = dbObject.name
     @aliases = dbObject.aliases
@@ -342,19 +380,8 @@ class MooObject
         throw new Error "Invalid alias '#{alias}'"
     @aliases = (alias.toString() for alias in aliases)
 
-  setVar: (newvar) ->
-    if newvar == null
-      @var = null
-      return null
-    if not (newvar? and newvar.toString? and !!newvar.toString().match /^[a-zA-Z_\$][0-9a-zA-Z_\$]*$/)
-      throw new Error "Invalid var"
-    newVarStr = newvar.toString()
-    if @db.varTaken newVarStr
-      throw new Error "That var is already taken"
-    else
-      @var = newVarStr
-
-  addVerbPublic: (socket, verbName, dobjarg, preparg, iobjarg) ->
+  addVerbPublic: (player, verbName, dobjarg, preparg, iobjarg) ->
+    socket = connections.socketFor player
     verb = (@verbs.filter (v) -> v.name == verbName)[0]
     if verb?
       throw new Error "That verb already exists on this object."
@@ -363,7 +390,8 @@ class MooObject
       socket.emit 'edit_verb', newVerb
       true
 
-  editVerb: (socket, verbName) ->
+  editVerb: (player, verbName) ->
+    socket = connections.socketFor player
     verb = (@verbs.filter (v) -> v.name == verbName)[0]
     if verb?
       clonedVerb = _.clone verb
@@ -426,18 +454,12 @@ class MooObject
     for alias in @aliases
       return true if match search, alias
 
-  # does this object respond to this verb?
-  respondsTo: (context) ->
-    @findVerb(context)?
-
-  # look for a verb on this object (or it's parents) that matches the given context
-  findVerb: (context) ->
+  # look for a verb on this object (or it's parents) that matches the given command
+  findVerb: (command, objects, self = @) ->
     for verb in @verbs
-      if verb.matchesContext context
+      if verb.matchesCommand command, objects, self
         return verb
-    if @parent_id?
-      return @parent().findVerb context
-    return null
+    return @parent()?.findVerb command, objects, self
 
   # find a verb on this object (or it's parents) that matches the given name
   findVerbByName: (name) ->
@@ -445,7 +467,7 @@ class MooObject
       if verb.name == name
         return verb
     if @parent_id?
-      return @parent().findVerbyName name
+      return @parent().findVerbByName name
     return null
 
   toJSON: ->
@@ -542,38 +564,37 @@ class MooVerb
   # then it matches anything at all.
   #
   # for now, just exact matches are considered
-  matches: (search) ->
+  matchesName: (search) ->
     search == @name
 
   # does this verb match the context?
-  matchesContext: (context) ->
-    return false if not @matches context.$verb
+  matchesCommand: (command, objects, self) ->
+    return false if not @matchesName command.verb
     switch @dobjarg
       when 'none'
-        return false if context.$dobj?
+        return false if objects.dobj not in [db.nothing, db.failed_match, db.ambiguous_match]
       when 'any'
-        return false if not context.$dobj?
+        return false if objects.dobj is db.nothing
       when 'this'
-        # TODO
-        return true
+        return false if objects.dobj isnt self
     switch @iobjarg
       when 'none'
-        return false if context.$iobj?
+        return false if objects.iobj not in [db.nothing, db.failed_match, db.ambiguous_match]
       when 'any'
-        return false if not context.$dobj?
+        return false if objects.iobj is db.nothing
       when 'this'
-        # TODO
-        return true
+        return false if objects.iobj isnt self
     switch @preparg
       when 'none'
-        return false if context.$prepstr?
+        return false if command.prepstr isnt undefined
       when 'any'
-        return false if not context.$prepstr?
+        return false if command.prepstr is undefined
       else
-        return false if context.$prepstr not in @preparg.split('/')
+        return false if command.prepstr not in @preparg.split('/')
     true
 
   toString: ->
     "[MooVerb #{@name}]"
 
-exports.db = new MooDB('db.json')
+db = new MooDB('db.json')
+exports.db = db

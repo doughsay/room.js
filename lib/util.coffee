@@ -12,10 +12,8 @@ truncate = (s, length = 25) ->
 printHelper = (x, maxdepth = 2) ->
   print x, maxdepth
 
-visited = []
-
 # recursive colorful object output
-print = (x, maxdepth, depth = 0, prefix = '') ->
+print = (x, maxdepth, depth = 0, prefix = '', parents = []) ->
   # possible types:
   #
   # number
@@ -30,10 +28,7 @@ print = (x, maxdepth, depth = 0, prefix = '') ->
 
   indent = ('' for i in [0..depth]).join '  '
 
-  if depth == 0
-    visited = []
-
-  output = switch typeof x
+  output = do -> switch typeof x
     when 'number'
       c x, 'yellow'
     when 'string'
@@ -54,40 +49,39 @@ print = (x, maxdepth, depth = 0, prefix = '') ->
       if x == null
         c 'null', 'red'
       else
-        if x in visited
+        if x in parents
           c '[CircularReference]', 'yellow inverse'
         else
-          visited.push x
+          parents.push x
           if Array.isArray x
-            if maxdepth == depth
-              c "[Array]", 'blue'
-            else if x.length == 0
-              '[]'
+            if x.length == 0
+              output = '[]'
+            else if maxdepth == depth
+              output = c "[Array]", 'blue'
             else
-              xs = (x.map (y) -> print y, maxdepth, depth+1)
+              xs = (x.map (y) -> print y, maxdepth, depth+1, '', parents)
               xs[0] = '[ ' + (xs[0].replace indent + '  ', '')
               xs[xs.length-1] += ' ]'
               if prefix != ''
                 xs[0] = '\n' + indent + xs[0]
-              xs.join ',\n'
+              output = xs.join ',\n'
           else
-            if maxdepth == depth
-              if x.mooObject
-                c x.toString(), 'blue'
-              else
-                c "[Object]", 'blue'
-            else if (key for key of x).length == 0
-              '{}'
+            if (key for key of x).length == 0
+              output = '{}'
+            else if maxdepth == depth
+              output = c x.toString(), 'blue'
             else
               xs = []
               for key, value of x
                 keyColor = 'blue'
-                xs.push print value, maxdepth, depth+1, (c key, keyColor) + ': '
+                xs.push print value, maxdepth, depth+1, (c key, keyColor) + ': ', parents
               xs[0] = '{ ' + (xs[0].replace indent + '  ', '')
               xs[xs.length-1] += ' }'
               if prefix != ''
                 xs[0] = '\n' + indent + xs[0]
-              xs.join ',\n'
+              output = xs.join ',\n'
+          parents.pop()
+          return output
 
   return indent + prefix + output
 
@@ -97,5 +91,13 @@ hmap = (h, fn) ->
     result[key] = fn value
   result
 
+hkmap = (h, fn) ->
+  result = {}
+  for key, value of h
+    [nkey, nvalue] = fn key, value
+    result[nkey] = nvalue
+  result
+
 exports.print = printHelper
 exports.hmap = hmap
+exports.hkmap = hkmap

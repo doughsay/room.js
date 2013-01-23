@@ -15,7 +15,7 @@ c = require('./lib/color').color
 parse = require('./lib/parser').parse
 db = require('./lib/moo').db
 mooUtil = require './lib/util'
-contextFor = require './lib/context'
+context = require './lib/context'
 formDescriptors = require './lib/forms'
 
 environment = new Mincer.Environment()
@@ -63,26 +63,19 @@ ws_server.sockets.on 'connection', (socket) ->
       command = parse str
 
       if command.verb == 'eval' and player.programmer
-        context = contextFor.eval({$player: player, $here: player.location()})
-        try
-          code = coffee.compile command.argstr, bare: true
-          output = vm.runInNewContext code, context
-          player.send mooUtil.print output
-        catch error
-          player.send c error.toString(), 'inverse bold red'
-          #player.send error.stack.split('\n').map((line) -> c line, 'inverse bold red').join('\n')
+        context.runEval command, player
       else
-        [verb, context] = db.buildContextForCommand player, command
-        context = contextFor.verb(context)
-        if verb?
-          try
-            code = coffee.compile verb.code, bare: true
-            vm.runInNewContext code, context
-          catch error
-            player.send c error.toString(), 'inverse bold red'
-            #player.send error.stack.split('\n').map((line) -> c line, 'inverse bold red').join('\n')
+        matchedObjects = db.matchObjects player, command
+        matchedVerb = db.matchVerb player, command, matchedObjects
+
+        if matchedVerb?
+          context.runVerb command, matchedObjects, matchedVerb, player
         else
-          player.send c("I didn't understand that.", 'gray')# + mooUtil.print command
+          huhVerb = player.location()?.findVerbByName 'huh'
+          if huhVerb?
+            context.runVerb command, matchedObjects, {verb: huhVerb, self: player.location()}, player
+          else
+            player.send c("I didn't understand that.", 'gray')
     else
       switch str
         when "help"
@@ -121,6 +114,21 @@ ws_server.sockets.on 'connection', (socket) ->
       connections.add player, socket
 
       player.send c "Welcome #{player.username}!", 'blue bold'
+
+      # TODO fix this
+      # sys = db.findById 0
+      # if sys?
+      #   verb = sys.findVerbByName 'player_connected'
+      #   if verb?
+      #     context = {$player: player}
+      #     context = contextFor.verb(context)
+      #     context.console = console
+      #     try
+      #       code = coffee.compile verb.code, bare: true
+      #       vm.runInNewContext code, context
+      #     catch error
+      #       console.log error.toString()
+
       fn null
     else
       formDescriptor = formDescriptors.login()
@@ -265,6 +273,20 @@ ws_server.sockets.on 'connection', (socket) ->
     else
       socket.emit 'output', c "You are not logged in.", 'red'
       fn {error: true}
+
+# server started
+# TODO fix this
+# do ->
+#   sys = db.findById 0
+#   if sys?
+#     verb = sys.findVerbByName 'server_started'
+#     if verb?
+#       context = contextFor.system()
+#       try
+#         code = coffee.compile verb.code, bare: true
+#         vm.runInNewContext code, context
+#       catch error
+#         console.log error.toString()
 
 process.on 'SIGINT', -> process.exit()
 process.on 'SIGTERM', -> process.exit()

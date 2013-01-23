@@ -7,246 +7,240 @@ db = require('./moo').db
 connections = require './connection_manager'
 mooUtil = require './util'
 
-# memoize all the context objects
-memo = {}
+class Context
 
-# return a context object for the given object and context
-contextify = (obj, context) ->
-  if obj? and obj.id?
-    if not memo[obj.id]?
-      memo[obj.id] = new ContextMooObject(obj, context)
-    memo[obj.id]
-  else
-    null
+  constructor: (@player, @memo = {}) ->
+    base =
+      eval:       undefined
+      c:          color
+      $:          (id) => @contextify db.findById(id)
+      $player:    @contextify @player
+      $here:      @contextify @player.location()
+
+    @context = _.extend @globals(), base
+
+  globals: ->
+    mooUtil.hkmap db.findById(0).getAllProperties(), (key, prop) =>
+      [value, mooObject] = prop
+      if mooObject
+        ["$#{key}", @contextify db.findById(value)]
+      else
+        ["$#{key}", value]
+
+  # return a context object for the given object
+  # also, memoize all the context objects within this context
+  contextify: (obj) ->
+    if obj? and obj.id?
+      if not @memo[obj.id]?
+        @memo[obj.id] = new ContextMooObject(obj, @)
+      @memo[obj.id]
+    else
+      @contextify db.nothing
+
+  decontextify: (contextObj) ->
+    db.findById contextObj?.id
+
+  run: (coffeeCode, extraArgs = [], sendOutput = false, stack = false) ->
+    try
+      code = coffee.compile coffeeCode, bare: true
+      ctext = _.clone @context
+      ctext.$args = extraArgs
+      output = vm.runInNewContext code, ctext
+      if sendOutput
+        @player.send mooUtil.print output
+      output
+    catch error
+      if stack
+        @player.send error.stack.split('\n').map((line) -> color line, 'inverse bold red').join('\n')
+      else
+        @player.send color error.toString(), 'inverse bold red'
+
+class EvalContext extends Context
+
+  constructor: (player) ->
+    super player
+
+    @context.edit       = (object, verb) => @decontextify(object).editVerb player, verb
+    @context.addverb    = (object, verbName, dobjarg = 'none', preparg = 'none', iobjarg = 'none') =>
+                            @decontextify(object).addVerbPublic player, verbName, dobjarg, preparg, iobjarg
+    @context.rmverb     = (object, verb) => @decontextify(object).rmVerb verb
+    @context.list       = -> db.list()
+    @context.search     = (search) -> db.search(search)
+    @context.tree       = (root_id) -> db.inheritance_tree(root_id)
+    @context.locations  = (root_id) -> db.location_tree(root_id)
+    @context.ls         = (x, depth = 2) ->
+                            player.send(mooUtil.print x, depth)
+                            true
+
+  run: (coffeeCode, extraArgs = []) ->
+    super coffeeCode, extraArgs, true
+
+class VerbContext extends Context
+
+  constructor: (player, self, dobj, iobj, verb, argstr, dobjstr, prepstr, iobjstr, memo = {}) ->
+    super player, memo
+
+    @context.$this    = @contextify self
+    @context.$dobj    = @contextify dobj
+    @context.$iobj    = @contextify iobj
+    @context.$verb    = verb
+    @context.$argstr  = argstr
+    @context.$dobjstr = dobjstr
+    @context.$prepstr = prepstr
+    @context.$iobjstr = iobjstr
+    @context.pass     = ->
+                          v = self.parent()?.findVerbByName verb
+                          if v?
+                            newContext = new VerbContext(
+                              player, self, dobj, iobj,
+                              verb, argstr, dobjstr, prepstr, iobjstr, memo)
+                            newContext.run v.code, Array.prototype.slice.call(arguments)
+                          else
+                            throw new Error "Cannot 'pass()' because '#{verb}' doesn't exists on a parent of #{self.name}."
+
+  run: (coffeeCode, extraArgs = []) ->
+    wrappedCoffeeCode = 'do($args) ->\n' +
+      coffeeCode.split('\n').map((line) -> '  ' + line).join('\n')
+    super wrappedCoffeeCode, extraArgs
 
 # A ContextMooObject is what's exposed in the verb and eval contexts
-ContextMooObject = (object, context) ->
+class ContextMooObject
 
-  Object.defineProperties(@, {
-    id:
-      enumerable: true
-      get: -> object.id
-      set: -> throw new Error "No setter for 'id'"
-    var:
-      enumerable: true
-      get: -> object.var
-      set: (newvar) -> object.setVar newvar
-    parent_id:
-      enumerable: true
-      get: -> object.parent_id
-      set: (id) -> object.chparent id
-    name:
-      enumerable: true
-      get: -> object.name
-      set: (name) -> object.rename name
-    aliases:
-      enumerable: true
-      get: -> (alias for alias in object.aliases)
-      set: (aliases) -> object.updateAliases aliases
-    location_id:
-      enumerable: true
-      get: -> object.location_id
-      set: -> throw new Error "No setter for 'location_id'"
-    contents_ids:
-      enumerable: true
-      get: -> object.contents_ids
-      set: -> throw new Error "No setter for 'contents_ids'"
-    mooObject:
-      enumerable: true
-      get: -> true
-      set: -> throw new Error "No setter for 'mooObject'"
-    player:
-      enumerable: true
-      get: -> object.player
-      set: -> throw new Error "No setter for 'player'"
-    programmer:
-      enumerable: true
-      get: -> object.programmer
-      set: -> throw new Error "No setter for 'programmer'"
-    properties:
-      enumerable: true
-      get: -> mooUtil.hmap object.getAllProperties(), (x) ->
-        [value, mooObject] = x
-        if mooObject
-          contextify db.findById(value), context
-        else
-          value
-      set: -> throw new Error "No setter for 'properties'"
-    verbs:
-      enumerable: true
-      get: ->
-        verbs = {}
-        for verbName, verb of object.getAllVerbs()
-          do (verb) =>
-            fn = =>
-              try
-                thisContext = _(context).clone()
-                thisContext.$this = contextify object
-                thisContext.$verb = verb.name
-                thisContext.$args = arguments
-                thisContext.$argstr = Array.prototype.slice.call(arguments).join ' '
+  constructor: (object, context) ->
 
-                thisContext = verbContext(thisContext)
+    Object.defineProperties(@, {
+      id:
+        enumerable: true
+        get: -> object.id
+        set: -> throw new Error "No setter for 'id'"
+      parent:
+        enumerable: true
+        get: -> context.contextify object.parent()
+        set: (contextParent) ->
+          if contextParent is null
+            parent_id = null
+          else if contextParent? and contextParent.id? and context.decontextify(contextParent)?
+            parent_id = contextParent.id
+          else
+            throw new Error "Invalid parent"
+          object.chparent parent_id
+      name:
+        enumerable: true
+        get: -> object.name
+        set: (name) -> object.rename name
+      aliases:
+        enumerable: true
+        get: -> (alias for alias in object.aliases)
+        set: (aliases) -> object.updateAliases aliases
+      location:
+        enumerable: true
+        get: -> context.contextify object.location()
+        set: (contextTarget) ->
+          if contextTarget is null
+            target = null
+          else if contextTarget? and contextTarget.id? and context.decontextify(contextTarget)?
+            target = context.decontextify contextTarget
+          else
+            throw new Error "Invalid target"
+          object.moveTo target
+      contents:
+        enumerable: true
+        get: -> object.contents().map (o) -> context.contextify o
+        set: -> throw new Error "No setter for 'contents_ids'"
+      mooObject:
+        enumerable: true
+        get: -> true
+        set: -> throw new Error "No setter for 'mooObject'"
+      player:
+        enumerable: true
+        get: -> object.player
+        set: -> throw new Error "No setter for 'player'"
+      programmer:
+        enumerable: true
+        get: -> object.programmer
+        set: -> throw new Error "No setter for 'programmer'"
+      properties:
+        enumerable: true
+        get: -> mooUtil.hmap object.getAllProperties(), (x) ->
+          [value, mooObject] = x
+          if mooObject
+            context.contextify db.findById(value)
+          else
+            value
+        set: -> throw new Error "No setter for 'properties'"
+      verbs:
+        enumerable: true
+        get: ->
+          verbs = {}
+          for verbName, verb of object.getAllVerbs()
+            do (verb) =>
+              fn = =>
+                newContext = new VerbContext(
+                  context.player, object, context.context.dobj, context.context.iobj,
+                  verb.name, context.context.argstr, context.context.dobjstr, context.context.prepstr, context.context.iobjstr, context.memo)
+                newContext.run verb.code, Array.prototype.slice.call(arguments)
+              fn.verb = true
+              verbs[verb.name] = fn
+          verbs
+        set: -> throw new Error "No setter for 'verbs'"
+    })
 
-                code = coffee.compile verb.code, bare: true
-                vm.runInNewContext code, thisContext
-              catch error
-                context.$player.send color error.toString(), 'inverse bold red'
-                #context.$player.send error.stack.split('\n').map((line) -> color line, 'inverse bold red').join('\n')
-            fn.verb = true
-            verbs[verb.name] = fn
-        verbs
-      set: -> throw new Error "No setter for 'verbs'"
-  })
+    @addProp = (key, value) ->
+      if value.mooObject
+        object.addProp key, value.id, true
+      else
+        object.addProp key, value, false
 
-  @parent = ->
-    contextify object.parent(), context
+    @rmProp = (key) ->
+      object.rmProp key
 
-  @location = ->
-    contextify object.location(), context
+    @getProp = (key) ->
+      [value, mooObject] = object.getProp key
+      if mooObject
+        context.contextify db.findById(value)
+      else
+        value
 
-  # safely move this object to another object or limbo (null)
-  @moveTo = (contextTarget) ->
-    if contextTarget is null
-      target = null
-    else if contextTarget? and contextTarget.id?
-      target = db.findById contextTarget.id
-    else
-      throw new Error "Invalid target"
+    @setProp = (key, value) ->
+      if value.mooObject
+        object.setProp key, value.id, true
+      else
+        object.setProp key, value, false
 
-    object.moveTo target
+    @clone = (newName, newAliases = []) ->
+      db.clone(object, newName, newAliases)
 
-  @contents = ->
-    object.contents().map (o) -> contextify o, context
+    @createChild = (newName, newAliases = []) ->
+      db.createChild(object, newName, newAliases)
 
-  @addProp = (key, value) ->
-    if value.mooObject
-      object.addProp key, value.id, true
-    else
-      object.addProp key, value, false
-
-  @rmProp = (key) ->
-    object.rmProp key
-
-  @getProp = (key) ->
-    [value, mooObject] = object.getProp key
-    if mooObject
-      contextify db.findById(value), context
-    else
-      value
-
-  @setProp = (key, value) ->
-    if value.mooObject
-      object.setProp key, value.id, true
-    else
-      object.setProp key, value, false
-
-  @chparent = (id) ->
-    object.chparent id
-
-  @rename = (name) ->
-    object.rename name
-
-  @setVar = (newvar) ->
-    object.setVar newvar
-
-  @updateAliases = (aliases) ->
-    object.updateAliases aliases
-
-  @editVerb = (verbName) ->
-    object.editVerb connections.socketFor(context.$player), verbName
-
-  @addVerb = (verbName, dobjarg = 'none', preparg = 'none', iobjarg = 'none') ->
-    object.addVerbPublic connections.socketFor(context.$player), verbName, dobjarg, preparg, iobjarg
-
-  @rmVerb = (verbName) ->
-    object.rmVerb verbName
-
-  @clone = (newName, newAliases = []) ->
-    db.clone(object, newName, newAliases)
-
-  @createChild = (newName, newAliases = []) ->
-    db.createChild(object, newName, newAliases)
-
-  # player specific methods
-  if object.player
-    @send = (msg) ->
-      object.send msg
-
-    @broadcast = (msg) ->
-      object.broadcast msg
-
-    @input = (msg, fn) ->
-      object.input msg, fn
-
-    @setProgrammer = (programmer) ->
-      object.setProgrammer programmer
-
-  @toString = ->
+    # player specific methods
     if object.player
-      "[MooPlayer #{object.name}]"
-    else
-      "[MooObject #{object.name}]"
+      @send = (msg) ->
+        object.send msg
 
-  # return so coffeescript doesn't screw up the object creation
-  return
+      @broadcast = (msg) ->
+        object.broadcast msg
 
-verbContext = (context) ->
-  vars = db.objectsWithVar().reduce ((map, object) ->
-    map["$#{object.var}"] = contextify object, context
-    map
-  ), {}
+      @input = (msg, fn) ->
+        object.input msg, fn
 
-  base =
-    eval:      undefined
-    c:         color
-    $:         (id) -> contextify db.findById(id), context
-    pass:      ->
-      try
-        thisContext = verbContext(context)
-        verb = db.findById(context.$this.parent()?.id).findVerbByName context.$verb
-        if verb?
-          code = coffee.compile verb.code, bare: true
-          output = vm.runInNewContext code, thisContext
-        else
-          context.$player.send color "The verb #{context.$verb} doesn't exist", 'inverse bold red'
-      catch error
-        context.$player.send color error.toString(), 'inverse bold red'
-      output
-    $this:     contextify context.$this, context
-    $player:   contextify context.$player, context
-    $here:     contextify context.$here, context
-    $dobj:     contextify context.$dobj, context
-    $iobj:     contextify context.$iobj, context
-    $verb:     context.$verb
-    $argstr:   context.$argstr
-    $dobjstr:  context.$dobjstr
-    $prepstr:  context.$prepstr
-    $iobjstr:  context.$iobjstr
+      @setProgrammer = (programmer) ->
+        object.setProgrammer programmer
 
-  _.extend vars, base
+    @toString = ->
+      if object.player
+        "[MooPlayer #{object.name}]"
+      else
+        "[MooObject #{object.name}]"
 
+runEval = (command, player) ->
+  (new EvalContext player).run command.argstr
 
-evalContext = (context) ->
-  vars = db.objectsWithVar().reduce ((map, object) ->
-    map["$#{object.var}"] = contextify object, context
-    map
-  ), {}
+runVerb = (command, matchedObjects, matchedVerb, player) ->
+  context = new VerbContext(
+    player, matchedVerb.self, matchedObjects.dobj, matchedObjects.iobj,
+    command.verb, command.argstr, command.dobjstr, command.prepstr, command.iobjstr)
+  context.run matchedVerb.verb.code
 
-  base =
-    eval:      undefined
-    ls:        (x, depth = 2) ->
-                  context.$player.send(mooUtil.print x, depth)
-                  true
-    c:         color
-    $:         (id) -> contextify db.findById(id), context
-    $player:   contextify context.$player, context
-    $here:     contextify context.$here, context
-    list:      -> db.list()
-    tree:      (root_id) -> db.inheritance_tree(root_id)
-    locations: (root_id) -> db.location_tree(root_id)
-
-  _.extend vars, base
-
-exports.verb = verbContext
-exports.eval = evalContext
+exports.runVerb = runVerb
+exports.runEval = runEval
