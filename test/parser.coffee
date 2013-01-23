@@ -48,9 +48,3 @@ describe 'parser', ->
       command.should.be.a('object')
       command.should.have.property('verb', 'eval')
       command.should.have.property('argstr', '2+2')
-
-    it 'should convert # to \'edit #\'', ->
-      command = parser.parse('#4.get')
-      command.should.be.a('object')
-      command.should.have.property('verb', 'edit')
-      command.should.have.property('argstr', '#4.get')
