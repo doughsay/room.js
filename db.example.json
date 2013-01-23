@@ -143,7 +143,7 @@
         "dobjarg": "none",
         "preparg": "none",
         "iobjarg": "none",
-        "code": "output = [c $here.name, 'yellow bold']\noutput.push $here.properties.description\noutput.push c 'You see here:', 'cyan'\nfor item in $here.contents()\n  output.push c item.name, 'cyan'\n$player.send output.join '\\n'"
+        "code": "output = [c $here.name, 'yellow bold']\noutput.push $here.properties.description\noutput.push c 'You see here:', 'cyan'\nfor item in $here.contents\n  output.push c item.name, 'cyan'\n$player.send output.join '\\n'"
       },
       {
         "name": "say",
@@ -192,14 +192,14 @@
         "dobjarg": "this",
         "preparg": "none",
         "iobjarg": "none",
-        "code": "if $this.location() == $player\n  $player.send \"You're already holding the #{$this.name}.\"\nelse\n  $this.moveTo $player\n  $player.send \"You pick up the #{$this.name}.\"\n  $player.broadcast \"#{$player.name} picks up the #{$this.name}.\""
+        "code": "if $this.location == $player\n  $player.send \"You're already holding the #{$this.name}.\"\nelse\n  $this.location = $player\n  $player.send \"You pick up the #{$this.name}.\"\n  $player.broadcast \"#{$player.name} picks up the #{$this.name}.\""
       },
       {
         "name": "drop",
         "dobjarg": "this",
         "preparg": "none",
         "iobjarg": "none",
-        "code": "if $this.location() == $player\n  $this.moveTo $here\n  $player.send \"You drop the #{$this.name}.\"\n  $player.broadcast \"#{$player.name} drops the #{$this.name}.\"\nelse\n  $player.send \"You're not holding the #{$this.name}.\""
+        "code": "if $this.location == $player\n  $this.location = $here\n  $player.send \"You drop the #{$this.name}.\"\n  $player.broadcast \"#{$player.name} drops the #{$this.name}.\"\nelse\n  $player.send \"You're not holding the #{$this.name}.\""
       }
     ]
   },
@@ -250,7 +250,7 @@
         "dobjarg": "this",
         "preparg": "none",
         "iobjarg": "none",
-        "code": "if $this.location() == $player\n  $player.send \"You swing the wooden sword around. You look a bit silly.\"\n  $player.broadcast \"#{$player.name} swings a wooden sword around.\"\nelse\n  $player.send \"You're not holding the sword.\""
+        "code": "if $this.location == $player\n  $player.send \"You swing the wooden sword around. You look a bit silly.\"\n  $player.broadcast \"#{$player.name} swings a wooden sword around.\"\nelse\n  $player.send \"You're not holding the sword.\""
       }
     ]
   },
