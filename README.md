@@ -64,7 +64,7 @@ Retrieve the object with the given `id`.
 
 ### `list`
 
-Returns a list all objects in the database with their `id`, `name` and `var` fields.
+Returns a list all objects in the database with their `id` and `name` fields.
 
 ### `search(str)`
 
@@ -85,18 +85,6 @@ Return a tree representing objects' locations.  Top level objects in this tree a
 ### `ls(x, depth = 2)`
 
 Pretty print `x` to a depth of `depth`.
-
-### `edit(object, verb)`
-
-Load the verb named `verb` of `object` into the verb editor.
-
-### `addverb(object, verb, dobjarg = 'none', preparg = 'none', iobjarg = 'none')`
-
-Add a new verb to `object` called `verb` and load it into the verb editor.  You can optionally specify the argument specifiers as well.
-
-### `rmverb(object, verb)`
-
-Remove verb named `verb` from `object`.
 
 Objects
 -------
@@ -187,6 +175,18 @@ Same as `setProp`.
 * `key` - (string) The key to store the property under.  If it already exists it will be overwritten.
 * `value` - (any) The value to store.  Can be any type.
 
+### `editVerb(verb)`
+
+Load the verb named `verb` of the object into the verb editor.
+
+### `addVerb(verb, dobjarg = 'none', preparg = 'none', iobjarg = 'none')`
+
+Add a new verb to the object called `verb` and load it into the verb editor.  You can optionally specify the argument specifiers as well.
+
+### `rmVerb(verb)`
+
+Remove verb named `verb` from the object.
+
 ### `clone(newName, newAliases = [])`
 
 Creates a clone of this object, copying all its properties and verbs.
@@ -232,8 +232,5 @@ TODO
 
 * Better object matching (See first big comment in lib/moo.coffee)
 * Better verb matching (See second big comment in lib/moo.coffee)
-* Using 'this' as the direct/indirect object argument specifier for verbs doesn't work yet
-* Preposition argument specifiers need some work.  Some prepositions are synonymous, e.g. 'with' and 'using' should be interchangable.  "open door with key" / "open door using key"
-* There should be a fallback function to catch un-recognized commands, like the 'huh' verb in LambdaMoo.
 * Logout
 * Remove database assumptions from the server code (player creation)

@@ -60,10 +60,6 @@ class EvalContext extends Context
   constructor: (player) ->
     super player
 
-    @context.edit       = (object, verb) => @decontextify(object).editVerb player, verb
-    @context.addverb    = (object, verbName, dobjarg = 'none', preparg = 'none', iobjarg = 'none') =>
-                            @decontextify(object).addVerbPublic player, verbName, dobjarg, preparg, iobjarg
-    @context.rmverb     = (object, verb) => @decontextify(object).rmVerb verb
     @context.list       = -> db.list()
     @context.search     = (search) -> db.search(search)
     @context.tree       = (root_id) -> db.inheritance_tree(root_id)
@@ -207,6 +203,15 @@ class ContextMooObject
       else
         object.setProp key, value, false
 
+    @editVerb = (verb) ->
+      object.editVerb context.player, verb
+
+    @addVerb = (verbName, dobjarg = 'none', preparg = 'none', iobjarg = 'none') ->
+      object.addVerbPublic context.player, verbName, dobjarg, preparg, iobjarg
+
+    @rmVerb = (verb) ->
+      object.rmVerb verb
+
     @clone = (newName, newAliases = []) ->
       db.clone(object, newName, newAliases)
 
@@ -227,20 +232,22 @@ class ContextMooObject
       @setProgrammer = (programmer) ->
         object.setProgrammer programmer
 
+      @clone = -> throw new Error "Can't clone players."
+      @create = -> throw new Error "Can't create players."
+
     @toString = ->
       if object.player
         "[MooPlayer #{object.name}]"
       else
         "[MooObject #{object.name}]"
 
-runEval = (command, player) ->
-  (new EvalContext player).run command.argstr
+runEval = (player, code) ->
+  (new EvalContext player).run code
 
-runVerb = (command, matchedObjects, matchedVerb, player) ->
+runVerb = (player, code, self, dobj = db.nothing, iobj = db.nothing, verbstr, argstr, dobjstr, prepstr, iobjstr) ->
   context = new VerbContext(
-    player, matchedVerb.self, matchedObjects.dobj, matchedObjects.iobj,
-    command.verb, command.argstr, command.dobjstr, command.prepstr, command.iobjstr)
-  context.run matchedVerb.verb.code
+    player, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr)
+  context.run code
 
 exports.runVerb = runVerb
 exports.runEval = runEval
