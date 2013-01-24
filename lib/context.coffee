@@ -60,10 +60,6 @@ class EvalContext extends Context
   constructor: (player) ->
     super player
 
-    @context.edit       = (object, verb) => @decontextify(object).editVerb player, verb
-    @context.addverb    = (object, verbName, dobjarg = 'none', preparg = 'none', iobjarg = 'none') =>
-                            @decontextify(object).addVerbPublic player, verbName, dobjarg, preparg, iobjarg
-    @context.rmverb     = (object, verb) => @decontextify(object).rmVerb verb
     @context.list       = -> db.list()
     @context.search     = (search) -> db.search(search)
     @context.tree       = (root_id) -> db.inheritance_tree(root_id)
@@ -206,6 +202,15 @@ class ContextMooObject
         object.setProp key, value.id, true
       else
         object.setProp key, value, false
+
+    @editVerb = (verb) ->
+      object.editVerb context.player, verb
+
+    @addVerb = (verbName, dobjarg = 'none', preparg = 'none', iobjarg = 'none') ->
+      object.addVerbPublic context.player, verbName, dobjarg, preparg, iobjarg
+
+    @rmVerb = (verb) ->
+      object.rmVerb verb
 
     @clone = (newName, newAliases = []) ->
       db.clone(object, newName, newAliases)
