@@ -227,20 +227,22 @@ class ContextMooObject
       @setProgrammer = (programmer) ->
         object.setProgrammer programmer
 
+      @clone = -> throw new Error "Can't clone players."
+      @create = -> throw new Error "Can't create players."
+
     @toString = ->
       if object.player
         "[MooPlayer #{object.name}]"
       else
         "[MooObject #{object.name}]"
 
-runEval = (command, player) ->
-  (new EvalContext player).run command.argstr
+runEval = (player, code) ->
+  (new EvalContext player).run code
 
-runVerb = (command, matchedObjects, matchedVerb, player) ->
+runVerb = (player, code, self, dobj = db.nothing, iobj = db.nothing, verbstr, argstr, dobjstr, prepstr, iobjstr) ->
   context = new VerbContext(
-    player, matchedVerb.self, matchedObjects.dobj, matchedObjects.iobj,
-    command.verb, command.argstr, command.dobjstr, command.prepstr, command.iobjstr)
-  context.run matchedVerb.verb.code
+    player, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr)
+  context.run code
 
 exports.runVerb = runVerb
 exports.runEval = runEval

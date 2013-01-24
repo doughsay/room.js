@@ -47,6 +47,10 @@ class MooDB
     @nothing = @objects[-1]
     @ambiguous_match = @objects[-2]
     @failed_match = @objects[-3]
+    @sys = @objects[0]
+
+    @nothing.send = (msg) ->
+      console.log msg
 
   save: (filename) ->
     util.puts "saving... not!"
@@ -196,19 +200,15 @@ class MooDB
   playerNameTaken: (name) ->
     !!(@players.filter (player) -> player.name == name).length
 
-  # TODO this makes several DB assumptions
   createNewPlayer: (name, username, password, programmer = false) ->
-    parentPlayerId = 2
-    startLocationId = 6
-
     nextId = @nextId()
 
     object =
       id: nextId
-      parent_id: parentPlayerId
+      parent_id: null
       name: name
       aliases: []
-      location_id: []
+      location_id: null
       contents_ids: []
       username: username
       password: password
@@ -221,8 +221,8 @@ class MooDB
 
     @objects[nextId] = newPlayer
     @players.push newPlayer
-    newPlayer.moveTo @findById startLocationId
-    true
+
+    newPlayer
 
   # create a clone of this object with copies of all it's properties and verbs
   clone: (object, newName, newAliases) ->
@@ -240,7 +240,7 @@ class MooDB
     newObject = new MooObject rawObject, @
     newObject.moveTo object.location()
     @objects[nextId] = newObject
-    @players.push newObject if newObject.player
+    # @players.push newObject if newObject.player
     true
 
   # Create a child of object
@@ -260,13 +260,13 @@ class MooDB
     newObject = new MooObject rawObject, @
     newObject.moveTo object.location()
     @objects[nextId] = newObject
-    @players.push newObject if newObject.player
+    # @players.push newObject if newObject.player
     true
 
   # terrible way to get the next available id in the DB
   nextId: ->
-    # the sorted keys of the object hash not including the 3 special objects (-1, -2 and -3)
-    sortedKeys = (Object.keys x).sort((a,b)->a-b)[3..]
+    # the sorted keys of the objects hash not including the 3 special objects (-1, -2 and -3)
+    sortedKeys = (Object.keys @objects).sort((a,b)->a-b)[3..]
     nextId = 0
     for i in [0..sortedKeys.length+1]
       if !@objects[i]

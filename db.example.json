@@ -61,21 +61,28 @@
         "dobjarg": "none",
         "preparg": "none",
         "iobjarg": "none",
-        "code": "console.log 'server_started called!'"
+        "code": "# TODO"
       },
       {
         "name": "player_created",
         "dobjarg": "none",
         "preparg": "none",
         "iobjarg": "none",
-        "code": "console.log 'player_created called!'"
+        "code": "$player.parent = $player_class\n$sys.verbs.player_connected()"
       },
       {
         "name": "player_connected",
         "dobjarg": "none",
         "preparg": "none",
         "iobjarg": "none",
-        "code": "console.log 'player_connected called!'\nconsole.log $player.name"
+        "code": "$player.location = $(6)\n$player.send \"Welcome, #{$player.name}!\"\n$player.location.verbs.player_connected?()"
+      },
+      {
+        "name": "player_disconnected",
+        "dobjarg": "none",
+        "preparg": "none",
+        "iobjarg": "none",
+        "code": "$player.location.verbs.player_disconnected?()\n$player.location = null"
       }
     ]
   },
@@ -110,7 +117,7 @@
     "parent_id": 2,
     "name": "Gandalf",
     "aliases": [],
-    "location_id": 6,
+    "location_id": null,
     "contents_ids": [],
     "player": true,
     "programmer": true,
@@ -158,6 +165,20 @@
         "preparg": "none",
         "iobjarg": "none",
         "code": "$player.send 'huh?'"
+      },
+      {
+        "name": "player_connected",
+        "dobjarg": "none",
+        "preparg": "none",
+        "iobjarg": "none",
+        "code": "$player.broadcast \"#{$player.name} pops into existence.\""
+      },
+      {
+        "name": "player_disconnected",
+        "dobjarg": "none",
+        "preparg": "none",
+        "iobjarg": "none",
+        "code": "$player.broadcast \"#{$player.name} fades into oblivion.\""
       }
     ]
   },
@@ -212,7 +233,6 @@
     ],
     "location_id": null,
     "contents_ids": [
-      3,
       7
     ],
     "player": false,

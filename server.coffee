@@ -52,8 +52,13 @@ ws_server.sockets.on 'connection', (socket) ->
   socket.emit 'output', "Type #{c 'help', 'magenta bold'} for a list of available commands."
 
   socket.on 'disconnect', ->
-    # TODO (when a player socket disconnects, put the player in limbo)
+    player = connections.playerFor socket
     connections.remove socket
+
+    if player?
+      verb = db.sys.findVerbByName 'player_disconnected'
+      if verb?
+        context.runVerb player, verb.code, db.sys
 
   socket.on 'input', (userStr) ->
     str = userStr || ""
@@ -63,17 +68,23 @@ ws_server.sockets.on 'connection', (socket) ->
       command = parse str
 
       if command.verb == 'eval' and player.programmer
-        context.runEval command, player
+        context.runEval player, command.argstr
       else
         matchedObjects = db.matchObjects player, command
         matchedVerb = db.matchVerb player, command, matchedObjects
 
+        {dobj: dobj, iobj: iobj} = matchedObjects
+        {verb: verbstr, argstr: argstr, dobjstr: dobjstr, prepstr: prepstr, iobjstr: iobjstr} = command
+
         if matchedVerb?
-          context.runVerb command, matchedObjects, matchedVerb, player
+          {verb: verb, self: self} = matchedVerb
+          context.runVerb player, verb.code, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr
         else
           huhVerb = player.location()?.findVerbByName 'huh'
           if huhVerb?
-            context.runVerb command, matchedObjects, {verb: huhVerb, self: player.location()}, player
+            code = huhVerb.code
+            self = player.location()
+            context.runVerb player, code, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr
           else
             player.send c("I didn't understand that.", 'gray')
     else
@@ -113,21 +124,9 @@ ws_server.sockets.on 'connection', (socket) ->
 
       connections.add player, socket
 
-      player.send c "Welcome #{player.username}!", 'blue bold'
-
-      # TODO fix this
-      # sys = db.findById 0
-      # if sys?
-      #   verb = sys.findVerbByName 'player_connected'
-      #   if verb?
-      #     context = {$player: player}
-      #     context = contextFor.verb(context)
-      #     context.console = console
-      #     try
-      #       code = coffee.compile verb.code, bare: true
-      #       vm.runInNewContext code, context
-      #     catch error
-      #       console.log error.toString()
+      verb = db.sys.findVerbByName 'player_connected'
+      if verb?
+        context.runVerb player, verb.code, db.sys
 
       fn null
     else
@@ -186,8 +185,13 @@ ws_server.sockets.on 'connection', (socket) ->
     if not valid
       fn formDescriptor
     else
-      db.createNewPlayer formData.name, formData.username, phash formData.password
-      socket.emit 'output', "\n#{c 'Account created!', 'bold green'}  You may now #{c 'login', 'bold magenta'}."
+      player = db.createNewPlayer formData.name, formData.username, phash formData.password
+      connections.add player, socket
+
+      verb = db.sys.findVerbByName 'player_created'
+      if verb?
+        context.runVerb player, verb.code, db.sys
+
       fn null
 
   socket.on 'save_verb', (userVerb, fn) ->
@@ -228,7 +232,7 @@ ws_server.sockets.on 'connection', (socket) ->
               break
             else if name.indexOf('*') == 0 and name.length > 1
               errors.push "* can't appear at the beginning of a verb's name"
-            else if not name.match /^[a-z]+\*?[a-z]*$/
+            else if not name.match /^[_a-z]+\*?[_a-z]*$/
               errors.push "verb names can be alphanumeric and contain * only once"
 
       if not verb.dobjarg?
@@ -275,18 +279,10 @@ ws_server.sockets.on 'connection', (socket) ->
       fn {error: true}
 
 # server started
-# TODO fix this
-# do ->
-#   sys = db.findById 0
-#   if sys?
-#     verb = sys.findVerbByName 'server_started'
-#     if verb?
-#       context = contextFor.system()
-#       try
-#         code = coffee.compile verb.code, bare: true
-#         vm.runInNewContext code, context
-#       catch error
-#         console.log error.toString()
+do ->
+  verb = db.sys.findVerbByName 'server_started'
+  if verb?
+    context.runVerb db.nothing, verb.code, db.sys
 
 process.on 'SIGINT', -> process.exit()
 process.on 'SIGTERM', -> process.exit()
