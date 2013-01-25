@@ -142,7 +142,7 @@ class MooDB
 
   globalAliases: ->
     @sys.properties.filter((prop) -> prop.value._mooObject?).reduce(((map, prop) ->
-      map[prop.value] = '$' + prop.key
+      map[prop.value._mooObject] = '$' + prop.key
       map
     ), {})
 
