@@ -40,7 +40,7 @@ xp.get '/', (req, res) ->
   res.render 'index'
 
 http_server = http.createServer(xp).listen xp.get('port'), ->
-  console.log "jsmoo http server listening on port " + xp.get 'port'
+  console.log "room.js http server listening on port " + xp.get 'port'
 
 ws_server = io.listen(http_server, {log: false})
 
@@ -48,7 +48,7 @@ ws_server = io.listen(http_server, {log: false})
 # repl.start('>').context.db = db
 
 ws_server.sockets.on 'connection', (socket) ->
-  socket.emit 'output', "Welcome to #{c 'jsmoo', 'blue bold'}!"
+  socket.emit 'output', "Welcome to #{c 'room.js', 'blue bold'}!"
   socket.emit 'output', "Type #{c 'help', 'magenta bold'} for a list of available commands."
 
   socket.on 'disconnect', ->
