@@ -140,10 +140,21 @@ class MooDB
     for id,object of @objects
       object
 
+  globalAliases: ->
+    @sys.properties.filter((prop) -> prop.value._mooObject?).reduce(((map, prop) ->
+      map[prop.value] = '$' + prop.key
+      map
+    ), {})
+
   list: ->
+    aliases = @globalAliases()
     for id,object of @objects
-      id: object.id
-      name: object.name
+      x =
+        id: object.id
+        name: object.name
+      if aliases[id]?
+        x.alias = aliases[id]
+      x
 
   search: (search) ->
     regex = new RegExp "#{search}", 'i'
@@ -151,13 +162,21 @@ class MooDB
       !!object.name.match regex
 
   inheritance_tree: (root_id) ->
+    aliases = @globalAliases()
+
     children = (o) =>
       child_os = @objectsAsArray().filter (other_o) ->
         other_o.parent_id == o.id
-      child_os.map (child_o) ->
-        id: child_o.id
-        name: child_o.name
-        children: children child_o
+      child_os.map show
+
+    show = (o) ->
+      x =
+        id: o.id
+        name: o.name
+      if aliases[o.id]?
+        x.alias = aliases[o.id]
+      x.children = children o
+      x
 
     if root_id?
       root = @findById root_id
@@ -168,17 +187,22 @@ class MooDB
     else
       top = @objectsAsArray().filter (o) ->
         o? and o.parent_id == null
-    top.map (o) ->
-      id: o.id
-      name: o.name
-      children: children o
+    top.map show
 
   location_tree: (root_id) ->
+    aliases = @globalAliases()
+
     contents = (o) =>
-      o.contents().map (p) ->
-        id: p.id
-        name: p.name
-        contents: contents p
+      o.contents().map show
+
+    show = (o) ->
+      x =
+        id: o.id
+        name: o.name
+      if aliases[o.id]?
+        x.alias = aliases[o.id]
+      x.contents = contents o
+      x
 
     if root_id?
       root = @findById root_id
@@ -189,10 +213,7 @@ class MooDB
     else
       top = @objectsAsArray().filter (o) ->
         o? and o.location_id == null
-    top.map (o) ->
-      id: o.id
-      name: o.name
-      contents: contents o
+    top.map show
 
   usernameTaken: (username) ->
     !!(@players.filter (player) -> player.username == username).length
@@ -325,8 +346,8 @@ class MooObject
   contents: ->
     @contents_ids.map (id) => @db.findById id
 
-  addProp: (key, value, mooObject) ->
-    @properties.push {key: key, value: value, mooObject: mooObject}
+  addProp: (key, value) ->
+    @properties.push {key: key, value: value}
 
   addVerb: (verb) ->
     @verbs.push new MooVerb verb
@@ -342,16 +363,14 @@ class MooObject
   getProp: (key) ->
     for prop in @properties
       if prop.key == key
-        return [prop.value, prop.mooObject]
+        return prop.value
     return @parent()?.getProp key
 
-  setProp: (key, value, mooObject) ->
+  setProp: (key, value) ->
     for prop in @properties
       if prop.key == key
         prop.value = value
-        prop.mooObject = mooObject
-        return value
-    @addProp key, value, mooObject
+    @addProp key, value
     return value
 
   chparent: (id) ->
@@ -423,7 +442,7 @@ class MooObject
     if @parent_id?
       @parent().getAllProperties(map)
     @properties.reduce(((map, prop) ->
-      map[prop.key] = [prop.value, prop.mooObject]
+      map[prop.key] = prop.value
       map
     ), map)
 
