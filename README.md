@@ -1,5 +1,5 @@
-jsmoo (tentative title)
-=======================
+room.js
+=======
 
 A [MOO](http://en.wikipedia.org/wiki/MOO) written in coffeescript running on node.js.
 
@@ -7,7 +7,7 @@ MOO stands for Mud, Object Oriented. One of the original MOOs was [LambdaMoo](ht
 
 The basic idea is to have a MUD which (privelaged) players can extend while in game.  You can create and edit objects, locations, and code from inside the MOO.
 
-jsmoo is different from other MOOs because:
+room.js is different from other MOOs because:
 
 1. It uses [CoffeeScript](http://coffeescript.org/) as the programming language instead of the original MOO language or some other custom language.
 2. You connect using a web browser, not a telnet or mud client.
@@ -18,8 +18,8 @@ Running the Server
 
 Assuming you have a working node.js environment: clone this repo, npm install, copy the example db, and launch the server:
 
-    git clone git@github.com:doughsay/jsmoo.git
-    cd jsmoo
+    git clone git@github.com:doughsay/room.js.git
+    cd room.js
     npm install
     cp db.example.json db.json
     ./server.coffee
