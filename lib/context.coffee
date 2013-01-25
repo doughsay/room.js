@@ -64,7 +64,7 @@ class Context
   decontextify: (contextObj) ->
     db.findById contextObj?.id
 
-  run: (coffeeCode, extraArgs = [], sendOutput = false, stack = true) ->
+  run: (coffeeCode, extraArgs = [], sendOutput = false, stack = false) ->
     try
       code = coffee.compile coffeeCode, bare: true
       ctext = _.clone @context
