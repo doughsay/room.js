@@ -11,48 +11,39 @@
     "properties": [
       {
         "key": "failed_match",
-        "value": -3,
-        "mooObject": true
+        "value": {"_mooObject": -3}
       },
       {
         "key": "ambiguous_match",
-        "value": -2,
-        "mooObject": true
+        "value": {"_mooObject": -2}
       },
       {
         "key": "nothing",
-        "value": -1,
-        "mooObject": true
+        "value": {"_mooObject": -1}
       },
       {
         "key": "sys",
-        "value": 0,
-        "mooObject": true
+        "value": {"_mooObject": 0}
       },
       {
         "key": "root",
-        "value": 1,
-        "mooObject": true
+        "value": {"_mooObject": 1}
       },
       {
         "key": "player_class",
-        "value": 2,
-        "mooObject": true
+        "value": {"_mooObject": 2}
       },
       {
         "key": "room",
-        "value": 4,
-        "mooObject": true
+        "value": {"_mooObject": 4}
       },
       {
         "key": "thing",
-        "value": 5,
-        "mooObject": true
+        "value": {"_mooObject": 5}
       },
       {
         "key": "util",
-        "value": 8,
-        "mooObject": true
+        "value": {"_mooObject": 8}
       }
     ],
     "verbs": [
@@ -140,8 +131,7 @@
     "properties": [
       {
         "key": "description",
-        "value": "A generic room.",
-        "mooObject": false
+        "value": "A generic room."
       }
     ],
     "verbs": [
@@ -196,8 +186,7 @@
     "properties": [
       {
         "key": "description",
-        "value": "A generic item.",
-        "mooObject": false
+        "value": "A generic item."
       }
     ],
     "verbs": [
@@ -240,8 +229,7 @@
     "properties": [
       {
         "key": "description",
-        "value": "The forest thins out here a bit.",
-        "mooObject": false
+        "value": "The forest thins out here a bit."
       }
     ],
     "verbs": []
@@ -260,8 +248,7 @@
     "properties": [
       {
         "key": "description",
-        "value": "A simple wooden sword.",
-        "mooObject": false
+        "value": "A simple wooden sword."
       }
     ],
     "verbs": [

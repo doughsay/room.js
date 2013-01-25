@@ -141,7 +141,7 @@ class MooDB
       object
 
   globalAliases: ->
-    @sys.properties.filter((prop) -> prop.mooObject).reduce(((map, prop) ->
+    @sys.properties.filter((prop) -> prop.value._mooObject?).reduce(((map, prop) ->
       map[prop.value] = '$' + prop.key
       map
     ), {})
@@ -346,8 +346,8 @@ class MooObject
   contents: ->
     @contents_ids.map (id) => @db.findById id
 
-  addProp: (key, value, mooObject) ->
-    @properties.push {key: key, value: value, mooObject: mooObject}
+  addProp: (key, value) ->
+    @properties.push {key: key, value: value}
 
   addVerb: (verb) ->
     @verbs.push new MooVerb verb
@@ -363,16 +363,14 @@ class MooObject
   getProp: (key) ->
     for prop in @properties
       if prop.key == key
-        return [prop.value, prop.mooObject]
+        return prop.value
     return @parent()?.getProp key
 
-  setProp: (key, value, mooObject) ->
+  setProp: (key, value) ->
     for prop in @properties
       if prop.key == key
         prop.value = value
-        prop.mooObject = mooObject
-        return value
-    @addProp key, value, mooObject
+    @addProp key, value
     return value
 
   chparent: (id) ->
@@ -444,7 +442,7 @@ class MooObject
     if @parent_id?
       @parent().getAllProperties(map)
     @properties.reduce(((map, prop) ->
-      map[prop.key] = [prop.value, prop.mooObject]
+      map[prop.key] = prop.value
       map
     ), map)
 

@@ -204,9 +204,9 @@ Creates a child of this object.  The child inherits all of its properties and ve
 Verbs
 -----
 
-To edit verbs on objects, use the functions `addverb`, `edit` and `rmverb` described above.
+To edit verbs on objects, use the object methods `addVerb`, `editVerb` and `rmVerb` described above.
 
-    edit $thing, 'examine'
+    $thing.editVerb 'examine'
 
 This will load the verb 'examine' of the 'Thing Class' into the verb editor.
 
@@ -223,7 +223,11 @@ The verb context has different variables available to it.  They are as follows:
 * `$prepstr` - the preposition string
 * `$iobjstr` - the indirect object string
 
-The verb context also has access to the `$` global function, and any global object names.
+The verb context also has access to the `$` function, as well as:
+
+### `pass(args...)`
+
+If this verb is inherited from a parent object, call the parent's version of the verb and return its result.
 
 TODO
 ----
@@ -232,5 +236,24 @@ TODO
 
 * Better object matching (See first big comment in lib/moo.coffee)
 * Better verb matching (See second big comment in lib/moo.coffee)
+    * Use verb aliases instead of lambdamoo style names
 * Logout
-* Remove database assumptions from the server code (player creation)
+
+### Bugs
+
+* Having moo objects with circular inheritence.
+    * $thing.parent == $root; $root.parent = $thing
+    * This causes `RangeError: Maximum call stack size exceeded`
+    * Solution: add a check to the parent setter.
+
+### Things that can crash the server
+
+* Writing moo code with infinite loops.
+    * Can't solve this right now as the vm module does not allow limiting execution of code.
+    * There are some github issue and pull requests out there for this.
+    * Note: doesn't actually crash the server.  Probably just overheats it and melts it...
+
+### Feature requests
+
+* Tab completion (evan)
+* Graphical map (greg)

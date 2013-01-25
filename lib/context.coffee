@@ -14,18 +14,42 @@ class Context
       eval:       undefined
       c:          color
       $:          (id) => @contextify db.findById(id)
-      $player:    @contextify @player
-      $here:      @contextify @player.location()
+      $player:    if @player? then @contextify @player else @contextify db.nothing
+      $here:      if @player.location()? then @contextify @player.location() else @contextify db.nothing
 
     @context = _.extend @globals(), base
 
-  globals: ->
-    mooUtil.hkmap db.findById(0).getAllProperties(), (key, prop) =>
-      [value, mooObject] = prop
-      if mooObject
-        ["$#{key}", @contextify db.findById(value)]
+  deserialize: (x) =>
+    switch typeof x
+      when 'object'
+        if x == null
+          null
+        else if Array.isArray x
+          x.map @deserialize
+        else if x._mooObject?
+          @contextify db.findById x._mooObject
+        else
+          mooUtil.hmap x, @deserialize
       else
-        ["$#{key}", value]
+        x
+
+  serialize: (x) =>
+    switch typeof x
+      when 'object'
+        if x == null
+          null
+        else if Array.isArray x
+          x.map @serialize
+        else if x instanceof ContextMooObject
+          {_mooObject: x.id}
+        else
+          mooUtil.hmap x, @serialize
+      else
+        x
+
+  globals: ->
+    mooUtil.hkmap db.sys.getAllProperties(), (key, value) =>
+      ["$#{key}", @deserialize value]
 
   # return a context object for the given object
   # also, memoize all the context objects within this context
@@ -35,12 +59,12 @@ class Context
         @memo[obj.id] = new ContextMooObject(obj, @)
       @memo[obj.id]
     else
-      @contextify db.nothing
+      null
 
   decontextify: (contextObj) ->
     db.findById contextObj?.id
 
-  run: (coffeeCode, extraArgs = [], sendOutput = false, stack = false) ->
+  run: (coffeeCode, extraArgs = [], sendOutput = false, stack = true) ->
     try
       code = coffee.compile coffeeCode, bare: true
       ctext = _.clone @context
@@ -76,9 +100,9 @@ class VerbContext extends Context
   constructor: (player, self, dobj, iobj, verb, argstr, dobjstr, prepstr, iobjstr, memo = {}) ->
     super player, memo
 
-    @context.$this    = @contextify self
-    @context.$dobj    = @contextify dobj
-    @context.$iobj    = @contextify iobj
+    @context.$this    = if self? then @contextify self else @contextify db.nothing
+    @context.$dobj    = if dobj? then @contextify dobj else @contextify db.nothing
+    @context.$iobj    = if iobj? then @contextify iobj else @contextify db.nothing
     @context.$verb    = verb
     @context.$argstr  = argstr
     @context.$dobjstr = dobjstr
@@ -143,10 +167,6 @@ class ContextMooObject
         enumerable: true
         get: -> object.contents().map (o) -> context.contextify o
         set: -> throw new Error "No setter for 'contents_ids'"
-      mooObject:
-        enumerable: true
-        get: -> true
-        set: -> throw new Error "No setter for 'mooObject'"
       player:
         enumerable: true
         get: -> object.player
@@ -157,12 +177,7 @@ class ContextMooObject
         set: -> throw new Error "No setter for 'programmer'"
       properties:
         enumerable: true
-        get: -> mooUtil.hmap object.getAllProperties(), (x) ->
-          [value, mooObject] = x
-          if mooObject
-            context.contextify db.findById(value)
-          else
-            value
+        get: -> mooUtil.hmap object.getAllProperties(), context.deserialize
         set: -> throw new Error "No setter for 'properties'"
       verbs:
         enumerable: true
@@ -182,26 +197,16 @@ class ContextMooObject
     })
 
     @addProp = (key, value) ->
-      if value.mooObject
-        object.addProp key, value.id, true
-      else
-        object.addProp key, value, false
+      object.addProp key, context.serialize value
 
     @rmProp = (key) ->
       object.rmProp key
 
     @getProp = (key) ->
-      [value, mooObject] = object.getProp key
-      if mooObject
-        context.contextify db.findById(value)
-      else
-        value
+      context.deserialize object.getProp key
 
     @setProp = (key, value) ->
-      if value.mooObject
-        object.setProp key, value.id, true
-      else
-        object.setProp key, value, false
+      object.setProp key, context.serialize value
 
     @editVerb = (verb) ->
       object.editVerb context.player, verb
