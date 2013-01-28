@@ -11,6 +11,8 @@
 #= require view_models/modal_form
 #= require view_models/moo
 
+#= require toasty
+
 # on dom ready, create the view model and apply the knockout bindings
 $ ->
   ko.applyBindings new MooView $('body'), $('.screen'), $('.command input')

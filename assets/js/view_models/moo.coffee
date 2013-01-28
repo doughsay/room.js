@@ -124,6 +124,9 @@ class MooView
     if command == 'clear'
       @lines []
       true
+    else if command == 'toasty!'
+      toasty()
+      true
     else
       false
 
