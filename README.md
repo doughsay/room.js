@@ -232,6 +232,11 @@ If this verb is inherited from a parent object, call the parent's version of the
 TODO
 ----
 
+* The db should be saved to disk periodically, not just on shutdown.  Crashes will lose everything from that session.
+* The db should not save directly over the existing file, a crash during save can corrupt the whole db.
+* The create function of moo objects should return the created object, not true.
+* The clone function of moo objects should return the cloned object, not true.
+
 ### Moo functionality
 
 * Better object matching (See first big comment in lib/moo.coffee)
