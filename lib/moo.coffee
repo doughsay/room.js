@@ -592,22 +592,23 @@ class MooVerb
     switch @dobjarg
       when 'none'
         return false if objects.dobj not in [db.nothing, db.failed_match, db.ambiguous_match]
-      when 'any'
-        return false if objects.dobj is db.nothing
+      #when 'any'
+        #return false if objects.dobj is db.nothing
       when 'this'
         return false if objects.dobj isnt self
     switch @iobjarg
       when 'none'
         return false if objects.iobj not in [db.nothing, db.failed_match, db.ambiguous_match]
-      when 'any'
-        return false if objects.iobj is db.nothing
+      #when 'any'
+        #return false if objects.iobj is db.nothing
       when 'this'
         return false if objects.iobj isnt self
     switch @preparg
       when 'none'
         return false if command.prepstr isnt undefined
       when 'any'
-        return false if command.prepstr is undefined
+        return true
+        #return false if command.prepstr is undefined
       else
         return false if command.prepstr not in @preparg.split('/')
     true
