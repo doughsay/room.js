@@ -257,6 +257,7 @@ TODO
     * Can't solve this right now as the vm module does not allow limiting execution of code.
     * There are some github issue and pull requests out there for this.
     * Note: doesn't actually crash the server.  Probably just overheats it and melts it...
+* Assigning a circular js object to a moo object as a property will cause the server to crash during db save.
 
 ### Feature requests
 
