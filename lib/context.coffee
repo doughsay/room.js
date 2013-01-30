@@ -1,6 +1,7 @@
 vm = require 'vm'
 coffee = require 'coffee-script'
 _ = require 'underscore'
+util = require 'util'
 
 color = require('./color').color
 db = require('./moo').db
@@ -78,6 +79,7 @@ class Context
         @player.send error.stack.split('\n').map((line) -> color line, 'inverse bold red').join('\n')
       else
         @player.send color error.toString(), 'inverse bold red'
+      util.log "#{@player.username} caused exception: #{error.toString()}"
 
 class EvalContext extends Context
 
@@ -218,10 +220,10 @@ class ContextMooObject
       object.rmVerb verb
 
     @clone = (newName, newAliases = []) ->
-      db.clone(object, newName, newAliases)
+      context.contextify db.clone(object, newName, newAliases)
 
     @create = (newName, newAliases = []) ->
-      db.createChild(object, newName, newAliases)
+      context.contextify db.createChild(object, newName, newAliases)
 
     # player specific methods
     if object.player
