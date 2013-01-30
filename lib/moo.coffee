@@ -4,6 +4,7 @@ _ = require 'underscore'
 
 connections = require './connection_manager'
 c = require('./color').color
+mooUtil = require './util'
 
 # A MOO DB is a collection of Moo Objects
 class MooDB
@@ -13,9 +14,9 @@ class MooDB
   objects: {}
   players: []
 
-  constructor: (filename) ->
-    util.print "loading... "
-    for id, dbObject of JSON.parse fs.readFileSync filename
+  constructor: (@filename) ->
+    startTime = mooUtil.tstart()
+    for id, dbObject of JSON.parse fs.readFileSync @filename
       if dbObject.player
         newMooObj = new MooPlayer dbObject, @
       else
@@ -24,7 +25,9 @@ class MooDB
       if newMooObj.player
         @players.push newMooObj
     @specials()
-    util.puts "done."
+    util.log "#{@filename} loaded in #{mooUtil.tend startTime}"
+
+    @saveInterval = setInterval @saveSync, 5*60*1000
 
   blankObject: (id, name) ->
     x =
@@ -52,13 +55,15 @@ class MooDB
     @nothing.send = (msg) ->
       console.log msg
 
-  save: (filename) ->
-    util.puts "saving... not!"
+  save: =>
+    # TODO
+    util.log "saving... not!"
 
-  saveSync: (filename) ->
-    util.print "saving... "
-    fs.writeFileSync filename, @serialize()
-    util.puts "done."
+  saveSync: =>
+    startTime = mooUtil.tstart()
+    fs.writeFileSync '_' + @filename, @serialize()
+    fs.renameSync '_' + @filename, @filename
+    util.log "#{@filename} saved in #{mooUtil.tend startTime}"
 
   serialize: ->
     # don't safe the special objects
@@ -261,8 +266,6 @@ class MooDB
     newObject = new MooObject rawObject, @
     newObject.moveTo object.location()
     @objects[nextId] = newObject
-    # @players.push newObject if newObject.player
-    true
 
   # Create a child of object
   # this child will inherit any of it's parent's properties and verbs
@@ -281,8 +284,6 @@ class MooDB
     newObject = new MooObject rawObject, @
     newObject.moveTo object.location()
     @objects[nextId] = newObject
-    # @players.push newObject if newObject.player
-    true
 
   # terrible way to get the next available id in the DB
   nextId: ->

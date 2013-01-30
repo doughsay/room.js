@@ -12,6 +12,9 @@ truncate = (s, length = 25) ->
 printHelper = (x, maxdepth = 2) ->
   print x, maxdepth
 
+tstart = -> process.hrtime()
+tend = (since) -> ((process.hrtime(since)[1] / 1000000).toFixed 2) + 'ms'
+
 # recursive colorful object output
 print = (x, maxdepth, depth = 0, prefix = '', parents = []) ->
   # possible types:
@@ -101,3 +104,5 @@ hkmap = (h, fn) ->
 exports.print = printHelper
 exports.hmap = hmap
 exports.hkmap = hkmap
+exports.tstart = tstart
+exports.tend = tend

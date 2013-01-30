@@ -40,7 +40,7 @@ xp.get '/', (req, res) ->
   res.render 'index'
 
 http_server = http.createServer(xp).listen xp.get('port'), ->
-  console.log "room.js http server listening on port " + xp.get 'port'
+  util.log "room.js http server listening on port " + xp.get 'port'
 
 ws_server = io.listen(http_server, {log: false})
 
@@ -288,4 +288,4 @@ process.on 'SIGINT', -> process.exit()
 process.on 'SIGTERM', -> process.exit()
 process.on 'exit', ->
   util.puts ""
-  db.saveSync('db.json')
+  db.saveSync()
