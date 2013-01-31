@@ -277,6 +277,8 @@ class MooDB
         throw new Error "Invalid alias '#{alias}'"
     nextId = @nextId()
     rawObject = JSON.parse JSON.stringify object
+    rawObject.properties = []
+    rawObject.verbs = []
     rawObject.id = nextId
     rawObject.parent_id = object.id
     rawObject.name = newName
@@ -284,6 +286,15 @@ class MooDB
     newObject = new MooObject rawObject, @
     newObject.moveTo object.location()
     @objects[nextId] = newObject
+
+  rm: (id) ->
+    if id > -1 and @findById(id)?
+      if @objects[id].player
+        @players = @players.filter (p) -> p.id != id
+      delete @objects[id]
+      true
+    else
+      false
 
   # terrible way to get the next available id in the DB
   nextId: ->
@@ -354,9 +365,8 @@ class MooObject
     @verbs.push new MooVerb verb
 
   rmProp: (key) ->
-    if key in (prop.key for prop in @properties)
-      @properties = @properties.filter (prop) ->
-        prop.key != key
+    if @hasOwnProp key
+      @properties = @properties.filter (prop) -> prop.key != key
       return true
     else
       throw new Error "property '#{key}' doesn't exist on this object."
@@ -370,9 +380,15 @@ class MooObject
   setProp: (key, value) ->
     for prop in @properties
       if prop.key == key
-        prop.value = value
+        return prop.value = value
     @addProp key, value
     return value
+
+  hasOwnProp: (key) ->
+    key in (prop.key for prop in @properties)
+
+  inheritsProp: (key) ->
+    !!@parent()?.getAllProperties()[key]?
 
   chparent: (id) ->
     if not id?
@@ -422,8 +438,17 @@ class MooObject
       throw new Error "That verb does not exist on this object."
 
   rmVerb: (verbName) ->
-    @verbs = (@verbs.filter (v) -> v.name != verbName)
-    true
+    if @hasOwnVerb verbName
+      @verbs = (@verbs.filter (v) -> v.name != verbName)
+      true
+    else
+      throw new Error "verb '#{verbName}' doesn't exist on this object."
+
+  hasOwnVerb: (verbName) ->
+    verbName in (verb.name for verb in @verbs)
+
+  inheritsVerb: (verbName) ->
+    !!@parent()?.getAllVerbs()[verbName]?
 
   saveVerb: (newVerb) ->
     for verb in @verbs

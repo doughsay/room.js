@@ -130,15 +130,14 @@ You can access attributes on objects like this:
 
 ### `programmer`
 
-(Boolean) {read-only} Is this object a programmer?
+(Boolean) Is this object a programmer?
 
-### `properties`
+Custom object attributes (Properties)
+-------------------------------------
 
-(Array[Any]) {read-only} The object's custom properties.
+You can add custom properties to objects using the method `addProp` described below.  Already existing properties can be accessed and edited like any other (java|coffee)script property, directly on the object:
 
-### `verbs`
-
-(Array[Verb]) {read-only} The object's verbs.
+`$(7).description = 'foo bar baz'
 
 Object methods
 --------------
@@ -151,7 +150,7 @@ These methods are available on moo objects:
 
 ### `addProp(key, value)`
 
-Adds a new property to this object.
+Adds a new property to this object, or overwrites an existing one.
 
 * `key` - (string) The key to store the property under.  If it already exists it will be overwritten.
 * `value` - (any) The value to store.  Can be any type.
@@ -161,19 +160,6 @@ Adds a new property to this object.
 Removes a property from an object.
 
 * `key` - (string) The key to remove.
-
-### `getProp(key)`
-
-Retrieve the value of a property.
-
-* `key` - (string) The key to retrieve.
-
-### `setProp(key, value)`
-
-Same as `setProp`.
-
-* `key` - (string) The key to store the property under.  If it already exists it will be overwritten.
-* `value` - (any) The value to store.  Can be any type.
 
 ### `editVerb(verb)`
 
@@ -225,21 +211,20 @@ The verb context has different variables available to it.  They are as follows:
 
 The verb context also has access to the `$` function, as well as:
 
-### `pass(args...)`
+### `rm(id)`
 
-If this verb is inherited from a parent object, call the parent's version of the verb and return its result.
+This removes object `id` from the database.  Warning: this is irreversible.
 
 TODO
 ----
 
-* Remove objects function
+* Logout / quit
 
 ### Moo functionality
 
 * Better object matching (See first big comment in lib/moo.coffee)
 * Better verb matching (See second big comment in lib/moo.coffee)
     * Use verb aliases instead of lambdamoo style names
-* Logout
 
 ### Bugs
 
@@ -255,6 +240,7 @@ TODO
     * Can't solve this right now as the vm module does not allow limiting execution of code.
     * There are some github issue and pull requests out there for this.
     * Note: doesn't actually crash the server.  Probably just overheats it and melts it...
+* Removing an object that has children.
 
 ### Feature requests
 

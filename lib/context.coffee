@@ -90,6 +90,7 @@ class EvalContext extends Context
     @context.search     = (search) -> db.search(search)
     @context.tree       = (root_id) -> db.inheritance_tree(root_id)
     @context.locations  = (root_id) -> db.location_tree(root_id)
+    @context.rm         = (id) -> db.rm id
     @context.ls         = (x, depth = 2) ->
                             player.send(mooUtil.print x, depth)
                             true
@@ -110,15 +111,7 @@ class VerbContext extends Context
     @context.$dobjstr = dobjstr
     @context.$prepstr = prepstr
     @context.$iobjstr = iobjstr
-    @context.pass     = ->
-                          v = self.parent()?.findVerbByName verb
-                          if v?
-                            newContext = new VerbContext(
-                              player, self, dobj, iobj,
-                              verb, argstr, dobjstr, prepstr, iobjstr, memo)
-                            newContext.run v.code, Array.prototype.slice.call(arguments)
-                          else
-                            throw new Error "Cannot 'pass()' because '#{verb}' doesn't exists on a parent of #{self.name}."
+    @context.rm       = (id) -> db.rm id
 
   run: (coffeeCode, extraArgs = []) ->
     wrappedCoffeeCode = 'do($args) ->\n' +
@@ -152,7 +145,26 @@ class ContextMooObject
         set: (name) -> object.rename name
       aliases:
         enumerable: true
-        get: -> (alias for alias in object.aliases)
+        get: ->
+          aliases = (alias for alias in object.aliases)
+
+          # makes a function which acts like an array mutator on the aliases array
+          # and then updates the objects underlying array
+          wam = (method) ->
+            ->
+              ret = [][method].apply aliases, arguments
+              object.updateAliases aliases
+              ret
+
+          aliases.pop = wam('pop')
+          aliases.push = wam('push')
+          aliases.reverse = wam('reverse')
+          aliases.shift = wam('shift')
+          aliases.sort = wam('sort')
+          aliases.splice = wam('splice')
+          aliases.unshift = wam('unshift')
+
+          aliases
         set: (aliases) -> object.updateAliases aliases
       location:
         enumerable: true
@@ -168,7 +180,7 @@ class ContextMooObject
       contents:
         enumerable: true
         get: -> object.contents().map (o) -> context.contextify o
-        set: -> throw new Error "No setter for 'contents_ids'"
+        set: -> throw new Error "No setter for 'contents'"
       player:
         enumerable: true
         get: -> object.player
@@ -176,48 +188,68 @@ class ContextMooObject
       programmer:
         enumerable: true
         get: -> object.programmer
-        set: -> throw new Error "No setter for 'programmer'"
-      properties:
-        enumerable: true
-        get: -> mooUtil.hmap object.getAllProperties(), context.deserialize
-        set: -> throw new Error "No setter for 'properties'"
-      verbs:
-        enumerable: true
-        get: ->
-          verbs = {}
-          for verbName, verb of object.getAllVerbs()
-            do (verb) =>
-              fn = =>
-                newContext = new VerbContext(
-                  context.player, object, context.context.dobj, context.context.iobj,
-                  verb.name, context.context.argstr, context.context.dobjstr, context.context.prepstr, context.context.iobjstr, context.memo)
-                newContext.run verb.code, Array.prototype.slice.call(arguments)
-              fn.verb = true
-              verbs[verb.name] = fn
-          verbs
-        set: -> throw new Error "No setter for 'verbs'"
+        set: (programmer) ->
+          if object.player
+            object.setProgrammer programmer
+          else
+            throw new Error "Object is not a player"
     })
 
+    addPropProp = (key) =>
+      Object.defineProperty(@, key,
+        enumerable: true
+        configurable: true
+        get: -> context.deserialize object.getProp key
+        set: (val) -> object.setProp key, context.serialize val
+      )
+
+    rmPropProp = (key) =>
+      delete @[key]
+
+    for key of object.getAllProperties()
+      addPropProp key
+
+    addVerbProp = (verb) =>
+      Object.defineProperty(@, verb.name,
+        enumerable: true
+        configurable: true
+        get: ->
+          fn = ->
+            newContext = new VerbContext(
+              context.player, object, context.context.dobj, context.context.iobj,
+              verb.name, context.context.argstr, context.context.dobjstr, context.context.prepstr, context.context.iobjstr, context.memo)
+            newContext.run verb.code, Array.prototype.slice.call(arguments)
+          fn.verb = true
+          fn
+        set: -> throw new Error "No setter for verb"
+      )
+
+    rmVerbProp = (verbName) =>
+      delete @[verbName]
+
+    for verbName, verb of object.getAllVerbs()
+      addVerbProp verb
+
     @addProp = (key, value) ->
-      object.addProp key, context.serialize value
+      object.setProp key, context.serialize value
+      addPropProp key
+      value
 
     @rmProp = (key) ->
+      if not object.inheritsProp key
+        rmPropProp key
       object.rmProp key
 
-    @getProp = (key) ->
-      context.deserialize object.getProp key
-
-    @setProp = (key, value) ->
-      object.setProp key, context.serialize value
-
-    @editVerb = (verb) ->
-      object.editVerb context.player, verb
+    @editVerb = (verbName) ->
+      object.editVerb context.player, verbName
 
     @addVerb = (verbName, dobjarg = 'none', preparg = 'none', iobjarg = 'none') ->
       object.addVerbPublic context.player, verbName, dobjarg, preparg, iobjarg
 
-    @rmVerb = (verb) ->
-      object.rmVerb verb
+    @rmVerb = (verbName) ->
+      if not object.inheritsVerb verbName
+        rmVerbProp verbName
+      object.rmVerb verbName
 
     @clone = (newName, newAliases = []) ->
       context.contextify db.clone(object, newName, newAliases)
@@ -235,9 +267,6 @@ class ContextMooObject
 
       @input = (msg, fn) ->
         object.input msg, fn
-
-      @setProgrammer = (programmer) ->
-        object.setProgrammer programmer
 
       @clone = -> throw new Error "Can't clone players."
       @create = -> throw new Error "Can't create players."
