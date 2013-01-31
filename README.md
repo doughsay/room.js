@@ -137,7 +137,7 @@ Custom object attributes (Properties)
 
 You can add custom properties to objects using the method `addProp` described below.  Already existing properties can be accessed and edited like any other (java|coffee)script property, directly on the object:
 
-`$(7).description = 'foo bar baz'
+    $(7).description = 'foo bar baz'
 
 Object methods
 --------------

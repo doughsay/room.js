@@ -10,7 +10,10 @@ ko.bindingHandlers.ace = {
 
     var editor = ace.edit(element);
     editor.setTheme("ace/theme/"+theme);
-    editor.getSession().setMode("ace/mode/"+mode);
+    var session = editor.getSession();
+    session.setMode("ace/mode/"+mode);
+    session.setUseSoftTabs(true);
+    session.setTabSize(2);
 
     // emulate onchange event, because ace does it weirdly
     // also keep track of a dirty flag
