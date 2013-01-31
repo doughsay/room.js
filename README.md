@@ -218,12 +218,13 @@ This removes object `id` from the database.  Warning: this is irreversible.
 TODO
 ----
 
+* Logout / quit
+
 ### Moo functionality
 
 * Better object matching (See first big comment in lib/moo.coffee)
 * Better verb matching (See second big comment in lib/moo.coffee)
     * Use verb aliases instead of lambdamoo style names
-* Logout
 
 ### Bugs
 
@@ -232,6 +233,7 @@ TODO
     * This causes `RangeError: Maximum call stack size exceeded`
     * Solution: add a check to the parent setter.
 * Attempting to assign a circular js object as a property on a moo object causes `RangeError: Maximum call stack size exceeded`
+* rmProp and rmVerb don't work properly with inheritence.  Getters are removed when they shouldn't be.
 
 ### Things that can crash the server
 
@@ -239,6 +241,7 @@ TODO
     * Can't solve this right now as the vm module does not allow limiting execution of code.
     * There are some github issue and pull requests out there for this.
     * Note: doesn't actually crash the server.  Probably just overheats it and melts it...
+* Removing an object that has children.
 
 ### Feature requests
 

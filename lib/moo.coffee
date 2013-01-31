@@ -277,6 +277,8 @@ class MooDB
         throw new Error "Invalid alias '#{alias}'"
     nextId = @nextId()
     rawObject = JSON.parse JSON.stringify object
+    rawObject.properties = []
+    rawObject.verbs = []
     rawObject.id = nextId
     rawObject.parent_id = object.id
     rawObject.name = newName
