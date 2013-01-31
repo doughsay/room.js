@@ -90,6 +90,7 @@ class EvalContext extends Context
     @context.search     = (search) -> db.search(search)
     @context.tree       = (root_id) -> db.inheritance_tree(root_id)
     @context.locations  = (root_id) -> db.location_tree(root_id)
+    @context.rm         = (id) -> db.rm id
     @context.ls         = (x, depth = 2) ->
                             player.send(mooUtil.print x, depth)
                             true
@@ -110,15 +111,7 @@ class VerbContext extends Context
     @context.$dobjstr = dobjstr
     @context.$prepstr = prepstr
     @context.$iobjstr = iobjstr
-    @context.pass     = ->
-                          v = self.parent()?.findVerbByName verb
-                          if v?
-                            newContext = new VerbContext(
-                              player, self, dobj, iobj,
-                              verb, argstr, dobjstr, prepstr, iobjstr, memo)
-                            newContext.run v.code, Array.prototype.slice.call(arguments)
-                          else
-                            throw new Error "Cannot 'pass()' because '#{verb}' doesn't exists on a parent of #{self.name}."
+    @context.rm       = (id) -> db.rm id
 
   run: (coffeeCode, extraArgs = []) ->
     wrappedCoffeeCode = 'do($args) ->\n' +

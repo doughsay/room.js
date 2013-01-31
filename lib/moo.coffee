@@ -285,6 +285,15 @@ class MooDB
     newObject.moveTo object.location()
     @objects[nextId] = newObject
 
+  rm: (id) ->
+    if id > -1 and @findById(id)?
+      if @objects[id].player
+        @players = @players.filter (p) -> p.id != id
+      delete @objects[id]
+      true
+    else
+      false
+
   # terrible way to get the next available id in the DB
   nextId: ->
     # the sorted keys of the objects hash not including the 3 special objects (-1, -2 and -3)
