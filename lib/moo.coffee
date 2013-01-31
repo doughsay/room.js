@@ -365,9 +365,8 @@ class MooObject
     @verbs.push new MooVerb verb
 
   rmProp: (key) ->
-    if key in (prop.key for prop in @properties)
-      @properties = @properties.filter (prop) ->
-        prop.key != key
+    if @hasOwnProp key
+      @properties = @properties.filter (prop) -> prop.key != key
       return true
     else
       throw new Error "property '#{key}' doesn't exist on this object."
@@ -381,9 +380,15 @@ class MooObject
   setProp: (key, value) ->
     for prop in @properties
       if prop.key == key
-        prop.value = value
+        return prop.value = value
     @addProp key, value
     return value
+
+  hasOwnProp: (key) ->
+    key in (prop.key for prop in @properties)
+
+  inheritsProp: (key) ->
+    !!@parent()?.getAllProperties()[key]?
 
   chparent: (id) ->
     if not id?
@@ -433,8 +438,17 @@ class MooObject
       throw new Error "That verb does not exist on this object."
 
   rmVerb: (verbName) ->
-    @verbs = (@verbs.filter (v) -> v.name != verbName)
-    true
+    if @hasOwnVerb verbName
+      @verbs = (@verbs.filter (v) -> v.name != verbName)
+      true
+    else
+      throw new Error "verb '#{verbName}' doesn't exist on this object."
+
+  hasOwnVerb: (verbName) ->
+    verbName in (verb.name for verb in @verbs)
+
+  inheritsVerb: (verbName) ->
+    !!@parent()?.getAllVerbs()[verbName]?
 
   saveVerb: (newVerb) ->
     for verb in @verbs

@@ -150,7 +150,7 @@ These methods are available on moo objects:
 
 ### `addProp(key, value)`
 
-Adds a new property to this object.
+Adds a new property to this object, or overwrites an existing one.
 
 * `key` - (string) The key to store the property under.  If it already exists it will be overwritten.
 * `value` - (any) The value to store.  Can be any type.
@@ -233,7 +233,6 @@ TODO
     * This causes `RangeError: Maximum call stack size exceeded`
     * Solution: add a check to the parent setter.
 * Attempting to assign a circular js object as a property on a moo object causes `RangeError: Maximum call stack size exceeded`
-* rmProp and rmVerb don't work properly with inheritence.  Getters are removed when they shouldn't be.
 
 ### Things that can crash the server
 

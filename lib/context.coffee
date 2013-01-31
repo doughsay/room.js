@@ -231,12 +231,14 @@ class ContextMooObject
       addVerbProp verb
 
     @addProp = (key, value) ->
-      object.addProp key, context.serialize value
+      object.setProp key, context.serialize value
       addPropProp key
+      value
 
     @rmProp = (key) ->
+      if not object.inheritsProp key
+        rmPropProp key
       object.rmProp key
-      rmPropProp key
 
     @editVerb = (verbName) ->
       object.editVerb context.player, verbName
@@ -245,8 +247,9 @@ class ContextMooObject
       object.addVerbPublic context.player, verbName, dobjarg, preparg, iobjarg
 
     @rmVerb = (verbName) ->
+      if not object.inheritsVerb verbName
+        rmVerbProp verbName
       object.rmVerb verbName
-      rmVerbProp verbName
 
     @clone = (newName, newAliases = []) ->
       context.contextify db.clone(object, newName, newAliases)
