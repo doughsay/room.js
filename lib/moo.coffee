@@ -425,7 +425,7 @@ class MooObject
 
   editVerb: (player, verbName) ->
     socket = connections.socketFor player
-    verb = (@verbs.filter (v) -> v.name == verbName)[0]
+    verb = (@verbs.filter (v) -> v.matchesName verbName)[0]
     if verb?
       clonedVerb = _.clone verb
       clonedVerb.oid = @id
@@ -584,28 +584,26 @@ class MooVerb
     @code = verb.code
 
   # does this verb match the search string?
-  # TODO: make it work like this:
-  # FROM THE LAMBDAMOO MANUAL:
-  # Every verb has one or more names; all of the names are kept in a single string,
-  # separated by spaces. In the simplest case, a verb-name is just a word made up
-  # of any characters other than spaces and stars (i.e., ` ' and `*'). In this
-  # case, the verb-name matches only itself; that is, the name must be matched
-  # exactly.
-  #
-  # If the name contains a single star, however, then the name matches any prefix
-  # of itself that is at least as long as the part before the star. For example,
-  # the verb-name `foo*bar' matches any of the strings `foo', `foob', `fooba', or
-  # `foobar'; note that the star itself is not considered part of the name.
-  #
-  # If the verb name ends in a star, then it matches any string that begins with
-  # the part before the star. For example, the verb-name `foo*' matches any of the
-  # strings `foo', `foobar', `food', or `foogleman', among many others. As a
-  # special case, if the verb-name is `*' (i.e., a single star all by itself),
-  # then it matches anything at all.
-  #
-  # for now, just exact matches are considered
   matchesName: (search) ->
-    search == @name
+    match = (name, search) ->
+      return true if name == '*'
+      if name.indexOf('*') != -1
+        nameParts = name.split '*'
+        return true if search == nameParts[0]
+        if search.indexOf(nameParts[0]) == 0
+          return true if nameParts[1] == ''
+          rest = search[nameParts[0].length..search.length]
+          return true if nameParts[1].indexOf(rest) == 0
+      else
+        return true if name == search
+
+      false
+
+    names = @name.split ' '
+    for name in names
+      return true if match name, search
+
+    false
 
   # does this verb match the context?
   matchesCommand: (command, objects, self) ->
