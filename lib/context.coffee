@@ -210,7 +210,12 @@ class ContextMooObject
       addPropProp key
 
     addVerbProp = (verb) =>
-      Object.defineProperty(@, verb.name,
+      # take the first of potentially multiple space seperated names
+      propName = verb.name.split(' ')[0]
+      # if the name has a * in it, remove it. (unless it's only a *)
+      if propName != '*'
+        propName = propName.replace '*', ''
+      Object.defineProperty(@, propName,
         enumerable: true
         configurable: true
         get: ->

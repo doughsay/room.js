@@ -6,6 +6,11 @@ connections = require './connection_manager'
 c = require('./color').color
 mooUtil = require './util'
 
+# some constants
+`const NO_MATCH = 0`
+`const EXACT_MATCH = 1`
+`const PARTIAL_MATCH = 2`
+
 # A MOO DB is a collection of Moo Objects
 class MooDB
   # @objects: Array[MooObject]
@@ -27,7 +32,7 @@ class MooDB
     @specials()
     util.log "#{@filename} loaded in #{mooUtil.tend startTime}"
 
-    @saveInterval = setInterval @saveSync, 5*60*1000
+    @saveInterval = setInterval @save, 5*60*1000
 
   blankObject: (id, name) ->
     x =
@@ -56,8 +61,12 @@ class MooDB
       console.log msg
 
   save: =>
-    # TODO
-    util.log "saving... not!"
+    startTime = mooUtil.tstart()
+    fs.writeFile '_' + @filename, @serialize(), (err) =>
+      throw err if err
+      fs.rename '_' + @filename, @filename, (err) =>
+        throw err if err
+        util.log "#{@filename} saved in #{mooUtil.tend startTime}"
 
   saveSync: =>
     startTime = mooUtil.tstart()
@@ -79,22 +88,13 @@ class MooDB
   findByNum: (numStr) ->
     @findById parseInt numStr.match(/^#([0-9]+)$/)?[1]
 
-  # buildContextForCommand: (player, command) ->
-  #   context = {}
-  #   for key,val of command
-  #     context["$#{key}"] = val
-  #   context = _.extend context, @findCommandObjects(player, command)
-  #   [verb, $this] = @findVerb context
-  #   context.$this = $this
-  #   [verb, context]
-
   # find the objects matched by the command
   matchObjects: (player, command) ->
     dobj: if command.dobjstr? then @findObject command.dobjstr, player else @nothing
     iobj: if command.iobjstr? then @findObject command.iobjstr, player else @nothing
 
   # search string can be:
-  # 'me', 'here', '#123' (an object number),
+  # 'me', 'here'
   # or an object name or alias, in which case we search "nearby"
   findObject: (search, player) ->
     return player if search == 'me'
@@ -103,14 +103,23 @@ class MooDB
     @findNearby search, player
 
   # find objects "nearby"
-  # i.e. the room, objects the player is holding, or objects in the room
+  # i.e. objects the player is holding, or objects in the room
   findNearby: (search, player) ->
-    room = player.location()
-    return room if room.matches search
-    for o in player.contents()
-      return o if o.matches search
-    for o in room.contents()
-      return o if o.matches search
+    searchItems = player.contents().concat player.location().contents().filter (o) -> o != player
+    matches = searchItems.map (item) -> [item.matches(search), item]
+    exactMatches = matches.filter (match) -> match[0] == EXACT_MATCH
+    partialMatches = matches.filter (match) -> match[0] == PARTIAL_MATCH
+
+    if exactMatches.length == 1
+      return exactMatches[0][1]
+    else if exactMatches.length > 1
+      return @ambiguous_match
+
+    if partialMatches.length == 1
+      return partialMatches[0][1]
+    else if partialMatches.length > 1
+      return @ambiguous_match
+
     return @failed_match
 
   matchVerb: (player, command, objects) ->
@@ -128,18 +137,6 @@ class MooDB
       self: objects.iobj
     else
       null
-
-  # findVerb: (context) ->
-  #   if context.$player.respondsTo context
-  #     [context.$player.findVerb(context), context.$player]
-  #   if context.$here.respondsTo context
-  #     [context.$here.findVerb(context), context.$here]
-  #   else if context.$dobj? && context.$dobj.respondsTo context
-  #     [context.$dobj.findVerb(context), context.$dobj]
-  #   else if context.$iobj? && context.$iobj.respondsTo context
-  #     [context.$iobj.findVerb(context), context.$iobj]
-  #   else
-  #     [null, null]
 
   objectsAsArray: ->
     for id,object of @objects
@@ -428,7 +425,7 @@ class MooObject
 
   editVerb: (player, verbName) ->
     socket = connections.socketFor player
-    verb = (@verbs.filter (v) -> v.name == verbName)[0]
+    verb = (@verbs.filter (v) -> v.matchesName verbName)[0]
     if verb?
       clonedVerb = _.clone verb
       clonedVerb.oid = @id
@@ -481,23 +478,21 @@ class MooObject
       map
     ), map)
 
-  # does this object match the search string?
-  # TODO: make it work like this:
-  # FROM THE LAMBDAMOO MANUAL:
-  # The server checks to see if the object string in the command is either
-  # exactly equal to or a prefix of any alias; if there are any exact
-  # matches, the prefix matches are ignored. If exactly one of the objects
-  # being considered has a matching alias, that object is used. If more
-  # than one has a match, then the special object #-2 (aka
-  # $ambiguous_match in LambdaCore) is used. If there are no matches, then
-  # the special object #-3 (aka $failed_match in LambdaCore) is used.
-  #
-  # for now, the first object found to match is used
+  # does this object exactly or partially match the search string?
   matches: (search) ->
-    match = (x, y) -> x == y || y.indexOf(x) == 0
-    return true if match search, @name
-    for alias in @aliases
-      return true if match search, alias
+    match = (x, y) ->
+      x = x.toLowerCase()
+      y = y.toLowerCase()
+      return EXACT_MATCH if x == y
+      return PARTIAL_MATCH if x.indexOf(y) == 0
+      return NO_MATCH
+
+    names = @aliases.concat [@name]
+    matches = names.map (name) -> match name, search
+
+    return EXACT_MATCH if EXACT_MATCH in matches
+    return PARTIAL_MATCH if PARTIAL_MATCH in matches
+    return NO_MATCH
 
   # look for a verb on this object (or it's parents) that matches the given command
   findVerb: (command, objects, self = @) ->
@@ -589,28 +584,26 @@ class MooVerb
     @code = verb.code
 
   # does this verb match the search string?
-  # TODO: make it work like this:
-  # FROM THE LAMBDAMOO MANUAL:
-  # Every verb has one or more names; all of the names are kept in a single string,
-  # separated by spaces. In the simplest case, a verb-name is just a word made up
-  # of any characters other than spaces and stars (i.e., ` ' and `*'). In this
-  # case, the verb-name matches only itself; that is, the name must be matched
-  # exactly.
-  #
-  # If the name contains a single star, however, then the name matches any prefix
-  # of itself that is at least as long as the part before the star. For example,
-  # the verb-name `foo*bar' matches any of the strings `foo', `foob', `fooba', or
-  # `foobar'; note that the star itself is not considered part of the name.
-  #
-  # If the verb name ends in a star, then it matches any string that begins with
-  # the part before the star. For example, the verb-name `foo*' matches any of the
-  # strings `foo', `foobar', `food', or `foogleman', among many others. As a
-  # special case, if the verb-name is `*' (i.e., a single star all by itself),
-  # then it matches anything at all.
-  #
-  # for now, just exact matches are considered
   matchesName: (search) ->
-    search == @name
+    match = (name, search) ->
+      return true if name == '*'
+      if name.indexOf('*') != -1
+        nameParts = name.split '*'
+        return true if search == nameParts[0]
+        if search.indexOf(nameParts[0]) == 0
+          return true if nameParts[1] == ''
+          rest = search[nameParts[0].length..search.length]
+          return true if nameParts[1].indexOf(rest) == 0
+      else
+        return true if name == search
+
+      false
+
+    names = @name.split ' '
+    for name in names
+      return true if match name, search
+
+    false
 
   # does this verb match the context?
   matchesCommand: (command, objects, self) ->
@@ -618,23 +611,20 @@ class MooVerb
     switch @dobjarg
       when 'none'
         return false if objects.dobj not in [db.nothing, db.failed_match, db.ambiguous_match]
-      #when 'any'
-        #return false if objects.dobj is db.nothing
+      # when 'any' anything goes!
       when 'this'
         return false if objects.dobj isnt self
     switch @iobjarg
       when 'none'
         return false if objects.iobj not in [db.nothing, db.failed_match, db.ambiguous_match]
-      #when 'any'
-        #return false if objects.iobj is db.nothing
+      # when 'any' anything goes!
       when 'this'
         return false if objects.iobj isnt self
     switch @preparg
       when 'none'
         return false if command.prepstr isnt undefined
-      when 'any'
+      when 'any' # anything goes!
         return true
-        #return false if command.prepstr is undefined
       else
         return false if command.prepstr not in @preparg.split('/')
     true

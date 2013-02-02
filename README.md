@@ -218,14 +218,6 @@ This removes object `id` from the database.  Warning: this is irreversible.
 TODO
 ----
 
-* Logout / quit
-
-### Moo functionality
-
-* Better object matching (See first big comment in lib/moo.coffee)
-* Better verb matching (See second big comment in lib/moo.coffee)
-    * Use verb aliases instead of lambdamoo style names
-
 ### Bugs
 
 * Having moo objects with circular inheritence.
@@ -246,3 +238,4 @@ TODO
 
 * Tab completion (evan)
 * Graphical map (greg)
+* Allow verbs to be written in plain javascript (evan)
