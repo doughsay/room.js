@@ -69,6 +69,16 @@ ws_server.sockets.on 'connection', (socket) ->
 
       if command.verb == 'eval' and player.programmer
         context.runEval player, command.argstr
+      else if command.verb in ['logout', 'quit']
+        player = connections.playerFor socket
+        connections.remove socket
+
+        if player?
+          verb = db.sys.findVerbByName 'player_disconnected'
+          if verb?
+            context.runVerb player, verb.code, db.sys
+
+        socket.emit 'output', '\nYou have been logged out.'
       else
         matchedObjects = db.matchObjects player, command
         matchedVerb = db.matchVerb player, command, matchedObjects
@@ -92,9 +102,9 @@ ws_server.sockets.on 'connection', (socket) ->
         when "help"
           msg = """
           \nAvailable commands:
-          * #{c 'login', 'magenta bold'}  - login to an existing account
-          * #{c 'create', 'magenta bold'} - create a new account
-          * #{c 'help', 'magenta bold'}   - show this message
+          • #{c 'login', 'magenta bold'}  - login to an existing account
+          • #{c 'create', 'magenta bold'} - create a new account
+          • #{c 'help', 'magenta bold'}   - show this message
           """
           socket.emit 'output', msg
         when "login"
