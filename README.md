@@ -218,11 +218,6 @@ This removes object `id` from the database.  Warning: this is irreversible.
 TODO
 ----
 
-### Moo functionality
-
-* Better verb matching (See second big comment in lib/moo.coffee)
-    * Use verb aliases instead of lambdamoo style names
-
 ### Bugs
 
 * Having moo objects with circular inheritence.
