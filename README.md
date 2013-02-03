@@ -218,6 +218,12 @@ This removes object `id` from the database.  Warning: this is irreversible.
 TODO
 ----
 
+* A better editor (seperate page)
+* Allow in-place property edits
+    * e.g. $here.exits['north'] = $exit.create 'north'
+    * The above won't work because $here.exits is a getter that returns a new object, not the real underlying object
+    * Don't really know how we can solve this...
+
 ### Bugs
 
 * Having moo objects with circular inheritence.
