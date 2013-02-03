@@ -536,6 +536,9 @@ class MooPlayer extends MooObject
   authenticates: (username, passwordHash) ->
     @username == username and @password == passwordHash
 
+  online: ->
+    (connections.socketFor @)?
+
   send: (msg) ->
     socket = connections.socketFor @
     if socket?

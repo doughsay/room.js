@@ -186,15 +186,20 @@ class ContextMooObject
         enumerable: true
         get: -> object.player
         set: -> throw new Error "No setter for 'player'"
-      programmer:
-        enumerable: true
-        get: -> object.programmer
-        set: (programmer) ->
-          if object.player
-            object.setProgrammer programmer
-          else
-            throw new Error "Object is not a player"
     })
+
+    # player specific properties
+    if object.player
+      Object.defineProperties(@,
+        programmer:
+          enumerable: true
+          get: -> object.programmer
+          set: (programmer) -> object.setProgrammer programmer
+        online:
+          enumerable: true
+          get: -> object.online()
+          set: -> throw new Error "No setter for 'online'"
+      )
 
     addPropProp = (key) =>
       Object.defineProperty(@, key,
