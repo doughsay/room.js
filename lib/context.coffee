@@ -17,6 +17,7 @@ class Context
       $:          (id) => @contextify db.findById(id)
       $player:    if @player? then @contextify @player else @contextify db.nothing
       $here:      if @player.location()? then @contextify @player.location() else @contextify db.nothing
+      players:    => db.players.map (player) => @contextify player
 
     @context = _.extend @globals(), base
 

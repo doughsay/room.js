@@ -298,4 +298,9 @@ process.on 'SIGINT', -> process.exit()
 process.on 'SIGTERM', -> process.exit()
 process.on 'exit', ->
   util.puts ""
+  for player in db.players
+    socket = connections.socketFor player
+    if socket?
+      socket.emit 'output', c 'Server shutting down.', 'red'
+      socket.disconnect()
   db.saveSync()
