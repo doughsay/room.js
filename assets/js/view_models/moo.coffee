@@ -106,6 +106,7 @@ class MooView
   sendCommand: ->
     command = @command()
     if command
+      @addLine c '\n'+command, 'gray'
       @history.unshift command
       if @history.length > @maxHistory()
         @history.pop()
