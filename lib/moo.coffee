@@ -105,6 +105,8 @@ class MooDB
   # find objects "nearby"
   # i.e. objects the player is holding, or objects in the room
   findNearby: (search, player) ->
+    return @failed_match if search == ''
+
     searchItems = player.contents().concat player.location().contents().filter (o) -> o != player
     matches = searchItems.map (item) -> [item.matches(search), item]
     exactMatches = matches.filter (match) -> match[0] == EXACT_MATCH
@@ -121,6 +123,27 @@ class MooDB
       return @ambiguous_match
 
     return @failed_match
+
+  # return a list of matched objects for moo-side use
+  mooMatch: (search, player) =>
+    return [] if search == ''
+
+    searchItems = player.contents().concat player.location().contents().filter (o) -> o != player
+    matches = searchItems.map (item) -> [item.matches(search), item]
+    exactMatches = matches.filter (match) -> match[0] == EXACT_MATCH
+    partialMatches = matches.filter (match) -> match[0] == PARTIAL_MATCH
+
+    if exactMatches.length == 1
+      return [exactMatches[0][1]]
+    else if exactMatches.length > 1
+      return exactMatches.map (match) -> match[1]
+
+    if partialMatches.length == 1
+      return [partialMatches[0][1]]
+    else if partialMatches.length > 1
+      return partialMatches.map (match) -> match[1]
+
+    return []
 
   matchVerb: (player, command, objects) ->
     if (verb = player.findVerb command, objects)

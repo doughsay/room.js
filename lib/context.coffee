@@ -7,6 +7,8 @@ color = require('./color').color
 db = require('./moo').db
 connections = require './connection_manager'
 mooUtil = require './util'
+mooBrowser = require './moo_browser'
+parse = require('./parser').parse
 
 class Context
 
@@ -18,6 +20,9 @@ class Context
       $player:    if @player? then @contextify @player else @contextify db.nothing
       $here:      if @player.location()? then @contextify @player.location() else @contextify db.nothing
       players:    => db.players.map (player) => @contextify player
+      browser:    mooBrowser
+      parse:      parse
+      match:      (search = '') => (db.mooMatch search, @player).map (o) => @contextify o
 
     @context = _.extend @globals(), base
 

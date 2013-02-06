@@ -75,6 +75,7 @@ parse_preposition = (text) ->
     i = search.index
     dobjstr = if i == 0 then undefined else text[0..(i-2)]
     iobjstr = text[(i+prepstr.length+1)..-1]
+    if iobjstr == '' then iobjstr = undefined
     [dobjstr, prepstr, iobjstr]
   else
     false
