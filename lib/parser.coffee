@@ -53,12 +53,7 @@ sanitize = (text) -> text.trim().replace /\s+/g, ' '
 specials = [
   { pattern: /^\/(?!\/)/, replacement: 'say ' },
   { pattern: /^\/\//, replacement: 'emote ' },
-  { pattern: /^\?/, replacement: 'eval ' },
-  { pattern: /\b(ass|tit|fag|vag)\b/g, replacement: '***' },
-  { pattern: /\b(shit|fuck|tits|cock|dick|boob|fags|cunt)\b/g, replacement: '****' },
-  { pattern: /\b(shits|fucks|bitch|penis|cocks|dicks|boobs|cunts)\b/g, replacement: '*****' },
-  { pattern: /\b(faggot|vagina)\b/g, replacement: '******' },
-  { pattern: /\b(faggots|bitches)\b/g, replacement: '*******' },
+  { pattern: /^\?/, replacement: 'eval ' }
 ]
 
 replaceSpecials = (text) ->
