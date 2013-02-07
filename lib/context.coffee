@@ -18,11 +18,12 @@ class Context
       c:          color
       $:          (id) => @contextify db.findById(id)
       $player:    if @player? then @contextify @player else @contextify db.nothing
-      $here:      if @player.location()? then @contextify @player.location() else @contextify db.nothing
+      $here:      if @player?.location()? then @contextify @player.location() else @contextify db.nothing
       players:    => db.players.map (player) => @contextify player
       browser:    mooBrowser
       parse:      parse
       match:      (search = '') => (db.mooMatch search, @player).map (o) => @contextify o
+      do_verb:    (object, verb, time, args = []) => @do_verb object, verb, time, args
 
     @context = _.extend @globals(), base
 
@@ -78,14 +79,27 @@ class Context
       ctext.$args = extraArgs
       output = vm.runInNewContext code, ctext
       if sendOutput
-        @player.send mooUtil.print output
+        @player?.send mooUtil.print output
       output
     catch error
       if stack
-        @player.send error.stack.split('\n').map((line) -> color line, 'inverse bold red').join('\n')
+        @player?.send error.stack.split('\n').map((line) -> color line, 'inverse bold red').join('\n')
       else
-        @player.send color error.toString(), 'inverse bold red'
-      util.log "#{@player.username} caused exception: #{error.toString()}"
+        @player?.send color error.toString(), 'inverse bold red'
+      util.log "#{@player?.username} caused exception: #{error.toString()}"
+
+  do_verb: (mooObject, verbName, time, args) ->
+    object = @decontextify mooObject
+    verb = object.findVerbByName verbName
+
+    setTimeout((->
+      newContext = new VerbContext(
+        null, object, null, null,
+        verbName, undefined, undefined, undefined, undefined, @memo)
+      newContext.run verb.code, args
+    ), time)
+
+    true
 
 class EvalContext extends Context
 
@@ -301,5 +315,14 @@ runVerb = (player, code, self, dobj = db.nothing, iobj = db.nothing, verbstr, ar
     player, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr)
   context.run code
 
+repeatVerb = (object, verbName, time) ->
+  setInterval((->
+    verb = object.findVerbByName verbName
+    if verb?
+      util.log 'tick'
+      runVerb db.nothing, verb.code, db.sys
+  ), time)
+
 exports.runVerb = runVerb
 exports.runEval = runEval
+exports.repeatVerb = repeatVerb
