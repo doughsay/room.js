@@ -66,7 +66,7 @@ class MooView
   # apply proper sizes to the input and the screen div
   setSizes: ->
     inputWidthDiff = @input.outerWidth() - @input.width()
-    @input.width($('.ui-layout-center').width() - inputWidthDiff)
+    @input.width($('.ui-layout-center').width() - inputWidthDiff - $('.prompt').outerWidth())
     @screen.height($('.ui-layout-center').height() - @input.outerHeight())
 
     # if an ace editor is present, call it's resize function
@@ -106,7 +106,7 @@ class MooView
   sendCommand: ->
     command = @command()
     if command
-      @addLine c '\n'+command, 'gray'
+      @addLine c '\n> '+command, 'gray'
       @history.unshift command
       if @history.length > @maxHistory()
         @history.pop()
