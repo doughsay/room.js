@@ -223,6 +223,10 @@ TODO
     * e.g. $here.exits['north'] = $exit.create 'north'
     * The above won't work because $here.exits is a getter that returns a new object, not the real underlying object
     * Don't really know how we can solve this...
+* Add 'events'
+    * allow players to schedule events that happen either once or periodically
+    * allow periodic events to be canceled
+    * persist events across server restarts
 
 ### Bugs
 
