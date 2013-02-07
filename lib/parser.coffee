@@ -54,11 +54,11 @@ specials = [
   { pattern: /^\/(?!\/)(\s*)/, replacement: 'say ' },
   { pattern: /^\/\/(\s*)/, replacement: 'emote ' },
   { pattern: /^\?(\s*)/, replacement: 'eval ' },
-  { pattern: /\b(ass|tit|fag|vag)\b/, replacement: '***' },
-  { pattern: /\b(shit|fuck|tits|cock|dick|boob|fags|cunt)\b/, replacement: '****' },
-  { pattern: /\b(shits|fucks|bitch|penis|cocks|dicks|boobs|cunts)\b/, replacement: '*****' },
-  { pattern: /\b(faggot|vagina)\b/, replacement: '******' },
-  { pattern: /\b(faggots|bitches)\b/, replacement: '*******' },
+  { pattern: /\b(ass|tit|fag|vag)\b/g, replacement: '***' },
+  { pattern: /\b(shit|fuck|tits|cock|dick|boob|fags|cunt)\b/g, replacement: '****' },
+  { pattern: /\b(shits|fucks|bitch|penis|cocks|dicks|boobs|cunts)\b/g, replacement: '*****' },
+  { pattern: /\b(faggot|vagina)\b/g, replacement: '******' },
+  { pattern: /\b(faggots|bitches)\b/g, replacement: '*******' },
 ]
 
 replaceSpecials = (text) ->
