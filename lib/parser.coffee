@@ -51,16 +51,20 @@ prepex = new RegExp '\\b(' + prepositions.join('|') + ')\\b'
 sanitize = (text) -> text.trim().replace /\s+/g, ' '
 
 specials = [
-  { pattern: /^\/(?!\/)(\s*)/, verb: 'say' },
-  { pattern: /^\/\/(\s*)/, verb: 'emote' },
-  { pattern: /^\?(\s*)/, verb: 'eval' },
+  { pattern: /^\/(?!\/)(\s*)/, replacement: 'say ' },
+  { pattern: /^\/\/(\s*)/, replacement: 'emote ' },
+  { pattern: /^\?(\s*)/, replacement: 'eval ' },
+  { pattern: /\b(ass|tit|fag|vag)\b/, replacement: '***' },
+  { pattern: /\b(shit|fuck|tits|cock|dick|boob|fags|cunt)\b/, replacement: '****' },
+  { pattern: /\b(shits|fucks|bitch|penis|cocks|dicks|boobs|cunts)\b/, replacement: '*****' },
+  { pattern: /\b(faggot|vagina)\b/, replacement: '******' },
+  { pattern: /\b(faggots|bitches)\b/, replacement: '*******' },
 ]
 
 replaceSpecials = (text) ->
   for special in specials
     if text.match special.pattern
-      text = text.replace special.pattern, special.verb + ' '
-      break
+      text = text.replace special.pattern, special.replacement
   text
 
 # return [first_word, rest]
