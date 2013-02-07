@@ -51,9 +51,9 @@ prepex = new RegExp '\\b(' + prepositions.join('|') + ')\\b'
 sanitize = (text) -> text.trim().replace /\s+/g, ' '
 
 specials = [
-  { pattern: /^\/(?!\/)(\s*)/, replacement: 'say ' },
-  { pattern: /^\/\/(\s*)/, replacement: 'emote ' },
-  { pattern: /^\?(\s*)/, replacement: 'eval ' },
+  { pattern: /^\/(?!\/)/, replacement: 'say ' },
+  { pattern: /^\/\//, replacement: 'emote ' },
+  { pattern: /^\?/, replacement: 'eval ' },
   { pattern: /\b(ass|tit|fag|vag)\b/g, replacement: '***' },
   { pattern: /\b(shit|fuck|tits|cock|dick|boob|fags|cunt)\b/g, replacement: '****' },
   { pattern: /\b(shits|fucks|bitch|penis|cocks|dicks|boobs|cunts)\b/g, replacement: '*****' },
