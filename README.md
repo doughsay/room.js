@@ -40,12 +40,12 @@ The only currently implemented verbs are:
 Programming
 -----------
 
-If you are signed in as a programmer, you can evaluate any CoffeeScript code by using the *eval* command (; shorthand).
+If you are signed in as a programmer, you can evaluate any CoffeeScript code by using the *eval* command (? shorthand).
 
     eval 2 + 2
     -> 4
 
-    ;Math.pow 2, 4
+    ?Math.pow 2, 4
     -> 16
 
 Eval Context

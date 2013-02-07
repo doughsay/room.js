@@ -51,9 +51,9 @@ prepex = new RegExp '\\b(' + prepositions.join('|') + ')\\b'
 sanitize = (text) -> text.trim().replace /\s+/g, ' '
 
 specials = [
-  { pattern: /^"(\s*)/, verb: 'say' },
-  { pattern: /^:(\s*)/, verb: 'emote' },
-  { pattern: /^;(\s*)/, verb: 'eval' },
+  { pattern: /^\/(?!\/)(\s*)/, verb: 'say' },
+  { pattern: /^\/\/(\s*)/, verb: 'emote' },
+  { pattern: /^\?(\s*)/, verb: 'eval' },
 ]
 
 replaceSpecials = (text) ->
