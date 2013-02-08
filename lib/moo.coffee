@@ -527,7 +527,7 @@ class MooObject
   # find a verb on this object (or it's parents) that matches the given name
   findVerbByName: (name) ->
     for verb in @verbs
-      if verb.name == name
+      if verb.matchesName name
         return verb
     if @parent_id?
       return @parent().findVerbByName name
