@@ -246,8 +246,8 @@ class ContextMooObject
         get: ->
           fn = ->
             newContext = new VerbContext(
-              context.player, object, context.context.dobj, context.context.iobj,
-              verb.name, context.context.argstr, context.context.dobjstr, context.context.prepstr, context.context.iobjstr, context.memo)
+              context.player, object, context.context.$dobj, context.context.$iobj,
+              verb.name, context.context.$argstr, context.context.$dobjstr, context.context.$prepstr, context.context.$iobjstr, context.memo)
             newContext.run verb.code, Array.prototype.slice.call(arguments)
           fn.verb = true
           fn
