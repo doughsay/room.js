@@ -45,7 +45,10 @@ print = (x, maxdepth, depth = 0, prefix = '', parents = []) ->
       c 'undefined', 'gray'
     when 'function'
       if x.verb
-        c '[MooVerb]', 'cyan'
+        if x.hidden
+          (c '[', 'cyan') + (c 'private', 'cyan bold') + (c ' MooVerb]', 'cyan')
+        else
+          c '[MooVerb]', 'cyan'
       else
         c '[Function]', 'cyan'
     when 'object'

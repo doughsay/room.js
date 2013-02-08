@@ -50,15 +50,17 @@ prepex = new RegExp '\\b(' + prepositions.join('|') + ')\\b'
 
 sanitize = (text) -> text.trim().replace /\s+/g, ' '
 
+specials = [
+  { pattern: /^\/(?!\/)/, replacement: 'say ' },
+  { pattern: /^\/\//, replacement: 'emote ' },
+  { pattern: /^`/, replacement: 'eval ' }
+]
+
 replaceSpecials = (text) ->
-  if text.indexOf('"') == 0
-    text.replace '"', 'say '
-  else if text.indexOf(':') == 0
-    text.replace ':', 'emote '
-  else if text.indexOf(';') == 0
-    text.replace ';', 'eval '
-  else
-    text
+  for special in specials
+    if text.match special.pattern
+      text = text.replace special.pattern, special.replacement
+  text
 
 # return [first_word, rest]
 chomp = (s) ->

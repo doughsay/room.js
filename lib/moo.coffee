@@ -147,17 +147,16 @@ class MooDB
 
   matchVerb: (player, command, objects) ->
     if (verb = player.findVerb command, objects)
-      verb: verb
-      self: player
+      self = player
     else if (verb = player.location()?.findVerb command, objects)
-      verb: verb
-      self: player.location()
+      self = player.location()
     else if (verb = objects.dobj?.findVerb command, objects)
-      verb: verb
-      self: objects.dobj
+      self = objects.dobj
     else if (verb = objects.iobj?.findVerb command, objects)
+      self = objects.iobj
+    if verb and not verb.hidden
       verb: verb
-      self: objects.iobj
+      self: self
     else
       null
 
@@ -436,13 +435,13 @@ class MooObject
         throw new Error "Invalid alias '#{alias}'"
     @aliases = (alias.toString() for alias in aliases)
 
-  addVerbPublic: (player, verbName, dobjarg, preparg, iobjarg) ->
+  addVerbPublic: (player, verbName, hidden, dobjarg, preparg, iobjarg) ->
     socket = connections.socketFor player
     verb = (@verbs.filter (v) -> v.name == verbName)[0]
     if verb?
       throw new Error "That verb already exists on this object."
     else
-      newVerb = {oid: @id, name: verbName, dobjarg: dobjarg, preparg: preparg, iobjarg: iobjarg, code: ''}
+      newVerb = {oid: @id, name: verbName, hidden: hidden, dobjarg: dobjarg, preparg: preparg, iobjarg: iobjarg, code: ''}
       socket.emit 'edit_verb', newVerb
       true
 
@@ -474,6 +473,7 @@ class MooObject
     for verb in @verbs
       if verb.name == newVerb.original_name
         verb.name = newVerb.name
+        verb.hidden = newVerb.hidden
         verb.dobjarg = newVerb.dobjarg
         verb.preparg = newVerb.preparg
         verb.iobjarg = newVerb.iobjarg
@@ -527,7 +527,7 @@ class MooObject
   # find a verb on this object (or it's parents) that matches the given name
   findVerbByName: (name) ->
     for verb in @verbs
-      if verb.name == name
+      if verb.matchesName name
         return verb
     if @parent_id?
       return @parent().findVerbByName name
@@ -597,6 +597,7 @@ class MooPlayer extends MooObject
 # A Moo Verb is a js function which runs in a sandboxed context
 class MooVerb
   # @name: String
+  # @hidden: Bool
   # @aliases: Array[String]
   # @dobjarg: String
   # @preparg: String
@@ -604,6 +605,7 @@ class MooVerb
   # @code: String
   constructor: (verb) ->
     @name = verb.name
+    @hidden = verb.hidden
     @dobjarg = verb.dobjarg
     @preparg = verb.preparg
     @iobjarg = verb.iobjarg
