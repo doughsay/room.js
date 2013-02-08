@@ -250,6 +250,7 @@ class ContextMooObject
               verb.name, context.context.$argstr, context.context.$dobjstr, context.context.$prepstr, context.context.$iobjstr, context.memo)
             newContext.run verb.code, Array.prototype.slice.call(arguments)
           fn.verb = true
+          fn.hidden = verb.hidden
           fn
         set: -> throw new Error "No setter for verb"
       )
@@ -273,8 +274,8 @@ class ContextMooObject
     @editVerb = (verbName) ->
       object.editVerb context.player, verbName
 
-    @addVerb = (verbName, dobjarg = 'none', preparg = 'none', iobjarg = 'none') ->
-      object.addVerbPublic context.player, verbName, dobjarg, preparg, iobjarg
+    @addVerb = (verbName, hidden = false, dobjarg = 'none', preparg = 'none', iobjarg = 'none') ->
+      object.addVerbPublic context.player, verbName, hidden, dobjarg, preparg, iobjarg
 
     @rmVerb = (verbName) ->
       if not object.inheritsVerb verbName

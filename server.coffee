@@ -209,6 +209,7 @@ ws_server.sockets.on 'connection', (socket) ->
       oid: if userVerb.oid? then userVerb.oid else null,
       original_name: userVerb.original_name || ""
       name: (userVerb.name || "").trim().split(' ').filter((s) -> s != '').map((s) -> s.trim().toLowerCase()).join ' '
+      hidden: userVerb.hidden || false
       dobjarg: userVerb.dobjarg || null
       preparg: userVerb.preparg || null
       iobjarg: userVerb.iobjarg || null

@@ -66,7 +66,7 @@ class MooView
   # apply proper sizes to the input and the screen div
   setSizes: ->
     inputWidthDiff = @input.outerWidth() - @input.width()
-    @input.width($('.ui-layout-center').width() - inputWidthDiff)
+    @input.width($('.ui-layout-center').width() - inputWidthDiff - $('.prompt').outerWidth())
     @screen.height($('.ui-layout-center').height() - @input.outerHeight())
 
     # if an ace editor is present, call it's resize function
@@ -79,12 +79,15 @@ class MooView
       editor = $ '.editor'
       actions = $ '.editor .actions'
       widthToSplit = editor.width() - actions.width()
-      input = editor.find 'input'
+      input = editor.children 'input'
       inputWidthDiff = input.outerWidth() - input.width() + 2
-      select = editor.find 'select'
+      select = editor.children 'select'
       selectWidthDiff = select.outerWidth() - select.width() + 2
-      input.width (widthToSplit / 4) - inputWidthDiff
-      select.width (widthToSplit / 4) - selectWidthDiff
+      label = editor.children 'label'
+      labelWidthDiff = label.outerWidth() - label.width() + 2
+      input.width (widthToSplit / 5) - inputWidthDiff
+      select.width (widthToSplit / 5) - selectWidthDiff
+      label.width (widthToSplit / 5) - labelWidthDiff
 
   # scroll the screen to the bottom
   scrollToBottom: ->
@@ -106,7 +109,7 @@ class MooView
   sendCommand: ->
     command = @command()
     if command
-      @addLine c '\n'+command, 'gray'
+      @addLine c '\n> '+command, 'gray'
       @history.unshift command
       if @history.length > @maxHistory()
         @history.pop()
