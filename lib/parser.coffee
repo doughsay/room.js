@@ -53,7 +53,7 @@ sanitize = (text) -> text.trim().replace /\s+/g, ' '
 specials = [
   { pattern: /^\/(?!\/)/, replacement: 'say ' },
   { pattern: /^\/\//, replacement: 'emote ' },
-  { pattern: /^\?/, replacement: 'eval ' }
+  { pattern: /^`/, replacement: 'eval ' }
 ]
 
 replaceSpecials = (text) ->
