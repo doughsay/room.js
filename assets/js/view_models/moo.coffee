@@ -79,12 +79,15 @@ class MooView
       editor = $ '.editor'
       actions = $ '.editor .actions'
       widthToSplit = editor.width() - actions.width()
-      input = editor.find 'input'
+      input = editor.children 'input'
       inputWidthDiff = input.outerWidth() - input.width() + 2
-      select = editor.find 'select'
+      select = editor.children 'select'
       selectWidthDiff = select.outerWidth() - select.width() + 2
-      input.width (widthToSplit / 4) - inputWidthDiff
-      select.width (widthToSplit / 4) - selectWidthDiff
+      div = editor.children 'div.privacy'
+      divWidthDiff = div.outerWidth() - div.width() + 2
+      input.width (widthToSplit / 5) - inputWidthDiff
+      select.width (widthToSplit / 5) - selectWidthDiff
+      div.width (widthToSplit / 5) - divWidthDiff
 
   # scroll the screen to the bottom
   scrollToBottom: ->

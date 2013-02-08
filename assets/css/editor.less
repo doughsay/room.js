@@ -6,7 +6,7 @@
 }
 
 .editor {
-  input {
+   > input {
     margin: 0;
     margin-right: 2px;
     padding: 4px;
@@ -21,7 +21,33 @@
     &:focus { border-color: @light_blue; }
   }
 
-  select {
+  > div.privacy {
+    margin: 0;
+    margin-right: 2px;
+    padding: 2px 4px 6px 4px;
+    height: 15px;
+    border: 2px solid @gray;
+    color: @red;
+    background-color: @black;
+    border-radius: 0;
+    text-shadow: 1px 1px 1px black;
+
+    display: inline-block;
+    vertical-align: top;
+
+    label {
+      font-family: 'Source Code Pro', sans-serif;
+      font-size: 12pt;
+      display: inline-block;
+    }
+
+    input {
+      margin: 0;
+      margin: 6px;
+    }
+  }
+
+  > select {
     margin: 0;
     margin-right: 2px;
     padding: 0;

@@ -259,8 +259,8 @@ class ContextMooObject
     @editVerb = (verbName) ->
       object.editVerb context.player, verbName
 
-    @addVerb = (verbName, dobjarg = 'none', preparg = 'none', iobjarg = 'none') ->
-      object.addVerbPublic context.player, verbName, dobjarg, preparg, iobjarg
+    @addVerb = (verbName, hidden = false, dobjarg = 'none', preparg = 'none', iobjarg = 'none') ->
+      object.addVerbPublic context.player, hidden, verbName, dobjarg, preparg, iobjarg
 
     @rmVerb = (verbName) ->
       if not object.inheritsVerb verbName
