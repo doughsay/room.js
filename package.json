@@ -11,6 +11,18 @@
     "underscore": "*",
     "mincer": "*",
     "should": "*",
-    "mocha": "*"
-  }
+    "mocha": "*",
+    "connect": "*",
+    "buffer-crc32": "*",
+    "js-methods": "*",
+    "debug": "*",
+    "fresh": "*",
+    "range-parser": "*",
+    "cookie-signature": "*",
+    "cookie": "*",
+    "send": "*",
+    "socket": "*",
+    "socket.io-client": "*"
+  },
+  "engine": "node >= 0.6.0"
 }
