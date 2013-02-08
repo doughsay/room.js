@@ -83,11 +83,11 @@ class MooView
       inputWidthDiff = input.outerWidth() - input.width() + 2
       select = editor.children 'select'
       selectWidthDiff = select.outerWidth() - select.width() + 2
-      div = editor.children 'div.privacy'
-      divWidthDiff = div.outerWidth() - div.width() + 2
+      label = editor.children 'label'
+      labelWidthDiff = label.outerWidth() - label.width() + 2
       input.width (widthToSplit / 5) - inputWidthDiff
       select.width (widthToSplit / 5) - selectWidthDiff
-      div.width (widthToSplit / 5) - divWidthDiff
+      label.width (widthToSplit / 5) - labelWidthDiff
 
   # scroll the screen to the bottom
   scrollToBottom: ->

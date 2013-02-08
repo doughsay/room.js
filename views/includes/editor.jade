@@ -1,7 +1,7 @@
 .editor(data-bind='with: loadedVerb')
   input.name(type='text', data-bind='value: name')
-  .privacy
-    label(for="hidden") hidden 
+  label.privacy
+    | hidden:
     input#hidden.hidden(type='checkbox', data-bind='checked: hidden')
   select.dobjarg(data-bind='value: dobjarg')
     option none
