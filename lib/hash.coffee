@@ -1,3 +1,5 @@
+# Generate sha256 hashes of password strings
+
 crypto = require 'crypto'
 
 exports.phash = (s) ->

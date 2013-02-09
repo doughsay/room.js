@@ -9,10 +9,10 @@
 
 #= require view_models/verb
 #= require view_models/modal_form
-#= require view_models/moo
+#= require view_models/client
 
 #= require toasty
 
 # on dom ready, create the view model and apply the knockout bindings
 $ ->
-  ko.applyBindings new MooView $('body'), $('.screen'), $('.command input')
+  ko.applyBindings new ClientView $('body'), $('.screen'), $('.command input')

@@ -1,17 +1,23 @@
+# Some usful utlity functions.
+
 c = require('./color').color
 
+# replace newlines in a string with '\n'
 safeString = (s) ->
   s.replace /\n/g, '\\n'
 
+# truncate a string to a specified length
 truncate = (s, length = 25) ->
   if s.length <= 25
     s
   else
     s[0..length] + '...'
 
+# helper for pretty print function
 printHelper = (x, maxdepth = 2) ->
   print x, maxdepth
 
+# helper functions for timing code execution
 tstart = -> process.hrtime()
 tend = (since) -> ((process.hrtime(since)[1] / 1000000).toFixed 2) + 'ms'
 
@@ -46,9 +52,9 @@ print = (x, maxdepth, depth = 0, prefix = '', parents = []) ->
     when 'function'
       if x.verb
         if x.hidden
-          (c '[', 'cyan') + (c 'private', 'cyan bold') + (c ' MooVerb]', 'cyan')
+          (c '[', 'cyan') + (c 'Private', 'cyan bold') + (c ' Verb]', 'cyan')
         else
-          c '[MooVerb]', 'cyan'
+          c '[Verb]', 'cyan'
       else
         c '[Function]', 'cyan'
     when 'object'
@@ -91,12 +97,14 @@ print = (x, maxdepth, depth = 0, prefix = '', parents = []) ->
 
   return indent + prefix + output
 
+# map for hashes.  applies fn to all values in a hash.
 hmap = (h, fn) ->
   result = {}
   for key, value of h
     result[key] = fn value
   result
 
+# map for hashes including their keys.  applies fn to all key/values in a hash.
 hkmap = (h, fn) ->
   result = {}
   for key, value of h

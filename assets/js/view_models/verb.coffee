@@ -1,3 +1,4 @@
+# Knockout.js view model for the room.js verb editor
 class VerbView
   constructor: (verb) ->
     @oid = verb.oid

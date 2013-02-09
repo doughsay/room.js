@@ -153,7 +153,7 @@ Calling methods on objects is simple:
 
     $player.addProp(arg1, arg2)
 
-These methods are available on moo objects:
+These methods are available on room.js objects:
 
 ### `addProp(key, value)`
 

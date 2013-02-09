@@ -1,4 +1,5 @@
-class MooView
+# Knockout.js view model for the room.js client
+class ClientView
 
   # apply styles to a string using a span
   c = (str, styles) ->

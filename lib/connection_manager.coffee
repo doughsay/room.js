@@ -1,3 +1,7 @@
+# This module keeps track of two maps:
+# sockets -> players
+# players -> sockets
+
 util = require 'util'
 
 sockets = {}
