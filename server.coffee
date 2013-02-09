@@ -295,10 +295,6 @@ do ->
   if verb?
     context.runVerb db.nothing, verb.code, db.sys
 
-# server tick
-do ->
-  context.repeatVerb db.sys, 'tick', 1000
-
 process.on 'SIGINT', -> process.exit()
 process.on 'SIGTERM', -> process.exit()
 process.on 'exit', ->

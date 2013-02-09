@@ -316,14 +316,5 @@ runVerb = (player, code, self, dobj = db.nothing, iobj = db.nothing, verbstr, ar
     player, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr)
   context.run code
 
-repeatVerb = (object, verbName, time) ->
-  setInterval((->
-    verb = object.findVerbByName verbName
-    if verb?
-      util.log 'tick'
-      runVerb db.nothing, verb.code, db.sys
-  ), time)
-
 exports.runVerb = runVerb
 exports.runEval = runEval
-exports.repeatVerb = repeatVerb
