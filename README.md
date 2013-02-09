@@ -5,7 +5,7 @@ A [MOO](http://en.wikipedia.org/wiki/MOO) written in coffeescript running on nod
 
 MOO stands for Mud, Object Oriented. One of the original MOOs was [LambdaMoo](http://en.wikipedia.org/wiki/LambdaMOO), developed at Xerox PARC.
 
-The basic idea is to have a MUD which (privelaged) players can extend while in game.  You can create and edit objects, locations, and code from inside the MOO.
+The basic idea is to have a MUD which (privileged) players can extend while in game.  You can create and edit objects, locations, and code from inside the MOO.
 
 room.js is different from other MOOs because:
 
@@ -16,13 +16,20 @@ room.js is different from other MOOs because:
 Running the Server
 ------------------
 
-Assuming you have a working node.js environment: clone this repo, npm install, copy the example db, and launch the server:
+Assuming you already have git and node.js >= v0.7.6:
 
+    # Get the code
     git clone git@github.com:doughsay/room.js.git
     cd room.js
+
+    # Install supporting libraries
     npm install
+
+    # Use the starter database
     cp db.example.json db.json
-    ./server.coffee
+
+    # Launch the server
+    node_modules/coffee-script/bin/coffee server.coffee
 
 Connect to it using a web browser by going to [http://localhost:8888/](http://localhost:8888/).
 
@@ -40,12 +47,12 @@ The only currently implemented verbs are:
 Programming
 -----------
 
-If you are signed in as a programmer, you can evaluate any CoffeeScript code by using the *eval* command (; shorthand).
+If you are signed in as a programmer, you can evaluate any CoffeeScript code by using the *eval* command (backtick '`' in shorthand).
 
     eval 2 + 2
     -> 4
 
-    ;Math.pow 2, 4
+    `Math.pow 2, 4
     -> 16
 
 Eval Context
@@ -146,7 +153,7 @@ Calling methods on objects is simple:
 
     $player.addProp(arg1, arg2)
 
-These methods are available on moo objects:
+These methods are available on room.js objects:
 
 ### `addProp(key, value)`
 
@@ -223,6 +230,11 @@ TODO
     * e.g. $here.exits['north'] = $exit.create 'north'
     * The above won't work because $here.exits is a getter that returns a new object, not the real underlying object
     * Don't really know how we can solve this...
+* Add 'events'
+    * allow players to schedule events that happen either once or periodically
+    * allow periodic events to be canceled
+    * persist events across server restarts
+* Don't allow sending of html tags
 
 ### Bugs
 
@@ -237,6 +249,7 @@ TODO
 * Writing moo code with infinite loops.
     * Can't solve this right now as the vm module does not allow limiting execution of code.
     * There are some github issue and pull requests out there for this.
+    * See here: (https://github.com/joyent/node/pull/4115)[https://github.com/joyent/node/pull/4115]
     * Note: doesn't actually crash the server.  Probably just overheats it and melts it...
 * Removing an object that has children.
 

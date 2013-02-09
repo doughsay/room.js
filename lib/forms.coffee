@@ -1,3 +1,5 @@
+# Form descriptors for the room.js client
+
 login = ->
   event: 'login'
   title: 'Login'

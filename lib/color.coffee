@@ -1,5 +1,5 @@
 # Not currently used.  Could be used to throw errors
-# if bad styles are sent.
+# if unrecognized styles are sent.
 allowed_styles = [
   'bold',
   'italic',
@@ -16,5 +16,6 @@ allowed_styles = [
   'yellow'
 ]
 
+# Colorize/stylize a string by wrapping it in a span and applying color and style classes.
 exports.color = (str, styles) ->
   "<span class='#{styles}'>#{str}</span>"
