@@ -234,6 +234,7 @@ TODO
     * allow players to schedule events that happen either once or periodically
     * allow periodic events to be canceled
     * persist events across server restarts
+* Don't allow sending of html tags
 
 ### Bugs
 
@@ -248,6 +249,7 @@ TODO
 * Writing moo code with infinite loops.
     * Can't solve this right now as the vm module does not allow limiting execution of code.
     * There are some github issue and pull requests out there for this.
+    * See here: (https://github.com/joyent/node/pull/4115)[https://github.com/joyent/node/pull/4115]
     * Note: doesn't actually crash the server.  Probably just overheats it and melts it...
 * Removing an object that has children.
 
