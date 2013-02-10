@@ -28,10 +28,10 @@ class RoomJsSocket
   # or calling the `disconnect` method of the socket.
   onDisconnect: =>
     # remove the socket from our list of logged in players, if it exists
+    player = connections.playerFor @socket
     connections.remove @socket
 
     # if there was a player logged in on the socket, call the `player_disconnected` verb on $sys
-    player = connections.playerFor @socket
     if player?
       verb = @db.sys.findVerbByName 'player_disconnected'
       if verb?
