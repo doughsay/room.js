@@ -139,7 +139,7 @@ class RoomJsSocket
       password: userData.password || ""
       password2: userData.password2 || ""
 
-    validate = (formData) ->
+    validate = (formData) =>
       formDescriptor = formDescriptors.createAccount()
       formDescriptor.inputs[0].value = formData.name
       formDescriptor.inputs[1].value = formData.username
@@ -158,7 +158,7 @@ class RoomJsSocket
         valid = false
         formDescriptor.inputs[1].error = "Not long enough"
 
-      if not formData.username.match /^[_a-zA-Z0-9]+$/
+      if not formData.username.match /^[_a-zA-Z0-9]*$/
         valid = false
         formDescriptor.inputs[1].error = "Alphanumeric only"
 

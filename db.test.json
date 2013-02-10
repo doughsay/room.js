@@ -1,0 +1,405 @@
+{
+  "0": {
+    "id": 0,
+    "parent_id": null,
+    "name": "System Object",
+    "aliases": [],
+    "location_id": null,
+    "contents_ids": [],
+    "player": false,
+    "programmer": false,
+    "properties": [
+      {
+        "key": "failed_match",
+        "value": {
+          "_mooObject": -3
+        }
+      },
+      {
+        "key": "ambiguous_match",
+        "value": {
+          "_mooObject": -2
+        }
+      },
+      {
+        "key": "nothing",
+        "value": {
+          "_mooObject": -1
+        }
+      },
+      {
+        "key": "sys",
+        "value": {
+          "_mooObject": 0
+        }
+      },
+      {
+        "key": "root",
+        "value": {
+          "_mooObject": 1
+        }
+      },
+      {
+        "key": "player_class",
+        "value": {
+          "_mooObject": 2
+        }
+      },
+      {
+        "key": "room",
+        "value": {
+          "_mooObject": 4
+        }
+      },
+      {
+        "key": "thing",
+        "value": {
+          "_mooObject": 5
+        }
+      },
+      {
+        "key": "exit",
+        "value": {
+          "_mooObject": 8
+        }
+      }
+    ],
+    "verbs": [
+      {
+        "name": "server_started",
+        "dobjarg": "none",
+        "preparg": "none",
+        "iobjarg": "none",
+        "code": "# TODO"
+      },
+      {
+        "name": "player_created",
+        "dobjarg": "none",
+        "preparg": "none",
+        "iobjarg": "none",
+        "code": "$player.parent = $player_class\n$sys.player_connected()"
+      },
+      {
+        "name": "player_connected",
+        "dobjarg": "none",
+        "preparg": "none",
+        "iobjarg": "none",
+        "code": "$player.location = $(6)\n$player.send c \"Welcome, #{$player.name}!\", 'blue bold'\n$player.location.player_connected?()"
+      },
+      {
+        "name": "player_disconnected",
+        "dobjarg": "none",
+        "preparg": "none",
+        "iobjarg": "none",
+        "code": "$player.location.player_disconnected?()\n$player.location = null"
+      }
+    ]
+  },
+  "1": {
+    "id": 1,
+    "parent_id": null,
+    "name": "Root Class",
+    "aliases": [],
+    "location_id": null,
+    "contents_ids": [],
+    "player": false,
+    "programmer": false,
+    "properties": [],
+    "verbs": []
+  },
+  "2": {
+    "id": 2,
+    "parent_id": 1,
+    "name": "Player Class",
+    "aliases": [
+      "player"
+    ],
+    "location_id": null,
+    "contents_ids": [],
+    "player": false,
+    "programmer": false,
+    "properties": [],
+    "verbs": []
+  },
+  "3": {
+    "id": 3,
+    "parent_id": 2,
+    "name": "Gandalf",
+    "aliases": [],
+    "location_id": null,
+    "contents_ids": [],
+    "player": true,
+    "programmer": true,
+    "properties": [],
+    "verbs": [],
+    "username": "root",
+    "password": "a075d17f3d453073853f813838c15b8023b8c487038436354fe599c3942e1f95"
+  },
+  "4": {
+    "id": 4,
+    "parent_id": 1,
+    "name": "Room Class",
+    "aliases": [
+      "room"
+    ],
+    "location_id": null,
+    "contents_ids": [],
+    "player": false,
+    "programmer": false,
+    "properties": [
+      {
+        "key": "description",
+        "value": "A generic room."
+      }
+    ],
+    "verbs": [
+      {
+        "name": "look",
+        "dobjarg": "none",
+        "preparg": "none",
+        "iobjarg": "none",
+        "code": "output = [c $here.name, 'yellow bold']\noutput.push $here.description\noutput.push c 'You see here:', 'cyan'\nfor item in $here.contents\n  output.push c item.name, 'cyan'\n$player.send output.join '\\n'"
+      },
+      {
+        "name": "say",
+        "dobjarg": "any",
+        "preparg": "any",
+        "iobjarg": "any",
+        "code": "$player.send (c 'You say \\\"', 'gray') + \"#{$argstr}\" + c \"\\\"\", 'gray'\n$player.broadcast (c \"#{$player.name} says \\\"\", 'gray') + \"#{$argstr}\" + c \"\\\"\", 'gray'"
+      },
+      {
+        "name": "huh",
+        "dobjarg": "none",
+        "preparg": "none",
+        "iobjarg": "none",
+        "code": "$player.send c 'I don\\'t understand that.', 'gray'"
+      },
+      {
+        "name": "player_connected",
+        "dobjarg": "none",
+        "preparg": "none",
+        "iobjarg": "none",
+        "code": "$player.broadcast \"#{$player.name} pops into existence.\""
+      },
+      {
+        "name": "player_disconnected",
+        "dobjarg": "none",
+        "preparg": "none",
+        "iobjarg": "none",
+        "code": "$player.broadcast \"#{$player.name} fades into oblivion.\""
+      },
+      {
+        "name": "go",
+        "dobjarg": "any",
+        "preparg": "none",
+        "iobjarg": "none",
+        "code": "for direction, exit of $this.exits\n  if direction == $argstr\n    exit.invoke()\n    found = true\nif not found\n  $player.send \"You can't go in that direction.\""
+      },
+      {
+        "name": "player_left",
+        "dobjarg": "none",
+        "preparg": "none",
+        "iobjarg": "none",
+        "code": "direction = $args[0]\n$player.send \"You go #{direction}.\"\n$player.broadcast \"#{$player.name} goes #{direction}.\""
+      },
+      {
+        "name": "player_arrived",
+        "dobjarg": "none",
+        "preparg": "none",
+        "iobjarg": "none",
+        "code": "$player.location.look()\n$player.broadcast \"#{$player.name} arrives.\""
+      },
+      {
+        "name": "emote",
+        "dobjarg": "any",
+        "preparg": "any",
+        "iobjarg": "any",
+        "code": "msg = [c('*', 'bold magenta'), $player.name, $argstr].join ' '\n$player.send msg\n$player.broadcast msg"
+      }
+    ]
+  },
+  "5": {
+    "id": 5,
+    "parent_id": 1,
+    "name": "Thing Class",
+    "aliases": [
+      "item"
+    ],
+    "location_id": null,
+    "contents_ids": [],
+    "player": false,
+    "programmer": false,
+    "properties": [
+      {
+        "key": "description",
+        "value": "A generic item."
+      }
+    ],
+    "verbs": [
+      {
+        "name": "examine",
+        "dobjarg": "this",
+        "preparg": "none",
+        "iobjarg": "none",
+        "code": "$player.send $this.description"
+      },
+      {
+        "name": "get",
+        "dobjarg": "this",
+        "preparg": "none",
+        "iobjarg": "none",
+        "code": "if $this.location == $player\n  $player.send \"You're already holding the #{$this.name}.\"\nelse\n  $this.location = $player\n  $player.send \"You pick up the #{$this.name}.\"\n  $player.broadcast \"#{$player.name} picks up the #{$this.name}.\""
+      },
+      {
+        "name": "drop",
+        "dobjarg": "this",
+        "preparg": "none",
+        "iobjarg": "none",
+        "code": "if $this.location == $player\n  $this.location = $here\n  $player.send \"You drop the #{$this.name}.\"\n  $player.broadcast \"#{$player.name} drops the #{$this.name}.\"\nelse\n  $player.send \"You're not holding the #{$this.name}.\""
+      }
+    ]
+  },
+  "6": {
+    "id": 6,
+    "parent_id": 4,
+    "name": "A forest clearing",
+    "aliases": [
+      "clearing"
+    ],
+    "location_id": null,
+    "contents_ids": [
+      7
+    ],
+    "player": false,
+    "programmer": false,
+    "properties": [
+      {
+        "key": "description",
+        "value": "The forest thins out here a bit. To the north you can see the entrance to a cave through the bushes."
+      },
+      {
+        "key": "exits",
+        "value": {
+          "north": {
+            "_mooObject": 9
+          }
+        }
+      },
+      {
+        "key": "description",
+        "value": "The forest thins out here a bit. To the north you can see the entrance to a cave through the bushes."
+      }
+    ],
+    "verbs": []
+  },
+  "7": {
+    "id": 7,
+    "parent_id": 5,
+    "name": "wooden sword",
+    "aliases": [
+      "sword"
+    ],
+    "location_id": 6,
+    "contents_ids": [],
+    "player": false,
+    "programmer": false,
+    "properties": [
+      {
+        "key": "description",
+        "value": "A simple wooden sword."
+      }
+    ],
+    "verbs": [
+      {
+        "name": "swing",
+        "dobjarg": "this",
+        "preparg": "none",
+        "iobjarg": "none",
+        "code": "if $this.location == $player\n  $player.send \"You swing the wooden sword around. You look a bit silly.\"\n  $player.broadcast \"#{$player.name} swings a wooden sword around.\"\nelse\n  $player.send \"You're not holding the sword.\""
+      }
+    ]
+  },
+  "8": {
+    "id": 8,
+    "parent_id": 1,
+    "name": "Exit Class",
+    "aliases": [],
+    "location_id": null,
+    "contents_ids": [],
+    "player": false,
+    "programmer": false,
+    "properties": [],
+    "verbs": [
+      {
+        "name": "invoke",
+        "dobjarg": "none",
+        "preparg": "none",
+        "iobjarg": "none",
+        "code": "direction = $this.name\ndestination = $this.destination\n\n$here.player_left?(direction)\n\n$player.location = destination\n\ndestination.player_arrived?(direction)"
+      }
+    ]
+  },
+  "9": {
+    "id": 9,
+    "parent_id": 8,
+    "name": "north",
+    "aliases": [],
+    "location_id": null,
+    "contents_ids": [],
+    "player": false,
+    "programmer": false,
+    "properties": [
+      {
+        "key": "destination",
+        "value": {
+          "_mooObject": 10
+        }
+      }
+    ],
+    "verbs": []
+  },
+  "10": {
+    "id": 10,
+    "parent_id": 4,
+    "name": "A Cave",
+    "aliases": [],
+    "location_id": null,
+    "contents_ids": [],
+    "player": false,
+    "programmer": false,
+    "properties": [
+      {
+        "key": "description",
+        "value": "This is a dark and slightly damp cave. You can barely see anything except the light coming from the opening to the south."
+      },
+      {
+        "key": "exits",
+        "value": {
+          "south": {
+            "_mooObject": 11
+          }
+        }
+      }
+    ],
+    "verbs": []
+  },
+  "11": {
+    "id": 11,
+    "parent_id": 8,
+    "name": "south",
+    "aliases": [],
+    "location_id": null,
+    "contents_ids": [],
+    "player": false,
+    "programmer": false,
+    "properties": [
+      {
+        "key": "destination",
+        "value": {
+          "_mooObject": 6
+        }
+      }
+    ],
+    "verbs": []
+  }
+}

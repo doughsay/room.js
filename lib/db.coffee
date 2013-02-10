@@ -24,7 +24,7 @@ exports.RoomJsDb = class
   objects: {}
   players: []
 
-  constructor: (@filename) ->
+  constructor: (@filename, @quiet = false) ->
     startTime = mooUtil.tstart()
     for id, dbObject of JSON.parse fs.readFileSync @filename
       if dbObject.player
@@ -35,7 +35,7 @@ exports.RoomJsDb = class
       if newMooObj.player
         @players.push newMooObj
     @specials()
-    util.log "#{@filename} loaded in #{mooUtil.tend startTime}"
+    util.log "#{@filename} loaded in #{mooUtil.tend startTime}" if not @quiet
 
     @saveInterval = setInterval @save, 5*60*1000
 
@@ -84,13 +84,13 @@ exports.RoomJsDb = class
       throw err if err
       fs.rename '_' + @filename, @filename, (err) =>
         throw err if err
-        util.log "#{@filename} saved in #{mooUtil.tend startTime}"
+        util.log "#{@filename} saved in #{mooUtil.tend startTime}" if not @quiet
 
   saveSync: ->
     startTime = mooUtil.tstart()
     fs.writeFileSync '_' + @filename, @serialize()
     fs.renameSync '_' + @filename, @filename
-    util.log "#{@filename} saved in #{mooUtil.tend startTime}"
+    util.log "#{@filename} saved in #{mooUtil.tend startTime}" if not @quiet
 
   serialize: ->
     # don't safe the special objects

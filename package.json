@@ -6,6 +6,7 @@
     "express": "*",
     "jade": "*",
     "socket.io": "*",
+    "socket.io-client": "*",
     "coffee-script": "*",
     "less": "*",
     "underscore": "*",
