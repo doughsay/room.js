@@ -7,7 +7,7 @@ util = require 'util'
 # It sets up the http server and responds to http requests by sending the client code.
 exports.RoomJsWebServer = class
 
-  constructor: (@port) ->
+  constructor: (@port, @quiet = false) ->
     environment = new Mincer.Environment()
     environment.appendPath 'assets/js'
     environment.appendPath 'assets/css'
@@ -29,8 +29,8 @@ exports.RoomJsWebServer = class
     xp.get '/', (req, res) ->
       res.render 'index'
 
-    @http_server = http.createServer(xp).listen xp.get('port'), ->
-      util.log "room.js http server listening on port " + xp.get 'port'
+    @http_server = http.createServer(xp).listen xp.get('port'), =>
+      util.log "room.js http server listening on port " + xp.get 'port' if not @quiet
 
   # return the reference to the http server
   getHttpServer: ->

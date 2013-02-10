@@ -1,12 +1,14 @@
 MOCHA_OPTS= --compilers coffee:coffee-script
 REPORTER = spec
 
-test: test-unit test-cov
+test: test-unit
 
 test-unit:
+	@cp db.test.json _db.test.json
 	@NODE_ENV=test ./node_modules/.bin/mocha \
 		--reporter $(REPORTER) \
 		$(MOCHA_OPTS)
+	@rm _db.test.json
 
 test-nyan:
 	@NODE_ENV=test ./node_modules/.bin/mocha \
