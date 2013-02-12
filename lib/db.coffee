@@ -42,7 +42,7 @@ exports.RoomJsDb = class
     # call server started verb
     verb = @sys.findVerbByName 'server_started'
     if verb?
-      context.runVerb @, @nothing, verb.code, @sys
+      context.runVerb @, @nothing, verb, @sys
 
   exit: ->
     for player in @players

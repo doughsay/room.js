@@ -71,9 +71,9 @@ class Context
   decontextify: (contextObj) ->
     @db.findById contextObj?.id
 
-  run: (coffeeCode, extraArgs = [], sendOutput = false, stack = false) ->
+  run: (verb, extraArgs = [], sendOutput = false, stack = false) ->
     try
-      code = coffee.compile coffeeCode, bare: true
+      code = coffee.compile verb.code, bare: true
       ctext = _.clone @context
       ctext.$args = extraArgs
       output = vm.runInNewContext code, ctext
@@ -81,11 +81,14 @@ class Context
         @player?.send mooUtil.print output
       output
     catch error
+      verbName = if @context.$this? then [@context.$this.toString()] else []
+      verbName.push verb.name
+      verbName = verbName.join '.'
       if stack
         @player?.send error.stack.split('\n').map((line) -> color line, 'inverse bold red').join('\n')
       else
-        @player?.send color error.toString(), 'inverse bold red'
-      util.log "#{@player?.username} caused exception: #{error.toString()}"
+        @player?.send color "#{error.toString()} in '#{verbName}'", 'inverse bold red'
+      util.log "#{@player?.username} caused exception in '#{verbName}': #{error.toString()}"
 
   do_verb: (mooObject, verbName, time, args) ->
     object = @decontextify mooObject
@@ -95,7 +98,7 @@ class Context
       newContext = new VerbContext(
         @db, null, object, null, null,
         verbName, undefined, undefined, undefined, undefined, @memo)
-      newContext.run verb.code, args
+      newContext.run verb, args
     ), time)
 
     true
@@ -115,7 +118,10 @@ class EvalContext extends Context
                             true
 
   run: (coffeeCode, extraArgs = []) ->
-    super coffeeCode, extraArgs, true
+    verbSpec =
+      code: coffeeCode
+      name: 'eval'
+    super verbSpec, extraArgs, true
 
 class VerbContext extends Context
 
@@ -132,10 +138,11 @@ class VerbContext extends Context
     @context.$iobjstr = iobjstr
     @context.rm       = (id) => @db.rm id
 
-  run: (coffeeCode, extraArgs = []) ->
-    wrappedCoffeeCode = 'do($args) ->\n' +
-      coffeeCode.split('\n').map((line) -> '  ' + line).join('\n')
-    super wrappedCoffeeCode, extraArgs
+  run: (verb, extraArgs = []) ->
+    verbSpec =
+      code: 'do($args) ->\n' + verb.code.split('\n').map((line) -> '  ' + line).join('\n')
+      name: verb.name
+    super verbSpec, extraArgs
 
 # A ContextRoomJsObject is what's exposed in the verb and eval contexts
 class ContextRoomJsObject
@@ -247,7 +254,7 @@ class ContextRoomJsObject
             newContext = new VerbContext(
               context.db, context.player, object, context.context.$dobj, context.context.$iobj,
               verb.name, context.context.$argstr, context.context.$dobjstr, context.context.$prepstr, context.context.$iobjstr, context.memo)
-            newContext.run verb.code, Array.prototype.slice.call(arguments)
+            newContext.run verb, Array.prototype.slice.call(arguments)
           fn.verb = true
           fn.hidden = verb.hidden
           fn
@@ -307,10 +314,10 @@ class ContextRoomJsObject
 runEval = (db, player, code) ->
   (new EvalContext db, player).run code
 
-runVerb = (db, player, code, self, dobj = db.nothing, iobj = db.nothing, verbstr, argstr, dobjstr, prepstr, iobjstr) ->
+runVerb = (db, player, verb, self, dobj = db.nothing, iobj = db.nothing, verbstr, argstr, dobjstr, prepstr, iobjstr) ->
   context = new VerbContext(
     db, player, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr)
-  context.run code
+  context.run verb
 
 exports.runVerb = runVerb
 exports.runEval = runEval
