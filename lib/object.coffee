@@ -3,6 +3,7 @@ _ = require 'underscore'
 connections = require './connection_manager'
 
 RoomJsVerb = require('./verb').RoomJsVerb
+RoomJsCronJob = require './cronjob'
 
 # some constants
 NO_MATCH = 0
@@ -34,6 +35,9 @@ exports.RoomJsObject = class
 
     @verbs = dbObject.verbs.map (verb) =>
       new RoomJsVerb verb, @db
+
+    cronjobs = dbObject.crontab or []
+    @crontab = cronjobs.map (job) => new RoomJsCronJob @, job
 
   parent: ->
     @db.findById @parent_id

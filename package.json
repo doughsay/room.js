@@ -12,6 +12,7 @@
     "underscore": "*",
     "mincer": "*",
     "should": "*",
-    "mocha": "*"
+    "mocha": "*",
+    "cron": "*"
   }
 }
