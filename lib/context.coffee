@@ -77,18 +77,26 @@ class Context
       ctext = _.clone @context
       ctext.$args = extraArgs
       output = vm.runInNewContext code, ctext
-      if sendOutput
-        @player?.send mooUtil.print output
+      if sendOutput and @player isnt @db.nothing
+        @player.send mooUtil.print output
       output
     catch error
-      verbName = if @context.$this? then [@context.$this.toString()] else []
-      verbName.push verb.name
-      verbName = verbName.join '.'
-      if stack
-        @player?.send error.stack.split('\n').map((line) -> color line, 'inverse bold red').join('\n')
-      else
-        @player?.send color "#{error.toString()} in '#{verbName}'", 'inverse bold red'
-      util.log "#{@player?.username} caused exception in '#{verbName}': #{error.toString()}"
+      source = if @context.$this? then [@context.$this.toString()] else []
+      source.push verb.name
+      source = source.join '.'
+
+      runner = 'server'
+
+      errorStr = error.toString()
+
+      if @player? and @player isnt @db.nothing
+        runner = @player.toString()
+        if stack
+          @player.send error.stack.split('\n').map((line) -> color line, 'inverse bold red').join('\n')
+        else
+          @player.send color "#{errorStr} in '#{source}'", 'inverse bold red'
+
+      util.log "#{runner} caused exception: #{errorStr} in '#{source}'"
 
   do_verb: (mooObject, verbName, time, args) ->
     object = @decontextify mooObject
@@ -211,6 +219,13 @@ class ContextRoomJsObject
         enumerable: true
         get: -> object.player
         set: -> throw new Error "No setter for 'player'"
+      crontab:
+        enumerable: true
+        get: -> object.crontab.map (job) ->
+          spec: job.spec
+          verb: job.verb
+          enabled: job.enabled
+        set: -> throw new Error "No setter for 'crontab'"
     })
 
     # player specific properties
@@ -290,6 +305,18 @@ class ContextRoomJsObject
 
     @create = (newName, newAliases = []) ->
       context.contextify context.db.createChild(object, newName, newAliases)
+
+    @addJob = (spec, verbName, start = false) ->
+      object.addJob spec, verbName, start
+
+    @rmJob = (i) ->
+      object.rmJob i
+
+    @startJob = (i) ->
+      object.startJob i
+
+    @stopJob = (i) ->
+      object.stopJob i
 
     # player specific methods
     if object.player

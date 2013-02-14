@@ -1,5 +1,6 @@
 # A simple wrapper around the http module, allowing moo code to GET (and later POST)
 http = require 'http'
+util = require 'util'
 
 c = require('./color').color
 
@@ -18,13 +19,13 @@ get = (host, path = '/', callback) ->
       try
         callback? output.join ''
       catch error
-        console.log "Caught Exception in browser callback: #{error.toString()}"
+        util.log "Caught Exception in browser callback: #{error.toString()}"
 
   client.on 'error', (error) ->
     try
       callback? c error.toString(), 'inverse bold red'
     catch error
-      console.log "Caught Exception in browser callback: #{error.toString()}"
+      util.log "Caught Exception in browser callback: #{error.toString()}"
 
   return undefined
 

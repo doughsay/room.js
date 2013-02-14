@@ -1,4 +1,5 @@
 _ = require 'underscore'
+util = require 'util'
 
 context = require './context'
 Cron = require './cron'
@@ -12,7 +13,7 @@ class RoomJsCronJob
     Cron.startJob @id if @enabled
 
   run: ->
-    console.log @toString()
+    util.log 'running job: ' + @toString()
     verb = @object.findVerbByName @verb
     if verb?
       context.runVerb @db, @db.nothing, verb, @object
@@ -41,6 +42,6 @@ class RoomJsCronJob
     clone
 
   toString: ->
-    "[RoomJsCronJob for #{@object.name} '#{@spec}' #{@verb}']"
+    "[Job: #{@object.toString()} '#{@spec}' #{@verb}']"
 
 module.exports = RoomJsCronJob

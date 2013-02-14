@@ -76,7 +76,7 @@ exports.RoomJsDb = class
     @sys = @objects[0]
 
     @nothing.send = (msg) ->
-      console.log msg
+      util.log "$nothing got message: #{msg}"
 
   save: =>
     startTime = mooUtil.tstart()
@@ -343,6 +343,3 @@ exports.RoomJsDb = class
         break
       nextId++
     nextId
-
-  toString: ->
-    "[RoomJsDb]"

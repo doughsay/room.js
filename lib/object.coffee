@@ -39,6 +39,10 @@ exports.RoomJsObject = class
     cronjobs = dbObject.crontab or []
     @crontab = cronjobs.map (job) => new RoomJsCronJob @, job
 
+  ##################
+  # object methods #
+  ##################
+
   parent: ->
     @db.findById @parent_id
 
@@ -61,38 +65,6 @@ exports.RoomJsObject = class
 
   contents: ->
     @contents_ids.map (id) => @db.findById id
-
-  addProp: (key, value) ->
-    @properties.push {key: key, value: value}
-
-  addVerb: (verb) ->
-    @verbs.push new RoomJsVerb verb, @db
-
-  rmProp: (key) ->
-    if @hasOwnProp key
-      @properties = @properties.filter (prop) -> prop.key != key
-      return true
-    else
-      throw new Error "property '#{key}' doesn't exist on this object."
-
-  getProp: (key) ->
-    for prop in @properties
-      if prop.key == key
-        return prop.value
-    return @parent()?.getProp key
-
-  setProp: (key, value) ->
-    for prop in @properties
-      if prop.key == key
-        return prop.value = value
-    @addProp key, value
-    return value
-
-  hasOwnProp: (key) ->
-    key in (prop.key for prop in @properties)
-
-  inheritsProp: (key) ->
-    !!@parent()?.getAllProperties()[key]?
 
   chparent: (id) ->
     if not id?
@@ -120,6 +92,79 @@ exports.RoomJsObject = class
         throw new Error "Invalid alias '#{alias}'"
     @aliases = (alias.toString() for alias in aliases)
 
+  # does this object exactly or partially match the search string?
+  matches: (search) ->
+    match = (x, y) ->
+      x = x.toLowerCase()
+      y = y.toLowerCase()
+      return EXACT_MATCH if x == y
+      return PARTIAL_MATCH if x.indexOf(y) == 0
+      return NO_MATCH
+
+    names = @aliases.concat [@name]
+    matches = names.map (name) -> match name, search
+
+    return EXACT_MATCH if EXACT_MATCH in matches
+    return PARTIAL_MATCH if PARTIAL_MATCH in matches
+    return NO_MATCH
+
+  ####################
+  # property methods #
+  ####################
+
+  addProp: (key, value) ->
+    @properties.push {key: key, value: value}
+
+  rmProp: (key) ->
+    if @hasOwnProp key
+      @properties = @properties.filter (prop) -> prop.key != key
+      return true
+    else
+      throw new Error "property '#{key}' doesn't exist on this object."
+
+  getProp: (key) ->
+    for prop in @properties
+      if prop.key == key
+        return prop.value
+    return @parent()?.getProp key
+
+  setProp: (key, value) ->
+    for prop in @properties
+      if prop.key == key
+        return prop.value = value
+    @addProp key, value
+    return value
+
+  hasOwnProp: (key) ->
+    key in (prop.key for prop in @properties)
+
+  inheritsProp: (key) ->
+    !!@parent()?.getAllProperties()[key]?
+
+  # recursively get all properties of an object and it's parent objects
+  # as a hash
+  getAllProperties: (map = {}) ->
+    if @parent_id?
+      @parent().getAllProperties(map)
+    @properties.reduce(((map, prop) ->
+      map[prop.key] = prop.value
+      map
+    ), map)
+
+  ################
+  # verb methods #
+  ################
+
+  addVerb: (verb) ->
+    @verbs.push new RoomJsVerb verb, @db
+
+  rmVerb: (verbName) ->
+    if @hasOwnVerb verbName
+      @verbs = (@verbs.filter (v) -> v.name != verbName)
+      true
+    else
+      throw new Error "verb '#{verbName}' doesn't exist on this object."
+
   addVerbPublic: (player, verbName, hidden, dobjarg, preparg, iobjarg) ->
     socket = connections.socketFor player
     verb = (@verbs.filter (v) -> v.name == verbName)[0]
@@ -141,13 +186,6 @@ exports.RoomJsObject = class
     else
       throw new Error "That verb does not exist on this object."
 
-  rmVerb: (verbName) ->
-    if @hasOwnVerb verbName
-      @verbs = (@verbs.filter (v) -> v.name != verbName)
-      true
-    else
-      throw new Error "verb '#{verbName}' doesn't exist on this object."
-
   hasOwnVerb: (verbName) ->
     verbName in (verb.name for verb in @verbs)
 
@@ -167,16 +205,6 @@ exports.RoomJsObject = class
     @addVerb newVerb
     return true
 
-  # recursively get all properties of an object and it's parent objects
-  # as a hash
-  getAllProperties: (map = {}) ->
-    if @parent_id?
-      @parent().getAllProperties(map)
-    @properties.reduce(((map, prop) ->
-      map[prop.key] = prop.value
-      map
-    ), map)
-
   # recursively get all verbs of an object and it's parent objects
   getAllVerbs: (map = {}) ->
     if @parent_id?
@@ -185,22 +213,6 @@ exports.RoomJsObject = class
       map[verb.name] = verb
       map
     ), map)
-
-  # does this object exactly or partially match the search string?
-  matches: (search) ->
-    match = (x, y) ->
-      x = x.toLowerCase()
-      y = y.toLowerCase()
-      return EXACT_MATCH if x == y
-      return PARTIAL_MATCH if x.indexOf(y) == 0
-      return NO_MATCH
-
-    names = @aliases.concat [@name]
-    matches = names.map (name) -> match name, search
-
-    return EXACT_MATCH if EXACT_MATCH in matches
-    return PARTIAL_MATCH if PARTIAL_MATCH in matches
-    return NO_MATCH
 
   # look for a verb on this object (or it's parents) that matches the given command
   findVerb: (command, objects, self = @) ->
@@ -218,10 +230,49 @@ exports.RoomJsObject = class
       return @parent().findVerbByName name
     return null
 
+  ###################
+  # cronjob methods #
+  ###################
+
+  addJob: (spec, verbName, start = false) ->
+    job =
+      spec: spec
+      verb: verbName
+      enabled: start
+    @crontab.push new RoomJsCronJob @, job
+
+  rmJob: (i) ->
+    if @crontab[i]?
+      @crontab[i].unregister()
+      delete @crontab[i]
+      @crontab = @crontab.filter (x) -> x?
+      true
+    else
+      false
+
+  startJob: (i) ->
+    if @crontab[i]?
+      @crontab[i].enable()
+      true
+    else
+      false
+
+  stopJob: (i) ->
+    if @crontab[i]?
+      @crontab[i].disable()
+      true
+    else
+      false
+
+  ##############
+  # to methods #
+  ##############
+
+  # remove properties which cause json serialization to fail
   toJSON: ->
     clone = _.clone @
     delete clone.db
     clone
 
   toString: ->
-    "[RoomJsObject #{@name}]"
+    "[##{@id} #{@name}]"
