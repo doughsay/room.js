@@ -56,7 +56,7 @@ print = (x, maxdepth, depth = 0, prefix = '', parents = []) ->
         else
           c '[Verb]', 'cyan'
       else
-        c '[Function]', 'cyan'
+        c '[Function]', 'gray'
     when 'object'
       if x == null
         c 'null', 'red'
