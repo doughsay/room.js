@@ -35,7 +35,7 @@ class RoomJsSocket
     if player?
       verb = @db.sys.findVerbByName 'player_disconnected'
       if verb?
-        context.runVerb @db, player, verb.code, @db.sys
+        context.runVerb @db, player, verb, @db.sys
 
   # fires when a socket sends a command
   onInput: (userStr) =>
@@ -77,7 +77,7 @@ class RoomJsSocket
       if player?
         verb = @db.sys.findVerbByName 'player_disconnected'
         if verb?
-          context.runVerb @db, player, verb.code, @db.sys
+          context.runVerb @db, player, verb, @db.sys
 
       @socket.emit 'output', '\nYou have been logged out.'
     else
@@ -89,13 +89,12 @@ class RoomJsSocket
 
       if matchedVerb?
         {verb: verb, self: self} = matchedVerb
-        context.runVerb @db, player, verb.code, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr
+        context.runVerb @db, player, verb, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr
       else
         huhVerb = player.location()?.findVerbByName 'huh'
         if huhVerb?
-          code = huhVerb.code
           self = player.location()
-          context.runVerb @db, player, code, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr
+          context.runVerb @db, player, huhVerb, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr
         else
           player.send c("I didn't understand that.", 'gray')
 
@@ -122,7 +121,7 @@ class RoomJsSocket
 
       verb = @db.sys.findVerbByName 'player_connected'
       if verb?
-        context.runVerb @db, player, verb.code, @db.sys
+        context.runVerb @db, player, verb, @db.sys
 
       fn null
     else
@@ -187,7 +186,7 @@ class RoomJsSocket
 
       verb = @db.sys.findVerbByName 'player_created'
       if verb?
-        context.runVerb @db, player, verb.code, @db.sys
+        context.runVerb @db, player, verb, @db.sys
 
       fn null
 

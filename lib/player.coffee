@@ -53,4 +53,4 @@ exports.RoomJsPlayer = class extends RoomJsObject
     @programmer = !!programmer
 
   toString: ->
-    "[RoomJsPlayer #{@name}]"
+    "[##{@id} #{@name} (#{@username})]"
