@@ -2,8 +2,6 @@ fs = require 'fs'
 util = require 'util'
 _ = require 'underscore'
 
-c = require('./color').color
-
 connections = require './connection_manager'
 mooUtil = require './util'
 context = require './context'
@@ -48,7 +46,7 @@ exports.RoomJsDb = class
     for player in @players
       socket = connections.socketFor player
       if socket?
-        socket.emit 'output', c 'Server shutting down.', 'red'
+        socket.emit 'output', '{red|Server shutting down.}'
         socket.disconnect()
     @saveSync()
 

@@ -2,8 +2,6 @@
 http = require 'http'
 util = require 'util'
 
-c = require('./color').color
-
 get = (host, path = '/', callback) ->
   throw new Error "No host specified" if not host?
 
@@ -23,7 +21,7 @@ get = (host, path = '/', callback) ->
 
   client.on 'error', (error) ->
     try
-      callback? c error.toString(), 'inverse bold red'
+      callback? "{inverse bold red|#{error.toString()}}"
     catch error
       util.log "Caught Exception in browser callback: #{error.toString()}"
 
