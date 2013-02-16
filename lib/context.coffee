@@ -8,6 +8,9 @@ mooUtil = require './util'
 mooBrowser = require './moo_browser'
 parse = require('./parser').parse
 
+contextProxyFor = require './context_proxy'
+proxies = require './helper_proxies'
+
 class Context
 
   constructor: (@db, @player, @memo = {}) ->
@@ -24,17 +27,21 @@ class Context
 
     @context = _.extend @globals(), base
 
-  deserialize: (x) =>
+  deserialize: (x, cb = (->), top = true) =>
     switch typeof x
       when 'object'
         if x == null
           null
-        else if Array.isArray x
-          x.map @deserialize
         else if x._mooObject?
           @contextify @db.findById x._mooObject
+        else if Array.isArray x
+          savecb = if top then => cb @serialize a else cb
+          a = x.map (y) => @deserialize y, savecb, false
+          Proxy.create proxies.objectProxyFor a, savecb
         else
-          mooUtil.hmap x, @deserialize
+          savecb = if top then => cb @serialize o else cb
+          o = mooUtil.hmap x, (y) => @deserialize y, savecb, false
+          Proxy.create proxies.objectProxyFor o, savecb
       else
         x
 
@@ -43,11 +50,15 @@ class Context
       when 'object'
         if x == null
           null
-        else if Array.isArray x
-          x.map @serialize
-        else if x instanceof ContextMooObject
+        else if x.proxy
           {_mooObject: x.id}
+        else if Array.isArray x
+          if x.helper_proxy
+            x = x.unProxy()
+          x.map @serialize
         else
+          if x.helper_proxy
+            x = x.unProxy()
           mooUtil.hmap x, @serialize
       else
         x
@@ -61,7 +72,7 @@ class Context
   contextify: (obj) ->
     if obj? and obj.id?
       if not @memo[obj.id]?
-        @memo[obj.id] = new ContextRoomJsObject(obj, @)
+        @memo[obj.id] = Proxy.create contextProxyFor obj, @ #new ContextRoomJsObject(obj, @)
       @memo[obj.id]
     else
       null
@@ -339,10 +350,11 @@ class ContextRoomJsObject
 runEval = (db, player, code) ->
   (new EvalContext db, player).run code
 
-runVerb = (db, player, verb, self, dobj = db.nothing, iobj = db.nothing, verbstr, argstr, dobjstr, prepstr, iobjstr) ->
+runVerb = (db, player, verb, self, dobj = db.nothing, iobj = db.nothing, verbstr, argstr, dobjstr, prepstr, iobjstr, extraArgs, memo = {}) ->
   context = new VerbContext(
-    db, player, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr)
-  context.run verb
+    db, player, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr, memo)
+  context.run verb, extraArgs
 
 exports.runVerb = runVerb
 exports.runEval = runEval
+exports.VerbContext = VerbContext

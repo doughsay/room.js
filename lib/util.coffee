@@ -63,7 +63,7 @@ print = (x, maxdepth, depth = 0, prefix = '', parents = []) ->
           '{yellow inverse|[CircularReference]}'
         else
           parents.push x
-          if Array.isArray x
+          if Array.isArray(x) or x.isArray?()
             if x.length == 0
               output = '[]'
             else if maxdepth == depth

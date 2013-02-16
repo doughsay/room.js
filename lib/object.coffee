@@ -135,6 +135,9 @@ exports.RoomJsObject = class
     @addProp key, value
     return value
 
+  hasProp: (key) ->
+    key of @getAllProperties()
+
   hasOwnProp: (key) ->
     key in (prop.key for prop in @properties)
 
