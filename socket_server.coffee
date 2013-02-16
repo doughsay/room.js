@@ -68,7 +68,8 @@ class RoomJsSocket
     command = parse str
 
     if command.verb == 'eval' and player.programmer
-      context.runEval @db, player, command.argstr
+      code = command.argstr.replace(/\\\{/g, '{').replace(/\\\}/g, '}')
+      context.runEval @db, player, code
     else if command.verb in ['logout', 'quit']
       player = connections.playerFor @socket
       connections.remove @socket
