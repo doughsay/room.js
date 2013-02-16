@@ -1,9 +1,28 @@
 # Knockout.js view model for the room.js client
 class ClientView
 
-  # apply styles to a string using a span
-  c = (str, styles) ->
-    "<span class='#{styles}'>#{str}</span>"
+  # apply styles to a color marked up string using a span
+  colorize = (str) ->
+    str
+      .replace(/\\\{/g, "!~TEMP_SWAP_LEFT~!")
+      .replace(/\\\}/g, "!~TEMP_SWAP_RIGHT~!")
+      .replace(/\{(.*?)\|/g, "<span class='$1'>")
+      .replace(/\}/g, "</span>")
+      .replace(/!~TEMP_SWAP_LEFT~!/g, "{")
+      .replace(/!~TEMP_SWAP_RIGHT~!/g, "}")
+
+  # escape any html in a string
+  escapeHTML = (str) ->
+    str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+
+  # escape curly brackets in a string
+  escapeBrackets = (str) ->
+    str
+      .replace(/\{/g, '\\{')
+      .replace(/\}/g, '\\}')
 
   lines: ko.observableArray []
   maxLines: ko.observable 1000
@@ -95,8 +114,9 @@ class ClientView
     @screen.scrollTop(@screen[0].scrollHeight);
 
   # add a line of output from the server to the screen
-  addLine: (line) ->
-    @lines.push line
+  addLine: (line, escape = true) ->
+    line = escapeHTML line if escape
+    @lines.push colorize line
     if @lines().length > @maxLines()
       @lines.shift()
     @scrollToBottom()
@@ -109,8 +129,9 @@ class ClientView
   # and add it to the command history
   sendCommand: ->
     command = @command()
+    escapedCommand = escapeBrackets command
     if command
-      @addLine c '\n> '+command, 'gray'
+      @addLine "\n{gray|> #{escapedCommand}}", false
       @history.unshift command
       if @history.length > @maxHistory()
         @history.pop()
@@ -121,7 +142,7 @@ class ClientView
           @inputCallback command
           @inputCallback = null
         else
-          @socket.emit 'input', command
+          @socket.emit 'input', escapedCommand
       @command ""
 
   # simple client-side commands
@@ -184,30 +205,30 @@ class ClientView
   #############################
 
   connect: =>
-    @addLine c 'Connected!', 'bold green'
+    @addLine '{bold green|Connected!}'
 
   connecting: =>
-    @addLine c "Connecting...", 'gray'
+    @addLine '{gray|Connecting...}'
 
   disconnect: =>
-    @addLine c 'Disconnected from server.', 'bold red'
+    @addLine '{bold red|Disconnected from server.}'
     @loadedVerb null
     @form null
 
   connect_failed: =>
-    @addLine c 'Connection to server failed.', 'bold red'
+    @addLine '{bold red|Connection to server failed.}'
 
   error: =>
-    @addLine c 'An unknown error occurred.', 'bold red'
+    @addLine '{bold red|An unknown error occurred.}'
 
   reconnect_failed: =>
-    @addLine c 'Unable to reconnect to server.', 'bold red'
+    @addLine '{bold red|Unable to reconnect to server.}'
 
   reconnect: =>
-  #  @addLine c 'Reconnected!', 'bold green'
+  #  @addLine '{bold green|Reconnected!}'
 
   reconnecting: =>
-    @addLine c "Attempting to reconnect...", 'gray'
+    @addLine '{gray|Attempting to reconnect...}'
 
   # output event
   # adds a line of output to the screen

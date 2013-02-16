@@ -1,7 +1,6 @@
 io = require 'socket.io'
 
 phash = require('./lib/hash').phash
-c = require('./lib/color').color
 parse = require('./lib/parser').parse
 
 connections = require './lib/connection_manager'
@@ -15,8 +14,8 @@ class RoomJsSocket
 
   # welcome the socket and attach the event listeners
   constructor: (@db, @socket) ->
-    @socket.emit 'output', "Welcome to #{c 'room.js', 'blue bold'}!"
-    @socket.emit 'output', "Type #{c 'help', 'magenta bold'} for a list of available commands."
+    @socket.emit 'output', "Welcome to {blue bold|room.js}!"
+    @socket.emit 'output', "Type {magenta bold|help} for a list of available commands."
 
     @socket.on 'disconnect', @onDisconnect
     @socket.on 'input', @onInput
@@ -52,9 +51,9 @@ class RoomJsSocket
       when "help"
         msg = """
         \nAvailable commands:
-        • #{c 'login', 'magenta bold'}  - login to an existing account
-        • #{c 'create', 'magenta bold'} - create a new account
-        • #{c 'help', 'magenta bold'}   - show this message
+        • {magenta bold|login}  - login to an existing account
+        • {magenta bold|create} - create a new account
+        • {magenta bold|help}   - show this message
         """
         @socket.emit 'output', msg
       when "login"
@@ -62,14 +61,15 @@ class RoomJsSocket
       when "create"
         @socket.emit 'request_form_input', formDescriptors.createAccount()
       else
-        @socket.emit 'output', "\nUnrecognized command. Type #{c 'help', 'magenta bold'} for a list of available commands."
+        @socket.emit 'output', "\nUnrecognized command. Type {magenta bold|help} for a list of available commands."
 
   # handle a player command
   onPlayerCommand: (player, str) =>
     command = parse str
 
     if command.verb == 'eval' and player.programmer
-      context.runEval @db, player, command.argstr
+      code = command.argstr.replace(/\\\{/g, '{').replace(/\\\}/g, '}')
+      context.runEval @db, player, code
     else if command.verb in ['logout', 'quit']
       player = connections.playerFor @socket
       connections.remove @socket
@@ -96,7 +96,7 @@ class RoomJsSocket
           self = player.location()
           context.runVerb @db, player, huhVerb, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr
         else
-          player.send c("I didn't understand that.", 'gray')
+          player.send "{gray|I didn't understand that.}"
 
   # handle log in form submission
   onLogin: (userData, fn) =>
@@ -114,7 +114,7 @@ class RoomJsSocket
 
       other_socket = connections.socketFor player
       if other_socket?
-        player.send c "Disconnected by another login.", 'red bold'
+        player.send "{red bold|Disconnected by another login.}"
         other_socket.disconnect()
 
       connections.add player, @socket
@@ -261,19 +261,19 @@ class RoomJsSocket
 
         if errors.length > 0
           errors.unshift 'There were errors in your verb code submission:'
-          player.send c (errors.join '\n'), 'red'
+          player.send '{red|'+(errors.join '\n')+'}'
           fn {error: true, verb: verb}
         else
           id = verb.oid
           object = @db.findById(id)
           object.saveVerb verb
-          player.send c "Verb saved!", 'green'
+          player.send '{green|Verb saved!}'
           fn {error: false, verb: verb}
       else
-        player.send c "You are not allowed to do that.", 'red'
+        player.send '{red|You are not allowed to do that.}'
         fn {error: true}
     else
-      @socket.emit 'output', c "You are not logged in.", 'red'
+      @socket.emit 'output', "{red|You are not logged in.}"
       fn {error: true}
 
 # This is the websocket server.

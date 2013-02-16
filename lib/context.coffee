@@ -3,7 +3,6 @@ coffee = require 'coffee-script'
 _ = require 'underscore'
 util = require 'util'
 
-color = require('./color').color
 connections = require './connection_manager'
 mooUtil = require './util'
 mooBrowser = require './moo_browser'
@@ -14,7 +13,6 @@ class Context
   constructor: (@db, @player, @memo = {}) ->
     base =
       eval:       undefined
-      c:          color
       $:          (id) => @contextify @db.findById(id)
       $player:    if @player? then @contextify @player else @contextify @db.nothing
       $here:      if @player?.location()? then @contextify @player.location() else @contextify @db.nothing
@@ -92,9 +90,9 @@ class Context
       if @player? and @player isnt @db.nothing
         runner = @player.toString()
         if stack
-          @player.send error.stack.split('\n').map((line) -> color line, 'inverse bold red').join('\n')
+          @player.send error.stack.split('\n').map((line) -> "{inverse bold red|#{line}}").join('\n')
         else
-          @player.send color "#{errorStr} in '#{source}'", 'inverse bold red'
+          @player.send "{inverse bold red|#{errorStr} in '#{source}'}"
 
       util.log "#{runner} caused exception: #{errorStr} in '#{source}'"
 

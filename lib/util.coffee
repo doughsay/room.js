@@ -1,7 +1,5 @@
 # Some usful utlity functions.
 
-c = require('./color').color
-
 # replace newlines in a string with '\n'
 safeString = (s) ->
   s.replace /\n/g, '\\n'
@@ -39,37 +37,37 @@ print = (x, maxdepth, depth = 0, prefix = '', parents = []) ->
 
   output = do -> switch typeof x
     when 'number'
-      c x, 'yellow'
+      "{yellow|#{x}}"
     when 'string'
       if depth == 0
-        "'" + (c (safeString x), 'green') + "'"
+        "'{green|#{safeString x}}'"
       else
-        "'" + (c (truncate safeString x), 'green') + "'"
+        "'{green|#{truncate safeString x}}'"
     when 'boolean'
-      c x.toString(), 'magenta'
+      "{magenta|#{x.toString()}}"
     when 'undefined'
-      c 'undefined', 'gray'
+      '{black|undefined}'
     when 'function'
       if x.verb
         if x.hidden
-          (c '[', 'cyan') + (c 'Private', 'cyan bold') + (c ' Verb]', 'cyan')
+          '{cyan|[{bold|Private} Verb]}'
         else
-          c '[Verb]', 'cyan'
+          '{cyan|[Verb]}'
       else
-        c '[Function]', 'gray'
+        '{gray|[Function]}'
     when 'object'
       if x == null
-        c 'null', 'red'
+        '{red|null}'
       else
         if x in parents
-          c '[CircularReference]', 'yellow inverse'
+          '{yellow inverse|[CircularReference]}'
         else
           parents.push x
           if Array.isArray x
             if x.length == 0
               output = '[]'
             else if maxdepth == depth
-              output = c "[Array]", 'blue'
+              output = '{blue|[Array]}'
             else
               xs = (x.map (y) -> print y, maxdepth, depth+1, '', parents)
               xs[0] = '[ ' + (xs[0].replace indent + '  ', '')
@@ -79,16 +77,15 @@ print = (x, maxdepth, depth = 0, prefix = '', parents = []) ->
               output = xs.join ',\n'
           else
             if (key for key of x).length == 0
-              output = '{}'
+              output = '\\{\\}'
             else if maxdepth == depth
-              output = c x.toString(), 'blue'
+              output = "{blue|#{x.toString()}}"
             else
               xs = []
               for key, value of x
-                keyColor = 'blue'
-                xs.push print value, maxdepth, depth+1, (c key, keyColor) + ': ', parents
-              xs[0] = '{ ' + (xs[0].replace indent + '  ', '')
-              xs[xs.length-1] += ' }'
+                xs.push print value, maxdepth, depth+1, "{blue|#{key}}" + ': ', parents
+              xs[0] = '\\{ ' + (xs[0].replace indent + '  ', '')
+              xs[xs.length-1] += ' \\}'
               if prefix != ''
                 xs[0] = '\n' + indent + xs[0]
               output = xs.join ',\n'
