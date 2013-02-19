@@ -57,7 +57,8 @@ module.exports = (obj, context) ->
       obj.rmProp name
     else if obj.hasOwnVerb name
       obj.rmVerb name
-    true
+    else
+      false
 
   fix: ->
     throw new Error 'fix not permitted on '+obj.toString()

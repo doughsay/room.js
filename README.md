@@ -28,26 +28,17 @@ Assuming you already have git and node.js >= v0.7.6:
     # Use the starter database
     cp db.example.json db.json
 
-    # Launch the server
-    node_modules/coffee-script/bin/coffee server.coffee
+    # Launch the server using the start script
+    ./start.sh
 
 Connect to it using a web browser by going to [http://localhost:8888/](http://localhost:8888/).
 
 The provided example db has one user who is also a programmer: username=root, password=p@ssw0rd.
 
-The only currently implemented verbs are:
-
-* look
-* say [anything]
-* examine [object]
-* get [object]
-* drop [object]
-* swing sword
-
 Programming
 -----------
 
-If you are signed in as a programmer, you can evaluate any CoffeeScript code by using the *eval* command (backtick '`' in shorthand).
+If you are signed in as a programmer, you can evaluate any CoffeeScript code by using the `eval` command (backtick '`' in shorthand).
 
     eval 2 + 2
     -> 4
@@ -60,8 +51,7 @@ Eval Context
 
 The eval context contains these global variables:
 
-* `$player` - the object representing you, the player.
-* `$here` - the object representing your current location.
+* `player` - the object representing you, the player.
 
 You also have access to some global functions:
 
@@ -92,6 +82,10 @@ Return a tree representing objects' locations.  Top level objects in this tree a
 ### `ls(x, depth = 2)`
 
 Pretty print `x` to a depth of `depth`.
+
+### `rm(id)`
+
+This removes object `id` from the database.  Warning: this is irreversible. (Also, don't use this right now, it's not very safe and can easily mess up your database.)
 
 Objects
 -------
@@ -135,38 +129,40 @@ You can access attributes on objects like this:
 
 (Boolean) {read-only} Is this object a player?
 
+### `crontab`
+
+(Array) {read-only} An array of cron-style jobs registered for this object.
+
+Attributes only on player objects
+---------------------------------
+
 ### `programmer`
 
-(Boolean) Is this object a programmer?
+(Boolean) Is this player a programmer?
+
+### `username`
+
+(String) The player's username.
 
 Custom object attributes (Properties)
 -------------------------------------
 
-You can add custom properties to objects using the method `addProp` described below.  Already existing properties can be accessed and edited like any other (java|coffee)script property, directly on the object:
+You can add or edit custom properties to objects by accessing them as you would in regular (java|coffee)script:
 
     $(7).description = 'foo bar baz'
+
+To delete properties, use the `delete` keyword like normal:
+
+    delete $(9).my_prop
 
 Object methods
 --------------
 
 Calling methods on objects is simple:
 
-    $player.addProp(arg1, arg2)
+    $object.method(arg1, arg2)
 
 These methods are available on room.js objects:
-
-### `addProp(key, value)`
-
-Adds a new property to this object, or overwrites an existing one.
-
-* `key` - (string) The key to store the property under.  If it already exists it will be overwritten.
-* `value` - (any) The value to store.  Can be any type.
-
-### `rmProp(key)`
-
-Removes a property from an object.
-
-* `key` - (string) The key to remove.
 
 ### `editVerb(verb)`
 
@@ -176,17 +172,6 @@ Load the verb named `verb` of the object into the verb editor.
 
 Add a new verb to the object called `verb` and load it into the verb editor.  You can optionally specify the argument specifiers as well.
 
-### `rmVerb(verb)`
-
-Remove verb named `verb` from the object.
-
-### `clone(newName, newAliases = [])`
-
-Creates a clone of this object, copying all its properties and verbs.
-
-* `newName` - (string) The name of the new object.
-* `newAliases` - (array[string]) (optional) The list of aliases for the new object.
-
 ### `create(newName, newAliases = [])`
 
 Creates a child of this object.  The child inherits all of its properties and verbs.
@@ -194,47 +179,68 @@ Creates a child of this object.  The child inherits all of its properties and ve
 * `newName` - (string) The name of the new object.
 * `newAliases` - (array[string]) (optional) The list of aliases for the new object.
 
+### `addJob(spec, verbName, start = false)`
+
+Add a new cron-style job to the object.
+
+* `spec` - (string) A cron-style spec (either 5 or 6 digits).
+* `verbName` - (string) The verb of this object to run.
+* `start` - (boolean) (optional) Whether or not to start the job after registering it.
+
+### `rmJob(index)`
+
+Removes the job specified by the (0-based) index. Check the `crontab` property of the object to find the index. This also stops the job.
+
+* `index` - (int) The 0-based index representing which job to remove.
+
+### `startJob(index)`
+
+Starts the job specified by the (0-based) index. The job will continue to run indefinitely, even through server restarts.
+
+* `index` - (int) The 0-based index representing which job to start.
+
+### `stopJob(index)`
+
+Stops the job specified by the (0-based) index.
+
+* `index` - (int) The 0-based index representing which job to stop.
+
+### `toString()`
+
+Return the string representation of this object.
+
 Verbs
 -----
 
-To edit verbs on objects, use the object methods `addVerb`, `editVerb` and `rmVerb` described above.
+To edit verbs on objects, use the object methods `addVerb` and `editVerb` described above.
 
     $thing.editVerb 'examine'
 
 This will load the verb 'examine' of the 'Thing Class' into the verb editor.
 
+To remove verbs from objects, you can just use the `delete` keyword.
+
+    delete $thing.examine
+
 The verb context has different variables available to it.  They are as follows:
 
-* `$this` - the object the verb was called on
-* `$player` - the player who called the verb
-* `$here` - the player's location
-* `$dobj` - the direct object, if any, that was specified when calling the verb
-* `$iobj` - the indirect object, if any, that was specified when calling the verb
-* `$verb` - the verb's name
-* `$argstr` - the entire string that was specfied not including the verb's name
-* `$dobjstr` - the direct object string
-* `$prepstr` - the preposition string
-* `$iobjstr` - the indirect object string
+* `this` or `@` - the object the verb was called on
+* `player` - the player who called the verb
+* `dobj` - the direct object, if any, that was specified when calling the verb
+* `iobj` - the indirect object, if any, that was specified when calling the verb
+* `verb` - the word used when invoking the verb
+* `argstr` - the entire string that was specfied not including the verb's name
+* `args` - either the words of argstr, or an array of arguments passed when calling a verb from inside another verb
+* `dobjstr` - the direct object string
+* `prepstr` - the preposition string
+* `iobjstr` - the indirect object string
 
-The verb context also has access to the `$` function, as well as:
-
-### `rm(id)`
-
-This removes object `id` from the database.  Warning: this is irreversible.
+The verb context also has access to the `$` function.
 
 TODO
 ----
 
 * A better editor (seperate page)
-* Allow in-place property edits
-    * e.g. $here.exits['north'] = $exit.create 'north'
-    * The above won't work because $here.exits is a getter that returns a new object, not the real underlying object
-    * Don't really know how we can solve this...
-* Add 'events'
-    * allow players to schedule events that happen either once or periodically
-    * allow periodic events to be canceled
-    * persist events across server restarts
-* Don't allow sending of html tags
 
 ### Bugs
 
