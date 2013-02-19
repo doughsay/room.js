@@ -16,7 +16,7 @@ class RoomJsCronJob
     util.log 'running job: ' + @toString()
     verb = @object.findVerbByName @verb
     if verb?
-      context.runVerb @db, @db.nothing, verb, @object
+      context.runVerb @db, null, verb, @object
 
   enable: ->
     if not @enabled

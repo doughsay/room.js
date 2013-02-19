@@ -154,6 +154,13 @@ exports.RoomJsObject = class
       map
     ), map)
 
+  # get all properties defined on this object
+  getOwnProperties: ->
+    @properties.reduce(((map, prop) ->
+      map[prop.key] = prop.value
+      map
+    ), {})
+
   ################
   # verb methods #
   ################
@@ -216,6 +223,13 @@ exports.RoomJsObject = class
       map[verb.name] = verb
       map
     ), map)
+
+  # get all verbs defined for this obejct
+  getOwnVerbs: ->
+    @verbs.reduce(((map, verb) ->
+      map[verb.name] = verb
+      map
+    ), {})
 
   # look for a verb on this object (or it's parents) that matches the given command
   findVerb: (command, objects, self = @) ->

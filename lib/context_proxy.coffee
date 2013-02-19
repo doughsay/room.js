@@ -4,67 +4,69 @@ contextModule = require('./context')
 
 module.exports = (obj, context) ->
 
-  keys = ->
+  keys = (own = false) ->
     ks = ['id', 'parent', 'name', 'aliases', 'location', 'contents', 'player', 'crontab']
     if obj.player
       ks.push 'username', 'programmer', 'online'
-    for prop of obj.getAllProperties()
+    for prop of (if own then obj.getOwnProperties() else obj.getAllProperties())
       ks.push prop
-    for verbName of obj.getAllVerbs()
+    for verbName of (if own then obj.getOwnVerbs() else obj.getAllVerbs())
       # take the first of potentially multiple space seperated names
       propName = verbName.split(' ')[0]
       # if the name has a * in it, remove it. (unless it's only a *)
       if propName != '*'
         propName = propName.replace '*', ''
       ks.push propName
-    ks.push 'create', 'addProp', 'rmProp', 'editVerb', 'addVerb', 'rmVerb', 'addJob', 'rmJob', 'startJob', 'stopJob'
+    ks.push 'create', 'editVerb', 'addVerb', 'addJob', 'rmJob', 'startJob', 'stopJob'
     if obj.player
       ks.push 'send', 'input'
     ks
 
-  # TODO
+  ownKeys = ->
+    keys true
+
   getOwnPropertyDescriptor: (name) ->
-    desc = Object.getOwnPropertyDescriptor(obj, name)
+    if name in ownKeys()
+      value: obj[name]
+      writable: true
+      enumerable: true
+      configurable: true
+    else
+      undefined
 
-    # a trapping proxy's properties must always be configurable
-    desc?.configurable = true
-    desc
-
-  # TODO
-  # not in ES5
   getPropertyDescriptor: (name) ->
-    desc = Object.getPropertyDescriptor(obj, name)
+    if name in keys()
+      value: obj[name]
+      writable: true
+      enumerable: true
+      configurable: true
+    else
+      undefined
 
-    # a trapping proxy's properties must always be configurable
-    desc?.configurable = true
-    desc
-
-  # TODO
   getOwnPropertyNames: ->
-    Object.getOwnPropertyNames obj
+    ownKeys()
 
-  #TODO
-  # not in ES5
   getPropertyNames: ->
-    Object.getPropertyNames obj
+    keys()
 
   defineProperty: (name, desc) ->
-    throw new Error 'not allowed'
+    throw new Error 'defineProperty not permitted on '+obj.toString()
 
-  # TODO
   delete: (name) ->
-    delete obj[name]
+    if obj.hasOwnProp name
+      obj.rmProp name
+    else if obj.hasOwnVerb name
+      obj.rmVerb name
+    true
 
   fix: ->
-    throw new Error 'not allowed'
+    throw new Error 'fix not permitted on '+obj.toString()
 
-  # TODO
   has: (name) ->
-    name of obj
+    name in keys()
 
-  # TODO
   hasOwn: (name) ->
-    ({}).hasOwnProperty.call obj, name
+    name in ownKeys()
 
   get: (receiver, name) ->
     passthrough = ['id', 'name', 'aliases', 'player', 'username', 'programmer', 'toString']
@@ -94,23 +96,12 @@ module.exports = (obj, context) ->
             verb: job.verb
             enabled: job.enabled
 
-        when 'addProp'
-          (key, value) ->
-            obj.setProp key, context.serialize value
-            value
-
-        when 'rmProp'
-          (key) -> obj.rmProp key
-
         when 'editVerb'
           (verbName) -> obj.editVerb context.player, verbName
 
         when 'addVerb'
           (verbName, hidden = false, dobjarg = 'none', preparg = 'none', iobjarg = 'none') ->
             obj.addVerbPublic context.player, verbName, hidden, dobjarg, preparg, iobjarg
-
-        when 'rmVerb'
-          (verbName) -> obj.rmVerb verbName
 
         when 'create'
           (newName, newAliases = []) ->
@@ -141,13 +132,14 @@ module.exports = (obj, context) ->
           else if (verb = obj.findVerbByName name)
             fn = ->
               contextModule.runVerb context.db,
-                context.player, verb, obj,
-                context.context.$dobj,
-                context.context.$iobj,
-                verb.name, context.context.$argstr,
-                context.context.$dobjstr,
-                context.context.$prepstr,
-                context.context.$iobjstr,
+                context.player,
+                verb, obj,
+                context.context.dobj,
+                context.context.iobj,
+                verb.name, context.context.argstr,
+                context.context.dobjstr,
+                context.context.prepstr,
+                context.context.iobjstr,
                 Array.prototype.slice.call(arguments),
                 context.memo
             fn.verb = true
@@ -197,7 +189,7 @@ module.exports = (obj, context) ->
         if obj.hasProp name
           obj.setProp name, context.serialize val
         else
-          throw new Error "no setter for '#{name}'"
+          obj.addProp name, context.serialize val
 
   enumerate: ->
     keys()
