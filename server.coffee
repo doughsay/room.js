@@ -1,5 +1,3 @@
-#!/usr/bin/env coffee
-
 util = require 'util'
 
 RoomJsDb           = require('./lib/db').RoomJsDb
