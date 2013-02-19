@@ -1,2 +1,2 @@
 #!/usr/bin/env sh
-/usr/bin/env coffee --nodejs --harmony server.coffee
+./node_modules/coffee-script/bin/coffee --nodejs --harmony server.coffee
