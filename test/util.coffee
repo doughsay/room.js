@@ -5,35 +5,35 @@ describe 'util', ->
   describe 'print', ->
 
     it 'should return numbers in yellow', ->
-      mooUtil.print(7).should.equal('<span class=\'yellow\'>7</span>')
+      mooUtil.print(7).should.equal('{yellow|7}')
 
     it 'should return strings in green surrounded by white quotes', ->
-      mooUtil.print('test').should.equal('\'<span class=\'green\'>test</span>\'')
+      mooUtil.print('test').should.equal('\'{green|test}\'')
 
     it 'should return booleans in magenta', ->
-      mooUtil.print(false).should.equal('<span class=\'magenta\'>false</span>')
+      mooUtil.print(false).should.equal('{magenta|false}')
 
-    it 'should return undefined in gray', ->
-      mooUtil.print(undefined).should.equal('<span class=\'gray\'>undefined</span>')
+    it 'should return undefined in black', ->
+      mooUtil.print(undefined).should.equal('{black|undefined}')
 
-    it 'should return functions in cyan', ->
-      mooUtil.print(->).should.equal('<span class=\'cyan\'>[Function]</span>')
+    it 'should return functions in gray', ->
+      mooUtil.print(->).should.equal('{gray|[Function]}')
 
     it 'should return null in red', ->
-      mooUtil.print(null).should.equal('<span class=\'red\'>null</span>')
+      mooUtil.print(null).should.equal('{red|null}')
 
     it 'should return compact empty arrays', ->
       mooUtil.print([]).should.equal('[]')
 
     it 'should return compact empty objects', ->
-      mooUtil.print({}).should.equal('{}')
+      mooUtil.print({}).should.equal('\\{\\}')
 
     it 'should return small arrays inline', ->
-      mooUtil.print([1]).should.equal('[ <span class=\'yellow\'>1</span> ]')
+      mooUtil.print([1]).should.equal('[ {yellow|1} ]')
 
     it 'should return small objects inline', ->
-      mooUtil.print({foo: 'bar'}).should.equal('{ <span class=\'blue\'>foo</span>: \'<span class=\'green\'>bar</span>\' }')
+      mooUtil.print({foo: 'bar'}).should.equal('\\{ {blue|foo}: \'{green|bar}\' \\}')
 
     it 'should truncate strings in objects', ->
       mooUtil.print({foo: 'this long string will be truncated'})
-        .should.equal('{ <span class=\'blue\'>foo</span>: \'<span class=\'green\'>this long string will be t...</span>\' }')
+        .should.equal('\\{ {blue|foo}: \'{green|this long string will be t...}\' \\}')

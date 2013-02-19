@@ -24,7 +24,7 @@ describe 'client', ->
 
     it 'should get a welcome message', (done) ->
       @socket.once 'output', (data) ->
-        data.should.equal 'Welcome to <span class=\'blue bold\'>room.js</span>!'
+        data.should.equal 'Welcome to {blue bold|room.js}!'
         done()
 
     ##########################
@@ -101,12 +101,14 @@ describe 'client', ->
     it 'should be able to run commands', (done) ->
       @socket.once 'output', (message) ->
         expectedMessage = """
-        \n<span class='yellow bold'>A forest clearing</span>
-        The forest thins out here a bit. To the north you can see the entrance to a cave through the bushes.
-        <span class='cyan'>You see here:</span>
-        <span class='cyan'>wooden sword</span>
-        <span class='cyan'>foo</span>
-        <span class='cyan'>Gandalf</span>
+        \n{yellow bold|A forest clearing}
+        The forest thins out here a bit. To the north you can see the entrance to a cave through the bushes. There is also a trap door barely visible in the grass.
+        {cyan|You see here:}
+        {cyan|blinker}
+        {cyan|iron sword}
+        {cyan|Larry the bird}
+        {cyan|wooden sword}
+        {cyan|foo}
         """
         message.should.equal expectedMessage
         done()
