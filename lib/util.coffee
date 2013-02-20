@@ -12,7 +12,7 @@ truncate = (s, length = 25) ->
     s[0..length] + '...'
 
 # helper for pretty print function
-printHelper = (x, maxdepth = 2) ->
+printHelper = (x, maxdepth = 1) ->
   print x, maxdepth
 
 # helper functions for timing code execution
@@ -67,7 +67,7 @@ print = (x, maxdepth, depth = 0, prefix = '', parents = []) ->
             if x.length == 0
               output = '[]'
             else if maxdepth == depth
-              output = '{blue|[Array]}'
+              output = "{blue|[Array(#{x.length})]}"
             else
               xs = (x.map (y) -> print y, maxdepth, depth+1, '', parents)
               xs[0] = '[ ' + (xs[0].replace indent + '  ', '')

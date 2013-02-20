@@ -131,7 +131,7 @@ class ClientView
     command = @command()
     escapedCommand = escapeBrackets command
     if command
-      @addLine "\n{gray|> #{escapedCommand}}", false
+      @addLine "\n{black|> #{escapedCommand}}", false
       @history.unshift command
       if @history.length > @maxHistory()
         @history.pop()

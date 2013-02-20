@@ -187,73 +187,13 @@ module.exports = class Db
     ), {})
 
   list: ->
-    aliases = @globalAliases()
-    for id,object of @objects
-      x =
-        id: object.id
-        name: object.name
-      if aliases[id]?
-        x.alias = aliases[id]
-      x
+    objectsArray = @objectsAsArray()
+    objectsArray[0...objectsArray.length-3]
 
   search: (search) ->
     regex = new RegExp "#{search}", 'i'
     @list().filter (object) ->
       !!object.name.match regex
-
-  inheritance_tree: (root_id) ->
-    aliases = @globalAliases()
-
-    children = (o) =>
-      child_os = @objectsAsArray().filter (other_o) ->
-        other_o.parent_id == o.id
-      child_os.map show
-
-    show = (o) ->
-      x =
-        id: o.id
-        name: o.name
-      if aliases[o.id]?
-        x.alias = aliases[o.id]
-      x.children = children o
-      x
-
-    if root_id?
-      root = @findById root_id
-      if root?
-        top = [root]
-      else
-        throw new Error "Invalid root object"
-    else
-      top = @objectsAsArray().filter (o) ->
-        o? and o.parent_id == null
-    top.map show
-
-  location_tree: (root_id) ->
-    aliases = @globalAliases()
-
-    contents = (o) =>
-      o.contents().map show
-
-    show = (o) ->
-      x =
-        id: o.id
-        name: o.name
-      if aliases[o.id]?
-        x.alias = aliases[o.id]
-      x.contents = contents o
-      x
-
-    if root_id?
-      root = @findById root_id
-      if root?
-        top = [root]
-      else
-        throw new Error "Invalid root object"
-    else
-      top = @objectsAsArray().filter (o) ->
-        o? and o.location_id == null
-    top.map show
 
   usernameTaken: (username) ->
     !!(@players.filter (player) -> player.username == username).length

@@ -12,7 +12,7 @@ EditorController = require './controllers/editor'
 
 db               = new Db 'db.json'
 webServer        = new WebServer 8888
-#clientController = new ClientController webServer.io, db
+clientController = new ClientController webServer.io, db
 editorController = new EditorController webServer.io, db
 
 process.on 'SIGINT', ->
