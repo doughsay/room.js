@@ -5,7 +5,7 @@ class EditorView
 
   # construct the view model
   constructor: ->
-    @socket = io.connect(window.location.href+'editor')
+    @socket = io.connect(window.location.href)
     @attachListeners()
 
   # attach the websocket event listeners

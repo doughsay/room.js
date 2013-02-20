@@ -5,6 +5,7 @@ util = require 'util'
 
 # This is the RoomJs web server.
 # It sets up the http server and responds to http requests by sending the client code.
+# It also starts a socket.io server on the same port.
 module.exports = class RoomJsWebServer
 
   constructor: (@port, @quiet = false) ->
@@ -29,12 +30,10 @@ module.exports = class RoomJsWebServer
     xp.get '/', (req, res) ->
       res.render 'client'
 
-    xp.get '/edit', (req, res) ->
+    xp.get '/editor', (req, res) ->
       res.render 'editor'
 
-    @http_server = http.createServer(xp).listen xp.get('port'), =>
+    http_server = http.createServer(xp).listen xp.get('port'), =>
       util.log "room.js http server listening on port " + xp.get 'port' if not @quiet
 
-  # return the reference to the http server
-  getHttpServer: ->
-    @http_server
+    @io = require('socket.io').listen(http_server, {log: false})

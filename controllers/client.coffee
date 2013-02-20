@@ -1,14 +1,16 @@
-phash = require('./lib/hash').phash
-parse = require('./lib/parser').parse
+util = require 'util'
 
-connections = require './lib/connection_manager'
-formDescriptors = require './lib/forms'
-context = require './lib/context'
+phash = require('../lib/hash').phash
+parse = require('../lib/parser').parse
+
+connections = require '../lib/connection_manager'
+formDescriptors = require '../lib/forms'
+context = require '../lib/context'
 
 
-# A RoomJsSocket represents a websocket connection from the web client.
-# It handles the websocket events.
-class RoomJsSocket
+# A Client represents a socket.io connection from the web client.
+# It handles client messages.
+class Client
 
   # welcome the socket and attach the event listeners
   constructor: (@db, @socket) ->
@@ -21,7 +23,7 @@ class RoomJsSocket
     @socket.on 'form_input_create', @onCreate
     @socket.on 'save_verb', @onSaveVerb
 
-  # fires when a websocket disconnects, either by the client closing the connection
+  # fires when a socket disconnects, either by the client closing the connection
   # or calling the `disconnect` method of the socket.
   onDisconnect: =>
     # remove the socket from our list of logged in players, if it exists
@@ -274,11 +276,12 @@ class RoomJsSocket
       @socket.emit 'output', "{red|You are not logged in.}"
       fn {error: true}
 
-# This is the websocket server.
-# It sets up the websocket listener and handles new socket connections.
-module.exports = class RoomJsSocketServer
+# This is the client controller.
+# It handles socket.io connections from the client
+module.exports = class ClientController
 
-  constructor: (httpServer, db) ->
-    io = require('socket.io').listen(httpServer, {log: false})
+  constructor: (io, db) ->
     io.of('/client').on 'connection', (socket) ->
-      new RoomJsSocket db, socket
+      address = socket.handshake.address
+      util.log "new client connection from #{address.address}:#{address.port}"
+      new Client db, socket

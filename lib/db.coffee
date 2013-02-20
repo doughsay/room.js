@@ -14,8 +14,8 @@ NO_MATCH = 0
 EXACT_MATCH = 1
 PARTIAL_MATCH = 2
 
-# A RoomJsDb is a collection of RoomJsObjects
-module.exports = class RoomJsDb
+# A Db is a collection of RoomJsObjects
+module.exports = class Db
   # @objects: Array[RoomJsObject]
   # @players: Array[RoomJsPlayer]
 
