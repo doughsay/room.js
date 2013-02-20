@@ -43,7 +43,7 @@ class ClientView
 
   # construct the view model
   constructor: (@body, @screen, @input) ->
-    @socket = io.connect()
+    @socket = io.connect(window.location.href+'client')
     @attachListeners()
     @setLayout()
     @setSizes()

@@ -1,5 +1,3 @@
-io = require 'socket.io'
-
 phash = require('./lib/hash').phash
 parse = require('./lib/parser').parse
 
@@ -278,9 +276,9 @@ class RoomJsSocket
 
 # This is the websocket server.
 # It sets up the websocket listener and handles new socket connections.
-exports.RoomJsSocketServer = class
+module.exports = class RoomJsSocketServer
 
   constructor: (httpServer, db) ->
-    ws_server = io.listen(httpServer, {log: false})
-    ws_server.sockets.on 'connection', (socket) ->
+    io = require('socket.io').listen(httpServer, {log: false})
+    io.of('/client').on 'connection', (socket) ->
       new RoomJsSocket db, socket

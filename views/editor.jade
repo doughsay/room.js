@@ -1,0 +1,8 @@
+extends layout
+
+block content
+  p foo bar baz
+
+block script
+  :coffeescript
+    $ -> ko.applyBindings new EditorView
