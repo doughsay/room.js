@@ -23,7 +23,11 @@ class Context
       parse:      parse
       match:      (search = '') => (@db.mooMatch search, @player).map (o) => @contextify o
       do_verb:    (object, verb, time, args = []) => @do_verb object, verb, time, args
-      rm:         (id) => @db.rm id
+      rm:         (idOrObject) =>
+                    if idOrObject?.proxy?
+                      @db.rm idOrObject.id
+                    else
+                      @db.rm idOrObject
 
     @context = _.extend @globals(), base
 
@@ -168,7 +172,7 @@ class VerbContext extends Context
             superVerb, self,
             @context.dobj,
             @context.iobj,
-            superVerb.name, @context.argstr,
+            superVerb.propName(), @context.argstr,
             @context.dobjstr,
             @context.prepstr,
             @context.iobjstr,

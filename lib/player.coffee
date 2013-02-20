@@ -40,11 +40,16 @@ exports.RoomJsPlayer = class extends RoomJsObject
     else
       false
 
-  input: (msg, fn) ->
+  input: (msg, callback) ->
     socket = connections.socketFor @
     if socket?
-      socket.emit 'request_input', "\n#{msg}", (response) ->
-        fn(response)
+      socket.emit 'request_input', "\n#{msg}", (response) =>
+        try
+          callback?.call null, response
+        catch error
+          errorStr = error.toString()
+          source = 'input callback'
+          @send "{inverse bold red|#{errorStr} in '#{source}'}"
       true
     else
       false

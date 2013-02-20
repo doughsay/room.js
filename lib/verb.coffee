@@ -63,6 +63,15 @@ exports.RoomJsVerb = class
         return false if command.prepstr not in @preparg.split('/')
     true
 
+  # the name to use when as a property of an object
+  propName: ->
+    propName = @name.split(' ')[0]
+    # if the name has a * in it, remove it. (unless it's only a *)
+    if propName != '*'
+      propName = propName.replace '*', ''
+
+    propName
+
   toJSON: ->
     clone = _.clone @
     delete clone.object

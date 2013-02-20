@@ -108,6 +108,19 @@ exports.RoomJsObject = class
     return PARTIAL_MATCH if PARTIAL_MATCH in matches
     return NO_MATCH
 
+  # does this object inherit from object `id`
+  inheritsFrom: (id) ->
+    return false if not id?
+    !!(@parent_id == id or @parent()?.inheritsFrom id)
+
+  # array of direct children of this object
+  children: ->
+    (o for id, o of @db.objects).filter (o) => o.parent_id == @id
+
+  # array of all descendants of this object
+  descendants: ->
+    (o for id, o of @db.objects).filter (o) => o.inheritsFrom @id
+
   ####################
   # property methods #
   ####################
@@ -218,7 +231,7 @@ exports.RoomJsObject = class
   # recursively get all verbs of an object and it's parent objects
   getAllVerbs: (map = {}) ->
     if @parent_id?
-      @parent().getAllVerbs(map)
+      map = @parent().getAllVerbs(map)
     @verbs.reduce(((map, verb) ->
       map[verb.name] = verb
       map

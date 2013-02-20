@@ -324,6 +324,10 @@ exports.RoomJsDb = class
 
   rm: (id) ->
     if id > -1 and @findById(id)?
+      object = @findById id
+      if object.children().length > 0
+        throw new Error 'That object cannot be removed because it has children'
+      object.moveTo null
       if @objects[id].player
         @players = @players.filter (p) -> p.id != id
       delete @objects[id]
