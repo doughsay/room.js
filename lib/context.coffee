@@ -23,7 +23,11 @@ class Context
       parse:      parse
       match:      (search = '') => (@db.mooMatch search, @player).map (o) => @contextify o
       do_verb:    (object, verb, time, args = []) => @do_verb object, verb, time, args
-      rm:         (id) => @db.rm id
+      rm:         (idOrObject) =>
+                    if idOrObject?.proxy?
+                      @db.rm idOrObject.id
+                    else
+                      @db.rm idOrObject
 
     @context = _.extend @globals(), base
 
@@ -155,6 +159,27 @@ class VerbContext extends Context
     @context.dobjstr = dobjstr
     @context.prepstr = prepstr
     @context.iobjstr = iobjstr
+
+    if self?
+      @context.pass  = =>
+        thisVerb = self.findVerbByName verb
+        thisObject = thisVerb.object
+        superObject = thisObject.parent()
+        superVerb = superObject?.findVerbByName verb
+        if superVerb?
+          runVerb @db,
+            @player,
+            superVerb, self,
+            @context.dobj,
+            @context.iobj,
+            superVerb.propName(), @context.argstr,
+            @context.dobjstr,
+            @context.prepstr,
+            @context.iobjstr,
+            Array.prototype.slice.call(arguments),
+            @memo
+        else
+          throw new Error 'verb has no \'super\''
 
   run: (verb, extraArgs) ->
 

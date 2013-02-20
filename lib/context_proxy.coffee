@@ -10,20 +10,24 @@ module.exports = (obj, context) ->
       ks.push 'username', 'programmer', 'online'
     for prop of (if own then obj.getOwnProperties() else obj.getAllProperties())
       ks.push prop
-    for verbName of (if own then obj.getOwnVerbs() else obj.getAllVerbs())
-      # take the first of potentially multiple space seperated names
-      propName = verbName.split(' ')[0]
-      # if the name has a * in it, remove it. (unless it's only a *)
-      if propName != '*'
-        propName = propName.replace '*', ''
-      ks.push propName
-    ks.push 'create', 'editVerb', 'addVerb', 'addJob', 'rmJob', 'startJob', 'stopJob'
+    for verbName, verb of (if own then obj.getOwnVerbs() else obj.getAllVerbs())
+      ks.push verb.propName() unless verb.propName() in ks
+    ks.push 'inherits_from', 'children', 'descendants', 'create', 'editVerb', 'addVerb', 'addJob', 'rmJob', 'startJob', 'stopJob'
     if obj.player
       ks.push 'send', 'input'
     ks
 
   ownKeys = ->
     keys true
+
+  reservedKeys = ->
+    ks = ['id', 'parent', 'name', 'aliases', 'location', 'contents', 'player', 'crontab']
+    if obj.player
+      ks.push 'username', 'programmer', 'online'
+    ks.push 'inherits_from', 'children', 'descendants', 'create', 'editVerb', 'addVerb', 'addJob', 'rmJob', 'startJob', 'stopJob'
+    if obj.player
+      ks.push 'send', 'input'
+    ks
 
   getOwnPropertyDescriptor: (name) ->
     if name in ownKeys()
@@ -91,6 +95,15 @@ module.exports = (obj, context) ->
         when 'contents'
           obj.contents().map (o) -> context.contextify o
 
+        when 'inherits_from'
+          (o) -> obj.inheritsFrom o?.id
+
+        when 'children'
+          -> obj.children().map (o) -> context.contextify o
+
+        when 'descendants'
+          -> obj.descendants().map (o) -> context.contextify o
+
         when 'crontab'
           obj.crontab.map (job) ->
             spec: job.spec
@@ -137,7 +150,7 @@ module.exports = (obj, context) ->
                 verb, obj,
                 context.context.dobj,
                 context.context.iobj,
-                verb.name, context.context.argstr,
+                verb.propName(), context.context.argstr,
                 context.context.dobjstr,
                 context.context.prepstr,
                 context.context.iobjstr,
@@ -187,9 +200,15 @@ module.exports = (obj, context) ->
           throw new Error "no setter for '#{name}'"
 
       else
-        if obj.hasProp name
+        v = obj.findVerbByName name
+        if v?
+          throw new Error "cannot overwrite verb '#{v.name}'"
+        else if obj.hasProp name
           obj.setProp name, context.serialize val
+        else if name in reservedKeys()
+          throw new Error "cannot set reserved key #{name}"
         else
+          console.log 'adding prop'
           obj.addProp name, context.serialize val
 
   enumerate: ->

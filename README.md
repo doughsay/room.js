@@ -85,7 +85,7 @@ Pretty print `x` to a depth of `depth`.
 
 ### `rm(id)`
 
-This removes object `id` from the database.  Warning: this is irreversible. (Also, don't use this right now, it's not very safe and can easily mess up your database.)
+This removes object `id` from the database.  Warning: this is irreversible.
 
 Objects
 -------
@@ -163,6 +163,18 @@ Calling methods on objects is simple:
     $object.method(arg1, arg2)
 
 These methods are available on room.js objects:
+
+### `inherits_from(obj)`
+
+Is this object a descendant of `obj`?
+
+### `children()`
+
+Returns an array of all direct children of this object.
+
+### `descendants()`
+
+Returns an array of all descendants of this object.
 
 ### `editVerb(verb)`
 

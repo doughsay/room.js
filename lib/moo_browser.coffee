@@ -15,13 +15,13 @@ get = (host, path = '/', callback) ->
       output.push chunk
     response.on 'end', ->
       try
-        callback? output.join ''
+        callback?.call null, output.join ''
       catch error
         util.log "Caught Exception in browser callback: #{error.toString()}"
 
   client.on 'error', (error) ->
     try
-      callback? "{inverse bold red|#{error.toString()}}"
+      callback?.call null, "{inverse bold red|#{error.toString()}}"
     catch error
       util.log "Caught Exception in browser callback: #{error.toString()}"
 
