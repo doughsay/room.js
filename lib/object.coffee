@@ -34,7 +34,7 @@ exports.RoomJsObject = class
     @properties = dbObject.properties
 
     @verbs = dbObject.verbs.map (verb) =>
-      new RoomJsVerb verb, @db
+      new RoomJsVerb verb, @
 
     cronjobs = dbObject.crontab or []
     @crontab = cronjobs.map (job) => new RoomJsCronJob @, job
@@ -166,7 +166,7 @@ exports.RoomJsObject = class
   ################
 
   addVerb: (verb) ->
-    @verbs.push new RoomJsVerb verb, @db
+    @verbs.push new RoomJsVerb verb, @
 
   rmVerb: (verbName) ->
     if @hasOwnVerb verbName

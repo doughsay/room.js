@@ -156,6 +156,27 @@ class VerbContext extends Context
     @context.prepstr = prepstr
     @context.iobjstr = iobjstr
 
+    if self?
+      @context.pass  = =>
+        thisVerb = self.findVerbByName verb
+        thisObject = thisVerb.object
+        superObject = thisObject.parent()
+        superVerb = superObject?.findVerbByName verb
+        if superVerb?
+          runVerb @db,
+            @player,
+            superVerb, self,
+            @context.dobj,
+            @context.iobj,
+            superVerb.name, @context.argstr,
+            @context.dobjstr,
+            @context.prepstr,
+            @context.iobjstr,
+            Array.prototype.slice.call(arguments),
+            @memo
+        else
+          throw new Error 'verb has no \'super\''
+
   run: (verb, extraArgs) ->
 
     verbSpec =

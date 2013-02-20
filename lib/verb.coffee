@@ -9,7 +9,7 @@ exports.RoomJsVerb = class
   # @preparg: String
   # @iobjarg: String
   # @code: String
-  constructor: (verb, @db) ->
+  constructor: (verb, @object) ->
     @name = verb.name
     @hidden = verb.hidden
     @dobjarg = verb.dobjarg
@@ -44,13 +44,13 @@ exports.RoomJsVerb = class
     return false if not @matchesName command.verb
     switch @dobjarg
       when 'none'
-        return false if objects.dobj not in [@db.nothing, @db.failed_match, @db.ambiguous_match]
+        return false if objects.dobj not in [@object.db.nothing, @object.db.failed_match, @object.db.ambiguous_match]
       # when 'any' anything goes!
       when 'this'
         return false if objects.dobj isnt self
     switch @iobjarg
       when 'none'
-        return false if objects.iobj not in [@db.nothing, @db.failed_match, @db.ambiguous_match]
+        return false if objects.iobj not in [@object.db.nothing, @object.db.failed_match, @object.db.ambiguous_match]
       # when 'any' anything goes!
       when 'this'
         return false if objects.iobj isnt self
@@ -65,7 +65,7 @@ exports.RoomJsVerb = class
 
   toJSON: ->
     clone = _.clone @
-    delete clone.db
+    delete clone.object
     clone
 
   toString: ->
