@@ -87,7 +87,7 @@ class ClientView
   setSizes: ->
     inputWidthDiff = @input.outerWidth() - @input.width()
     @input.width($('.ui-layout-center').width() - inputWidthDiff - $('.prompt').outerWidth())
-    @screen.height($('.ui-layout-center').height() - @input.outerHeight())
+    @screen.height($('.ui-layout-center').height() - @input.outerHeight() - 2)
 
     # if an ace editor is present, call it's resize function
     # and set sizes for all the form elements to make them look prettier
