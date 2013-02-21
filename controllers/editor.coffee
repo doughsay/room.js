@@ -14,7 +14,18 @@ class Editor
   onDisconnect: =>
 
   onGetTree: (data, fn) =>
-    fn @db.list()
+    fn [
+        {
+          id: 1
+          parent: null
+          global: '$root'
+          name: 'Root Class'
+          aliases: []
+          children: []
+          crontab: []
+          tell: ''
+        }
+      ]
 
 # This is the editor controller.
 # It handles socket.io connections from the editor.

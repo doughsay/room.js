@@ -4,7 +4,7 @@ class EditorView
   socket: null
 
   # construct the view model
-  constructor: ->
+  constructor: (@body) ->
     @socket = io.connect(window.location.href)
     @attachListeners()
 
@@ -18,6 +18,25 @@ class EditorView
     @socket.on 'reconnect_failed', @reconnect_failed
     @socket.on 'reconnect', @reconnect
     @socket.on 'reconnecting', @reconnecting
+
+    @setLayout()
+
+  # build the jqeury ui layout
+  setLayout: ->
+    @layout = @body.layout
+      livePaneResizing: true
+      west:
+        size: '15%'
+        slidable: false
+        childOptions:
+          livePaneResizing: true
+          center:
+            paneSelector: '.ui-layout-west-center'
+          south:
+            paneSelector: '.ui-layout-west-south'
+            size: '50%'
+            slidable: false
+
 
   loadSidebar: ->
     @socket.emit 'get_tree', null, (tree) ->
