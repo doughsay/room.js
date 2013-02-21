@@ -72,6 +72,8 @@ exports.RoomJsObject = class
       true
     else
       object = @db.findById id
+      if object.inheritsFrom @id
+        throw new Error 'Cannot create circular inheritance'
       if not object?
         throw new Error "Invalid object"
       @parent_id = id
