@@ -43,7 +43,7 @@ class ClientView
 
   # construct the view model
   constructor: (@body, @screen, @input) ->
-    @socket = io.connect()
+    @socket = io.connect(window.location.href+'client')
     @attachListeners()
     @setLayout()
     @setSizes()
@@ -131,7 +131,7 @@ class ClientView
     command = @command()
     escapedCommand = escapeBrackets command
     if command
-      @addLine "\n{gray|> #{escapedCommand}}", false
+      @addLine "\n{black|> #{escapedCommand}}", false
       @history.unshift command
       if @history.length > @maxHistory()
         @history.pop()

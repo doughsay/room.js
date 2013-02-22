@@ -12,7 +12,3 @@
 #= require view_models/client
 
 #= require toasty
-
-# on dom ready, create the view model and apply the knockout bindings
-$ ->
-  ko.applyBindings new ClientView $('body'), $('.screen'), $('.command input')

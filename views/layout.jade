@@ -2,10 +2,11 @@ doctype 5
 html
   head
     title room.js
-    link(rel='stylesheet', href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700')
-    link(rel='stylesheet', href='/assets/app.css')
+    link(rel='stylesheet', href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400')
+    link(rel='stylesheet', href='/assets/client.css')
   body
     block content
     script(src='/socket.io/socket.io.js')
     script(src='/assets/ace/ace.js')
-    script(src='/assets/app.js')
+    script(src='/assets/client.js')
+    block script

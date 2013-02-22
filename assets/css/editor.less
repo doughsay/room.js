@@ -1,116 +1,30 @@
-.ace_editor {
-  top: 27px;
-  right: 0;
-  bottom: 0;
-  left: 0;
+//= require bootstrap
+
+.ui-layout-pane {
+  overflow: hidden;
 }
 
-.editor {
-   > input {
-    margin: 0;
-    margin-right: 2px;
-    padding: 4px;
-    height: 15px;
-    font-family: 'Source Code Pro', sans-serif;
-    font-size: 12pt;
-    border: 2px solid @gray;
-    color: @light_blue;
-    background-color: @black;
-    border-radius: 0;
-    text-shadow: 1px 1px 1px black;
-    &:focus { border-color: @light_blue; }
-  }
+.ui-layout-resizer {
+  background: gray;
 
-  > label.privacy {
-    margin: 0;
-    margin-right: 2px;
-    padding: 2px 4px 6px 4px;
-    height: 15px;
-    border: 2px solid @gray;
-    color: @red;
-    background-color: @black;
-    border-radius: 0;
-    text-shadow: 1px 1px 1px black;
+  &.ui-layout-resizer-open-hover,
+  &.ui-layout-resizer-dragging {
+    background-color: black;
 
-    font-family: 'Source Code Pro', sans-serif;
-    font-size: 12pt;
-    display: inline-block;
-
-    display: inline-block;
-    vertical-align: top;
-
-    input {
-      margin: 0;
-      margin: 6px;
+    &.ui-layout-resizer-dragging-limit {
+      background-color: red;
     }
   }
 
-  > select {
-    margin: 0;
-    margin-right: 2px;
-    padding: 0;
-    height: 27px;
-    font-family: 'Source Code Pro', sans-serif;
-    font-size: 12pt;
-    background-color: @black;
-    border: 2px solid @gray;
-    border-radius: 0;
-    text-shadow: 1px 1px 1px black;
-    -webkit-transition: border linear .2s;
-    -moz-transition: border linear .2s;
-    transition: border linear .2s;
-    &.dobjarg {
-      color: @light_green;
-      &:focus { border-color: @light_green; }
-    }
-    &.preparg {
-      color: @light_yellow;
-      &:focus { border-color: @light_yellow; }
-    }
-    &.iobjarg {
-      color: @light_magenta;
-      &:focus { border-color: @light_magenta; }
-    }
-    option {
-      background-color: @black;
+  .ui-layout-toggler {
+    background-color: darkgray;
+
+    &.ui-layout-toggler-hover {
+      background-color: blue;
     }
   }
+}
 
-  .actions {
-    position: absolute;
-    top: 0;
-    right: 0;
-
-    a {
-      display: inline-block;
-      margin: 0;
-      padding: 0 4px;
-      height: 23px;
-      font-family: 'Source Code Pro', sans-serif;
-      font-size: 12pt;
-      border: 2px solid @gray;
-      text-shadow: 1px 1px 1px @black;
-      color: @white;
-      cursor: pointer;
-      &:hover {
-        text-decoration: none;
-      }
-      &.save {
-        background-color: @blue;
-        &:hover {
-          background-color: @light_blue;
-        }
-      }
-      &.closeEditor {
-        margin-left: 2px;
-        background-color: @black;
-        &:hover {
-          background-color: @light_black;
-        }
-      }
-      i {
-        margin-top: 4px;
-      }
-    }
-  }
+ul.indented {
+  margin-left: 16px;
 }

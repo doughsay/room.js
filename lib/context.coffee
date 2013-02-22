@@ -130,10 +130,8 @@ class EvalContext extends Context
   constructor: (@db, player) ->
     super @db, player
 
-    @context.list       = => @db.list()
-    @context.search     = (search) => @db.search(search)
-    @context.tree       = (root_id) => @db.inheritance_tree(root_id)
-    @context.locations  = (root_id) => @db.location_tree(root_id)
+    @context.list       = => @db.list().map (o) => @contextify o
+    @context.search     = (search) => @db.search(search).map (o) => @contextify o
     @context.ls         = (x, depth = 2) ->
                             player.send(mooUtil.print x, depth)
                             true

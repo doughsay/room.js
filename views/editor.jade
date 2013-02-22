@@ -1,0 +1,82 @@
+doctype 5
+html
+  head
+    title room.js editor
+    link(rel='stylesheet', href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400')
+    link(rel='stylesheet', href='/assets/editor.css')
+  body
+    .ui-layout-center
+      p editor goes here
+    .ui-layout-west
+      .ui-layout-west-center
+        .row-fluid
+          input.search-query.span12(type='text', placeholder='Filter')
+        hr
+        .row-fluid
+          ul.unstyled
+            li
+              i.icon-chevron-right
+              |&nbsp;
+              span.label.label-info #0
+              |&nbsp;
+              a(href='#') System Object
+              span.label.pull-right $sys
+            li
+              i.icon-chevron-down
+              |&nbsp;
+              span.label.label-info #1
+              |&nbsp;
+              a(href='#') Root Class
+              span.label.pull-right $root
+              ul.unstyled.indented
+                li
+                  i.icon-chevron-down
+                  |&nbsp;
+                  span.label.label-info #2
+                  |&nbsp;
+                  a(href='#') Player Class
+                  span.label.pull-right $player
+                  ul.unstyled.indented
+                    li
+                      i.icon-user
+                      |&nbsp;
+                      span.label.label-info #3
+                      |&nbsp;
+                      a(href='#') Gandalf
+                      span.label.pull-right $wizard
+                li
+                  i.icon-chevron-right
+                  |&nbsp;
+                  span.label.label-info #4
+                  |&nbsp;
+                  a(href='#') Room Class
+                  span.label.pull-right $room
+                li
+                  i.icon-chevron-right
+                  |&nbsp;
+                  span.label.label-info #5
+                  |&nbsp;
+                  a(href='#') Thing Class
+                  span.label.pull-right $thing
+                li
+                  i.icon-chevron-right
+                  |&nbsp;
+                  span.label.label-info #8
+                  |&nbsp;
+                  a(href='#') Exit Class
+                  span.label.pull-right $exit
+            li
+              i.icon-chevron-right
+              |&nbsp;
+              span.label.label-info #21
+              |&nbsp;
+              a(href='#') Utility Verbs
+              span.label.pull-right $util
+      .ui-layout-west-south
+        p selected object properties and verbs go here
+
+    script(src='/socket.io/socket.io.js')
+    script(src='/assets/ace/ace.js')
+    script(src='/assets/editor.js')
+    :coffeescript
+      $ -> ko.applyBindings new EditorView $('body')

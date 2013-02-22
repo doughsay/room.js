@@ -5,16 +5,16 @@ contextModule = require('./context')
 module.exports = (obj, context) ->
 
   keys = (own = false) ->
-    ks = ['id', 'parent', 'name', 'aliases', 'location', 'contents', 'player', 'crontab']
+    ks = ['id', 'parent', 'name', 'aliases', 'location', 'contents', 'children', 'isPlayer', 'crontab']
     if obj.player
-      ks.push 'username', 'programmer', 'online'
+      ks.push 'username', 'programmer', 'isOnline'
     props = if own then obj.getOwnProperties() else obj.getAllProperties()
     for prop of props
       ks.push prop
     verbs = if own then obj.getOwnVerbs() else obj.getAllVerbs()
     for verbName, verb of verbs
       ks.push verb.propName() unless verb.propName() in ks
-    ks.push 'inherits_from', 'children', 'descendants', 'create', 'editVerb', 'addVerb', 'addJob', 'rmJob', 'startJob', 'stopJob'
+    ks.push 'inheritsFrom', 'create', 'editVerb', 'addVerb', 'addJob', 'rmJob', 'startJob', 'stopJob'
     if obj.player
       ks.push 'send', 'input'
     ks
@@ -23,10 +23,10 @@ module.exports = (obj, context) ->
     keys true
 
   reservedKeys = ->
-    ks = ['id', 'parent', 'name', 'aliases', 'location', 'contents', 'player', 'crontab']
+    ks = ['id', 'parent', 'name', 'aliases', 'location', 'contents', 'children', 'isPlayer', 'crontab']
     if obj.player
-      ks.push 'username', 'programmer', 'online'
-    ks.push 'inherits_from', 'children', 'descendants', 'create', 'editVerb', 'addVerb', 'addJob', 'rmJob', 'startJob', 'stopJob'
+      ks.push 'username', 'isProgrammer', 'isOnline'
+    ks.push 'inheritsFrom', 'create', 'editVerb', 'addVerb', 'addJob', 'rmJob', 'startJob', 'stopJob'
     if obj.player
       ks.push 'send', 'input'
     ks
@@ -76,13 +76,10 @@ module.exports = (obj, context) ->
     name in ownKeys()
 
   get: (receiver, name) ->
-    passthrough = ['id', 'name', 'aliases', 'player', 'username', 'programmer', 'toString']
-    passthroughAsFn = ['online']
+    passthrough = ['id', 'name', 'aliases', 'username', 'toString']
 
     if name in passthrough
       obj[name]
-    else if name in passthroughAsFn
-      obj[name]?()
     else
       switch name
         when 'proxy'
@@ -97,14 +94,20 @@ module.exports = (obj, context) ->
         when 'contents'
           obj.contents().map (o) -> context.contextify o
 
-        when 'inherits_from'
+        when 'inheritsFrom'
           (o) -> obj.inheritsFrom o?.id
 
-        when 'children'
-          -> obj.children().map (o) -> context.contextify o
+        when 'isPlayer'
+          obj.player
 
-        when 'descendants'
-          -> obj.descendants().map (o) -> context.contextify o
+        when 'isProgrammer'
+          obj.programmer
+
+        when 'isOnline'
+          obj.online?()
+
+        when 'children'
+          obj.children().map (o) -> context.contextify o
 
         when 'crontab'
           obj.crontab.map (job) ->
