@@ -2,16 +2,16 @@ should = require 'should'
 client = require 'socket.io-client'
 fs = require 'fs'
 
-RoomJsDb = require('../lib/db').RoomJsDb
-RoomJsWebServer = require('../web_server').RoomJsWebServer
-RoomJsSocketServer = require('../socket_server').RoomJsSocketServer
+Db               = require '../lib/db'
+WebServer        = require '../web_server'
+ClientController = require '../controllers/client'
 
 describe 'client', ->
   before ->
-    @db = new RoomJsDb '_db.test.json', true
-    webServer = new RoomJsWebServer 8888, true
-    socketServer = new RoomJsSocketServer webServer.getHttpServer(), @db
-    @socket = client.connect 'http://127.0.0.1:8888/'
+    @db = new Db '_db.test.json', true
+    webServer = new WebServer 8888, true
+    clientController = new ClientController webServer.io, @db
+    @socket = client.connect 'http://127.0.0.1:8888/client'
 
   describe 'connection', ->
 

@@ -135,7 +135,7 @@
         "dobjarg": "none",
         "preparg": "none",
         "iobjarg": "none",
-        "code": "[msg] = args\n\nif @player\n  @send msg"
+        "code": "[msg] = args\n\nif @isPlayer\n  @send msg"
       }
     ],
     "crontab": []
