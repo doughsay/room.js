@@ -8,9 +8,11 @@ module.exports = (obj, context) ->
     ks = ['id', 'parent', 'name', 'aliases', 'location', 'contents', 'player', 'crontab']
     if obj.player
       ks.push 'username', 'programmer', 'online'
-    for prop of (if own then obj.getOwnProperties() else obj.getAllProperties())
+    props = if own then obj.getOwnProperties() else obj.getAllProperties()
+    for prop of props
       ks.push prop
-    for verbName, verb of (if own then obj.getOwnVerbs() else obj.getAllVerbs())
+    verbs = if own then obj.getOwnVerbs() else obj.getAllVerbs()
+    for verbName, verb of verbs
       ks.push verb.propName() unless verb.propName() in ks
     ks.push 'inherits_from', 'children', 'descendants', 'create', 'editVerb', 'addVerb', 'addJob', 'rmJob', 'startJob', 'stopJob'
     if obj.player
@@ -200,13 +202,13 @@ module.exports = (obj, context) ->
           throw new Error "no setter for '#{name}'"
 
       else
+        if name in reservedKeys()
+          throw new Error "cannot set reserved key #{name}"
         v = obj.findVerbByName name
         if v?
           throw new Error "cannot overwrite verb '#{v.name}'"
         else if obj.hasProp name
           obj.setProp name, context.serialize val
-        else if name in reservedKeys()
-          throw new Error "cannot set reserved key #{name}"
         else
           console.log 'adding prop'
           obj.addProp name, context.serialize val
