@@ -50,10 +50,11 @@ class Context
         x
 
   serialize: (x) =>
-    try
-      JSON.stringify x
-    catch error
-      throw new Error 'Unserializable property'
+    if not x.proxy
+      try
+        JSON.stringify x
+      catch error
+        throw new Error 'Unserializable property'
 
     switch typeof x
       when 'object'
