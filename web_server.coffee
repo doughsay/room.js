@@ -30,8 +30,8 @@ module.exports = class RoomJsWebServer
     xp.get '/', (req, res) ->
       res.render 'client'
 
-    xp.get '/editor', (req, res) ->
-      res.render 'editor'
+    # xp.get '/editor', (req, res) ->
+    #   res.render 'editor'
 
     http_server = http.createServer(xp).listen xp.get('port'), =>
       util.log "room.js http server listening on port " + xp.get 'port' if not @quiet
