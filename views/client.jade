@@ -11,3 +11,9 @@ block content
   .ui-layout-north(data-bind='if: loadedVerb')
     include includes/editor
   include includes/modal
+
+block script
+  :coffeescript
+    # on dom ready, create the view model and apply the knockout bindings
+    $ ->
+      ko.applyBindings new ClientView $('body'), $('.screen'), $('.command input')
