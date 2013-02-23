@@ -11,9 +11,11 @@ test-unit:
 	@rm _db.test.json
 
 test-nyan:
+	@cp db.test.json _db.test.json
 	@NODE_ENV=test ./node_modules/.bin/mocha --harmony \
 		--reporter nyan \
 		$(MOCHA_OPTS)
+	@rm _db.test.json
 
 test-cov:
 	@./node_modules/.bin/coffee -c lib
