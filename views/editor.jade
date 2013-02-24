@@ -6,7 +6,24 @@ html
     link(rel='stylesheet', href='/assets/editor.css')
   body
     .ui-layout-center
-      p editor goes here
+      ul.nav.nav-tabs
+        li.active: a(href='#')
+          i.icon-cog
+          |$player.i*nventory
+          button.close.dirty •
+        li: a(href='#')
+          i.icon-cog
+          |$root.tell
+          button.close ×
+        li: a(href='#')
+          i.icon-cog
+          |$thing.g*et t*ake gr*ab
+          button.close ×
+        li: a(href='#')
+          i.icon-file-alt
+          |[#7 Wooden Sword].description
+          button.close ×
+
     .ui-layout-west
       .ui-layout-west-center
         .search
@@ -18,70 +35,71 @@ html
             ul.nav.nav-list
               li
                 span.pull-left
-                  i.icon-chevron-right
+                  i.icon-caret-right
                   span.label.label-info #0
                   span.label $sys
                 a(href='#') System Object
               li
                 span.pull-left
-                  i.icon-chevron-down
+                  i.icon-caret-down
                   span.label.label-info #1
                   span.label $root
                 a(href='#') Root Class
                 ul.nav.nav-list.level1
                   li
                     span.pull-left
-                      i.icon-chevron-down
+                      i.icon-caret-down
                       span.label.label-info #2
                       span.label $player
                     a(href='#') Player Class
                     ul.nav.nav-list.level2
                       li.active
                         span.pull-left
-                          i.icon-user.icon-white
+                          i.icon-user
                           span.label.label-inverse #3
                           span.label $wizard
                         a(href='#') Gandalf
                   li
                     span.pull-left
-                      i.icon-chevron-right
+                      i.icon-caret-right
                       span.label.label-info #4
                       span.label $room
                     a(href='#') Room Class
                   li
                     span.pull-left
-                      i.icon-chevron-right
+                      i.icon-caret-right
                       span.label.label-info #5
                       span.label $thing
                     a(href='#') Thing Class
                   li
                     span.pull-left
-                      i.icon-chevron-right
+                      i.icon-caret-right
                       span.label.label-info #8
                       span.label $exit
                     a(href='#') Exit Class
               li
                 span.pull-left
-                  i.icon-chevron-right
+                  i.icon-caret-right
                   span.label.label-info #21
                   span.label $util
                 a(href='#') Utility Verbs
+
       .ui-layout-west-south
         .overflow-container
           ul.nav.nav-list
             li.nav-header Properties
             li
               a(href='#')
-                i.icon-file
+                i.icon-file-alt
                 |color
             li
               a(href='#')
-                i.icon-file
+                i.icon-file-alt
                 |health
             li.nav-header Verbs
             li.active
               a(href='#')
-                i.icon-cog.icon-white
+                i.icon-cog
                 |tell
             li
               a(href='#')

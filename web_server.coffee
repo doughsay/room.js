@@ -17,6 +17,7 @@ module.exports = class WebServer
     environment.appendPath 'vendor/assets/css'
     environment.appendPath 'vendor/assets/css/bootstrap'
     environment.appendPath 'vendor/assets/img'
+    environment.appendPath 'vendor/assets/font'
 
     xp = express()
 

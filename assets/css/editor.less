@@ -1,4 +1,5 @@
 //= require bootstrap
+//= require font-awesome
 
 .ui-layout-pane {
   overflow-x: hidden;
@@ -35,6 +36,16 @@ hr {
 }
 
 ul.nav-list {
+  li {
+    i {
+      color: black;
+    }
+    &.active {
+      i {
+        color: white;
+      }
+    }
+  }
   span.pull-left {
     margin-top: 2px;
     span.label {
@@ -47,7 +58,7 @@ ul.nav-list {
   width: 1000px;
 }
 
-i.icon-chevron-right, i.icon-chevron-down {
+i.icon-caret-right, i.icon-caret-down {
   cursor: pointer;
 }
 
@@ -60,6 +71,19 @@ ul.level1 {
     a {
       margin-left: -45px;
       margin-right: -45px;
+    }
+  }
+}
+
+ul.nav-tabs {
+  i {
+    margin-right: 2px;
+    color: black;
+  }
+  button.close {
+    margin-left: 5px;
+    &.dirty {
+      font-size: 25pt;
     }
   }
 }
