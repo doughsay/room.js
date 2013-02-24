@@ -8,7 +8,7 @@ html
     .ui-layout-center
       .tabs
         ul.nav.nav-tabs
-          li.active: a(href='#')
+          li: a(href='#')
             i.icon-cog
             |$player.i*nventory
             button.close.dirty •
@@ -16,7 +16,7 @@ html
             i.icon-cog
             |$root.tell
             button.close ×
-          li: a(href='#')
+          li.active: a(href='#')
             i.icon-cog
             |$thing.g*et t*ake gr*ab
             button.close ×
@@ -24,6 +24,42 @@ html
             i.icon-file-alt
             |[#7 Wooden Sword].description
             button.close ×
+      .toolbar.navbar.navbar-static-top
+        .navbar-inner
+          form.navbar-form.form-inline
+            .row-fluid
+              input(type='text', value='g*et t*ake gr*ab')
+              select
+                option none
+                option(selected) this
+                option any
+              select
+                option none
+                option any
+                option with/using
+                option at/to
+                option in front of
+                option in/inside/into
+                option on top of/on/onto/upon
+                option out of/from inside/from
+                option over
+                option through
+                option under/underneath/beneath
+                option behind
+                option beside
+                option for/about
+                option is
+                option as
+                option off/off of
+              select
+                option none
+                option this
+                option any
+              label.checkbox
+                input(type='checkbox')
+                |hidden
+              button.btn.btn-primary.pull-right
+                |Save
       .editor
 
     .ui-layout-west
@@ -134,10 +170,12 @@ html
 
         element = $('.editor')[0]
         code = """
-        # display a player's inventory
-        names = @contents.map (i) -> i.name
-        names.unshift "You are carrying:"
-        player.tell names.join "\\n"
+        if @location == player
+          player.tell "You're already holding \#\{@name\}."
+        else
+          @location = player
+          player.tell "You pick up \#\{@name\}."
+          player.location.announce "\#\{player.name\} picks up \#\{@name\}."
         """
         options = {mode: "coffee", theme: "clouds", value: code, css: {fontSize: "12pt", fontFamily: "\'Source Code Pro\', sans-serif"}}
         theme = options.theme || 'textmate'
