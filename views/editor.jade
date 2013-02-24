@@ -6,23 +6,25 @@ html
     link(rel='stylesheet', href='/assets/editor.css')
   body
     .ui-layout-center
-      ul.nav.nav-tabs
-        li.active: a(href='#')
-          i.icon-cog
-          |$player.i*nventory
-          button.close.dirty •
-        li: a(href='#')
-          i.icon-cog
-          |$root.tell
-          button.close ×
-        li: a(href='#')
-          i.icon-cog
-          |$thing.g*et t*ake gr*ab
-          button.close ×
-        li: a(href='#')
-          i.icon-file-alt
-          |[#7 Wooden Sword].description
-          button.close ×
+      .tabs
+        ul.nav.nav-tabs
+          li.active: a(href='#')
+            i.icon-cog
+            |$player.i*nventory
+            button.close.dirty •
+          li: a(href='#')
+            i.icon-cog
+            |$root.tell
+            button.close ×
+          li: a(href='#')
+            i.icon-cog
+            |$thing.g*et t*ake gr*ab
+            button.close ×
+          li: a(href='#')
+            i.icon-file-alt
+            |[#7 Wooden Sword].description
+            button.close ×
+      .editor
 
     .ui-layout-west
       .ui-layout-west-center
@@ -127,4 +129,27 @@ html
     script(src='/assets/ace/ace.js')
     script(src='/assets/editor.js')
     :coffeescript
-      $ -> ko.applyBindings new EditorView $('body')
+      $ ->
+        ko.applyBindings new EditorView $('body')
+
+        element = $('.editor')[0]
+        code = """
+        # display a player's inventory
+        names = @contents.map (i) -> i.name
+        names.unshift "You are carrying:"
+        player.tell names.join "\\n"
+        """
+        options = {mode: "coffee", theme: "clouds", value: code, css: {fontSize: "12pt", fontFamily: "\'Source Code Pro\', sans-serif"}}
+        theme = options.theme || 'textmate'
+        mode = options.mode || 'javascript'
+        css = options.css || {}
+        value = options.value
+
+        editor = ace.edit(element)
+        editor.setTheme("ace/theme/"+theme)
+        session = editor.getSession()
+        session.setMode("ace/mode/"+mode)
+        session.setUseSoftTabs(true)
+        session.setTabSize(2)
+        $(element).css(css)
+        editor.setValue(value, -1)
