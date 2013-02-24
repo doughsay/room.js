@@ -35,31 +35,33 @@ hr {
   padding: 5px 5px 0;
 }
 
+.overflow-container {
+  width: 1000px;
+}
+
 ul.nav-list {
   li {
     i {
       color: black;
+      &.icon-caret-right, &.icon-caret-down {
+        cursor: pointer;
+      }
     }
     &.active {
       i {
         color: white;
       }
     }
-  }
-  span.pull-left {
-    margin-top: 2px;
-    span.label {
-      margin-right: 3px;
+    a {
+      span.label {
+        margin-right: 3px;
+        vertical-align: 1px;
+      }
+    }
+    span.pull-left {
+      margin-top: 3px;
     }
   }
-}
-
-.overflow-container {
-  width: 1000px;
-}
-
-i.icon-caret-right, i.icon-caret-down {
-  cursor: pointer;
 }
 
 ul.level1 {
