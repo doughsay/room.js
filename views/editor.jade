@@ -9,71 +9,93 @@ html
       p editor goes here
     .ui-layout-west
       .ui-layout-west-center
-        .row-fluid
-          input.search-query.span12(type='text', placeholder='Filter')
+        .search
+          .row-fluid
+            input.search-query.span12(type='text', placeholder='Filter')
         hr
         .row-fluid
-          ul.unstyled
-            li
-              i.icon-chevron-right
-              |&nbsp;
-              span.label.label-info #0
-              |&nbsp;
-              a(href='#') System Object
-              span.label.pull-right $sys
-            li
-              i.icon-chevron-down
-              |&nbsp;
-              span.label.label-info #1
-              |&nbsp;
-              a(href='#') Root Class
-              span.label.pull-right $root
-              ul.unstyled.indented
-                li
+          .overflow-container
+            ul.nav.nav-list
+              li
+                span.pull-left
+                  i.icon-chevron-right
+                  span.label.label-info #0
+                  span.label $sys
+                a(href='#') System Object
+              li
+                span.pull-left
                   i.icon-chevron-down
-                  |&nbsp;
-                  span.label.label-info #2
-                  |&nbsp;
-                  a(href='#') Player Class
-                  span.label.pull-right $player
-                  ul.unstyled.indented
-                    li
-                      i.icon-user
-                      |&nbsp;
-                      span.label.label-info #3
-                      |&nbsp;
-                      a(href='#') Gandalf
-                      span.label.pull-right $wizard
-                li
+                  span.label.label-info #1
+                  span.label $root
+                a(href='#') Root Class
+                ul.nav.nav-list.level1
+                  li
+                    span.pull-left
+                      i.icon-chevron-down
+                      span.label.label-info #2
+                      span.label $player
+                    a(href='#') Player Class
+                    ul.nav.nav-list.level2
+                      li.active
+                        span.pull-left
+                          i.icon-user.icon-white
+                          span.label.label-inverse #3
+                          span.label $wizard
+                        a(href='#') Gandalf
+                  li
+                    span.pull-left
+                      i.icon-chevron-right
+                      span.label.label-info #4
+                      span.label $room
+                    a(href='#') Room Class
+                  li
+                    span.pull-left
+                      i.icon-chevron-right
+                      span.label.label-info #5
+                      span.label $thing
+                    a(href='#') Thing Class
+                  li
+                    span.pull-left
+                      i.icon-chevron-right
+                      span.label.label-info #8
+                      span.label $exit
+                    a(href='#') Exit Class
+              li
+                span.pull-left
                   i.icon-chevron-right
-                  |&nbsp;
-                  span.label.label-info #4
-                  |&nbsp;
-                  a(href='#') Room Class
-                  span.label.pull-right $room
-                li
-                  i.icon-chevron-right
-                  |&nbsp;
-                  span.label.label-info #5
-                  |&nbsp;
-                  a(href='#') Thing Class
-                  span.label.pull-right $thing
-                li
-                  i.icon-chevron-right
-                  |&nbsp;
-                  span.label.label-info #8
-                  |&nbsp;
-                  a(href='#') Exit Class
-                  span.label.pull-right $exit
-            li
-              i.icon-chevron-right
-              |&nbsp;
-              span.label.label-info #21
-              |&nbsp;
-              a(href='#') Utility Verbs
-              span.label.pull-right $util
+                  span.label.label-info #21
+                  span.label $util
+                a(href='#') Utility Verbs
       .ui-layout-west-south
-        p selected object properties and verbs go here
+        .overflow-container
+          ul.nav.nav-list
+            li.nav-header Properties
+            li
+              a(href='#')
+                i.icon-file
+                |color
+            li
+              a(href='#')
+                i.icon-file
+                |health
+            li.nav-header Verbs
+            li.active
+              a(href='#')
+                i.icon-cog.icon-white
+                |tell
+            li
+              a(href='#')
+                i.icon-cog
+                |i*nventory
+            li
+              a(href='#')
+                i.icon-cog
+                |dance
+            li
+              a(href='#')
+                i.icon-cog
+                |hurt
+
 
     script(src='/socket.io/socket.io.js')
     script(src='/assets/ace/ace.js')

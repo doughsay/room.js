@@ -1,7 +1,8 @@
 //= require bootstrap
 
 .ui-layout-pane {
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .ui-layout-resizer {
@@ -25,6 +26,40 @@
   }
 }
 
-ul.indented {
-  margin-left: 16px;
+hr {
+  margin: 5px 0;
+}
+
+.search {
+  padding: 5px 5px 0;
+}
+
+ul.nav-list {
+  span.pull-left {
+    margin-top: 2px;
+    span.label {
+      margin-right: 3px;
+    }
+  }
+}
+
+.overflow-container {
+  width: 1000px;
+}
+
+i.icon-chevron-right, i.icon-chevron-down {
+  cursor: pointer;
+}
+
+ul.level1 {
+  a {
+    margin-left: -30px;
+    margin-right: -30px;
+  }
+  ul.level2 {
+    a {
+      margin-left: -45px;
+      margin-right: -45px;
+    }
+  }
 }
