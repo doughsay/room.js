@@ -11,6 +11,7 @@ class Editor
 
     @socket.on 'disconnect', @onDisconnect
     @socket.on 'get_tree', @onGetTree
+    @socket.on 'get_object', @onGetObject
 
   # fires when a socket disconnects, either by the client closing the connection
   # or calling the `disconnect` method of the socket.
@@ -18,6 +19,9 @@ class Editor
 
   onGetTree: (data, fn) =>
     fn @editorInterface.objectsTree()
+
+  onGetObject: (id, fn) =>
+    fn @editorInterface.getObject(id)
 
 # This is the editor controller.
 # It handles socket.io connections from the editor.

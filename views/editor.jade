@@ -6,14 +6,14 @@ html
     link(rel='stylesheet', href='/assets/editor.css')
   body
     script(type='text/html', id='TreeNodeTemplate')
-      li
+      li(data-bind='visible: visible, css: {active: active}')
         span.pull-left
           i(data-bind='css: iconClass, click: toggle')
-        a(href='#', data-bind='click: select')
-          span.label.label-info(data-bind='text: idPresenter')
-          span.label(data-bind='text: alias')
-          span(data-bind='text: name')
-        ul.nav.nav-list(data-bind='visible: expanded, template: {name: "TreeNodeTemplate", foreach: children}')
+        a(href='#', data-bind='click: $root.select(id)')
+          span.label.label-inverse(data-bind='html: idPresenter')
+          span.label(data-bind='html: aliasPresenter')
+          span(data-bind='html: namePresenter')
+        ul.nav.nav-list(data-bind='visible: expanded, template: {name: "TreeNodeTemplate", foreach: children}, css: levelClass')
 
     .ui-layout-center
       .tabs
@@ -84,33 +84,21 @@ html
 
       .ui-layout-west-south
         .overflow-container
-          ul.nav.nav-list
-            li.nav-header Properties
+          ul.nav.nav-list(data-bind='with: selectedObject')
+            li.nav-header(data-bind='visible: properties().length > 0') Properties
+            // ko foreach: properties
             li
-              a(href='#')
+              a(href='#', data-bind='click: $parent.select')
                 i.icon-file-alt
-                |color
+                span(data-bind='text: key')
+            // /ko
+            li.nav-header(data-bind='visible: verbs().length > 0') Verbs
+            // ko foreach: verbs
             li
-              a(href='#')
-                i.icon-file-alt
-                |health
-            li.nav-header Verbs
-            li
-              a(href='#')
+              a(href='#', data-bind='click: $parent.select')
                 i.icon-cog
-                |tell
-            li.active
-              a(href='#')
-                i.icon-cog
-                |i*nventory
-            li
-              a(href='#')
-                i.icon-cog
-                |dance
-            li
-              a(href='#')
-                i.icon-cog
-                |hurt
+                span(data-bind='text: name')
+            // /ko
 
 
     script(src='/socket.io/socket.io.js')
@@ -120,7 +108,6 @@ html
       $ ->
         ko.applyBindings (window.view = new EditorView $('body'))
 
-        ###
         element = $('.editor')[0]
         code = """
         if @location == player
@@ -144,4 +131,3 @@ html
         session.setTabSize(2)
         $(element).css(css)
         editor.setValue(value, -1)
-        ###

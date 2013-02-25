@@ -1,26 +1,95 @@
 class TreeNode
 
-  constructor: (o) ->
+  constructor: (o, @view, @level = 1) ->
     @id = ko.observable o.id
     @name = ko.observable o.name
     @player = ko.observable o.player
     @alias = ko.observable o.alias
-    @children = ko.observableArray o.children.map (p) -> new TreeNode p
+    @children = ko.observableArray o.children.map (p) => new TreeNode p, @view, @level+1
 
     # presenters
-    @idPresenter = ko.computed => "\##{@id()}"
+    @idPresenter = ko.computed =>
+      id = "\##{@id()}"
+      filter = @view.filter()
+
+      return id if filter == ''
+
+      if id.toLowerCase().indexOf(filter.toLowerCase()) != -1
+        id.replace new RegExp("(#{filter})", 'ig'), '<span class="highlight">$1</span>'
+      else
+        id
+
+    @namePresenter = ko.computed =>
+      name = @name()
+      filter = @view.filter()
+
+      return name if filter == ''
+
+      if name.toLowerCase().indexOf(filter.toLowerCase()) != -1
+        name.replace new RegExp("(#{filter})", 'ig'), '<span class="highlight">$1</span>'
+      else
+        name
+
+    @aliasPresenter = ko.computed =>
+      return '' if not @alias()?
+      alias = "#{@alias()}"
+      filter = @view.filter()
+
+      return alias if filter == ''
+
+      if alias.toLowerCase().indexOf(filter.toLowerCase()) != -1
+        alias.replace new RegExp("(#{filter})", 'ig'), '<span class="highlight">$1</span>'
+      else
+        alias
 
     # state
-    @active = ko.observable false
     @expanded = ko.observable false
     @iconClass = ko.computed =>
       if @children().length > 0
         if @expanded() then 'icon-caret-down' else 'icon-caret-right'
       else
         if @player() then 'icon-user' else 'icon-file'
+    @levelClass = ko.computed => "level#{@level}"
+    @visible = ko.computed =>
+      return true if @view.filter() == ''
+
+      true in (o.visible() for o in @children()) or @matchesFilter()
+
+    @active = ko.computed (x) =>
+      selected = @view.selectedObject()
+      if not selected?
+        false
+      else
+        selected.id() == @id()
+
+    @view.filter.subscribe (filter) =>
+      if filter isnt '' and @visible()
+        @expanded true
 
   toggle: ->
     @expanded !@expanded()
+
+  matchesFilter: ->
+    filter = @view.filter()
+
+    matches = (str) =>
+      str.toLowerCase().indexOf(filter.toLowerCase()) != -1
+
+    matches(@name()) or matches("#{@alias()}") or matches("\##{@id()}")
+
+class ActiveObject
+
+  constructor: (object) ->
+    @id = ko.observable object.id
+    @properties = ko.observableArray object.properties.map (p) ->
+      key: ko.observable p.key
+      value: ko.observable p.value
+    @verbs = ko.observableArray object.verbs.map (v) ->
+      name: ko.observable v.name
+      dobjarg: ko.observable v.dobjarg
+      preparg: ko.observable v.preparg
+      iobjarg: ko.observable v.iobjarg
+      code: ko.observable v.code
 
   select: ->
     console.log 'TODO'
@@ -36,20 +105,20 @@ class EditorView
     @objects = ko.observableArray []
     @filter = ko.observable ''
 
-    @filteredObjects = ko.computed =>
-      filter = @filter()
-      objects = @objects()
-      # TODO
-      # return nested array of objects who's name or alias or id match the filter
-      # parents of objects who match must be shown obviously
-      # highlighting the matched text would be nice too
+    @selectedObject = ko.observable null
 
     @attachListeners()
 
   # on keyup in the search field this fires so the viewmodel updates immediately
-  updateFilter: (e) =>
+  updateFilter: ->
     $('.search input').trigger 'change'
     true
+
+  select: (idAccessor) ->
+    id = idAccessor()
+    =>
+      @socket.emit 'get_object', id, (object) =>
+        @selectedObject new ActiveObject object
 
   # attach the websocket event listeners
   attachListeners: ->
@@ -83,7 +152,7 @@ class EditorView
 
   loadSidebar: ->
     @socket.emit 'get_tree', null, (tree) =>
-      @objects tree.map (o) -> new TreeNode o
+      @objects tree.map (o) => new TreeNode o, @
 
   #############################
   # websocket event listeners #

@@ -30,3 +30,11 @@ module.exports = class EditorInterface
       o.parent_id == null
 
     top.map show
+
+  getObject: (id) ->
+    object = @db.findById id
+    {
+      id: object.id
+      properties: object.properties
+      verbs: object.verbs
+    }

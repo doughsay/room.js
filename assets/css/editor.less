@@ -39,6 +39,15 @@ hr {
   width: 1000px;
 }
 
+.highlight {
+  background-color: yellow;
+}
+.label {
+  .highlight {
+    background-color: gray;
+  }
+}
+
 ul.nav-list {
   li {
     i {
@@ -48,7 +57,7 @@ ul.nav-list {
       }
     }
     &.active {
-      i {
+      & > span i, & > a i {
         color: white;
       }
     }
