@@ -1,10 +1,13 @@
 util = require 'util'
 
+EditorInterface = require '../lib/editor_interface'
+
 # An Editor represents a socket.io connection from the web editor.
 # It handles editor messages.
 class Editor
 
   constructor: (@db, @socket) ->
+    @editorInterface = new EditorInterface @db
 
     @socket.on 'disconnect', @onDisconnect
     @socket.on 'get_tree', @onGetTree
@@ -14,18 +17,7 @@ class Editor
   onDisconnect: =>
 
   onGetTree: (data, fn) =>
-    fn [
-        {
-          id: 1
-          parent: null
-          global: '$root'
-          name: 'Root Class'
-          aliases: []
-          children: []
-          crontab: []
-          tell: ''
-        }
-      ]
+    fn @editorInterface.objectsTree()
 
 # This is the editor controller.
 # It handles socket.io connections from the editor.

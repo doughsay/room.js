@@ -5,6 +5,16 @@ html
     link(rel='stylesheet', href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400')
     link(rel='stylesheet', href='/assets/editor.css')
   body
+    script(type='text/html', id='TreeNodeTemplate')
+      li
+        span.pull-left
+          i(data-bind='css: iconClass, click: toggle')
+        a(href='#', data-bind='click: select')
+          span.label.label-info(data-bind='text: idPresenter')
+          span.label(data-bind='text: alias')
+          span(data-bind='text: name')
+        ul.nav.nav-list(data-bind='visible: expanded, template: {name: "TreeNodeTemplate", foreach: children}')
+
     .ui-layout-center
       .tabs
         ul.nav.nav-tabs
@@ -66,69 +76,11 @@ html
       .ui-layout-west-center
         .search
           .row-fluid
-            input.search-query.span12(type='text', placeholder='Filter')
+            input.search-query.span12(type='text', placeholder='Filter', data-bind='value: filter, event: {keyup: updateFilter}')
         hr
         .row-fluid
           .overflow-container
-            ul.nav.nav-list
-              li
-                span.pull-left
-                  i.icon-caret-right
-                a(href='#')
-                  span.label.label-info #0
-                  span.label $sys
-                  |System Object
-              li
-                span.pull-left
-                  i.icon-caret-down
-                a(href='#')
-                  span.label.label-info #1
-                  span.label $root
-                  |Root Class
-                ul.nav.nav-list.level1
-                  li
-                    span.pull-left
-                      i.icon-caret-down
-                    a(href='#')
-                      span.label.label-info #2
-                      span.label $player
-                      |Player Class
-                    ul.nav.nav-list.level2
-                      li.active
-                        span.pull-left
-                          i.icon-user
-                        a(href='#')
-                          span.label.label-inverse #3
-                          span.label $wizard
-                          |Gandalf
-                  li
-                    span.pull-left
-                      i.icon-caret-right
-                    a(href='#')
-                      span.label.label-info #4
-                      span.label $room
-                      |Room Class
-                  li
-                    span.pull-left
-                      i.icon-caret-right
-                    a(href='#')
-                      span.label.label-info #5
-                      span.label $thing
-                      |Thing Class
-                  li
-                    span.pull-left
-                      i.icon-caret-right
-                    a(href='#')
-                      span.label.label-info #8
-                      span.label $exit
-                      |Exit Class
-              li
-                span.pull-left
-                  i.icon-caret-right
-                a(href='#')
-                  span.label.label-info #21
-                  span.label $util
-                  |Utility Verbs
+            ul.nav.nav-list(data-bind='template: {name: "TreeNodeTemplate", foreach: objects}')
 
       .ui-layout-west-south
         .overflow-container
@@ -166,8 +118,9 @@ html
     script(src='/assets/editor.js')
     :coffeescript
       $ ->
-        ko.applyBindings new EditorView $('body')
+        ko.applyBindings (window.view = new EditorView $('body'))
 
+        ###
         element = $('.editor')[0]
         code = """
         if @location == player
@@ -191,3 +144,4 @@ html
         session.setTabSize(2)
         $(element).css(css)
         editor.setValue(value, -1)
+        ###

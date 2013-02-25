@@ -1,3 +1,30 @@
+class TreeNode
+
+  constructor: (o) ->
+    @id = ko.observable o.id
+    @name = ko.observable o.name
+    @player = ko.observable o.player
+    @alias = ko.observable o.alias
+    @children = ko.observableArray o.children.map (p) -> new TreeNode p
+
+    # presenters
+    @idPresenter = ko.computed => "\##{@id()}"
+
+    # state
+    @active = ko.observable false
+    @expanded = ko.observable false
+    @iconClass = ko.computed =>
+      if @children().length > 0
+        if @expanded() then 'icon-caret-down' else 'icon-caret-right'
+      else
+        if @player() then 'icon-user' else 'icon-file'
+
+  toggle: ->
+    @expanded !@expanded()
+
+  select: ->
+    console.log 'TODO'
+
 # Knockout.js view model for the room.js editor
 class EditorView
 
@@ -6,7 +33,23 @@ class EditorView
   # construct the view model
   constructor: (@body) ->
     @socket = io.connect(window.location.href)
+    @objects = ko.observableArray []
+    @filter = ko.observable ''
+
+    @filteredObjects = ko.computed =>
+      filter = @filter()
+      objects = @objects()
+      # TODO
+      # return nested array of objects who's name or alias or id match the filter
+      # parents of objects who match must be shown obviously
+      # highlighting the matched text would be nice too
+
     @attachListeners()
+
+  # on keyup in the search field this fires so the viewmodel updates immediately
+  updateFilter: (e) =>
+    $('.search input').trigger 'change'
+    true
 
   # attach the websocket event listeners
   attachListeners: ->
@@ -26,7 +69,7 @@ class EditorView
     @layout = @body.layout
       livePaneResizing: true
       west:
-        size: '15%'
+        size: '20%'
         slidable: false
         childOptions:
           livePaneResizing: true
@@ -39,8 +82,8 @@ class EditorView
 
 
   loadSidebar: ->
-    @socket.emit 'get_tree', null, (tree) ->
-      console.log tree
+    @socket.emit 'get_tree', null, (tree) =>
+      @objects tree.map (o) -> new TreeNode o
 
   #############################
   # websocket event listeners #
