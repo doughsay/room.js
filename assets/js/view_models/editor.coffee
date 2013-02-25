@@ -84,15 +84,46 @@ class ActiveObject
     @properties = ko.observableArray object.properties.map (p) ->
       key: ko.observable p.key
       value: ko.observable p.value
+      active: ko.observable false
     @verbs = ko.observableArray object.verbs.map (v) ->
       name: ko.observable v.name
       dobjarg: ko.observable v.dobjarg
       preparg: ko.observable v.preparg
       iobjarg: ko.observable v.iobjarg
       code: ko.observable v.code
+      active: ko.observable false
 
-  select: ->
-    console.log 'TODO'
+  selectProperty: (keyAccessor) ->
+    key = keyAccessor()
+    =>
+      for p in @properties()
+        if p.key() == key
+          p.active true
+        else
+          p.active false
+
+      v.active(false) for v in @verbs()
+
+  selectVerb: (nameAccessor) ->
+    name = nameAccessor()
+    =>
+      for v in @verbs()
+        if v.name() == name
+          v.active true
+        else
+          v.active false
+
+      p.active(false) for p in @properties()
+
+  openProperty: (keyAccessor) ->
+    key = keyAccessor()
+    =>
+      console.log 'TODO', 'open property', key
+
+  openVerb: (nameAccessor) ->
+    name = nameAccessor()
+    =>
+      console.log 'TODO', 'open verb', name
 
 # Knockout.js view model for the room.js editor
 class EditorView

@@ -87,15 +87,15 @@ html
           ul.nav.nav-list(data-bind='with: selectedObject')
             li.nav-header(data-bind='visible: properties().length > 0') Properties
             // ko foreach: properties
-            li
-              a(href='#', data-bind='click: $parent.select')
+            li(data-bind='css: {active: active}')
+              a(href='#', data-bind='click: $parent.selectProperty(key), event: {dblclick: $parent.openProperty(key)}')
                 i.icon-file-alt
                 span(data-bind='text: key')
             // /ko
             li.nav-header(data-bind='visible: verbs().length > 0') Verbs
             // ko foreach: verbs
-            li
-              a(href='#', data-bind='click: $parent.select')
+            li(data-bind='css: {active: active}')
+              a(href='#', data-bind='click: $parent.selectVerb(name), event: {dblclick: $parent.openVerb(name)}')
                 i.icon-cog
                 span(data-bind='text: name')
             // /ko
