@@ -77,7 +77,7 @@ class TreeNode
 
     matches(@name()) or matches("#{@alias()}") or matches("\##{@id()}")
 
-class ActiveObject
+class SelectedObject
 
   constructor: (object) ->
     @id = ko.observable object.id
@@ -115,15 +115,23 @@ class ActiveObject
 
       p.active(false) for p in @properties()
 
-  openProperty: (keyAccessor) ->
-    key = keyAccessor()
-    =>
-      console.log 'TODO', 'open property', key
+class Tab
 
-  openVerb: (nameAccessor) ->
-    name = nameAccessor()
-    =>
-      console.log 'TODO', 'open verb', name
+  constructor: (tab) ->
+    @type = tab.type
+    @name = ko.observable tab.name
+    @objectId = tab.objectId
+    @dirty = ko.observable false
+
+    @iconClass = ko.computed =>
+      switch @type
+        when 'verb'
+          'icon-cog'
+        when 'property'
+          'icon-file-alt'
+
+    @closeSymbol = ko.computed =>
+      if @dirty() then '•' else '×'
 
 # Knockout.js view model for the room.js editor
 class EditorView
@@ -138,6 +146,8 @@ class EditorView
 
     @selectedObject = ko.observable null
 
+    @tabs = ko.observableArray []
+
     @attachListeners()
 
   # on keyup in the search field this fires so the viewmodel updates immediately
@@ -149,7 +159,26 @@ class EditorView
     id = idAccessor()
     =>
       @socket.emit 'get_object', id, (object) =>
-        @selectedObject new ActiveObject object
+        @selectedObject new SelectedObject object
+
+  openProperty: (idAccessor, keyAccessor) ->
+    id = idAccessor()
+    key = keyAccessor()
+    =>
+      @tabs.push new Tab {type: 'property', objectId: id, name: key}
+
+  openVerb: (idAccessor, nameAccessor) ->
+    id = idAccessor()
+    name = nameAccessor()
+    =>
+      @tabs.push new Tab {type: 'verb', objectId: id, name: name}
+
+  closeTab: (tab, event) ->
+    console.log 'TODO close tab'
+    event.stopPropagation()
+
+  selectTab: (tab) ->
+    console.log 'TODO select tab'
 
   # attach the websocket event listeners
   attachListeners: ->

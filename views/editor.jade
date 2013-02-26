@@ -17,60 +17,65 @@ html
 
     .ui-layout-center
       .tabs
-        ul.nav.nav-tabs
-          li: a(href='#')
-            i.icon-cog
-            |$player.i*nventory
-            button.close.dirty •
-          li: a(href='#')
-            i.icon-cog
-            |$root.tell
-            button.close ×
-          li.active: a(href='#')
-            i.icon-cog
-            |$thing.g*et t*ake gr*ab
-            button.close ×
-          li: a(href='#')
-            i.icon-file-alt
-            |[#7 Wooden Sword].description
-            button.close ×
-      .toolbar.navbar.navbar-static-top
-        .navbar-inner
-          form.navbar-form.form-inline
-            .row-fluid
-              input(type='text', value='g*et t*ake gr*ab')
-              select
-                option none
-                option(selected) this
-                option any
-              select
-                option none
-                option any
-                option with/using
-                option at/to
-                option in front of
-                option in/inside/into
-                option on top of/on/onto/upon
-                option out of/from inside/from
-                option over
-                option through
-                option under/underneath/beneath
-                option behind
-                option beside
-                option for/about
-                option is
-                option as
-                option off/off of
-              select
-                option none
-                option this
-                option any
-              label.checkbox
-                input(type='checkbox')
-                |hidden
-              button.btn.btn-primary.pull-right
-                |Save
-      .editor
+        ul.nav.nav-tabs(data-bind='foreach: tabs')
+          li
+            a(href='#', data-bind='click: $root.selectTab')
+              i(data-bind='css: iconClass')
+              span(data-bind='text: name')
+              button.close(data-bind='css: {dirty: dirty}, text: closeSymbol, click: $root.closeTab')
+          //- li: a(href='#')
+          //-   i.icon-cog
+          //-   span $player.i*nventory
+          //-   button.close.dirty •
+          //- li: a(href='#')
+          //-   i.icon-cog
+          //-   span $root.tell
+          //-   button.close ×
+          //- li.active: a(href='#')
+          //-   i.icon-cog
+          //-   span $thing.g*et t*ake gr*ab
+          //-   button.close ×
+          //- li: a(href='#')
+          //-   i.icon-file-alt
+          //-   span [#7 Wooden Sword].description
+          //-   button.close ×
+      //- .toolbar.navbar.navbar-static-top
+      //-   .navbar-inner
+      //-     form.navbar-form.form-inline
+      //-       .row-fluid
+      //-         input(type='text', value='g*et t*ake gr*ab')
+      //-         select
+      //-           option none
+      //-           option(selected) this
+      //-           option any
+      //-         select
+      //-           option none
+      //-           option any
+      //-           option with/using
+      //-           option at/to
+      //-           option in front of
+      //-           option in/inside/into
+      //-           option on top of/on/onto/upon
+      //-           option out of/from inside/from
+      //-           option over
+      //-           option through
+      //-           option under/underneath/beneath
+      //-           option behind
+      //-           option beside
+      //-           option for/about
+      //-           option is
+      //-           option as
+      //-           option off/off of
+      //-         select
+      //-           option none
+      //-           option this
+      //-           option any
+      //-         label.checkbox
+      //-           input(type='checkbox')
+      //-           |hidden
+      //-         button.btn.btn-primary.pull-right
+      //-           |Save
+      //- .editor
 
     .ui-layout-west
       .ui-layout-west-center
@@ -88,14 +93,14 @@ html
             li.nav-header(data-bind='visible: properties().length > 0') Properties
             // ko foreach: properties
             li(data-bind='css: {active: active}')
-              a(href='#', data-bind='click: $parent.selectProperty(key), event: {dblclick: $parent.openProperty(key)}')
+              a(href='#', data-bind='click: $parent.selectProperty(key), event: {dblclick: $root.openProperty($parent.id, key)}')
                 i.icon-file-alt
                 span(data-bind='text: key')
             // /ko
             li.nav-header(data-bind='visible: verbs().length > 0') Verbs
             // ko foreach: verbs
             li(data-bind='css: {active: active}')
-              a(href='#', data-bind='click: $parent.selectVerb(name), event: {dblclick: $parent.openVerb(name)}')
+              a(href='#', data-bind='click: $parent.selectVerb(name), event: {dblclick: $root.openVerb($parent.id, name)}')
                 i.icon-cog
                 span(data-bind='text: name')
             // /ko
@@ -108,6 +113,7 @@ html
       $ ->
         ko.applyBindings (window.view = new EditorView $('body'))
 
+        ###
         element = $('.editor')[0]
         code = """
         if @location == player
@@ -131,3 +137,4 @@ html
         session.setTabSize(2)
         $(element).css(css)
         editor.setValue(value, -1)
+        ###
