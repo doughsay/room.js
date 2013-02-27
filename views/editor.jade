@@ -18,8 +18,8 @@ html
     .ui-layout-center
       .tabs
         ul.nav.nav-tabs(data-bind='foreach: tabs')
-          li
-            a(href='#', data-bind='click: $root.selectTab')
+          li(data-bind='css: {active: active}')
+            a(href='#', data-bind='click: $root.selectTab($data)')
               i(data-bind='css: iconClass')
               span(data-bind='text: name')
               button.close(data-bind='css: {dirty: dirty}, text: closeSymbol, click: $root.closeTab')

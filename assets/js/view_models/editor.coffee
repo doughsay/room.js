@@ -55,7 +55,7 @@ class TreeNode
 
       true in (o.visible() for o in @children()) or @matchesFilter()
 
-    @active = ko.computed (x) =>
+    @active = ko.computed =>
       selected = @view.selectedObject()
       if not selected?
         false
@@ -117,7 +117,7 @@ class SelectedObject
 
 class Tab
 
-  constructor: (tab) ->
+  constructor: (tab, @view) ->
     @type = tab.type
     @name = ko.observable tab.name
     @objectId = tab.objectId
@@ -133,6 +133,9 @@ class Tab
     @closeSymbol = ko.computed =>
       if @dirty() then '•' else '×'
 
+    @active = ko.computed =>
+      @ == @view.selectedTab()
+
 # Knockout.js view model for the room.js editor
 class EditorView
 
@@ -147,6 +150,8 @@ class EditorView
     @selectedObject = ko.observable null
 
     @tabs = ko.observableArray []
+
+    @selectedTab = ko.observable null
 
     @attachListeners()
 
@@ -165,20 +170,48 @@ class EditorView
     id = idAccessor()
     key = keyAccessor()
     =>
-      @tabs.push new Tab {type: 'property', objectId: id, name: key}
+      tab = @tabs().filter((t) -> t.type is 'property' and t.objectId is id and t.name() is key)[0]
+      if tab?
+        @selectTab(tab)()
+      else
+        tab = new Tab {type: 'property', objectId: id, name: key}, @
+        @tabs.push tab
+        @selectTab(tab)()
 
   openVerb: (idAccessor, nameAccessor) ->
     id = idAccessor()
     name = nameAccessor()
     =>
-      @tabs.push new Tab {type: 'verb', objectId: id, name: name}
+      tab = @tabs().filter((t) -> t.type is 'verb' and t.objectId is id and t.name() is name)[0]
+      if tab?
+        @selectTab(tab)()
+      else
+        tab = new Tab {type: 'verb', objectId: id, name: name}, @
+        @tabs.push tab
+        @selectTab(tab)()
 
-  closeTab: (tab, event) ->
-    console.log 'TODO close tab'
+  closeTab: (tab, event) =>
+    remove = =>
+      tabIndex = @tabs.indexOf(tab)
+      selectOther = tab.active()
+      @tabs.remove(tab)
+      if selectOther
+        otherTab = @tabs()[tabIndex]
+        if not otherTab? and tabIndex > 0
+          otherTab = @tabs()[tabIndex-1]
+        @selectTab(otherTab)() if otherTab?
+
+    if tab.dirty()
+      bootbox.confirm "Are you sure you want to close this #{tab.type}?  Your unsaved changes will be lost.", (close) =>
+        remove() if close
+    else
+      remove()
+
     event.stopPropagation()
 
   selectTab: (tab) ->
-    console.log 'TODO select tab'
+    =>
+      @selectedTab tab
 
   # attach the websocket event listeners
   attachListeners: ->
