@@ -137,6 +137,7 @@ class Tab
 
     @session.setUseSoftTabs true
     @session.setTabSize 2
+    @session.setUseWrapMode true
 
     @displayName = ko.computed =>
       object = @object()
@@ -174,18 +175,18 @@ class EditorView
     @selectedObject = ko.observable null
 
     @tabs = ko.observableArray []
-    @tabs.subscribe @setSizes
+    @tabs.subscribe => @setSizes()
 
     @selectedTab = ko.observable null
-
-    @attachListeners()
-    @setLayout()
-    @setSizes()
 
     element = $('.editor')[0]
     @editor = ace.edit element
     @editor.setTheme 'ace/theme/clouds'
     $(element).css fontSize: '12pt', fontFamily: '"Source Code Pro", sans-serif'
+
+    @attachListeners()
+    @setLayout()
+    @setSizes()
 
     ko.applyBindings @
 
@@ -268,6 +269,8 @@ class EditorView
   setLayout: ->
     @layout = @body.layout
       livePaneResizing: true
+      onresize: =>
+        @setSizes()
       west:
         size: '20%'
         slidable: false
@@ -281,14 +284,15 @@ class EditorView
             slidable: false
 
   setSizes: ->
-    window.setTimeout (->
-      editor = $ '.editor'
-      frame = editor.parent()
-      tabs = $ '.tabs'
-      toolbar = $ '.toolbar'
-      editor.width frame.innerWidth()
-      editor.height frame.innerHeight() - tabs.outerHeight() - toolbar.outerHeight()
-    ), 1
+    editor = $ '.editor'
+    frame = editor.parent()
+    tabs = $ '.tabs'
+    toolbar = $ '.toolbar'
+    console.log frame.innerHeight()
+    editor.width frame.innerWidth()
+    editor.height frame.innerHeight() - tabs.outerHeight() - toolbar.outerHeight()
+    console.log @editor
+    @editor.resize()
 
   loadSidebar: ->
     @socket.emit 'get_tree', null, (tree) =>
