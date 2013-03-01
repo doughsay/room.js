@@ -86,12 +86,16 @@ class SelectedObject
       value: ko.observable p.value
       active: ko.observable false
     @verbs = ko.observableArray object.verbs.map (v) ->
-      name: ko.observable v.name
-      dobjarg: ko.observable v.dobjarg
-      preparg: ko.observable v.preparg
-      iobjarg: ko.observable v.iobjarg
-      code: ko.observable v.code
-      active: ko.observable false
+      x =
+        name: ko.observable v.name
+        dobjarg: ko.observable v.dobjarg
+        preparg: ko.observable v.preparg
+        iobjarg: ko.observable v.iobjarg
+        code: ko.observable v.code
+        hidden: ko.observable v.hidden
+        active: ko.observable false
+      x.iconClass = ko.computed => if x.hidden() then 'icon-eye-close' else 'icon-cog'
+      x
 
   selectProperty: (keyAccessor) ->
     key = keyAccessor()
@@ -121,9 +125,18 @@ class Tab
     @type = tab.type
     @object = ko.observable tab.object
     @name = ko.observable tab.name
-    @objectId = tab.objectId
     @dirty = ko.observable false
-    console.log @object()
+
+    switch @type
+      when 'verb'
+        @verb = tab.verb
+        @session = new ace.EditSession @verb.code(), 'ace/mode/coffee'
+      when 'property'
+        @property = tab.property
+        @session = new ace.EditSession JSON.stringify(@property.value(), null, '  '), 'ace/mode/json'
+
+    @session.setUseSoftTabs true
+    @session.setTabSize 2
 
     @displayName = ko.computed =>
       object = @object()
@@ -161,10 +174,18 @@ class EditorView
     @selectedObject = ko.observable null
 
     @tabs = ko.observableArray []
+    @tabs.subscribe @setSizes
 
     @selectedTab = ko.observable null
 
     @attachListeners()
+    @setLayout()
+    @setSizes()
+
+    element = $('.editor')[0]
+    @editor = ace.edit element
+    @editor.setTheme 'ace/theme/clouds'
+    $(element).css fontSize: '12pt', fontFamily: '"Source Code Pro", sans-serif'
 
     ko.applyBindings @
 
@@ -182,26 +203,26 @@ class EditorView
   openProperty: (idAccessor, keyAccessor) ->
     id = idAccessor()
     key = keyAccessor()
-    =>
-      tab = @tabs().filter((t) -> t.type is 'property' and t.objectId is id and t.name() is key)[0]
+    (property) =>
+      tab = @tabs().filter((t) -> t.type is 'property' and t.object().id is id and t.name() is key)[0]
       if tab?
         @selectTab(tab)()
       else
         @socket.emit 'get_object', id, (object) =>
-          tab = new Tab {type: 'property', object: object, name: key}, @
+          tab = new Tab {type: 'property', object: object, name: key, property: property}, @
           @tabs.push tab
           @selectTab(tab)()
 
   openVerb: (idAccessor, nameAccessor) ->
     id = idAccessor()
     name = nameAccessor()
-    =>
-      tab = @tabs().filter((t) -> t.type is 'verb' and t.objectId is id and t.name() is name)[0]
+    (verb) =>
+      tab = @tabs().filter((t) -> t.type is 'verb' and t.object().id is id and t.name() is name)[0]
       if tab?
         @selectTab(tab)()
       else
         @socket.emit 'get_object', id, (object) =>
-          tab = new Tab {type: 'verb', object: object, name: name}, @
+          tab = new Tab {type: 'verb', object: object, name: name, verb: verb}, @
           @tabs.push tab
           @selectTab(tab)()
 
@@ -230,6 +251,7 @@ class EditorView
   selectTab: (tab) ->
     =>
       @selectedTab tab
+      @editor.setSession tab.session
 
   # attach the websocket event listeners
   attachListeners: ->
@@ -241,8 +263,6 @@ class EditorView
     @socket.on 'reconnect_failed', @reconnect_failed
     @socket.on 'reconnect', @reconnect
     @socket.on 'reconnecting', @reconnecting
-
-    @setLayout()
 
   # build the jqeury ui layout
   setLayout: ->
@@ -260,6 +280,15 @@ class EditorView
             size: '50%'
             slidable: false
 
+  setSizes: ->
+    window.setTimeout (->
+      editor = $ '.editor'
+      frame = editor.parent()
+      tabs = $ '.tabs'
+      toolbar = $ '.toolbar'
+      editor.width frame.innerWidth()
+      editor.height frame.innerHeight() - tabs.outerHeight() - toolbar.outerHeight()
+    ), 1
 
   loadSidebar: ->
     @socket.emit 'get_tree', null, (tree) =>

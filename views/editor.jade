@@ -25,16 +25,16 @@ html
               button.close(data-bind='css: {dirty: dirty}, text: closeSymbol, click: $root.closeTab')
       .toolbar(data-bind='with: selectedTab')
         .verb-toolbar(data-bind='if: type == "verb"')
-          .navbar.navbar-static-top
+          .navbar.navbar-static-top(data-bind='with: verb')
             .navbar-inner
               form.navbar-form.form-inline
                 .row-fluid
                   input(type='text', data-bind='value: name')
-                  select
+                  select(data-bind='value: dobjarg')
                     option none
                     option(selected) this
                     option any
-                  select
+                  select(data-bind='value: preparg')
                     option none
                     option any
                     option with/using
@@ -52,23 +52,23 @@ html
                     option is
                     option as
                     option off/off of
-                  select
+                  select(data-bind='value: iobjarg')
                     option none
                     option this
                     option any
                   label.checkbox
-                    input(type='checkbox')
+                    input(type='checkbox', data-bind='checked: hidden')
                     |hidden
                   button.btn.btn-primary.pull-right
                     |Save
         .property-toolbar(data-bind='if: type == "property"')
-          .navbar.navbar-static-top
+          .navbar.navbar-static-top(data-bind='with: property')
             .navbar-inner
               form.navbar-form.form-inline
                 .row-fluid
                   button.btn.btn-primary.pull-right
                     |Save
-      .editor
+      .editor(data-bind='visible: selectedTab')
 
     .ui-layout-west
       .ui-layout-west-center
@@ -94,7 +94,7 @@ html
             // ko foreach: verbs
             li(data-bind='css: {active: active}')
               a(href='#', data-bind='click: $parent.selectVerb(name), event: {dblclick: $root.openVerb($parent.id, name)}')
-                i.icon-cog
+                i(data-bind='css: iconClass')
                 span(data-bind='text: name')
             // /ko
 
@@ -105,29 +105,3 @@ html
     :coffeescript
       $ ->
         window.view = new EditorView $('body')
-
-        ###
-        element = $('.editor')[0]
-        code = """
-        if @location == player
-          player.tell "You're already holding \#\{@name\}."
-        else
-          @location = player
-          player.tell "You pick up \#\{@name\}."
-          player.location.announce "\#\{player.name\} picks up \#\{@name\}."
-        """
-        options = {mode: "coffee", theme: "clouds", value: code, css: {fontSize: "12pt", fontFamily: "\'Source Code Pro\', sans-serif"}}
-        theme = options.theme || 'textmate'
-        mode = options.mode || 'javascript'
-        css = options.css || {}
-        value = options.value
-
-        editor = ace.edit(element)
-        editor.setTheme("ace/theme/"+theme)
-        session = editor.getSession()
-        session.setMode("ace/mode/"+mode)
-        session.setUseSoftTabs(true)
-        session.setTabSize(2)
-        $(element).css(css)
-        editor.setValue(value, -1)
-        ###
