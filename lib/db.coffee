@@ -104,6 +104,9 @@ module.exports = class Db
   findByNum: (numStr) ->
     @findById parseInt numStr.match(/^#([0-9]+)$/)?[1]
 
+  aliasFor: (id) ->
+    @globalAliases()[id]
+
   # find the objects matched by the command
   matchObjects: (player, command) ->
     dobj: if command.dobjstr? then @findObject command.dobjstr, player else @nothing

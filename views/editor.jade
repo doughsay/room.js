@@ -21,67 +21,60 @@ html
           li(data-bind='css: {active: active}')
             a(href='#', data-bind='click: $root.selectTab($data)')
               i(data-bind='css: iconClass')
-              span(data-bind='text: name')
+              span(data-bind='text: displayName')
               button.close(data-bind='css: {dirty: dirty}, text: closeSymbol, click: $root.closeTab')
-          //- li: a(href='#')
-          //-   i.icon-cog
-          //-   span $player.i*nventory
-          //-   button.close.dirty •
-          //- li: a(href='#')
-          //-   i.icon-cog
-          //-   span $root.tell
-          //-   button.close ×
-          //- li.active: a(href='#')
-          //-   i.icon-cog
-          //-   span $thing.g*et t*ake gr*ab
-          //-   button.close ×
-          //- li: a(href='#')
-          //-   i.icon-file-alt
-          //-   span [#7 Wooden Sword].description
-          //-   button.close ×
-      //- .toolbar.navbar.navbar-static-top
-      //-   .navbar-inner
-      //-     form.navbar-form.form-inline
-      //-       .row-fluid
-      //-         input(type='text', value='g*et t*ake gr*ab')
-      //-         select
-      //-           option none
-      //-           option(selected) this
-      //-           option any
-      //-         select
-      //-           option none
-      //-           option any
-      //-           option with/using
-      //-           option at/to
-      //-           option in front of
-      //-           option in/inside/into
-      //-           option on top of/on/onto/upon
-      //-           option out of/from inside/from
-      //-           option over
-      //-           option through
-      //-           option under/underneath/beneath
-      //-           option behind
-      //-           option beside
-      //-           option for/about
-      //-           option is
-      //-           option as
-      //-           option off/off of
-      //-         select
-      //-           option none
-      //-           option this
-      //-           option any
-      //-         label.checkbox
-      //-           input(type='checkbox')
-      //-           |hidden
-      //-         button.btn.btn-primary.pull-right
-      //-           |Save
-      //- .editor
+      .toolbar(data-bind='with: selectedTab')
+        .verb-toolbar(data-bind='if: type == "verb"')
+          .navbar.navbar-static-top
+            .navbar-inner
+              form.navbar-form.form-inline
+                .row-fluid
+                  input(type='text', data-bind='value: name')
+                  select
+                    option none
+                    option(selected) this
+                    option any
+                  select
+                    option none
+                    option any
+                    option with/using
+                    option at/to
+                    option in front of
+                    option in/inside/into
+                    option on top of/on/onto/upon
+                    option out of/from inside/from
+                    option over
+                    option through
+                    option under/underneath/beneath
+                    option behind
+                    option beside
+                    option for/about
+                    option is
+                    option as
+                    option off/off of
+                  select
+                    option none
+                    option this
+                    option any
+                  label.checkbox
+                    input(type='checkbox')
+                    |hidden
+                  button.btn.btn-primary.pull-right
+                    |Save
+        .property-toolbar(data-bind='if: type == "property"')
+          .navbar.navbar-static-top
+            .navbar-inner
+              form.navbar-form.form-inline
+                .row-fluid
+                  button.btn.btn-primary.pull-right
+                    |Save
+      .editor
 
     .ui-layout-west
       .ui-layout-west-center
         .search
           .row-fluid
-            input.search-query.span12(type='text', placeholder='Filter', data-bind='value: filter, event: {keyup: updateFilter}')
+            input.search-query.span12(type='text', placeholder='Filter', data-bind='value: filter_text, event: {keyup: updateFilter}')
         hr
         .row-fluid
           .overflow-container
@@ -111,7 +104,7 @@ html
     script(src='/assets/editor.js')
     :coffeescript
       $ ->
-        ko.applyBindings (window.view = new EditorView $('body'))
+        window.view = new EditorView $('body')
 
         ###
         element = $('.editor')[0]

@@ -119,9 +119,16 @@ class Tab
 
   constructor: (tab, @view) ->
     @type = tab.type
+    @object = ko.observable tab.object
     @name = ko.observable tab.name
     @objectId = tab.objectId
     @dirty = ko.observable false
+    console.log @object()
+
+    @displayName = ko.computed =>
+      object = @object()
+      objName = if object.alias? then object.alias else "[##{object.id} #{object.name}]"
+      "#{objName}.#{@name()}"
 
     @iconClass = ko.computed =>
       switch @type
@@ -145,7 +152,11 @@ class EditorView
   constructor: (@body) ->
     @socket = io.connect(window.location.href)
     @objects = ko.observableArray []
-    @filter = ko.observable ''
+    @filter_text = ko.observable ''
+
+    @filter = ko.computed( =>
+      @filter_text()
+    ).extend throttle: 500
 
     @selectedObject = ko.observable null
 
@@ -154,6 +165,8 @@ class EditorView
     @selectedTab = ko.observable null
 
     @attachListeners()
+
+    ko.applyBindings @
 
   # on keyup in the search field this fires so the viewmodel updates immediately
   updateFilter: ->
@@ -174,9 +187,10 @@ class EditorView
       if tab?
         @selectTab(tab)()
       else
-        tab = new Tab {type: 'property', objectId: id, name: key}, @
-        @tabs.push tab
-        @selectTab(tab)()
+        @socket.emit 'get_object', id, (object) =>
+          tab = new Tab {type: 'property', object: object, name: key}, @
+          @tabs.push tab
+          @selectTab(tab)()
 
   openVerb: (idAccessor, nameAccessor) ->
     id = idAccessor()
@@ -186,9 +200,10 @@ class EditorView
       if tab?
         @selectTab(tab)()
       else
-        tab = new Tab {type: 'verb', objectId: id, name: name}, @
-        @tabs.push tab
-        @selectTab(tab)()
+        @socket.emit 'get_object', id, (object) =>
+          tab = new Tab {type: 'verb', object: object, name: name}, @
+          @tabs.push tab
+          @selectTab(tab)()
 
   closeTab: (tab, event) =>
     remove = =>
@@ -200,6 +215,9 @@ class EditorView
         if not otherTab? and tabIndex > 0
           otherTab = @tabs()[tabIndex-1]
         @selectTab(otherTab)() if otherTab?
+
+      if @tabs().length == 0
+        @selectedTab null
 
     if tab.dirty()
       bootbox.confirm "Are you sure you want to close this #{tab.type}?  Your unsaved changes will be lost.", (close) =>

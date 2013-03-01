@@ -42,6 +42,14 @@ hr {
 .highlight {
   background-color: yellow;
 }
+li.active {
+  > a .highlight {
+    background-color: #004F73;
+  }
+  > a .label .highlight {
+    background-color: gray;
+  }
+}
 .label {
   .highlight {
     background-color: gray;
@@ -102,14 +110,14 @@ ul.nav-tabs {
 
 .toolbar {
   margin-top: -20px;
-  input, select {
-    margin-right: 5px;
+  .row-fluid {
+    > input, > select {
+      margin-right: 5px;
+      width: 20%;
+    }
   }
 }
 
-.ace_editor {
-  top: 79px;
-  right: 0;
-  bottom: 0;
-  left: 0;
+.editor {
+  background-color: gray;
 }

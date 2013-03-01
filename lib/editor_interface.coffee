@@ -33,8 +33,11 @@ module.exports = class EditorInterface
 
   getObject: (id) ->
     object = @db.findById id
+    alias = @db.aliasFor id
     {
       id: object.id
+      name: object.name
+      alias: alias
       properties: object.properties
       verbs: object.verbs
     }
