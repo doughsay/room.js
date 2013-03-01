@@ -125,15 +125,47 @@ class Tab
     @type = tab.type
     @object = ko.observable tab.object
     @name = ko.observable tab.name
-    @dirty = ko.observable false
 
     switch @type
       when 'verb'
         @verb = tab.verb
+        console.log @verb
         @session = new ace.EditSession @verb.code(), 'ace/mode/coffee'
+        @session.on 'change', (e) => @verb.code @session.getValue()
+
+        @_code = @verb.code()
+        @_dobjarg = @verb.dobjarg()
+        @_preparg = @verb.preparg()
+        @_iobjarg = @verb.iobjarg()
+        @_hidden = @verb.hidden()
+        @_name = @verb.name()
+
+        @dirty = ko.computed =>
+          code = @verb.code()
+          dobjarg = @verb.dobjarg()
+          preparg = @verb.preparg()
+          iobjarg = @verb.iobjarg()
+          hidden = @verb.hidden()
+          name = @verb.name()
+
+          not (code is @_code and dobjarg is @_dobjarg and preparg is @_preparg and iobjarg is @_iobjarg and hidden is @_hidden and name is @_name)
+
       when 'property'
         @property = tab.property
         @session = new ace.EditSession JSON.stringify(@property.value(), null, '  '), 'ace/mode/json'
+        @error = ko.observable false
+        @session.on 'change', (e) =>
+          try
+            @property.value JSON.parse @session.getValue()
+            @error false
+          catch e
+            @error true
+
+        @_value = JSON.stringify @property.value()
+
+        @dirty = ko.computed =>
+          value = JSON.stringify @property.value()
+          value isnt @_value
 
     @session.setUseSoftTabs true
     @session.setTabSize 2
@@ -156,6 +188,8 @@ class Tab
 
     @active = ko.computed =>
       @ == @view.selectedTab()
+
+  save: -> bootbox.alert "TODO"
 
 # Knockout.js view model for the room.js editor
 class EditorView
@@ -182,6 +216,7 @@ class EditorView
     element = $('.editor')[0]
     @editor = ace.edit element
     @editor.setTheme 'ace/theme/clouds'
+    @editor.setShowPrintMargin false
     $(element).css fontSize: '12pt', fontFamily: '"Source Code Pro", sans-serif'
 
     @attachListeners()
@@ -288,10 +323,8 @@ class EditorView
     frame = editor.parent()
     tabs = $ '.tabs'
     toolbar = $ '.toolbar'
-    console.log frame.innerHeight()
     editor.width frame.innerWidth()
     editor.height frame.innerHeight() - tabs.outerHeight() - toolbar.outerHeight()
-    console.log @editor
     @editor.resize()
 
   loadSidebar: ->

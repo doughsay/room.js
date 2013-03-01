@@ -59,15 +59,16 @@ html
                   label.checkbox
                     input(type='checkbox', data-bind='checked: hidden')
                     |hidden
-                  button.btn.btn-primary.pull-right
+                  button.btn.btn-primary.pull-right(data-bind='click: $parent.save, visible: $parent.dirty')
                     |Save
         .property-toolbar(data-bind='if: type == "property"')
           .navbar.navbar-static-top(data-bind='with: property')
             .navbar-inner
               form.navbar-form.form-inline
                 .row-fluid
-                  button.btn.btn-primary.pull-right
+                  button.btn.btn-primary.pull-right(data-bind='click: $parent.save, disable: $parent.error, visible: $parent.dirty')
                     |Save
+                  .error.label.label-important.pull-right(data-bind='visible: $parent.error') JSON syntax error, fix it before you can save.
       .editor(data-bind='visible: selectedTab')
 
     .ui-layout-west
