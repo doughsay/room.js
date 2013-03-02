@@ -82,9 +82,17 @@ class SelectedObject
   constructor: (object) ->
     @id = ko.observable object.id
     @properties = ko.observableArray object.properties.map (p) ->
-      key: ko.observable p.key
-      value: ko.observable p.value
-      active: ko.observable false
+      x =
+        key: ko.observable p.key
+        value: ko.observable p.value
+        active: ko.observable false
+      x.propertyMenu = -> [
+        {
+          text: 'Delete Property',
+          action: -> console.log 'TODO: delete property', x.key()
+        }
+      ]
+      x
     @verbs = ko.observableArray object.verbs.map (v) ->
       x =
         name: ko.observable v.name
@@ -95,6 +103,12 @@ class SelectedObject
         hidden: ko.observable v.hidden
         active: ko.observable false
       x.iconClass = ko.computed => if x.hidden() then 'icon-eye-close' else 'icon-cog'
+      x.verbMenu = -> [
+        {
+          text: 'Delete Verb',
+          action: -> console.log 'TODO: delete verb', x.name()
+        }
+      ]
       x
 
   selectProperty: (keyAccessor) ->
@@ -118,6 +132,12 @@ class SelectedObject
           v.active false
 
       p.active(false) for p in @properties()
+
+  newProperty: (name) ->
+    console.log 'TODO: create new property', name
+
+  newVerb: ->
+    console.log 'TODO: create new verb'
 
 class Tab
 
@@ -151,7 +171,9 @@ class Tab
 
       when 'property'
         @property = tab.property
-        @session = new ace.EditSession JSON.stringify(@property.value(), null, '  '), 'ace/mode/json'
+        value = @property.value()
+        value ?= null
+        @session = new ace.EditSession JSON.stringify(value, null, '  '), 'ace/mode/json'
         @error = ko.observable false
         @session.on 'change', (e) =>
           try
@@ -160,7 +182,7 @@ class Tab
           catch e
             @error true
 
-        @_value = JSON.stringify @property.value()
+        @_value = JSON.stringify value
 
         @dirty = ko.computed =>
           value = JSON.stringify @property.value()
@@ -336,8 +358,21 @@ class EditorView
   # Context Menus #
   #################
 
-  attributeMenu:
-    [{text: 'foo', action: (e) -> console.log 'bar'}]
+  attributeMenu: ->
+    [
+      {
+        text: 'New Property',
+        action: =>
+          bootbox.prompt "Name:", (name) =>
+            if name?
+              @selectedObject().newProperty name
+      },
+      {
+        text: 'New Verb',
+        action: =>
+          @selectedObject().newVerb()
+      }
+    ]
 
   #############################
   # websocket event listeners #

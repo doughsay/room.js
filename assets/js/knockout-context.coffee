@@ -8,4 +8,3 @@ ko.bindingHandlers.context =
     ko.utils.domNodeDisposal.addDisposeCallback element, ->
       context.destroy selector
   update: (element, valueAccessor) ->
-    console.log 'update!'
