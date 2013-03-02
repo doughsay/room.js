@@ -81,7 +81,7 @@ html
           .overflow-container
             ul.nav.nav-list(data-bind='template: {name: "TreeNodeTemplate", foreach: objects}')
 
-      .ui-layout-west-south
+      .ui-layout-west-south(data-bind='context: attributeMenu')
         .overflow-container
           ul.nav.nav-list(data-bind='with: selectedObject')
             li.nav-header(data-bind='visible: properties().length > 0') Properties

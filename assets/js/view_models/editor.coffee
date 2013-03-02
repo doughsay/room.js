@@ -129,7 +129,6 @@ class Tab
     switch @type
       when 'verb'
         @verb = tab.verb
-        console.log @verb
         @session = new ace.EditSession @verb.code(), 'ace/mode/coffee'
         @session.on 'change', (e) => @verb.code @session.getValue()
 
@@ -222,6 +221,8 @@ class EditorView
     @attachListeners()
     @setLayout()
     @setSizes()
+
+    context.init compress: true
 
     ko.applyBindings @
 
@@ -330,6 +331,13 @@ class EditorView
   loadSidebar: ->
     @socket.emit 'get_tree', null, (tree) =>
       @objects tree.map (o) => new TreeNode o, @
+
+  #################
+  # Context Menus #
+  #################
+
+  attributeMenu:
+    [{text: 'foo', action: (e) -> console.log 'bar'}]
 
   #############################
   # websocket event listeners #

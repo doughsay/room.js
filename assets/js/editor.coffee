@@ -1,11 +1,11 @@
+#= require underscore
 #= require jquery
 #= require jquery-ui
 #= require jquery-layout
 #= require bootstrap
-#= require bootstrap-contextmenu
+#= require context
 #= require bootbox
 #= require knockout
-#= require knockout-ace
-#= require knockout-modal
+#= require knockout-context
 
 #= require view_models/editor
