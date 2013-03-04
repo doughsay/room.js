@@ -44,3 +44,6 @@ module.exports = class EditorInterface
 
   saveProperty: (property) ->
     @db.findById(property.object_id).setProp property.key, property.value
+
+  saveVerb: (verb) ->
+    @db.findById(verb.object_id).saveVerb verb

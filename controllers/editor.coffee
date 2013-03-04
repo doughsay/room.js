@@ -13,6 +13,7 @@ class Editor
     @socket.on 'get_tree', @onGetTree
     @socket.on 'get_object', @onGetObject
     @socket.on 'save_property', @onSaveProperty
+    @socket.on 'save_verb', @onSaveVerb
 
   # fires when a socket disconnects, either by the client closing the connection
   # or calling the `disconnect` method of the socket.
@@ -26,6 +27,10 @@ class Editor
 
   onSaveProperty: (property, fn) =>
     @editorInterface.saveProperty property
+    fn()
+
+  onSaveVerb: (verb, fn) =>
+    @editorInterface.saveVerb verb
     fn()
 
 # This is the editor controller.
