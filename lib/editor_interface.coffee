@@ -42,5 +42,5 @@ module.exports = class EditorInterface
       verbs: object.getOwnVerbs()
     }
 
-  saveProperty: (id, key, value) ->
-    @db.findById(id).setProp key, value
+  saveProperty: (property) ->
+    @db.findById(property.object_id).setProp property.key, property.value

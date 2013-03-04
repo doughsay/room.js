@@ -37,16 +37,30 @@ class PropertyTab extends Tab
       catch e
         @error true
 
-    @_value = JSON.stringify value
+    @_value = ko.observable JSON.stringify value
 
     @dirty = ko.computed =>
       value = JSON.stringify @property.value()
-      value isnt @_value
+      value isnt @_value()
 
     super()
 
   restore: ->
     @property.value JSON.parse @_value
+
+  save: =>
+    @view.socket.emit 'save_property', @serialize(), (error) =>
+      if error?
+        bootbox.alert "There was an error saving: #{error}"
+      else
+        @_value JSON.stringify @property.value()
+
+  serialize: ->
+    {
+      object_id: @property.object.id
+      key: @property.key()
+      value: @property.value()
+    }
 
 class VerbTab extends Tab
 
