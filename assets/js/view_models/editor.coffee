@@ -125,6 +125,7 @@ class EditorView
       west:
         size: '20%'
         slidable: false
+        closable: false
         childOptions:
           livePaneResizing: true
           center:
@@ -133,6 +134,7 @@ class EditorView
             paneSelector: '.ui-layout-west-south'
             size: '50%'
             slidable: false
+            closable: false
 
   # set the size of the ace editor
   setSizes: ->

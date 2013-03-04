@@ -12,19 +12,18 @@
 
   &.ui-layout-resizer-open-hover,
   &.ui-layout-resizer-dragging {
-    background-color: black;
+    background-color: #0088cc;
 
     &.ui-layout-resizer-dragging-limit {
       background-color: red;
     }
   }
 
-  .ui-layout-toggler {
-    background-color: darkgray;
-
-    &.ui-layout-toggler-hover {
-      background-color: blue;
-    }
+  &.ui-layout-resizer-west, &.ui-layout-resizer-east {
+    cursor: col-resize !important;
+  }
+  &.ui-layout-resizer-north, &.ui-layout-resizer-south {
+    cursor: row-resize !important;
   }
 }
 
