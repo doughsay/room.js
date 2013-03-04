@@ -7,14 +7,14 @@ class Property
     @value = ko.observable value
     
     @active = ko.observable false
-    
-  menu: ->
-    [
-      {
-        text: 'Delete Property',
-        action: => console.log 'TODO: delete property', @key()
-      }
-    ]
+
+    @menu = ko.computed =>
+      [
+        {
+          text: "Delete Property '#{@key()}'",
+          action: => console.log 'TODO: delete property', @key()
+        }
+      ]
 
 class Verb
 
@@ -33,13 +33,13 @@ class Verb
     @iconClass = ko.computed =>
       if @hidden() then 'icon-eye-close' else 'icon-cog'
   
-  menu: ->
-    [
-      {
-        text: 'Delete Verb',
-        action: => console.log 'TODO: delete verb', @name()
-      }
-    ]
+    @menu = ko.computed =>
+      [
+        {
+          text: "Delete Verb '#{@name()}'",
+          action: => console.log 'TODO: delete verb', @name()
+        }
+      ]
 
 # view model for an object in the editor
 class MiniObject

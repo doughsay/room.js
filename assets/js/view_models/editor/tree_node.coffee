@@ -2,6 +2,8 @@
 class TreeNode
 
   constructor: (o, @view, @level = 1) ->
+
+    # attributes
     @id = o.id
     @name = ko.observable o.name
     @player = ko.observable o.player
@@ -27,12 +29,7 @@ class TreeNode
 
     # state
     @expanded = ko.observable false
-    @iconClass = ko.computed =>
-      if @children().length > 0
-        if @expanded() then 'icon-caret-down' else 'icon-caret-right'
-      else
-        if @player() then 'icon-user' else 'icon-file'
-    @levelClass = ko.computed => "level#{@level}"
+
     @visible = ko.computed =>
       return true if @view.filter() == ''
 
@@ -45,9 +42,36 @@ class TreeNode
       else
         selected.id == @id
 
+    # classes
+    @iconClass = ko.computed =>
+      if @children().length > 0
+        if @expanded() then 'icon-caret-down' else 'icon-caret-right'
+      else
+        if @player() then 'icon-user' else 'icon-file'
+
+    @levelClass = ko.computed => "level#{@level}"
+
+    # subscriptions
     @view.filter.subscribe (filter) =>
       if filter isnt '' and @visible()
         @expanded true
+
+    # context menu
+    @menu = ko.computed =>
+      [
+        {
+          text: "New Child of '#{@name()}'",
+          action: => console.log 'TODO: new child object of', @name()
+        },
+        {
+          text: "Rename '#{@name()}'",
+          action: => console.log 'TODO: rename object', @name()
+        },
+        {
+          text: "Delete '#{@name()}'",
+          action: => console.log 'TODO: delete object', @name()
+        }
+      ]
 
   toggle: ->
     @expanded !@expanded()

@@ -81,19 +81,19 @@ html
           .overflow-container
             ul.nav.nav-list(data-bind='template: {name: "TreeNodeTemplate", foreach: objects}')
 
-      .ui-layout-west-south(data-bind='context: attributeMenu()')
+      .ui-layout-west-south
         .overflow-container
           ul.nav.nav-list(data-bind='with: selectedObject')
             li.nav-header(data-bind='visible: properties().length > 0') Properties
             // ko foreach: properties
-            li(data-bind='css: {active: active}, context: menu()')
+            li(data-bind='css: {active: active}')
               a(href='#', data-bind='click: $parent.selectProperty, event: {dblclick: $root.openProperty}')
                 i.icon-file-alt
                 span(data-bind='text: key')
             // /ko
             li.nav-header(data-bind='visible: verbs().length > 0') Verbs
             // ko foreach: verbs
-            li(data-bind='css: {active: active}, context: menu()')
+            li(data-bind='css: {active: active}')
               a(href='#', data-bind='click: $parent.selectVerb, event: {dblclick: $root.openVerb}')
                 i(data-bind='css: iconClass')
                 span(data-bind='text: name')

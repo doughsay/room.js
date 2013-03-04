@@ -171,6 +171,18 @@ class EditorView
       }
     ]
 
+  # context menu for the object browser
+  objectMenu: ->
+    [
+      {
+        text: 'New Top-Level Object',
+        action: =>
+          bootbox.prompt "Name:", (name) =>
+            if name?
+              @newObject name
+      }
+    ]
+
   #############################
   # websocket event listeners #
   #############################
