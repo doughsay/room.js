@@ -38,6 +38,9 @@ module.exports = class EditorInterface
       id: object.id
       name: object.name
       alias: alias
-      properties: object.properties
-      verbs: object.verbs
+      properties: object.getOwnProperties()
+      verbs: object.getOwnVerbs()
     }
+
+  saveProperty: (id, key, value) ->
+    @db.findById(id).setProp key, value

@@ -9,7 +9,7 @@ html
       li(data-bind='visible: visible, css: {active: active}')
         span.pull-left
           i(data-bind='css: iconClass, click: toggle')
-        a(href='#', data-bind='click: $root.select(id)')
+        a(href='#', data-bind='click: $root.selectObject')
           span.label.label-inverse(data-bind='html: idPresenter')
           span.label(data-bind='html: aliasPresenter')
           span(data-bind='html: namePresenter')
@@ -19,7 +19,7 @@ html
       .tabs
         ul.nav.nav-tabs(data-bind='foreach: tabs')
           li(data-bind='css: {active: active}')
-            a(href='#', data-bind='click: $root.selectTab($data)')
+            a(href='#', data-bind='click: $root.selectTab')
               i(data-bind='css: iconClass')
               span(data-bind='text: displayName')
               button.close(data-bind='css: {dirty: dirty}, text: closeSymbol, click: $root.closeTab')
@@ -86,15 +86,15 @@ html
           ul.nav.nav-list(data-bind='with: selectedObject')
             li.nav-header(data-bind='visible: properties().length > 0') Properties
             // ko foreach: properties
-            li(data-bind='css: {active: active}, context: propertyMenu()')
-              a(href='#', data-bind='click: $parent.selectProperty(key), event: {dblclick: $root.openProperty($parent.id, key)}')
+            li(data-bind='css: {active: active}, context: menu()')
+              a(href='#', data-bind='click: $parent.selectProperty, event: {dblclick: $root.openProperty}')
                 i.icon-file-alt
                 span(data-bind='text: key')
             // /ko
             li.nav-header(data-bind='visible: verbs().length > 0') Verbs
             // ko foreach: verbs
-            li(data-bind='css: {active: active}, context: verbMenu()')
-              a(href='#', data-bind='click: $parent.selectVerb(name), event: {dblclick: $root.openVerb($parent.id, name)}')
+            li(data-bind='css: {active: active}, context: menu()')
+              a(href='#', data-bind='click: $parent.selectVerb, event: {dblclick: $root.openVerb}')
                 i(data-bind='css: iconClass')
                 span(data-bind='text: name')
             // /ko

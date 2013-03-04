@@ -1,217 +1,3 @@
-class TreeNode
-
-  constructor: (o, @view, @level = 1) ->
-    @id = ko.observable o.id
-    @name = ko.observable o.name
-    @player = ko.observable o.player
-    @alias = ko.observable o.alias
-    @children = ko.observableArray o.children.map (p) => new TreeNode p, @view, @level+1
-
-    # presenters
-    @idPresenter = ko.computed =>
-      id = "\##{@id()}"
-      filter = @view.filter()
-
-      return id if filter == ''
-
-      if id.toLowerCase().indexOf(filter.toLowerCase()) != -1
-        id.replace new RegExp("(#{filter})", 'ig'), '<span class="highlight">$1</span>'
-      else
-        id
-
-    @namePresenter = ko.computed =>
-      name = @name()
-      filter = @view.filter()
-
-      return name if filter == ''
-
-      if name.toLowerCase().indexOf(filter.toLowerCase()) != -1
-        name.replace new RegExp("(#{filter})", 'ig'), '<span class="highlight">$1</span>'
-      else
-        name
-
-    @aliasPresenter = ko.computed =>
-      return '' if not @alias()?
-      alias = "#{@alias()}"
-      filter = @view.filter()
-
-      return alias if filter == ''
-
-      if alias.toLowerCase().indexOf(filter.toLowerCase()) != -1
-        alias.replace new RegExp("(#{filter})", 'ig'), '<span class="highlight">$1</span>'
-      else
-        alias
-
-    # state
-    @expanded = ko.observable false
-    @iconClass = ko.computed =>
-      if @children().length > 0
-        if @expanded() then 'icon-caret-down' else 'icon-caret-right'
-      else
-        if @player() then 'icon-user' else 'icon-file'
-    @levelClass = ko.computed => "level#{@level}"
-    @visible = ko.computed =>
-      return true if @view.filter() == ''
-
-      true in (o.visible() for o in @children()) or @matchesFilter()
-
-    @active = ko.computed =>
-      selected = @view.selectedObject()
-      if not selected?
-        false
-      else
-        selected.id() == @id()
-
-    @view.filter.subscribe (filter) =>
-      if filter isnt '' and @visible()
-        @expanded true
-
-  toggle: ->
-    @expanded !@expanded()
-
-  matchesFilter: ->
-    filter = @view.filter()
-
-    matches = (str) =>
-      str.toLowerCase().indexOf(filter.toLowerCase()) != -1
-
-    matches(@name()) or matches("#{@alias()}") or matches("\##{@id()}")
-
-class SelectedObject
-
-  constructor: (object) ->
-    @id = ko.observable object.id
-    @properties = ko.observableArray object.properties.map (p) ->
-      x =
-        key: ko.observable p.key
-        value: ko.observable p.value
-        active: ko.observable false
-      x.propertyMenu = -> [
-        {
-          text: 'Delete Property',
-          action: -> console.log 'TODO: delete property', x.key()
-        }
-      ]
-      x
-    @verbs = ko.observableArray object.verbs.map (v) ->
-      x =
-        name: ko.observable v.name
-        dobjarg: ko.observable v.dobjarg
-        preparg: ko.observable v.preparg
-        iobjarg: ko.observable v.iobjarg
-        code: ko.observable v.code
-        hidden: ko.observable v.hidden
-        active: ko.observable false
-      x.iconClass = ko.computed => if x.hidden() then 'icon-eye-close' else 'icon-cog'
-      x.verbMenu = -> [
-        {
-          text: 'Delete Verb',
-          action: -> console.log 'TODO: delete verb', x.name()
-        }
-      ]
-      x
-
-  selectProperty: (keyAccessor) ->
-    key = keyAccessor()
-    =>
-      for p in @properties()
-        if p.key() == key
-          p.active true
-        else
-          p.active false
-
-      v.active(false) for v in @verbs()
-
-  selectVerb: (nameAccessor) ->
-    name = nameAccessor()
-    =>
-      for v in @verbs()
-        if v.name() == name
-          v.active true
-        else
-          v.active false
-
-      p.active(false) for p in @properties()
-
-  newProperty: (name) ->
-    console.log 'TODO: create new property', name
-
-  newVerb: ->
-    console.log 'TODO: create new verb'
-
-class Tab
-
-  constructor: (tab, @view) ->
-    @type = tab.type
-    @object = ko.observable tab.object
-    @name = ko.observable tab.name
-
-    switch @type
-      when 'verb'
-        @verb = tab.verb
-        @session = new ace.EditSession @verb.code(), 'ace/mode/coffee'
-        @session.on 'change', (e) => @verb.code @session.getValue()
-
-        @_code = @verb.code()
-        @_dobjarg = @verb.dobjarg()
-        @_preparg = @verb.preparg()
-        @_iobjarg = @verb.iobjarg()
-        @_hidden = @verb.hidden()
-        @_name = @verb.name()
-
-        @dirty = ko.computed =>
-          code = @verb.code()
-          dobjarg = @verb.dobjarg()
-          preparg = @verb.preparg()
-          iobjarg = @verb.iobjarg()
-          hidden = @verb.hidden()
-          name = @verb.name()
-
-          not (code is @_code and dobjarg is @_dobjarg and preparg is @_preparg and iobjarg is @_iobjarg and hidden is @_hidden and name is @_name)
-
-      when 'property'
-        @property = tab.property
-        value = @property.value()
-        value ?= null
-        @session = new ace.EditSession JSON.stringify(value, null, '  '), 'ace/mode/json'
-        @error = ko.observable false
-        @session.on 'change', (e) =>
-          try
-            @property.value JSON.parse @session.getValue()
-            @error false
-          catch e
-            @error true
-
-        @_value = JSON.stringify value
-
-        @dirty = ko.computed =>
-          value = JSON.stringify @property.value()
-          value isnt @_value
-
-    @session.setUseSoftTabs true
-    @session.setTabSize 2
-    @session.setUseWrapMode true
-
-    @displayName = ko.computed =>
-      object = @object()
-      objName = if object.alias? then object.alias else "[##{object.id} #{object.name}]"
-      "#{objName}.#{@name()}"
-
-    @iconClass = ko.computed =>
-      switch @type
-        when 'verb'
-          'icon-cog'
-        when 'property'
-          'icon-file-alt'
-
-    @closeSymbol = ko.computed =>
-      if @dirty() then '•' else '×'
-
-    @active = ko.computed =>
-      @ == @view.selectedTab()
-
-  save: -> bootbox.alert "TODO"
-
 # Knockout.js view model for the room.js editor
 class EditorView
 
@@ -230,7 +16,10 @@ class EditorView
     @selectedObject = ko.observable null
 
     @tabs = ko.observableArray []
-    @tabs.subscribe => @setSizes()
+    @tabs.subscribe =>
+      window.setTimeout (=>
+        @setSizes()
+      ), 1
 
     @selectedTab = ko.observable null
 
@@ -253,40 +42,45 @@ class EditorView
     $('.search input').trigger 'change'
     true
 
-  select: (idAccessor) ->
-    id = idAccessor()
-    =>
-      @socket.emit 'get_object', id, (object) =>
-        @selectedObject new SelectedObject object
+  ################
+  # View Actions #
+  ################
+  # These methods are triggered from the view, usually through clicks
 
-  openProperty: (idAccessor, keyAccessor) ->
-    id = idAccessor()
-    key = keyAccessor()
-    (property) =>
-      tab = @tabs().filter((t) -> t.type is 'property' and t.object().id is id and t.name() is key)[0]
-      if tab?
-        @selectTab(tab)()
-      else
-        @socket.emit 'get_object', id, (object) =>
-          tab = new Tab {type: 'property', object: object, name: key, property: property}, @
-          @tabs.push tab
-          @selectTab(tab)()
+  # triggered by clicking an object in the object browser
+  selectObject: (node) =>
+    @socket.emit 'get_object', node.id, (object) =>
+      @selectedObject new MiniObject object
 
-  openVerb: (idAccessor, nameAccessor) ->
-    id = idAccessor()
-    name = nameAccessor()
-    (verb) =>
-      tab = @tabs().filter((t) -> t.type is 'verb' and t.object().id is id and t.name() is name)[0]
-      if tab?
-        @selectTab(tab)()
-      else
-        @socket.emit 'get_object', id, (object) =>
-          tab = new Tab {type: 'verb', object: object, name: name, verb: verb}, @
-          @tabs.push tab
-          @selectTab(tab)()
+  # triggered by double-clicking a property in the object attribute list
+  openProperty: (property) =>
+    tab = @tabs().filter((t) -> t.type is 'property' and t.property.object.id is property.object.id and t.property.key() is property.key())[0]
+    if tab?
+      @selectTab(tab)
+    else
+      tab = new PropertyTab property, @
+      @tabs.push tab
+      @selectTab(tab)
 
+  # triggered by double-clicking a verb in the object attribute list
+  openVerb: (verb) =>
+    tab = @tabs().filter((t) -> t.type is 'verb' and t.verb.object.id is verb.object.id and t.verb.name() is verb.name())[0]
+    if tab?
+      @selectTab(tab)
+    else
+      tab = new VerbTab verb, @
+      @tabs.push tab
+      @selectTab(tab)
+
+  # triggered by clicking a tab
+  selectTab: (tab) =>
+    @selectedTab tab
+    @editor.setSession tab.session
+
+  # triggered by clicking a tab's close button
   closeTab: (tab, event) =>
-    remove = =>
+    remove = (restore = false) =>
+      tab.restore() if restore
       tabIndex = @tabs.indexOf(tab)
       selectOther = tab.active()
       @tabs.remove(tab)
@@ -294,23 +88,22 @@ class EditorView
         otherTab = @tabs()[tabIndex]
         if not otherTab? and tabIndex > 0
           otherTab = @tabs()[tabIndex-1]
-        @selectTab(otherTab)() if otherTab?
+        @selectTab(otherTab) if otherTab?
 
       if @tabs().length == 0
         @selectedTab null
 
     if tab.dirty()
       bootbox.confirm "Are you sure you want to close this #{tab.type}?  Your unsaved changes will be lost.", (close) =>
-        remove() if close
+        remove(true) if close
     else
       remove()
 
     event.stopPropagation()
 
-  selectTab: (tab) ->
-    =>
-      @selectedTab tab
-      @editor.setSession tab.session
+  #######################
+  # Misc Helper Methods #
+  #######################
 
   # attach the websocket event listeners
   attachListeners: ->
@@ -341,6 +134,7 @@ class EditorView
             size: '50%'
             slidable: false
 
+  # set the size of the ace editor
   setSizes: ->
     editor = $ '.editor'
     frame = editor.parent()
@@ -350,14 +144,17 @@ class EditorView
     editor.height frame.innerHeight() - tabs.outerHeight() - toolbar.outerHeight()
     @editor.resize()
 
-  loadSidebar: ->
+  # load all known objects into the object browser
+  loadBrowser: ->
     @socket.emit 'get_tree', null, (tree) =>
       @objects tree.map (o) => new TreeNode o, @
 
   #################
   # Context Menus #
   #################
+  # these methods return context menu definitions
 
+  # context menu for the object attribute list
   attributeMenu: ->
     [
       {
@@ -380,7 +177,7 @@ class EditorView
 
   connect: =>
     console.log 'Connected!'
-    @loadSidebar()
+    @loadBrowser()
 
   connecting: =>
     console.log 'Connecting...'
