@@ -1,6 +1,7 @@
 fs = require 'fs'
 util = require 'util'
 _ = require 'underscore'
+EventEmitter = require('events').EventEmitter
 
 connections = require './connection_manager'
 mooUtil = require './util'
@@ -15,7 +16,7 @@ EXACT_MATCH = 1
 PARTIAL_MATCH = 2
 
 # A Db is a collection of RoomJsObjects
-module.exports = class Db
+module.exports = class Db extends EventEmitter
   # @objects: Array[RoomJsObject]
   # @players: Array[RoomJsPlayer]
 
@@ -29,6 +30,7 @@ module.exports = class Db
         newMooObj = new RoomJsPlayer dbObject, @
       else
         newMooObj = new RoomJsObject dbObject, @
+      newMooObj.on 'add_property', (x) => @emit 'add_property', x
       @objects[parseInt(dbObject.id)] = newMooObj
       if newMooObj.player
         @players.push newMooObj

@@ -15,6 +15,9 @@ class Editor
     @socket.on 'save_property', @onSaveProperty
     @socket.on 'save_verb', @onSaveVerb
 
+    @db.on 'add_property', (x) ->
+      console.log 'property was added', x
+
   # fires when a socket disconnects, either by the client closing the connection
   # or calling the `disconnect` method of the socket.
   onDisconnect: =>

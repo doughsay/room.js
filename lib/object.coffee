@@ -1,4 +1,5 @@
 _ = require 'underscore'
+EventEmitter = require('events').EventEmitter
 
 connections = require './connection_manager'
 
@@ -11,7 +12,7 @@ EXACT_MATCH = 1
 PARTIAL_MATCH = 2
 
 # A RoomJsObject has properties and RoomJsVerbs
-exports.RoomJsObject = class
+exports.RoomJsObject = class RoomJsObject extends EventEmitter
   # @id: Int
   # @parent_id: Int
   # @name: String
@@ -128,6 +129,7 @@ exports.RoomJsObject = class
   ####################
 
   addProp: (key, value) ->
+    @emit 'add_property', {key: key, value: value}
     @properties.push {key: key, value: value}
 
   rmProp: (key) ->
