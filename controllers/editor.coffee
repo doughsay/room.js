@@ -15,12 +15,14 @@ class Editor
     @socket.on 'save_property', @onSaveProperty
     @socket.on 'save_verb', @onSaveVerb
 
-    @db.on 'add_property', (x) ->
-      console.log 'property was added', x
+    @db.on 'newObject', @onNewObject
+    @db.on 'rmObject', @onRmObject
 
   # fires when a socket disconnects, either by the client closing the connection
   # or calling the `disconnect` method of the socket.
   onDisconnect: =>
+    @db.removeListener 'newObject', @onNewObject
+    @db.removeListener 'rmObject', @onRmObject
 
   onGetTree: (data, fn) =>
     fn @editorInterface.objectsTree()
@@ -35,6 +37,18 @@ class Editor
   onSaveVerb: (verb, fn) =>
     @editorInterface.saveVerb verb
     fn()
+
+  ##################
+  # Sync callbacks #
+  ##################
+  # These callbacks keep the editor in sync when things change in the database
+
+  onNewObject: (id) =>
+    @socket.emit 'new_object', @editorInterface.getObjectNode id
+
+
+  onRmObject: (id) =>
+    @socket.emit 'rm_object', id
 
 # This is the editor controller.
 # It handles socket.io connections from the editor.

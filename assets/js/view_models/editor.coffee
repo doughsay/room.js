@@ -116,6 +116,9 @@ class EditorView
     @socket.on 'reconnect', @reconnect
     @socket.on 'reconnecting', @reconnecting
 
+    @socket.on 'new_object', @new_object
+    @socket.on 'rm_object', @rm_object
+
   # build the jqeury ui layout
   setLayout: ->
     @layout = @body.layout
@@ -184,6 +187,16 @@ class EditorView
               @newObject name
       }
     ]
+
+  ########################
+  # Sync event listeners #
+  ########################
+
+  new_object: (obj) ->
+    console.log obj
+
+  rm_object: (id) ->
+    console.log id
 
   #############################
   # websocket event listeners #

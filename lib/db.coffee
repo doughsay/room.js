@@ -30,7 +30,6 @@ module.exports = class Db extends EventEmitter
         newMooObj = new RoomJsPlayer dbObject, @
       else
         newMooObj = new RoomJsObject dbObject, @
-      newMooObj.on 'add_property', (x) => @emit 'add_property', x
       @objects[parseInt(dbObject.id)] = newMooObj
       if newMooObj.player
         @players.push newMooObj
@@ -246,6 +245,8 @@ module.exports = class Db extends EventEmitter
     newObject = new RoomJsObject rawObject, @
     newObject.moveTo object.location()
     @objects[nextId] = newObject
+    @emit 'newObject', nextId
+    newObject
 
   # Create a child of object
   # this child will inherit any of it's parent's properties and verbs
@@ -266,6 +267,8 @@ module.exports = class Db extends EventEmitter
     newObject = new RoomJsObject rawObject, @
     newObject.moveTo object.location()
     @objects[nextId] = newObject
+    @emit 'newObject', nextId
+    newObject
 
   rm: (id) ->
     if id > -1 and @findById(id)?
@@ -276,6 +279,7 @@ module.exports = class Db extends EventEmitter
       if @objects[id].player
         @players = @players.filter (p) -> p.id != id
       delete @objects[id]
+      @emit 'rmObject', id
       true
     else
       false

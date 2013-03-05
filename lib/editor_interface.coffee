@@ -31,6 +31,17 @@ module.exports = class EditorInterface
 
     top.map show
 
+  getObjectNode: (id) ->
+    object = @db.findById id
+    alias = @db.aliasFor id
+    {
+      id: object.id
+      parent_id: object.parent_id
+      name: object.name
+      player: object.player
+      alias: alias
+    }
+
   getObject: (id) ->
     object = @db.findById id
     alias = @db.aliasFor id
