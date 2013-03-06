@@ -313,12 +313,20 @@ class EditorView
 
   add_property: (spec) =>
     console.log 'TODO add property', spec
+    # if this event is for the selected object, add this property to the property list
 
   rm_property: (spec) =>
     console.log 'TODO rm property', spec
+    # if this event is for the selected object, remove this property from the property list
+    # if this property was open in a tab, close the tab
 
   update_property: (spec) =>
     console.log 'TODO update property', spec
+    # if this property was open in a tab, update the tab
+
+  # TODO
+  # verb sync events
+  # object global alias sync events
 
   #############################
   # websocket event listeners #
