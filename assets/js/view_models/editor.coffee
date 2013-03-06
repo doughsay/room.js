@@ -107,6 +107,10 @@ class EditorView
     @socket.on 'object_parent_changed', @object_parent_changed
     @socket.on 'object_name_changed', @object_name_changed
 
+    @socket.on 'add_property', @add_property
+    @socket.on 'rm_property', @rm_property
+    @socket.on 'update_property', @update_property
+
   # build the jqeury ui layout
   setLayout: ->
     @layout = @body.layout
@@ -306,6 +310,15 @@ class EditorView
 
     o = @findInTabs spec.id
     o.name spec.name if o?
+
+  add_property: (spec) =>
+    console.log 'TODO add property', spec
+
+  rm_property: (spec) =>
+    console.log 'TODO rm property', spec
+
+  update_property: (spec) =>
+    console.log 'TODO update property', spec
 
   #############################
   # websocket event listeners #

@@ -132,12 +132,14 @@ exports.RoomJsObject = class RoomJsObject extends EventEmitter
   ####################
 
   addProp: (key, value) ->
-    @emit 'add_property', {key: key, value: value}
-    @properties.push {key: key, value: value}
+    x = @properties.push {key: key, value: value}
+    @db.emit 'addProperty', {id: @id, key: key, value: value}
+    x
 
   rmProp: (key) ->
     if @hasOwnProp key
       @properties = @properties.filter (prop) -> prop.key != key
+      @db.emit 'rmProperty', {id: @id, key: key}
       return true
     else
       throw new Error "property '#{key}' doesn't exist on this object."
@@ -151,7 +153,9 @@ exports.RoomJsObject = class RoomJsObject extends EventEmitter
   setProp: (key, value) ->
     for prop in @properties
       if prop.key == key
-        return prop.value = value
+        prop.value = value
+        @db.emit 'updateProperty', {id: @id, key: key, value: value}
+        return value
     @addProp key, value
     return value
 

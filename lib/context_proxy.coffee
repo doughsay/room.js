@@ -213,7 +213,6 @@ module.exports = (obj, context) ->
         else if obj.hasProp name
           obj.setProp name, context.serialize val
         else
-          console.log 'adding prop'
           obj.addProp name, context.serialize val
 
   enumerate: ->

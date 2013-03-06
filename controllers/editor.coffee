@@ -20,6 +20,10 @@ class Editor
     @db.on 'objectParentChanged', @onObjectParentChanged
     @db.on 'objectNameChanged', @onObjectNameChanged
 
+    @db.on 'addProperty', @addProperty
+    @db.on 'rmProperty', @rmProperty
+    @db.on 'updateProperty', @updateProperty
+
   # fires when a socket disconnects, either by the client closing the connection
   # or calling the `disconnect` method of the socket.
   onDisconnect: =>
@@ -47,18 +51,14 @@ class Editor
   ##################
   # These callbacks keep the editor in sync when things change in the database
 
-  onNewObject: (id) =>
-    @socket.emit 'new_object', @editorInterface.getObjectNode id
+  onNewObject: (id) => @socket.emit 'new_object', @editorInterface.getObjectNode id
+  onRmObject: (id) => @socket.emit 'rm_object', id
+  onObjectParentChanged: (spec) => @socket.emit 'object_parent_changed', spec
+  onObjectNameChanged: (spec) => @socket.emit 'object_name_changed', spec
+  addProperty: (spec) => @socket.emit 'add_property', spec
+  rmProperty: (spec) => @socket.emit 'rm_property', spec
+  updateProperty: (spec) => @socket.emit 'update_property', spec
 
-
-  onRmObject: (id) =>
-    @socket.emit 'rm_object', id
-
-  onObjectParentChanged: (spec) =>
-    @socket.emit 'object_parent_changed', spec
-
-  onObjectNameChanged: (spec) =>
-    @socket.emit 'object_name_changed', spec
 
 # This is the editor controller.
 # It handles socket.io connections from the editor.
