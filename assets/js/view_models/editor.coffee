@@ -79,25 +79,11 @@ class EditorView
 
   # triggered by clicking a tab's close button
   closeTab: (tab, event) =>
-    remove = (restore = false) =>
-      tab.restore() if restore
-      tabIndex = @tabs.indexOf(tab)
-      selectOther = tab.active()
-      @tabs.remove(tab)
-      if selectOther
-        otherTab = @tabs()[tabIndex]
-        if not otherTab? and tabIndex > 0
-          otherTab = @tabs()[tabIndex-1]
-        @selectTab(otherTab) if otherTab?
-
-      if @tabs().length == 0
-        @selectedTab null
-
     if tab.dirty()
       bootbox.confirm "Are you sure you want to close this #{tab.type}?  Your unsaved changes will be lost.", (close) =>
-        remove(true) if close
+        @removeTab(tab) if close
     else
-      remove()
+      @removeTab tab
 
     event.stopPropagation()
 
@@ -156,6 +142,12 @@ class EditorView
     @socket.emit 'get_tree', null, (tree) =>
       @objects tree.map (o) => new TreeNode o, @
 
+  clearEditor: ->
+    @objects []
+    @tabs []
+    @selectedObject null
+    @selectedTab null
+
   findInTree: (id) ->
     find = (id, o) ->
       if o.id == id
@@ -173,6 +165,49 @@ class EditorView
 
     found
 
+  removeFromTree: (id) ->
+    removeChild = (id, p) =>
+      [match] = (child for child in p.children() when child.id is id)
+      if match?
+        p.children.remove match
+        match
+      else
+        removed = null
+        for child in p.children()
+          removed = removeChild(id, child)
+          break if removed?
+        removed
+
+    removed = null
+    for o in @objects()
+      removed = removeChild id, o
+      break if removed?
+
+    removed
+
+  insertIntoTree: (obj) ->
+    insertChild = (o, p) =>
+      if p.id == o.parent_id
+        if o instanceof TreeNode
+          p.children.push o
+        else
+          p.children.push new TreeNode o, @, p.level+1
+        p.children.sort (l, r) -> l.id - r.id
+        true
+      else
+        added = false
+        for child in p.children()
+          added = insertChild(o, child)
+          break if added
+        added
+
+    added = false
+    for o in @objects()
+      added = insertChild obj, o
+      break if added
+
+    added
+
   findInTabs: (id) ->
     os = @tabs().map (tab) ->
       switch tab.type
@@ -184,6 +219,33 @@ class EditorView
     [match] = os.filter (o) -> o.id is id
 
     match || null
+
+  removeFromTabs: (id) ->
+    tabsToRemove = []
+    for tab in @tabs()
+      switch tab.type
+        when 'property'
+          o = tab.property.object
+        when 'verb'
+          o = tab.verb.object
+      if o.id is id
+        tabsToRemove.push tab
+
+    @removeTab tab for tab in tabsToRemove
+
+  removeTab: (tab) ->
+    tab.restore()
+    tabIndex = @tabs.indexOf(tab)
+    selectOther = tab.active()
+    @tabs.remove(tab)
+    if selectOther
+      otherTab = @tabs()[tabIndex]
+      if not otherTab? and tabIndex > 0
+        otherTab = @tabs()[tabIndex-1]
+      @selectTab(otherTab) if otherTab?
+
+    if @tabs().length == 0
+      @selectedTab null
 
   #################
   # Context Menus #
@@ -225,39 +287,18 @@ class EditorView
 
   new_object: (obj) =>
     obj.children = []
-
-    insertChild = (o, p) =>
-      if p.id == o.parent_id
-        p.children.push new TreeNode o, @, p.level+1
-        return true
-      else
-        added = false
-        for child in p.children()
-          added = insertChild(o, child)
-          break if added
-        return added
-
-    for o in @objects()
-      break if insertChild obj, o
+    @insertIntoTree obj
 
   rm_object: (id) =>
-    removeChild = (id, p) =>
-      [match] = (child for child in p.children() when child.id is id)
-      if match?
-        p.children.remove match
-        return true
-      else
-        removed = false
-        for child in p.children()
-          removed = removeChild(id, child)
-          break if removed
-        return removed
-
-    for o in @objects()
-      break if removeChild id, o
+    @removeFromTree id
+    @removeFromTabs id
+    if @selectedObject().id is id
+      @selectedObject null
 
   object_parent_changed: (spec) =>
-    console.log 'TODO: object parent changed:', spec
+    o = @removeFromTree spec.id
+    o.parent_id = spec.parent_id
+    @insertIntoTree o
 
   object_name_changed: (spec) =>
     o = @findInTree spec.id
@@ -271,26 +312,31 @@ class EditorView
   #############################
 
   connect: =>
-    console.log 'Connected!'
+    # console.log 'Connected!'
     @loadBrowser()
 
   connecting: =>
-    console.log 'Connecting...'
+    # console.log 'Connecting...'
 
   disconnect: =>
-    console.log 'Disconnected from server.'
+    # console.log 'Disconnected from server.'
+    bootbox.alert 'Disconnected from server.'
+    @clearEditor()
 
   connect_failed: =>
-    console.log 'Connection to server failed.'
+    # console.log 'Connection to server failed.'
+    bootbox.alert 'Connection to server failed.'
 
   error: =>
-    console.log 'An unknown error occurred.'
+    # console.log 'An unknown error occurred.'
+    bootbox.alert 'An unknown error occurred.'
 
   reconnect_failed: =>
-    console.log 'Unable to reconnect to server.'
+    # console.log 'Unable to reconnect to server.'
+    bootbox.alert 'Unable to reconnect to server.'
 
   reconnect: =>
     # console.log 'Reconnected!'
 
   reconnecting: =>
-    console.log 'Attempting to reconnect...'
+    # console.log 'Attempting to reconnect...'
