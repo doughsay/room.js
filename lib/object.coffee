@@ -153,8 +153,9 @@ exports.RoomJsObject = class RoomJsObject extends EventEmitter
   setProp: (key, value) ->
     for prop in @properties
       if prop.key == key
-        prop.value = value
-        @db.emit 'updateProperty', {id: @id, key: key, value: value}
+        if prop.value isnt value
+          prop.value = value
+          @db.emit 'updateProperty', {id: @id, key: key, value: value}
         return value
     @addProp key, value
     return value
@@ -190,11 +191,14 @@ exports.RoomJsObject = class RoomJsObject extends EventEmitter
   ################
 
   addVerb: (verb) ->
-    @verbs.push new RoomJsVerb verb, @
+    x = @verbs.push new RoomJsVerb verb, @
+    @db.emit 'addVerb', {id: @id, verb: verb}
+    x
 
   rmVerb: (verbName) ->
     if @hasOwnVerb verbName
       @verbs = (@verbs.filter (v) -> v.name != verbName)
+      @db.emit 'rmVerb', {id: @id, verbName: verbName}
       true
     else
       throw new Error "verb '#{verbName}' doesn't exist on this object."
@@ -235,6 +239,7 @@ exports.RoomJsObject = class RoomJsObject extends EventEmitter
         verb.preparg = newVerb.preparg
         verb.iobjarg = newVerb.iobjarg
         verb.code = newVerb.code
+        @db.emit 'updateVerb', {id: @id, verb: newVerb}
         return true
     @addVerb newVerb
     return true

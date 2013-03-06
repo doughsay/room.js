@@ -5,7 +5,7 @@ class Property
 
     @key = ko.observable key
     @value = ko.observable value
-    
+
     @active = ko.observable false
 
     @menu = ko.computed =>
@@ -29,10 +29,10 @@ class Verb
     @hidden = ko.observable verb.hidden
 
     @active = ko.observable false
-    
+
     @iconClass = ko.computed =>
       if @hidden() then 'icon-eye-close' else 'icon-cog'
-  
+
     @menu = ko.computed =>
       [
         {
@@ -51,6 +51,28 @@ class MiniObject
 
     @properties = ko.observableArray (new Property @, key, value for key, value of object.properties)
     @verbs = ko.observableArray (new Verb @, name, verb for name, verb of object.verbs)
+
+    @sort()
+
+  addProperty: (key, value) ->
+    @properties.push new Property @, key, value
+    @sort()
+
+  rmProperty: (key) ->
+    [match] = @properties().filter (p) -> p.key() is key
+    if match?
+      @properties.remove match
+      true
+    else
+      false
+
+  addVerb: (verb) ->
+    @verbs.push new Verb @, verb.name, verb
+    @sort()
+
+  sort: ->
+    @properties.sort (l, r) -> if l.key() is r.key() then 0 else (if l.key() < r.key() then -1 else 1)
+    @verbs.sort (l, r) -> if l.name() is r.name() then 0 else (if l.name() < r.name() then -1 else 1)
 
   unselectAll: ->
     p.active false for p in @properties()

@@ -111,6 +111,10 @@ class EditorView
     @socket.on 'rm_property', @rm_property
     @socket.on 'update_property', @update_property
 
+    @socket.on 'add_verb', @add_verb
+    @socket.on 'rm_verb', @rm_verb
+    @socket.on 'update_verb', @update_verb
+
   # build the jqeury ui layout
   setLayout: ->
     @layout = @body.layout
@@ -224,6 +228,11 @@ class EditorView
 
     match || null
 
+  updatePropertyInTabs: (id, key, value) ->
+    for tab in @tabs()
+      if tab.type is 'property' and tab.property.key() is key and tab.property.object.id is id
+        tab.updateValue value
+
   removeFromTabs: (id) ->
     tabsToRemove = []
     for tab in @tabs()
@@ -233,6 +242,14 @@ class EditorView
         when 'verb'
           o = tab.verb.object
       if o.id is id
+        tabsToRemove.push tab
+
+    @removeTab tab for tab in tabsToRemove
+
+  removePropertyFromTabs: (id, key) ->
+    tabsToRemove = []
+    for tab in @tabs()
+      if tab.type is 'property' and tab.property.key() is key and tab.property.object.id is id
         tabsToRemove.push tab
 
     @removeTab tab for tab in tabsToRemove
@@ -312,21 +329,36 @@ class EditorView
     o.name spec.name if o?
 
   add_property: (spec) =>
-    console.log 'TODO add property', spec
-    # if this event is for the selected object, add this property to the property list
+    if @selectedObject().id is spec.id
+      @selectedObject().addProperty spec.key, spec.value
 
   rm_property: (spec) =>
-    console.log 'TODO rm property', spec
-    # if this event is for the selected object, remove this property from the property list
-    # if this property was open in a tab, close the tab
+    if @selectedObject().id is spec.id
+      @selectedObject().rmProperty spec.key
+
+    @removePropertyFromTabs spec.id, spec.key
 
   update_property: (spec) =>
-    console.log 'TODO update property', spec
-    # if this property was open in a tab, update the tab
+    @updatePropertyInTabs spec.id, spec.key, spec.value
+
+    if @selectedObject().id is spec.id
+      for property in @selectedObject().properties()
+        if property.key() is spec.key
+          property.value spec.value
+
+  add_verb: (spec) =>
+    console.log 'add verb', spec
+
+  rm_verb: (spec) =>
+    console.log 'rm verb', spec
+
+  update_verb: (spec) =>
+    console.log 'update verb', spec
 
   # TODO
   # verb sync events
   # object global alias sync events
+  # confirm overwrites of dirty tabs
 
   #############################
   # websocket event listeners #

@@ -62,6 +62,12 @@ class PropertyTab extends Tab
   restore: ->
     @property.value JSON.parse @_value()
 
+  updateValue: (value) ->
+    value ?= null
+    @property.value value
+    @session.setValue JSON.stringify value, null, '  '
+    @_value JSON.stringify value
+
 class VerbTab extends Tab
 
   type: 'verb'

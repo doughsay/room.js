@@ -24,6 +24,10 @@ class Editor
     @db.on 'rmProperty', @rmProperty
     @db.on 'updateProperty', @updateProperty
 
+    @db.on 'addVerb', @addVerb
+    @db.on 'rmVerb', @rmVerb
+    @db.on 'updateVerb', @updateVerb
+
   # fires when a socket disconnects, either by the client closing the connection
   # or calling the `disconnect` method of the socket.
   onDisconnect: =>
@@ -31,6 +35,14 @@ class Editor
     @db.removeListener 'rmObject', @onRmObject
     @db.removeListener 'objectParentChanged', @onObjectParentChanged
     @db.removeListener 'objectNameChanged', @onObjectNameChanged
+
+    @db.removeListener 'addProperty', @addProperty
+    @db.removeListener 'rmProperty', @rmProperty
+    @db.removeListener 'updateProperty', @updateProperty
+
+    @db.removeListener 'addVerb', @addVerb
+    @db.removeListener 'rmVerb', @rmVerb
+    @db.removeListener 'updateVerb', @updateVerb
 
   onGetTree: (data, fn) =>
     fn @editorInterface.objectsTree()
@@ -55,10 +67,14 @@ class Editor
   onRmObject: (id) => @socket.emit 'rm_object', id
   onObjectParentChanged: (spec) => @socket.emit 'object_parent_changed', spec
   onObjectNameChanged: (spec) => @socket.emit 'object_name_changed', spec
+
   addProperty: (spec) => @socket.emit 'add_property', spec
   rmProperty: (spec) => @socket.emit 'rm_property', spec
   updateProperty: (spec) => @socket.emit 'update_property', spec
 
+  addVerb: (spec) => @socket.emit 'add_verb', spec
+  rmVerb: (spec) => @socket.emit 'rm_verb', spec
+  updateVerb: (spec) => @socket.emit 'update_verb', spec
 
 # This is the editor controller.
 # It handles socket.io connections from the editor.
