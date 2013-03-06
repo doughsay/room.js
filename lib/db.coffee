@@ -227,6 +227,8 @@ module.exports = class Db extends EventEmitter
     @objects[nextId] = newPlayer
     @players.push newPlayer
 
+    @emit 'newObject', nextId
+
     newPlayer
 
   # create a clone of this object with copies of all it's properties and verbs

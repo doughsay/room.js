@@ -70,6 +70,7 @@ exports.RoomJsObject = class RoomJsObject extends EventEmitter
   chparent: (id) ->
     if not id?
       @parent_id = null
+      @db.emit 'objectParentChanged', {id: @id, parent_id: null}
       true
     else
       object = @db.findById id
@@ -78,6 +79,7 @@ exports.RoomJsObject = class RoomJsObject extends EventEmitter
       if not object?
         throw new Error "Invalid object"
       @parent_id = id
+      @db.emit 'objectParentChanged', {id: @id, parent_id: id}
       true
 
   rename: (name) ->
@@ -87,6 +89,7 @@ exports.RoomJsObject = class RoomJsObject extends EventEmitter
     if @player and @db.playerNameTaken nameStr
       throw new Error "That player name is already taken"
     else
+      @db.emit 'objectNameChanged', {id: @id, name: nameStr}
       @name = nameStr
 
   updateAliases: (aliases) ->

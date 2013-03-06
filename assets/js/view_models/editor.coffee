@@ -118,6 +118,8 @@ class EditorView
 
     @socket.on 'new_object', @new_object
     @socket.on 'rm_object', @rm_object
+    @socket.on 'object_parent_changed', @object_parent_changed
+    @socket.on 'object_name_changed', @object_name_changed
 
   # build the jqeury ui layout
   setLayout: ->
@@ -153,6 +155,35 @@ class EditorView
   loadBrowser: ->
     @socket.emit 'get_tree', null, (tree) =>
       @objects tree.map (o) => new TreeNode o, @
+
+  findInTree: (id) ->
+    find = (id, o) ->
+      if o.id == id
+        o
+      else
+        for child in o.children()
+          found = find id, child
+          return found if found?
+        null
+
+    found = null
+    for o in @objects()
+      found = find id, o
+      break if found?
+
+    found
+
+  findInTabs: (id) ->
+    os = @tabs().map (tab) ->
+      switch tab.type
+        when 'property'
+          tab.property.object
+        when 'verb'
+          tab.verb.object
+
+    [match] = os.filter (o) -> o.id is id
+
+    match || null
 
   #################
   # Context Menus #
@@ -192,11 +223,48 @@ class EditorView
   # Sync event listeners #
   ########################
 
-  new_object: (obj) ->
-    console.log obj
+  new_object: (obj) =>
+    obj.children = []
 
-  rm_object: (id) ->
-    console.log id
+    insertChild = (o, p) =>
+      if p.id == o.parent_id
+        p.children.push new TreeNode o, @, p.level+1
+        return true
+      else
+        added = false
+        for child in p.children()
+          added = insertChild(o, child)
+          break if added
+        return added
+
+    for o in @objects()
+      break if insertChild obj, o
+
+  rm_object: (id) =>
+    removeChild = (id, p) =>
+      [match] = (child for child in p.children() when child.id is id)
+      if match?
+        p.children.remove match
+        return true
+      else
+        removed = false
+        for child in p.children()
+          removed = removeChild(id, child)
+          break if removed
+        return removed
+
+    for o in @objects()
+      break if removeChild id, o
+
+  object_parent_changed: (spec) =>
+    console.log 'TODO: object parent changed:', spec
+
+  object_name_changed: (spec) =>
+    o = @findInTree spec.id
+    o.name spec.name if o?
+
+    o = @findInTabs spec.id
+    o.name spec.name if o?
 
   #############################
   # websocket event listeners #

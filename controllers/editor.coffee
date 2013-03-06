@@ -17,12 +17,16 @@ class Editor
 
     @db.on 'newObject', @onNewObject
     @db.on 'rmObject', @onRmObject
+    @db.on 'objectParentChanged', @onObjectParentChanged
+    @db.on 'objectNameChanged', @onObjectNameChanged
 
   # fires when a socket disconnects, either by the client closing the connection
   # or calling the `disconnect` method of the socket.
   onDisconnect: =>
     @db.removeListener 'newObject', @onNewObject
     @db.removeListener 'rmObject', @onRmObject
+    @db.removeListener 'objectParentChanged', @onObjectParentChanged
+    @db.removeListener 'objectNameChanged', @onObjectNameChanged
 
   onGetTree: (data, fn) =>
     fn @editorInterface.objectsTree()
@@ -49,6 +53,12 @@ class Editor
 
   onRmObject: (id) =>
     @socket.emit 'rm_object', id
+
+  onObjectParentChanged: (spec) =>
+    @socket.emit 'object_parent_changed', spec
+
+  onObjectNameChanged: (spec) =>
+    @socket.emit 'object_name_changed', spec
 
 # This is the editor controller.
 # It handles socket.io connections from the editor.
