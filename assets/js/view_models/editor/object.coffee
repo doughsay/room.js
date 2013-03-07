@@ -41,6 +41,14 @@ class Verb
         }
       ]
 
+  update: (verb) ->
+    @name verb.name
+    @dobjarg verb.dobjarg
+    @preparg verb.preparg
+    @iobjarg verb.iobjarg
+    @code verb.code
+    @hidden verb.hidden
+
 # view model for an object in the editor
 class MiniObject
 
@@ -66,9 +74,27 @@ class MiniObject
     else
       false
 
+  updateProperty: (key, value) ->
+    for property in @properties()
+      if property.key() is key
+        property.value value
+
   addVerb: (verb) ->
     @verbs.push new Verb @, verb.name, verb
     @sort()
+
+  rmVerb: (verbName) ->
+    [match] = @verbs().filter (v) -> v.name() is verbName
+    if match?
+      @verbs.remove match
+      true
+    else
+      false
+
+  updateVerb: (verb) ->
+    for v in @verbs()
+      if v.name() is verb.original_name
+        v.update verb
 
   sort: ->
     @properties.sort (l, r) -> if l.key() is r.key() then 0 else (if l.key() < r.key() then -1 else 1)

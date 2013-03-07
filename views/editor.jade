@@ -9,7 +9,7 @@ html
       li(data-bind='visible: visible, css: {active: active}')
         span.pull-left
           i(data-bind='css: iconClass, click: toggle')
-        a(href='#', data-bind='click: $root.selectObject')
+        a(href='#', data-bind='click: $root.selectObject, event: {dblclick: toggle}')
           span.label.label-inverse(data-bind='html: idPresenter')
           span.label(data-bind='html: aliasPresenter')
           span(data-bind='html: namePresenter')

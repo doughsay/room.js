@@ -254,6 +254,14 @@ class EditorView
 
     @removeTab tab for tab in tabsToRemove
 
+  removeVerbFromTabs: (id, verbName) ->
+    tabsToRemove = []
+    for tab in @tabs()
+      if tab.type is 'verb' and tab.verb.name() is verbName and tab.verb.object.id is id
+        tabsToRemove.push tab
+
+    @removeTab tab for tab in tabsToRemove
+
   removeTab: (tab) ->
     tab.restore()
     tabIndex = @tabs.indexOf(tab)
@@ -342,18 +350,24 @@ class EditorView
     @updatePropertyInTabs spec.id, spec.key, spec.value
 
     if @selectedObject().id is spec.id
-      for property in @selectedObject().properties()
-        if property.key() is spec.key
-          property.value spec.value
+      @selectedObject().updateProperty spec.key, spec.value
 
   add_verb: (spec) =>
-    console.log 'add verb', spec
+    if @selectedObject().id is spec.id
+      @selectedObject().addVerb spec.verb
 
   rm_verb: (spec) =>
-    console.log 'rm verb', spec
+    if @selectedObject().id is spec.id
+      @selectedObject().rmVerb spec.verbName
+
+    @removeVerbFromTabs spec.id, spec.verbName
 
   update_verb: (spec) =>
-    console.log 'update verb', spec
+    console.log 'TODO update verb', spec
+    # @updateVerbInTabs spec.id, spec.verb
+
+    if @selectedObject().id is spec.id
+      @selectedObject().updateVerb spec.verb
 
   # TODO
   # verb sync events
