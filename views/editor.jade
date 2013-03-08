@@ -6,7 +6,7 @@ html
     link(rel='stylesheet', href='/assets/editor.css')
   body
     script(type='text/html', id='TreeNodeTemplate')
-      li(data-bind='visible: visible, css: {active: active}')
+      li(data-bind='visible: visible, css: {active: active}, context: menu')
         span.pull-left
           i(data-bind='css: iconClass, click: toggle')
         a(href='#', data-bind='click: $root.selectObject, event: {dblclick: toggle}')
@@ -18,7 +18,7 @@ html
     .ui-layout-center
       .tabs
         ul.nav.nav-tabs(data-bind='foreach: tabs')
-          li(data-bind='css: {active: active}')
+          li(data-bind='css: {active: active}, context: menu')
             a(href='#', data-bind='click: $root.selectTab')
               i(data-bind='css: iconClass')
               span(data-bind='text: displayName')
@@ -72,7 +72,7 @@ html
       .editor(data-bind='visible: selectedTab')
 
     .ui-layout-west
-      .ui-layout-west-center
+      .ui-layout-west-center(data-bind='context: objectMenu')
         .search
           .row-fluid
             input.search-query.span12(type='text', placeholder='Filter', data-bind='value: filter_text, event: {keyup: updateFilter}')
@@ -81,19 +81,19 @@ html
           .overflow-container
             ul.nav.nav-list(data-bind='template: {name: "TreeNodeTemplate", foreach: objects}')
 
-      .ui-layout-west-south
+      .ui-layout-west-south(data-bind='context: attributeMenu')
         .overflow-container
           ul.nav.nav-list(data-bind='with: selectedObject')
             li.nav-header(data-bind='visible: properties().length > 0') Properties
             // ko foreach: properties
-            li(data-bind='css: {active: active}')
+            li(data-bind='css: {active: active}, context: menu')
               a(href='#', data-bind='click: $parent.selectProperty, event: {dblclick: $root.openProperty}')
                 i.icon-file-alt
                 span(data-bind='text: key')
             // /ko
             li.nav-header(data-bind='visible: verbs().length > 0') Verbs
             // ko foreach: verbs
-            li(data-bind='css: {active: active}')
+            li(data-bind='css: {active: active}, context: menu')
               a(href='#', data-bind='click: $parent.selectVerb, event: {dblclick: $root.openVerb}')
                 i(data-bind='css: iconClass')
                 span(data-bind='text: name')

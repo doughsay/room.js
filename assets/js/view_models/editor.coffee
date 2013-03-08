@@ -50,7 +50,7 @@ class EditorView
   # triggered by clicking an object in the object browser
   selectObject: (node) =>
     @socket.emit 'get_object', node.id, (object) =>
-      @selectedObject new MiniObject object
+      @selectedObject new MiniObject object, @
 
   # triggered by double-clicking a property in the object attribute list
   openProperty: (property) =>
@@ -85,7 +85,16 @@ class EditorView
     else
       @removeTab tab
 
-    event.stopPropagation()
+    if event?
+      event.stopPropagation()
+
+  closeOtherTabs: (thisTab) =>
+    for tab in (tab for tab in @tabs())
+      @closeTab tab if tab isnt thisTab
+
+  closeAllTabs: =>
+    for tab in (tab for tab in @tabs())
+      @closeTab tab
 
   #######################
   # Misc Helper Methods #
@@ -231,7 +240,7 @@ class EditorView
   updatePropertyInTabs: (id, key, value) ->
     for tab in @tabs()
       if tab.type is 'property' and tab.property.key() is key and tab.property.object.id is id
-        tab.updateValue value
+        tab.update value
 
   removeFromTabs: (id) ->
     tabsToRemove = []
@@ -276,35 +285,31 @@ class EditorView
     if @tabs().length == 0
       @selectedTab null
 
+  updateVerbInTabs: (id, verb) ->
+    for tab in @tabs()
+      if tab.type is 'verb' and tab.verb.name() is verb.original_name and tab.verb.object.id is id
+        tab.update verb
+
+  newObject: (name) ->
+    console.log 'TODO: create new object', name
+
   #################
   # Context Menus #
   #################
   # these methods return context menu definitions
 
   # context menu for the object attribute list
-  attributeMenu: ->
-    [
-      {
-        text: 'New Property',
-        action: =>
-          bootbox.prompt "Name:", (name) =>
-            if name?
-              @selectedObject().newProperty name
-      },
-      {
-        text: 'New Verb',
-        action: =>
-          @selectedObject().newVerb()
-      }
-    ]
+  attributeMenu: =>
+    if @selectedObject()?
+      @selectedObject().menu()
 
   # context menu for the object browser
-  objectMenu: ->
+  objectMenu: =>
     [
       {
-        text: 'New Top-Level Object',
+        text: 'New top-level object',
         action: =>
-          bootbox.prompt "Name:", (name) =>
+          bootbox.prompt "Name for new object:", (name) =>
             if name?
               @newObject name
       }
@@ -363,14 +368,12 @@ class EditorView
     @removeVerbFromTabs spec.id, spec.verbName
 
   update_verb: (spec) =>
-    console.log 'TODO update verb', spec
-    # @updateVerbInTabs spec.id, spec.verb
+    @updateVerbInTabs spec.id, spec.verb
 
     if @selectedObject().id is spec.id
       @selectedObject().updateVerb spec.verb
 
   # TODO
-  # verb sync events
   # object global alias sync events
   # confirm overwrites of dirty tabs
 

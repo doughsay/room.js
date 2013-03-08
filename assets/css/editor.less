@@ -56,6 +56,14 @@ li.active {
   }
 }
 
+ul.nav-list, ul.nav-tabs, ul.dropdown-menu {
+  user-select: none;
+  -o-user-select:none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+}
+
 ul.nav-list {
   li {
     i {
@@ -127,4 +135,8 @@ ul.nav-tabs {
 
 .editor {
   background-color: gray;
+}
+
+.dropdown-menu.open {
+  display: block;
 }

@@ -12,7 +12,21 @@ class Tab
     @active = ko.computed =>
       @ == @view.selectedTab()
 
-  save: -> bootbox.alert "TODO"
+  menu: =>
+    [
+      {
+        text: "Close tab",
+        action: => @view.closeTab @
+      },
+      {
+        text: "Close other tabs",
+        action: => @view.closeOtherTabs @
+      },
+      {
+        text: "Close all tabs",
+        action: => @view.closeAllTabs()
+      }
+    ]
 
 class PropertyTab extends Tab
 
@@ -62,7 +76,7 @@ class PropertyTab extends Tab
   restore: ->
     @property.value JSON.parse @_value()
 
-  updateValue: (value) ->
+  update: (value) ->
     value ?= null
     @property.value value
     @session.setValue JSON.stringify value, null, '  '
@@ -133,3 +147,20 @@ class VerbTab extends Tab
     @verb.iobjarg @_iobjarg()
     @verb.hidden @_hidden()
     @verb.name @_name()
+
+  update: (verb) ->
+    @verb.name verb.name
+    @verb.dobjarg verb.dobjarg
+    @verb.preparg verb.preparg
+    @verb.iobjarg verb.iobjarg
+    @verb.code verb.code
+    @verb.hidden verb.hidden
+
+    @_name verb.name
+    @_dobjarg verb.dobjarg
+    @_preparg verb.preparg
+    @_iobjarg verb.iobjarg
+    @_code verb.code
+    @_hidden verb.hidden
+
+    @session.setValue verb.code

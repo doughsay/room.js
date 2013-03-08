@@ -1,26 +1,28 @@
 class Property
 
-  constructor: (object, key, value) ->
-    @object = object
-
+  constructor: (@object, key, value) ->
     @key = ko.observable key
     @value = ko.observable value
 
     @active = ko.observable false
 
-    @menu = ko.computed =>
-      [
-        {
-          text: "Delete Property '#{@key()}'",
-          action: => console.log 'TODO: delete property', @key()
-        }
-      ]
+  menu: =>
+    @object.selectProperty @
+    [
+      {
+        text: "Delete property '#{@key()}'",
+        action: =>
+          bootbox.confirm "Are you sure you want to permanently delete property '#{@key()}' of '#{@object.name()}'?", (confirmed) =>
+            @delete() if confirmed
+      }
+    ]
+
+  delete: ->
+    console.log 'TODO: delete property', @key()
 
 class Verb
 
-  constructor: (object, name, verb) ->
-    @object = object
-
+  constructor: (@object, name, verb) ->
     @name = ko.observable name
     @dobjarg = ko.observable verb.dobjarg
     @preparg = ko.observable verb.preparg
@@ -33,13 +35,19 @@ class Verb
     @iconClass = ko.computed =>
       if @hidden() then 'icon-eye-close' else 'icon-cog'
 
-    @menu = ko.computed =>
-      [
-        {
-          text: "Delete Verb '#{@name()}'",
-          action: => console.log 'TODO: delete verb', @name()
-        }
-      ]
+  menu: =>
+    @object.selectVerb @
+    [
+      {
+        text: "Delete verb '#{@name()}'",
+        action: =>
+          bootbox.confirm "Are you sure you want to permanently delete verb '#{@name()}' of '#{@object.name()}'?", (confirmed) =>
+            @delete() if confirmed
+      }
+    ]
+
+  delete: ->
+    console.log 'TODO: delete verb', @name()
 
   update: (verb) ->
     @name verb.name
@@ -52,7 +60,7 @@ class Verb
 # view model for an object in the editor
 class MiniObject
 
-  constructor: (object) ->
+  constructor: (object, @view) ->
     @id = object.id
     @name = ko.observable object.name
     @alias = ko.observable object.alias
@@ -61,6 +69,24 @@ class MiniObject
     @verbs = ko.observableArray (new Verb @, name, verb for name, verb of object.verbs)
 
     @sort()
+
+  menu: =>
+    [
+      {
+        text: 'New property',
+        action: =>
+          bootbox.prompt "Name of new property for '#{@name()}':", (name) =>
+            if name?
+              @newProperty name
+      },
+      {
+        text: 'New verb',
+        action: =>
+          bootbox.prompt "Name of new verb for '#{@name()}':", (name) =>
+            if name?
+              @newVerb name
+      }
+    ]
 
   addProperty: (key, value) ->
     @properties.push new Property @, key, value
@@ -115,5 +141,5 @@ class MiniObject
   newProperty: (name) ->
     console.log 'TODO: create new property', name
 
-  newVerb: ->
-    console.log 'TODO: create new verb'
+  newVerb: (name) ->
+    console.log 'TODO: create new verb', name

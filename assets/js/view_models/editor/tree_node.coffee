@@ -56,22 +56,39 @@ class TreeNode
       if filter isnt '' and @visible()
         @expanded true
 
-    # context menu
-    @menu = ko.computed =>
-      [
-        {
-          text: "New Child of '#{@name()}'",
-          action: => console.log 'TODO: new child object of', @name()
-        },
-        {
-          text: "Rename '#{@name()}'",
-          action: => console.log 'TODO: rename object', @name()
-        },
-        {
-          text: "Delete '#{@name()}'",
-          action: => console.log 'TODO: delete object', @name()
-        }
-      ]
+  newChild: (name) ->
+    console.log 'TODO: new child object of', @name(), 'called', name
+
+  rename: (name) ->
+    console.log 'TODO: rename object', @name(), 'to', name
+
+  delete: ->
+    console.log 'TODO: delete object', @name()
+
+  menu: =>
+    @view.selectObject @
+    [
+      {
+        text: "New child of '#{@name()}'",
+        action: =>
+          bootbox.prompt "Name for new child of '#{@name()}':", (name) =>
+            if name?
+              @newChild name
+      },
+      {
+        text: "Rename '#{@name()}'",
+        action: =>
+          bootbox.prompt "New name for '#{@name()}':", (name) =>
+            if name?
+              @rename name
+      },
+      {
+        text: "Delete '#{@name()}'",
+        action: =>
+          bootbox.confirm "Are you sure you want to permanently delete '#{@name()}'?", (confirmed) =>
+            @delete() if confirmed
+      }
+    ]
 
   toggle: ->
     @expanded !@expanded()
