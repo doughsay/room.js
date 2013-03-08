@@ -133,13 +133,13 @@ exports.RoomJsObject = class RoomJsObject extends EventEmitter
 
   addProp: (key, value) ->
     x = @properties.push {key: key, value: value}
-    @db.emit 'addProperty', {id: @id, key: key, value: value}
+    @db.emit 'propertyAdded', {id: @id, key: key, value: value}
     x
 
   rmProp: (key) ->
     if @hasOwnProp key
       @properties = @properties.filter (prop) -> prop.key != key
-      @db.emit 'rmProperty', {id: @id, key: key}
+      @db.emit 'propertyDeleted', {id: @id, key: key}
       return true
     else
       throw new Error "property '#{key}' doesn't exist on this object."
@@ -155,7 +155,7 @@ exports.RoomJsObject = class RoomJsObject extends EventEmitter
       if prop.key == key
         if prop.value isnt value
           prop.value = value
-          @db.emit 'updateProperty', {id: @id, key: key, value: value}
+          @db.emit 'propertyUpdated', {id: @id, key: key, value: value}
         return value
     @addProp key, value
     return value
@@ -192,13 +192,13 @@ exports.RoomJsObject = class RoomJsObject extends EventEmitter
 
   addVerb: (verb) ->
     x = @verbs.push new RoomJsVerb verb, @
-    @db.emit 'addVerb', {id: @id, verb: verb}
+    @db.emit 'verbAdded', {id: @id, verb: verb}
     x
 
   rmVerb: (verbName) ->
     if @hasOwnVerb verbName
       @verbs = (@verbs.filter (v) -> v.name != verbName)
-      @db.emit 'rmVerb', {id: @id, verbName: verbName}
+      @db.emit 'verbDeleted', {id: @id, verbName: verbName}
       true
     else
       throw new Error "verb '#{verbName}' doesn't exist on this object."
@@ -239,7 +239,7 @@ exports.RoomJsObject = class RoomJsObject extends EventEmitter
         verb.preparg = newVerb.preparg
         verb.iobjarg = newVerb.iobjarg
         verb.code = newVerb.code
-        @db.emit 'updateVerb', {id: @id, verb: newVerb}
+        @db.emit 'verbUpdated', {id: @id, verb: newVerb}
         return true
     @addVerb newVerb
     return true

@@ -15,34 +15,34 @@ class Editor
     @socket.on 'save_property', @onSaveProperty
     @socket.on 'save_verb', @onSaveVerb
 
-    @db.on 'newObject', @onNewObject
-    @db.on 'rmObject', @onRmObject
-    @db.on 'objectParentChanged', @onObjectParentChanged
-    @db.on 'objectNameChanged', @onObjectNameChanged
+    @db.on 'objectCreated', @objectCreated
+    @db.on 'objectDeleted', @objectDeleted
+    @db.on 'objectParentChanged', @objectParentChanged
+    @db.on 'objectNameChanged', @objectNameChanged
 
-    @db.on 'addProperty', @addProperty
-    @db.on 'rmProperty', @rmProperty
-    @db.on 'updateProperty', @updateProperty
+    @db.on 'propertyAdded', @propertyAdded
+    @db.on 'propertyDeleted', @propertyDeleted
+    @db.on 'propertyUpdated', @propertyUpdated
 
-    @db.on 'addVerb', @addVerb
-    @db.on 'rmVerb', @rmVerb
-    @db.on 'updateVerb', @updateVerb
+    @db.on 'verbAdded', @verbAdded
+    @db.on 'verbDeleted', @verbDeleted
+    @db.on 'verbUpdated', @verbUpdated
 
   # fires when a socket disconnects, either by the client closing the connection
   # or calling the `disconnect` method of the socket.
   onDisconnect: =>
-    @db.removeListener 'newObject', @onNewObject
-    @db.removeListener 'rmObject', @onRmObject
-    @db.removeListener 'objectParentChanged', @onObjectParentChanged
-    @db.removeListener 'objectNameChanged', @onObjectNameChanged
+    @db.removeListener 'objectCreated', @objectCreated
+    @db.removeListener 'objectDeleted', @objectDeleted
+    @db.removeListener 'objectParentChanged', @objectParentChanged
+    @db.removeListener 'objectNameChanged', @objectNameChanged
 
-    @db.removeListener 'addProperty', @addProperty
-    @db.removeListener 'rmProperty', @rmProperty
-    @db.removeListener 'updateProperty', @updateProperty
+    @db.removeListener 'propertyAdded', @propertyAdded
+    @db.removeListener 'propertyDeleted', @propertyDeleted
+    @db.removeListener 'propertyUpdated', @propertyUpdated
 
-    @db.removeListener 'addVerb', @addVerb
-    @db.removeListener 'rmVerb', @rmVerb
-    @db.removeListener 'updateVerb', @updateVerb
+    @db.removeListener 'verbAdded', @verbAdded
+    @db.removeListener 'verbDeleted', @verbDeleted
+    @db.removeListener 'verbUpdated', @verbUpdated
 
   onGetTree: (data, fn) =>
     fn @editorInterface.objectsTree()
@@ -63,18 +63,18 @@ class Editor
   ##################
   # These callbacks keep the editor in sync when things change in the database
 
-  onNewObject: (id) => @socket.emit 'new_object', @editorInterface.getObjectNode id
-  onRmObject: (id) => @socket.emit 'rm_object', id
-  onObjectParentChanged: (spec) => @socket.emit 'object_parent_changed', spec
-  onObjectNameChanged: (spec) => @socket.emit 'object_name_changed', spec
+  objectCreated: (id) => @socket.emit 'object_created', @editorInterface.getObjectNode id
+  objectDeleted: (id) => @socket.emit 'object_deleted', id
+  objectParentChanged: (spec) => @socket.emit 'object_parent_changed', spec
+  objectNameChanged: (spec) => @socket.emit 'object_name_changed', spec
 
-  addProperty: (spec) => @socket.emit 'add_property', spec
-  rmProperty: (spec) => @socket.emit 'rm_property', spec
-  updateProperty: (spec) => @socket.emit 'update_property', spec
+  propertyAdded: (spec) => @socket.emit 'property_added', spec
+  propertyDeleted: (spec) => @socket.emit 'property_deleted', spec
+  propertyUpdated: (spec) => @socket.emit 'property_updated', spec
 
-  addVerb: (spec) => @socket.emit 'add_verb', spec
-  rmVerb: (spec) => @socket.emit 'rm_verb', spec
-  updateVerb: (spec) => @socket.emit 'update_verb', spec
+  verbAdded: (spec) => @socket.emit 'verb_added', spec
+  verbDeleted: (spec) => @socket.emit 'verb_deleted', spec
+  verbUpdated: (spec) => @socket.emit 'verb_updated', spec
 
 # This is the editor controller.
 # It handles socket.io connections from the editor.

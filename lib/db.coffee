@@ -227,7 +227,7 @@ module.exports = class Db extends EventEmitter
     @objects[nextId] = newPlayer
     @players.push newPlayer
 
-    @emit 'newObject', nextId
+    @emit 'objectCreated', nextId
 
     newPlayer
 
@@ -247,7 +247,7 @@ module.exports = class Db extends EventEmitter
     newObject = new RoomJsObject rawObject, @
     newObject.moveTo object.location()
     @objects[nextId] = newObject
-    @emit 'newObject', nextId
+    @emit 'objectCreated', nextId
     newObject
 
   # Create a child of object
@@ -269,7 +269,7 @@ module.exports = class Db extends EventEmitter
     newObject = new RoomJsObject rawObject, @
     newObject.moveTo object.location()
     @objects[nextId] = newObject
-    @emit 'newObject', nextId
+    @emit 'objectCreated', nextId
     newObject
 
   rm: (id) ->
@@ -281,7 +281,7 @@ module.exports = class Db extends EventEmitter
       if @objects[id].player
         @players = @players.filter (p) -> p.id != id
       delete @objects[id]
-      @emit 'rmObject', id
+      @emit 'objectDeleted', id
       true
     else
       false

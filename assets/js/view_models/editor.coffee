@@ -111,18 +111,18 @@ class EditorView
     @socket.on 'reconnect', @reconnect
     @socket.on 'reconnecting', @reconnecting
 
-    @socket.on 'new_object', @new_object
-    @socket.on 'rm_object', @rm_object
+    @socket.on 'object_created', @object_created
+    @socket.on 'object_deleted', @object_deleted
     @socket.on 'object_parent_changed', @object_parent_changed
     @socket.on 'object_name_changed', @object_name_changed
 
-    @socket.on 'add_property', @add_property
-    @socket.on 'rm_property', @rm_property
-    @socket.on 'update_property', @update_property
+    @socket.on 'property_added', @property_added
+    @socket.on 'property_deleted', @property_deleted
+    @socket.on 'property_updated', @property_updated
 
-    @socket.on 'add_verb', @add_verb
-    @socket.on 'rm_verb', @rm_verb
-    @socket.on 'update_verb', @update_verb
+    @socket.on 'verb_added', @verb_added
+    @socket.on 'verb_deleted', @verb_deleted
+    @socket.on 'verb_updated', @verb_updated
 
   # build the jqeury ui layout
   setLayout: ->
@@ -319,11 +319,11 @@ class EditorView
   # Sync event listeners #
   ########################
 
-  new_object: (obj) =>
+  object_created: (obj) =>
     obj.children = []
     @insertIntoTree obj
 
-  rm_object: (id) =>
+  object_deleted: (id) =>
     @removeFromTree id
     @removeFromTabs id
     if @selectedObject().id is id
@@ -341,33 +341,33 @@ class EditorView
     o = @findInTabs spec.id
     o.name spec.name if o?
 
-  add_property: (spec) =>
+  property_added: (spec) =>
     if @selectedObject().id is spec.id
       @selectedObject().addProperty spec.key, spec.value
 
-  rm_property: (spec) =>
+  property_deleted: (spec) =>
     if @selectedObject().id is spec.id
       @selectedObject().rmProperty spec.key
 
     @removePropertyFromTabs spec.id, spec.key
 
-  update_property: (spec) =>
+  property_updated: (spec) =>
     @updatePropertyInTabs spec.id, spec.key, spec.value
 
     if @selectedObject().id is spec.id
       @selectedObject().updateProperty spec.key, spec.value
 
-  add_verb: (spec) =>
+  verb_added: (spec) =>
     if @selectedObject().id is spec.id
       @selectedObject().addVerb spec.verb
 
-  rm_verb: (spec) =>
+  verb_deleted: (spec) =>
     if @selectedObject().id is spec.id
       @selectedObject().rmVerb spec.verbName
 
     @removeVerbFromTabs spec.id, spec.verbName
 
-  update_verb: (spec) =>
+  verb_updated: (spec) =>
     @updateVerbInTabs spec.id, spec.verb
 
     if @selectedObject().id is spec.id
