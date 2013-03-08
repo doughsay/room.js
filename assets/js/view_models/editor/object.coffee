@@ -18,7 +18,7 @@ class Property
     ]
 
   delete: ->
-    console.log 'TODO: delete property', @key()
+    @object.view.socket.emit 'delete_property', {id: @object.id, key: @key()}
 
 class Verb
 
@@ -47,7 +47,7 @@ class Verb
     ]
 
   delete: ->
-    console.log 'TODO: delete verb', @name()
+    @object.view.socket.emit 'delete_verb', {id: @object.id, name: @name()} # TODO this will fail when someone has edited the name but not saved yet
 
   update: (verb) ->
     @name verb.name
@@ -139,7 +139,7 @@ class MiniObject
     verb.active true
 
   newProperty: (name) ->
-    console.log 'TODO: create new property', name
+    @view.socket.emit 'create_property', {id: @id, key: name, value: ''}
 
   newVerb: (name) ->
-    console.log 'TODO: create new verb', name
+    @view.socket.emit 'create_verb', {id: @id, name: name}

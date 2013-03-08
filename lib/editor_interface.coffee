@@ -58,3 +58,22 @@ module.exports = class EditorInterface
 
   saveVerb: (verb) ->
     @db.findById(verb.object_id).saveVerb verb
+
+  createProperty: (id, key, value) =>
+    @db.findById(id).addProp key, value
+
+  createVerb: (id, name) =>
+    verb =
+      name: name
+      hidden: false
+      dobjarg: 'none'
+      preparg: 'none'
+      iobjarg: 'none'
+      code: ''
+    @db.findById(id).addVerb verb
+
+  deleteProperty: (id, key) =>
+    @db.findById(id).rmProp key
+
+  deleteVerb: (id, name) =>
+    @db.findById(id).rmVerb name

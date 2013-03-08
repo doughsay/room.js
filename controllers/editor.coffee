@@ -9,11 +9,16 @@ class Editor
   constructor: (@db, @socket) ->
     @editorInterface = new EditorInterface @db
 
-    @socket.on 'disconnect', @onDisconnect
-    @socket.on 'get_tree', @onGetTree
-    @socket.on 'get_object', @onGetObject
-    @socket.on 'save_property', @onSaveProperty
-    @socket.on 'save_verb', @onSaveVerb
+    @socket.on 'disconnect', @disconnect
+    @socket.on 'get_tree', @getTree
+    @socket.on 'get_object', @getObject
+    @socket.on 'save_property', @saveProperty
+    @socket.on 'save_verb', @saveVerb
+
+    @socket.on 'create_property', @createProperty
+    @socket.on 'create_verb', @createVerb
+    @socket.on 'delete_property', @deleteProperty
+    @socket.on 'delete_verb', @deleteVerb
 
     @db.on 'objectCreated', @objectCreated
     @db.on 'objectDeleted', @objectDeleted
@@ -30,7 +35,7 @@ class Editor
 
   # fires when a socket disconnects, either by the client closing the connection
   # or calling the `disconnect` method of the socket.
-  onDisconnect: =>
+  disconnect: =>
     @db.removeListener 'objectCreated', @objectCreated
     @db.removeListener 'objectDeleted', @objectDeleted
     @db.removeListener 'objectParentChanged', @objectParentChanged
@@ -44,19 +49,35 @@ class Editor
     @db.removeListener 'verbDeleted', @verbDeleted
     @db.removeListener 'verbUpdated', @verbUpdated
 
-  onGetTree: (data, fn) =>
+  ####################
+  # Editor callbacks #
+  ####################
+
+  getTree: (data, fn) =>
     fn @editorInterface.objectsTree()
 
-  onGetObject: (id, fn) =>
+  getObject: (id, fn) =>
     fn @editorInterface.getObject id
 
-  onSaveProperty: (property, fn) =>
+  saveProperty: (property, fn) =>
     @editorInterface.saveProperty property
     fn()
 
-  onSaveVerb: (verb, fn) =>
+  saveVerb: (verb, fn) =>
     @editorInterface.saveVerb verb
     fn()
+
+  createProperty: (data) =>
+    @editorInterface.createProperty data.id, data.key, data.value
+
+  createVerb: (data) =>
+    @editorInterface.createVerb data.id, data.name
+
+  deleteProperty: (data) =>
+    @editorInterface.deleteProperty data.id, data.key
+
+  deleteVerb: (data) =>
+    @editorInterface.deleteVerb data.id, data.name
 
   ##################
   # Sync callbacks #
