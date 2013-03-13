@@ -54,7 +54,7 @@ class EditorView
             slidable: false
             closable: false
 
-    # @setSizes()
+    @setSizes()
 
     ko.applyBindings @
     $('.cloak').removeClass 'cloak'
@@ -76,6 +76,7 @@ class EditorView
         @authenticated true
         @error null
         @loadBrowser()
+        $('.editor-layout').layout().resizeAll()
       else
         @error 'Invalid username or password'
 
