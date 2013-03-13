@@ -3,9 +3,9 @@
 #= require jquery-ui
 #= require jquery-layout
 #= require bootstrap
-#= require context
 #= require bootbox
 #= require knockout
+#= require knockout-layout
 #= require knockout-context
 #= require knockout-sortable
 

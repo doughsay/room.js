@@ -1,5 +1,7 @@
 util = require 'util'
 
+phash = require('../lib/hash').phash
+
 EditorInterface = require '../lib/editor_interface'
 
 # An Editor represents a socket.io connection from the web editor.
@@ -10,6 +12,7 @@ class Editor
     @editorInterface = new EditorInterface @db
 
     @socket.on 'disconnect', @disconnect
+    @socket.on 'login', @login
     @socket.on 'get_tree', @getTree
     @socket.on 'get_object', @getObject
     @socket.on 'save_property', @saveProperty
@@ -60,6 +63,15 @@ class Editor
   ####################
   # Editor callbacks #
   ####################
+
+  login: (userData, fn) =>
+    sanitize = (userData) ->
+      username: (userData.username || "").trim()
+      password: userData.password || ""
+
+    formData = sanitize userData
+    [player] = @db.players.filter (player) -> player.authenticates(formData.username, phash formData.password)
+    fn player? and player.programmer
 
   getTree: (data, fn) =>
     fn @editorInterface.objectsTree()

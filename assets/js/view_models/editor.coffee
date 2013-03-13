@@ -4,8 +4,13 @@ class EditorView
   socket: null
 
   # construct the view model
-  constructor: (@body) ->
+  constructor: ->
     @socket = io.connect(window.location.href)
+    @username = ko.observable ''
+    @password = ko.observable ''
+    @error = ko.observable null
+    @connected = ko.observable false
+    @authenticated = ko.observable false
     @objects = ko.observableArray []
     @filter_text = ko.observable ''
 
@@ -30,10 +35,26 @@ class EditorView
     $(element).css fontSize: '12pt', fontFamily: '"Source Code Pro", sans-serif'
 
     @attachListeners()
-    @setLayout()
-    @setSizes()
 
-    context.init compress: true
+    @layoutOptions = ko.observable
+      livePaneResizing: true
+      onresize: =>
+        @setSizes()
+      west:
+        size: '20%'
+        slidable: false
+        closable: false
+        childOptions:
+          livePaneResizing: true
+          center:
+            paneSelector: '.ui-layout-west-center'
+          south:
+            paneSelector: '.ui-layout-west-south'
+            size: '50%'
+            slidable: false
+            closable: false
+
+    # @setSizes()
 
     ko.applyBindings @
 
@@ -47,10 +68,30 @@ class EditorView
   ################
   # These methods are triggered from the view, usually through clicks
 
+  login: ->
+    @socket.emit 'login', {username: @username(), password: @password()}, (good) =>
+      @password ''
+      if good
+        @authenticated true
+        @error null
+        @loadBrowser()
+      else
+        @error 'Invalid username or password'
+
+  unsetError: ->
+    @error null
+
+  authenticate: ->
+    @authenticated true
+
   # triggered by clicking an object in the object browser
   selectObject: (node) =>
-    @socket.emit 'get_object', node.id, (object) =>
-      @selectedObject new MiniObject object, @
+    o = @findInTabs node.id
+    if o?
+      @selectedObject o
+    else
+      @socket.emit 'get_object', node.id, (object) =>
+        @selectedObject new MiniObject object, @
 
   # triggered by double-clicking a property in the object attribute list
   openProperty: (property) =>
@@ -123,26 +164,6 @@ class EditorView
     @socket.on 'verb_added', @verb_added
     @socket.on 'verb_deleted', @verb_deleted
     @socket.on 'verb_updated', @verb_updated
-
-  # build the jqeury ui layout
-  setLayout: ->
-    @layout = @body.layout
-      livePaneResizing: true
-      onresize: =>
-        @setSizes()
-      west:
-        size: '20%'
-        slidable: false
-        closable: false
-        childOptions:
-          livePaneResizing: true
-          center:
-            paneSelector: '.ui-layout-west-center'
-          south:
-            paneSelector: '.ui-layout-west-south'
-            size: '50%'
-            slidable: false
-            closable: false
 
   # set the size of the ace editor
   setSizes: ->
@@ -391,31 +412,27 @@ class EditorView
   #############################
 
   connect: =>
-    # console.log 'Connected!'
-    @loadBrowser()
+    @connected true
 
   connecting: =>
-    # console.log 'Connecting...'
 
   disconnect: =>
-    # console.log 'Disconnected from server.'
     bootbox.alert 'Disconnected from server.'
     @clearEditor()
+    @connected false
+    @authenticated false
 
   connect_failed: =>
-    # console.log 'Connection to server failed.'
+    # this will never happen, see socket.io pull request: https://github.com/LearnBoost/socket.io-client/pull/516
     bootbox.alert 'Connection to server failed.'
 
   error: =>
-    # console.log 'An unknown error occurred.'
     bootbox.alert 'An unknown error occurred.'
 
   reconnect_failed: =>
-    # console.log 'Unable to reconnect to server.'
+    # this will never happen, see socket.io pull request: https://github.com/LearnBoost/socket.io-client/pull/516
     bootbox.alert 'Unable to reconnect to server.'
 
   reconnect: =>
-    # console.log 'Reconnected!'
 
   reconnecting: =>
-    # console.log 'Attempting to reconnect...'
