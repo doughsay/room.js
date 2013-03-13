@@ -2,18 +2,19 @@ should = require 'should'
 client = require 'socket.io-client'
 fs = require 'fs'
 
-RoomJsDb = require('../lib/db').RoomJsDb
-RoomJsWebServer = require('../web_server').RoomJsWebServer
-RoomJsSocketServer = require('../socket_server').RoomJsSocketServer
+Db               = require '../lib/db'
+WebServer        = require '../web_server'
+ClientController = require '../controllers/client'
 
 describe 'client', ->
-  before ->
-    @db = new RoomJsDb '_db.test.json', true
-    webServer = new RoomJsWebServer 8888, true
-    socketServer = new RoomJsSocketServer webServer.getHttpServer(), @db
-    @socket = client.connect 'http://127.0.0.1:8888/'
 
   describe 'connection', ->
+
+    before ->
+      @db = new Db '_db.test.json', true
+      webServer = new WebServer 8888, true
+      clientController = new ClientController webServer.io, @db
+      @socket = client.connect 'http://127.0.0.1:8888/client'
 
     ############################
     # General connection tests #
@@ -96,6 +97,10 @@ describe 'client', ->
         should.not.exist response
         done()
 
+    #################
+    # Command tests #
+    #################
+
     # TODO test an assortment of player commands
 
     it 'should be able to run commands', (done) ->
@@ -114,3 +119,38 @@ describe 'client', ->
         done()
 
       @socket.emit 'input', 'look'
+
+    it 'should be able to eval code', (done) ->
+      @socket.once 'output', (message) ->
+        message.should.equal "\n{yellow|4}"
+        done()
+
+      @socket.emit 'input', '`2+2'
+
+    it 'should be able to read all built-in properties of an object', (done) ->
+
+      props = [
+        ['`$root.id', '{yellow|1}'],
+        ['`$root.parent', '{red|null}'],
+        ['`$root.name', "'{green|Root Class}'"],
+        ['`$root.aliases', '[]'],
+        ['`$root.location', '{red|null}'],
+        ['`$root.contents', '[]'],
+        ['`$root.children.length', '{yellow|5}'],
+        ['`$root.isPlayer', '{magenta|false}'],
+        ['`$root.crontab', '[]'],
+      ]
+
+      i = 0
+
+      @socket.on 'output', (x) =>
+        [command, output] = props[i]
+        x.should.equal '\n'+output
+        i++
+        if i is 9
+          @socket.removeAllListeners('output')
+          done()
+
+      for pair in props
+        [command, output] = pair
+        @socket.emit 'input', command

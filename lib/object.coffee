@@ -1,4 +1,5 @@
 _ = require 'underscore'
+EventEmitter = require('events').EventEmitter
 
 connections = require './connection_manager'
 
@@ -11,7 +12,7 @@ EXACT_MATCH = 1
 PARTIAL_MATCH = 2
 
 # A RoomJsObject has properties and RoomJsVerbs
-exports.RoomJsObject = class
+exports.RoomJsObject = class RoomJsObject extends EventEmitter
   # @id: Int
   # @parent_id: Int
   # @name: String
@@ -69,6 +70,7 @@ exports.RoomJsObject = class
   chparent: (id) ->
     if not id?
       @parent_id = null
+      @db.emit 'objectParentChanged', {id: @id, parent_id: null}
       true
     else
       object = @db.findById id
@@ -77,6 +79,7 @@ exports.RoomJsObject = class
       if not object?
         throw new Error "Invalid object"
       @parent_id = id
+      @db.emit 'objectParentChanged', {id: @id, parent_id: id}
       true
 
   rename: (name) ->
@@ -86,6 +89,7 @@ exports.RoomJsObject = class
     if @player and @db.playerNameTaken nameStr
       throw new Error "That player name is already taken"
     else
+      @db.emit 'objectNameChanged', {id: @id, name: nameStr}
       @name = nameStr
 
   updateAliases: (aliases) ->
@@ -128,11 +132,14 @@ exports.RoomJsObject = class
   ####################
 
   addProp: (key, value) ->
-    @properties.push {key: key, value: value}
+    x = @properties.push {key: key, value: value}
+    @db.emit 'propertyAdded', {id: @id, key: key, value: value}
+    x
 
   rmProp: (key) ->
     if @hasOwnProp key
       @properties = @properties.filter (prop) -> prop.key != key
+      @db.emit 'propertyDeleted', {id: @id, key: key}
       return true
     else
       throw new Error "property '#{key}' doesn't exist on this object."
@@ -146,7 +153,10 @@ exports.RoomJsObject = class
   setProp: (key, value) ->
     for prop in @properties
       if prop.key == key
-        return prop.value = value
+        if prop.value isnt value
+          prop.value = value
+          @db.emit 'propertyUpdated', {id: @id, key: key, value: value}
+        return value
     @addProp key, value
     return value
 
@@ -181,11 +191,14 @@ exports.RoomJsObject = class
   ################
 
   addVerb: (verb) ->
-    @verbs.push new RoomJsVerb verb, @
+    x = @verbs.push new RoomJsVerb verb, @
+    @db.emit 'verbAdded', {id: @id, verb: verb}
+    x
 
   rmVerb: (verbName) ->
     if @hasOwnVerb verbName
       @verbs = (@verbs.filter (v) -> v.name != verbName)
+      @db.emit 'verbDeleted', {id: @id, verbName: verbName}
       true
     else
       throw new Error "verb '#{verbName}' doesn't exist on this object."
@@ -226,6 +239,7 @@ exports.RoomJsObject = class
         verb.preparg = newVerb.preparg
         verb.iobjarg = newVerb.iobjarg
         verb.code = newVerb.code
+        @db.emit 'verbUpdated', {id: @id, verb: newVerb}
         return true
     @addVerb newVerb
     return true
