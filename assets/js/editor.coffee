@@ -7,6 +7,7 @@
 #= require bootbox
 #= require knockout
 #= require knockout-context
+#= require knockout-sortable
 
 #= require view_models/editor
 #= require view_models/editor/tree_node

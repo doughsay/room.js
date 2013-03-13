@@ -6,8 +6,8 @@ class Tab
     @session.setTabSize 2
     @session.setUseWrapMode true
 
-    @closeSymbol = ko.computed =>
-      if @dirty() then '•' else '×'
+    @closeIcon = ko.computed =>
+      if @dirty() then 'icon-asterisk' else 'icon-remove'
 
     @active = ko.computed =>
       @ == @view.selectedTab()

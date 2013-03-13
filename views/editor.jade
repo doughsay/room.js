@@ -17,12 +17,12 @@ html
 
     .ui-layout-center
       .tabs
-        ul.nav.nav-tabs(data-bind='foreach: tabs')
+        ul.nav.nav-tabs(data-bind='sortable: tabs')
           li(data-bind='css: {active: active}, context: menu')
             a(href='#', data-bind='click: $root.selectTab')
               i(data-bind='css: iconClass')
               span(data-bind='text: displayName')
-              button.close(data-bind='css: {dirty: dirty}, text: closeSymbol, click: $root.closeTab')
+              i.close(data-bind='css: closeIcon, click: $root.closeTab')
       .toolbar(data-bind='with: selectedTab')
         .verb-toolbar(data-bind='if: type == "verb"')
           .navbar.navbar-static-top(data-bind='with: verb')
