@@ -197,6 +197,10 @@ class EditorView
 
     removed = null
     for o in @objects()
+      if o.id is id
+        @objects.remove o
+        removed = true
+        break
       removed = removeChild id, o
       break if removed?
 
@@ -219,9 +223,14 @@ class EditorView
         added
 
     added = false
-    for o in @objects()
-      added = insertChild obj, o
-      break if added
+    if obj.parent_id is null
+      @objects.push new TreeNode obj, @
+      @objects.sort (l, r) -> l.id - r.id
+      return true
+    else
+      for o in @objects()
+        added = insertChild obj, o
+        break if added
 
     added
 
@@ -291,7 +300,7 @@ class EditorView
         tab.update verb
 
   newObject: (name) ->
-    console.log 'TODO: create new object', name
+    @socket.emit 'create_object', {name: name}
 
   #################
   # Context Menus #

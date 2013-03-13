@@ -57,13 +57,13 @@ class TreeNode
         @expanded true
 
   newChild: (name) ->
-    console.log 'TODO: new child object of', @name(), 'called', name
+    @view.socket.emit 'create_child', {id: @id, name: name}
 
   rename: (name) ->
-    console.log 'TODO: rename object', @name(), 'to', name
+    @view.socket.emit 'rename_object', {id: @id, name: name}
 
   delete: ->
-    console.log 'TODO: delete object', @name()
+    @view.socket.emit 'delete_object', {id: @id}
 
   menu: =>
     @view.selectObject @
@@ -78,15 +78,19 @@ class TreeNode
       {
         text: "Rename '#{@name()}'",
         action: =>
-          bootbox.prompt "New name for '#{@name()}':", (name) =>
+          bootbox.prompt "New name for '#{@name()}':", 'Cancel', 'OK', ((name) =>
             if name?
               @rename name
+          ), @name()
       },
       {
         text: "Delete '#{@name()}'",
         action: =>
-          bootbox.confirm "Are you sure you want to permanently delete '#{@name()}'?", (confirmed) =>
-            @delete() if confirmed
+          if @children().length > 0
+            bootbox.alert "You cannot delete this object because it has children. Delete it's children first."
+          else
+            bootbox.confirm "Are you sure you want to permanently delete '#{@name()}'?", (confirmed) =>
+              @delete() if confirmed
       }
     ]
 

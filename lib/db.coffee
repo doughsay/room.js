@@ -231,6 +231,12 @@ module.exports = class Db extends EventEmitter
 
     newPlayer
 
+  createNewObject: (name) ->
+    nextId = @nextId()
+    @objects[nextId] = @blankObject nextId, name
+    @emit 'objectCreated', nextId
+    @objects[nextId]
+
   # create a clone of this object with copies of all it's properties and verbs
   clone: (object, newName, newAliases) ->
     if not (newName? and newName.toString?)
@@ -252,7 +258,7 @@ module.exports = class Db extends EventEmitter
 
   # Create a child of object
   # this child will inherit any of it's parent's properties and verbs
-  createChild: (object, newName, newAliases) ->
+  createChild: (object, newName, newAliases = []) ->
     if not (newName? and newName.toString?)
       throw new Error "Invalid name for new object"
     for alias in newAliases

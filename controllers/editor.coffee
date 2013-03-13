@@ -20,6 +20,11 @@ class Editor
     @socket.on 'delete_property', @deleteProperty
     @socket.on 'delete_verb', @deleteVerb
 
+    @socket.on 'create_object', @createObject
+    @socket.on 'create_child', @createChild
+    @socket.on 'rename_object', @renameObject
+    @socket.on 'delete_object', @deleteObject
+
     @db.on 'objectCreated', @objectCreated
     @db.on 'objectDeleted', @objectDeleted
     @db.on 'objectParentChanged', @objectParentChanged
@@ -48,6 +53,9 @@ class Editor
     @db.removeListener 'verbAdded', @verbAdded
     @db.removeListener 'verbDeleted', @verbDeleted
     @db.removeListener 'verbUpdated', @verbUpdated
+
+    address = @socket.handshake.address
+    util.log "editor disconnected from #{address.address}:#{address.port}"
 
   ####################
   # Editor callbacks #
@@ -78,6 +86,18 @@ class Editor
 
   deleteVerb: (data) =>
     @editorInterface.deleteVerb data.id, data.name
+
+  createObject: (data) =>
+    @editorInterface.createObject data.name
+
+  createChild: (data) =>
+    @editorInterface.createChild data.id, data.name
+
+  renameObject: (data) =>
+    @editorInterface.renameObject data.id, data.name
+
+  deleteObject: (data) =>
+    @editorInterface.deleteObject data.id
 
   ##################
   # Sync callbacks #

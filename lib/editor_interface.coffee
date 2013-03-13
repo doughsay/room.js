@@ -77,3 +77,16 @@ module.exports = class EditorInterface
 
   deleteVerb: (id, name) =>
     @db.findById(id).rmVerb name
+
+  createObject: (name) =>
+    @db.createNewObject name
+
+  createChild: (id, name) =>
+    object = @db.findById id
+    @db.createChild object, name
+
+  renameObject: (id, name) =>
+    @db.findById(id).rename name
+
+  deleteObject: (id) =>
+    @db.rm id
