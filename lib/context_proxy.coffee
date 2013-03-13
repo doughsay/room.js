@@ -7,7 +7,7 @@ module.exports = (obj, context) ->
   keys = (own = false) ->
     ks = ['id', 'parent', 'name', 'aliases', 'location', 'contents', 'children', 'isPlayer', 'crontab']
     if obj.player
-      ks.push 'username', 'programmer', 'isOnline'
+      ks.push 'username', 'isProgrammer', 'isOnline'
     props = if own then obj.getOwnProperties() else obj.getAllProperties()
     for prop of props
       ks.push prop
@@ -197,7 +197,7 @@ module.exports = (obj, context) ->
           throw new Error "Invalid target"
         obj.moveTo target
 
-      when 'programmer'
+      when 'isProgrammer'
         if obj.player
           programmer = !!val
           obj.setProgrammer programmer
@@ -213,7 +213,6 @@ module.exports = (obj, context) ->
         else if obj.hasProp name
           obj.setProp name, context.serialize val
         else
-          console.log 'adding prop'
           obj.addProp name, context.serialize val
 
   enumerate: ->

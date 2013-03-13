@@ -36,6 +36,9 @@ class Client
       if verb?
         context.runVerb @db, player, verb, @db.sys
 
+    address = @socket.handshake.address
+    util.log "client disconnected from #{address.address}:#{address.port}"
+
   # fires when a socket sends a command
   onInput: (userStr) =>
     str = userStr || ""

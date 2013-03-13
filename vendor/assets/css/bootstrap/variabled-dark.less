@@ -1,0 +1,214 @@
+/*
+* pikock, autreplanete http://www.autreplanete.com/ 
+*  
+**/
+
+
+// Colors
+@black: #1b1e1f;
+@grayDarker: #000000;
+@grayDark: #000000;
+@gray: #555753;
+@grayLight: #000000;
+@grayLighter: #000000;
+@white: #eeeeec;
+@blue: #729fcf;
+@blueDark: #000000;
+@green: #8ae234;
+@red: #ef2929;
+@yellow: #fce94f;
+@orange: #000000;
+@pink: #000000;
+@purple: #ad7fa8;
+
+
+// Brand Colors
+@mainBrandColor: #000;
+@secondBrandColor: #222;
+@thirdBrandColor: #333;
+@callToActionColor: #333;
+
+
+// Scaffolding
+@bodyBackground: @black;
+@textColor: @white;
+@linkColor: @blue;
+@linkColorHover: lighten(@linkColor, 15%);
+@baseBorderRadius: 4px;
+@borderRadiusLarge: 6px;
+@borderRadiusSmall: 3px;
+
+
+// Typography
+@sansFontFamily: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+@serifFontFamily: Georgia, 'Times New Roman', Times, serif;
+@monoFontFamily: Monaco, Menlo, Consolas, 'Courier New', monospace;
+@baseFontSize: 14px;
+@baseFontFamily: @sansFontFamily;
+@baseLineHeight: 20px;
+@altFontFamily: @serifFontFamily;
+@headingsFontFamily: inherit;
+@headingsFontWeight: bold;
+@headingsColor: inherit;
+
+
+// Component Sizing
+@fontSizeLarge: @baseFontSize * 1.25;
+@paddingLarge: 11px 19px;
+@fontSizeSmall: @baseFontSize * 0.85;
+@paddingSmall: 2px 10px;
+@fontSizeMini: @baseFontSize * 0.75;
+@paddingMini: 0 6px;
+
+
+// Buttons
+@btnBackground: @white;
+@btnBackgroundHighlight: darken(@white, 15%);
+@btnBorder: #bbb;
+@btnPrimaryBackground: @linkColor;
+@btnPrimaryBackgroundHighlight: darken(@btnPrimaryBackground, 15%);
+@btnInfoBackground: @purple;
+@btnInfoBackgroundHighlight: darken(@purple, 15%);
+@btnSuccessBackground: @green;
+@btnSuccessBackgroundHighlight: darken(@green, 10%);
+@btnWarningBackground: @yellow;
+@btnWarningBackgroundHighlight: darken(@yellow, 15%);
+@btnDangerBackground: @red;
+@btnDangerBackgroundHighlight: darken(@red, 15%);
+@btnInverseBackground: @black;
+@btnInverseBackgroundHighlight: darken(@black, 15%);
+
+
+// Dropdowns
+@dropdownBackground: darken(@black, 2%);
+@dropdownBorder: darken(@black, 5%);
+@dropdownDividerTop: darken(@black, 5%);
+@dropdownDividerBottom: lighten(@black, 5%);
+@dropdownLinkColor: @grayDark;
+@dropdownLinkColorHover: @white;
+@dropdownLinkColorActive: @white;
+@dropdownLinkBackgroundActive: @linkColor;
+@dropdownLinkBackgroundHover: @dropdownLinkBackgroundActive;
+
+
+// Forms
+@inputBackground: darken(@black, 5%);
+@inputBorder: lighten(@black, 10%);
+@inputBorderRadius: @baseBorderRadius;
+@inputDisabledBackground: darken(@black, 4%);
+@formActionsBackground: @black;
+@inputHeight: @baseLineHeight + 10px;
+@horizontalComponentOffset: 180px;
+@placeholderText: darken(@white, 50%);
+@hrBorder: darken(@black, 5%);
+@wellBackground: darken(@black, 2%);
+
+
+// Table
+@tableBackground: transparent;
+@tableBackgroundAccent: lighten(@black, 5%);
+@tableBackgroundHover: lighten(@black, 10%);
+@tableBorder: lighten(@black, 10%);
+
+
+// Navbar
+@navbarCollapseWidth: 979px;
+@navbarCollapseDesktopWidth: @navbarCollapseWidth + 1;
+@navbarHeight: 40px;
+@navbarBackgroundHighlight: @black;
+@navbarBackground: darken(@navbarBackgroundHighlight, 5%);
+@navbarBorder: darken(@navbarBackground, 12%);
+@navbarText: @white;
+@navbarLinkColor: darken(@white, 25%);
+@navbarLinkColorHover: lighten(@white, 100%);
+@navbarLinkColorActive: @navbarLinkColor;
+@navbarLinkBackgroundHover: transparent;
+@navbarLinkBackgroundActive: darken(@navbarBackground, 5%);
+@navbarBrandColor: @navbarLinkColor;
+
+
+// Hero Unit
+@heroUnitBackground: @wellBackground;
+@heroUnitHeadingColor: inherit;
+@heroUnitLeadColor: inherit;
+
+
+// Pagination
+@paginationBackground: #fff;
+@paginationBorder: #ddd;
+@paginationActiveBackground: #f5f5f5;
+
+
+// Form States
+@warningText: @black;
+@warningBackground: @yellow;
+@warningBorder: darken(spin(@warningBackground, -10), 3%);
+@errorText: @black;
+@errorBackground: @red;
+@errorBorder: darken(spin(@errorBackground, -10), 3%);
+@successText: @black;
+@successBackground: @green;
+@successBorder: darken(spin(@successBackground, -10), 5%);
+@infoText: @black;
+@infoBackground: @blue;
+@infoBorder: darken(spin(@infoBackground, -10), 7%);
+
+
+// toolTip
+@tooltipColor: #fff;
+@tooltipBackground: #000;
+@tooltipArrowWidth: 5px;
+@tooltipArrowColor: @tooltipBackground;
+
+
+// popOver
+@popoverBackground: darken(@black, 2%);
+@popoverArrowWidth: 10px;
+@popoverArrowColor: darken(@black, 2%);
+@popoverTitleBackground: darken(@popoverBackground, 3%);
+@popoverArrowOuterWidth: @popoverArrowWidth + 1;
+@popoverArrowOuterColor: darken(@black, 5%);
+
+
+// Sprites
+@iconSpritePath: '../twitter-bootstrap/img/glyphicons-halflings.png';
+@iconWhiteSpritePath: '../twitter-bootstrap/img/glyphicons-halflings-white.png';
+
+
+// Private
+@zindexDropdown: 1000;
+@zindexPopover: 1010;
+@zindexTooltip: 1030;
+@zindexFixedNavbar: 1030;
+@zindexModalBackdrop: 1040;
+@zindexModal: 1050;
+@navbarInverseBackground: #111111;
+@navbarInverseBackgroundHighlight: #222222;
+@navbarInverseBorder: #252525;
+@navbarInverseText: @grayLight;
+@navbarInverseLinkColor: @grayLight;
+@navbarInverseLinkColorHover: @white;
+@navbarInverseLinkColorActive: @navbarInverseLinkColorHover;
+@navbarInverseLinkBackgroundHover: transparent;
+@navbarInverseLinkBackgroundActive: @navbarInverseBackground;
+@navbarInverseSearchBackground: lighten(@navbarInverseBackground, 25%);
+@navbarInverseSearchBackgroundFocus: @white;
+@navbarInverseSearchBorder: @navbarInverseBackground;
+@navbarInverseSearchPlaceholderColor: #ccc;
+@navbarInverseBrandColor: @navbarInverseLinkColor;
+@gridColumns: 12;
+@gridColumnWidth: 60px;
+@gridGutterWidth: 20px;
+@gridRowWidth: (@gridColumns * @gridColumnWidth) + (@gridGutterWidth * (@gridColumns - 1));
+@gridColumnWidth1200: 70px;
+@gridGutterWidth1200: 30px;
+@gridRowWidth1200: (@gridColumns * @gridColumnWidth1200) + (@gridGutterWidth1200 * (@gridColumns - 1));
+@gridColumnWidth768: 42px;
+@gridGutterWidth768: 20px;
+@gridRowWidth768: (@gridColumns * @gridColumnWidth768) + (@gridGutterWidth768 * (@gridColumns - 1));
+@fluidGridColumnWidth: percentage(@gridColumnWidth/@gridRowWidth);
+@fluidGridGutterWidth: percentage(@gridGutterWidth/@gridRowWidth);
+@fluidGridColumnWidth1200: percentage(@gridColumnWidth1200/@gridRowWidth1200);
+@fluidGridGutterWidth1200: percentage(@gridGutterWidth1200/@gridRowWidth1200);
+@fluidGridColumnWidth768: percentage(@gridColumnWidth768/@gridRowWidth768);
+@fluidGridGutterWidth768: percentage(@gridColumnWidth768/@gridRowWidth768);

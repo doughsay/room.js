@@ -4,79 +4,128 @@ html
     title room.js editor
     link(rel='stylesheet', href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400')
     link(rel='stylesheet', href='/assets/editor.css')
-  body
-    .ui-layout-center
-      p editor goes here
-    .ui-layout-west
-      .ui-layout-west-center
-        .row-fluid
-          input.search-query.span12(type='text', placeholder='Filter')
-        hr
-        .row-fluid
-          ul.unstyled
-            li
-              i.icon-chevron-right
-              |&nbsp;
-              span.label.label-info #0
-              |&nbsp;
-              a(href='#') System Object
-              span.label.pull-right $sys
-            li
-              i.icon-chevron-down
-              |&nbsp;
-              span.label.label-info #1
-              |&nbsp;
-              a(href='#') Root Class
-              span.label.pull-right $root
-              ul.unstyled.indented
-                li
-                  i.icon-chevron-down
-                  |&nbsp;
-                  span.label.label-info #2
-                  |&nbsp;
-                  a(href='#') Player Class
-                  span.label.pull-right $player
-                  ul.unstyled.indented
-                    li
-                      i.icon-user
-                      |&nbsp;
-                      span.label.label-info #3
-                      |&nbsp;
-                      a(href='#') Gandalf
-                      span.label.pull-right $wizard
-                li
-                  i.icon-chevron-right
-                  |&nbsp;
-                  span.label.label-info #4
-                  |&nbsp;
-                  a(href='#') Room Class
-                  span.label.pull-right $room
-                li
-                  i.icon-chevron-right
-                  |&nbsp;
-                  span.label.label-info #5
-                  |&nbsp;
-                  a(href='#') Thing Class
-                  span.label.pull-right $thing
-                li
-                  i.icon-chevron-right
-                  |&nbsp;
-                  span.label.label-info #8
-                  |&nbsp;
-                  a(href='#') Exit Class
-                  span.label.pull-right $exit
-            li
-              i.icon-chevron-right
-              |&nbsp;
-              span.label.label-info #21
-              |&nbsp;
-              a(href='#') Utility Verbs
-              span.label.pull-right $util
-      .ui-layout-west-south
-        p selected object properties and verbs go here
+  body.cloak
+    script(type='text/html', id='TreeNodeTemplate')
+      li(data-bind='visible: visible, css: {active: active}, context: menu')
+        span.pull-left
+          i(data-bind='css: iconClass, click: toggle')
+        a(href='#', data-bind='click: $root.selectObject, event: {dblclick: toggle}')
+          span.label.label-inverse(data-bind='html: idPresenter')
+          span.label(data-bind='html: aliasPresenter')
+          span(data-bind='html: namePresenter')
+        ul.nav.nav-list(data-bind='visible: expanded, template: {name: "TreeNodeTemplate", foreach: children}, css: levelClass')
+
+    .noconnection(data-bind='visible: !connected()')
+      .alert.alert-error.alert-error
+        h4 Error!
+        span Connection to the server was lost.
+    .login(data-bind='visible: !authenticated() && connected()')
+      .well.form-horizontal
+        form(data-bind='submit: login')
+          div(data-bind='if: error')
+            .alert.alert-error
+              button.close(data-bind='click: unsetError') ×
+              span(data-bind='text: error')
+          .control-group
+            label.control-label(for='username') Username
+            .controls
+              input(type='text', id='username', placeholder='Username', data-bind='value: username')
+          .control-group
+            label.control-label(for='password') Password
+            .controls
+              input(type='password', id='password', placeholder='Password', data-bind='value: password')
+          .form-actions
+            button.btn.btn-primary(type='submit') Login
+    .ide(data-bind='visible: authenticated')
+      .editor-layout(data-bind='layout: layoutOptions')
+        .ui-layout-center
+          .tabs
+            ul.nav.nav-tabs(data-bind='sortable: tabs')
+              li(data-bind='css: {active: active}, context: menu')
+                a(href='#', data-bind='click: $root.selectTab')
+                  i(data-bind='css: iconClass')
+                  span(data-bind='text: displayName')
+                  i.close(data-bind='css: closeIcon, click: $root.closeTab')
+          .toolbar(data-bind='with: selectedTab')
+            .verb-toolbar(data-bind='if: type == "verb"')
+              .navbar.navbar-static-top(data-bind='with: verb')
+                .navbar-inner
+                  form.navbar-form.form-inline
+                    .row-fluid
+                      input(type='text', data-bind='value: name')
+                      select(data-bind='value: dobjarg')
+                        option none
+                        option(selected) this
+                        option any
+                      select(data-bind='value: preparg')
+                        option none
+                        option any
+                        option with/using
+                        option at/to
+                        option in front of
+                        option in/inside/into
+                        option on top of/on/onto/upon
+                        option out of/from inside/from
+                        option over
+                        option through
+                        option under/underneath/beneath
+                        option behind
+                        option beside
+                        option for/about
+                        option is
+                        option as
+                        option off/off of
+                      select(data-bind='value: iobjarg')
+                        option none
+                        option this
+                        option any
+                      label.checkbox
+                        input(type='checkbox', data-bind='checked: hidden')
+                        |hidden
+                      button.btn.btn-primary.pull-right(data-bind='click: $parent.save, visible: $parent.dirty')
+                        |Save
+            .property-toolbar(data-bind='if: type == "property"')
+              .navbar.navbar-static-top(data-bind='with: property')
+                .navbar-inner
+                  form.navbar-form.form-inline
+                    .row-fluid
+                      button.btn.btn-primary.pull-right(data-bind='click: $parent.save, disable: $parent.error, visible: $parent.dirty')
+                        |Save
+                      .error.label.label-important.pull-right(data-bind='visible: $parent.error') JSON syntax error, fix it before you can save.
+          .editor(data-bind='visible: selectedTab')
+
+        .ui-layout-west
+          .ui-layout-west-center(data-bind='context: objectMenu')
+            .search
+              .row-fluid
+                input.search-query.span12(type='text', placeholder='Filter', data-bind='value: filter_text, event: {keyup: updateFilter}')
+            hr
+            .row-fluid
+              .overflow-container
+                ul.nav.nav-list(data-bind='template: {name: "TreeNodeTemplate", foreach: objects}')
+
+          .ui-layout-west-south(data-bind='context: attributeMenu')
+            .overflow-container
+              ul.nav.nav-list(data-bind='with: selectedObject')
+                li.nav-header(data-bind='visible: properties().length > 0') Properties
+                // ko foreach: properties
+                li(data-bind='css: {active: active}, context: menu')
+                  a(href='#', data-bind='click: $parent.selectProperty, event: {dblclick: $root.openProperty}')
+                    i.icon-file-alt
+                    span(data-bind='text: key')
+                // /ko
+                li.nav-header(data-bind='visible: verbs().length > 0') Verbs
+                // ko foreach: verbs
+                li(data-bind='css: {active: active}, context: menu')
+                  a(href='#', data-bind='click: $parent.selectVerb, event: {dblclick: $root.openVerb}')
+                    i(data-bind='css: iconClass')
+                    span(data-bind='text: name')
+                // /ko
+
 
     script(src='/socket.io/socket.io.js')
     script(src='/assets/ace/ace.js')
     script(src='/assets/editor.js')
     :coffeescript
-      $ -> ko.applyBindings new EditorView $('body')
+      $ ->
+        window.view = new EditorView

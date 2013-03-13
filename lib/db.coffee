@@ -1,6 +1,7 @@
 fs = require 'fs'
 util = require 'util'
 _ = require 'underscore'
+EventEmitter = require('events').EventEmitter
 
 connections = require './connection_manager'
 mooUtil = require './util'
@@ -15,7 +16,7 @@ EXACT_MATCH = 1
 PARTIAL_MATCH = 2
 
 # A Db is a collection of RoomJsObjects
-module.exports = class Db
+module.exports = class Db extends EventEmitter
   # @objects: Array[RoomJsObject]
   # @players: Array[RoomJsPlayer]
 
@@ -103,6 +104,9 @@ module.exports = class Db
 
   findByNum: (numStr) ->
     @findById parseInt numStr.match(/^#([0-9]+)$/)?[1]
+
+  aliasFor: (id) ->
+    @globalAliases()[id]
 
   # find the objects matched by the command
   matchObjects: (player, command) ->
@@ -223,7 +227,15 @@ module.exports = class Db
     @objects[nextId] = newPlayer
     @players.push newPlayer
 
+    @emit 'objectCreated', nextId
+
     newPlayer
+
+  createNewObject: (name) ->
+    nextId = @nextId()
+    @objects[nextId] = @blankObject nextId, name
+    @emit 'objectCreated', nextId
+    @objects[nextId]
 
   # create a clone of this object with copies of all it's properties and verbs
   clone: (object, newName, newAliases) ->
@@ -241,10 +253,12 @@ module.exports = class Db
     newObject = new RoomJsObject rawObject, @
     newObject.moveTo object.location()
     @objects[nextId] = newObject
+    @emit 'objectCreated', nextId
+    newObject
 
   # Create a child of object
   # this child will inherit any of it's parent's properties and verbs
-  createChild: (object, newName, newAliases) ->
+  createChild: (object, newName, newAliases = []) ->
     if not (newName? and newName.toString?)
       throw new Error "Invalid name for new object"
     for alias in newAliases
@@ -261,6 +275,8 @@ module.exports = class Db
     newObject = new RoomJsObject rawObject, @
     newObject.moveTo object.location()
     @objects[nextId] = newObject
+    @emit 'objectCreated', nextId
+    newObject
 
   rm: (id) ->
     if id > -1 and @findById(id)?
@@ -271,6 +287,7 @@ module.exports = class Db
       if @objects[id].player
         @players = @players.filter (p) -> p.id != id
       delete @objects[id]
+      @emit 'objectDeleted', id
       true
     else
       false

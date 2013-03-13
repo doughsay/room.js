@@ -3,7 +3,7 @@ connections = require './connection_manager'
 RoomJsObject = require('./object').RoomJsObject
 
 # a RoomJsPlayer is just a slightly more specialized RoomJsObject
-exports.RoomJsPlayer = class extends RoomJsObject
+exports.RoomJsPlayer = class RoomJsPlayer extends RoomJsObject
   # RoomJsObject fields +
   # @username: String
   # @password: String
