@@ -57,6 +57,7 @@ class EditorView
     # @setSizes()
 
     ko.applyBindings @
+    $('.cloak').removeClass 'cloak'
 
   # on keyup in the search field this fires so the viewmodel updates immediately
   updateFilter: ->
