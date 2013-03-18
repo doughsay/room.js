@@ -23,6 +23,7 @@ class Context
       parse:      parse
       match:      (search = '') => (@db.mooMatch search, @player).map (o) => @contextify o
       do_verb:    (object, verb, time, args = []) => @do_verb object, verb, time, args
+      idle:       (player) => connections.idleTimeFor player
       rm:         (idOrObject) =>
                     if idOrObject?.proxy?
                       @db.rm idOrObject.id
