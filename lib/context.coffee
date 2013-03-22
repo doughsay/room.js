@@ -24,6 +24,7 @@ class Context
       match:      (search = '') => (@db.mooMatch search, @player).map (o) => @contextify o
       do_verb:    (object, verb, time, args = []) => @do_verb object, verb, time, args
       idle:       (player) => connections.idleTimeFor player
+      search:     (search) => @db.search(search).map (o) => @contextify o
       rm:         (idOrObject) =>
                     if idOrObject?.proxy?
                       @db.rm idOrObject.id
@@ -132,7 +133,6 @@ class EvalContext extends Context
     super @db, player
 
     @context.list       = => @db.list().map (o) => @contextify o
-    @context.search     = (search) => @db.search(search).map (o) => @contextify o
     @context.ls         = (x, depth = 2) ->
                             player.send(mooUtil.print x, depth)
                             true
