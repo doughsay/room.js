@@ -1,7 +1,12 @@
 {
   "name": "room.js",
   "version": "0.0.1",
+  "author": "Chris Dosé <chris.dose@gmail.com>",
+  "description": "A MOO in CoffeeScript",
   "private": true,
+  "scripts": {
+    "start": "./node_modules/coffee-script/bin/coffee --nodejs --harmony server.coffee"
+  },
   "dependencies": {
     "express": "*",
     "jade": "*",
@@ -14,5 +19,8 @@
     "should": "*",
     "mocha": "*",
     "cron": "*"
+  },
+  "engines": {
+    "node": ">=0.11.3"
   }
 }

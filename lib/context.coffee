@@ -3,6 +3,7 @@ coffee = require 'coffee-script'
 _ = require 'underscore'
 util = require 'util'
 
+config = require '../config/server'
 connections = require './connection_manager'
 mooUtil = require './util'
 mooBrowser = require './moo_browser'
@@ -92,7 +93,7 @@ class Context
       ctext = _.clone @context
       if extraArgs?
         ctext.args = extraArgs
-      output = vm.runInNewContext code, ctext
+      output = vm.runInNewContext code, ctext, verb.name+'.vm', config.verbTimeout
       if sendOutput and @player isnt @db.nothing
         @player.send mooUtil.print output
       output
