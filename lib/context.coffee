@@ -89,6 +89,8 @@ class Context
 
   run: (verb, extraArgs, sendOutput = false, stack = false) ->
     try
+      if @memo.level > config.maxStack
+        throw new Error 'Max stack depth reached'
       code = coffee.compile verb.code, bare: true
       ctext = _.clone @context
       if extraArgs?
@@ -194,12 +196,22 @@ class VerbContext extends Context
 
 
 runEval = (db, player, code) ->
-  (new EvalContext db, player).run code
+  context = new EvalContext db, player
+  memo = context.memo
+  memo.level = 0 if not memo.level?
+  memo.level += 1
+  val = context.run code
+  memo.level -= 1
+  val
 
 runVerb = (db, player, verb, self, dobj = db.nothing, iobj = db.nothing, verbstr, argstr, dobjstr, prepstr, iobjstr, extraArgs, memo = {}) ->
+  memo.level = 0 if not memo.level?
+  memo.level += 1
   context = new VerbContext(
     db, player, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr, memo)
-  context.run verb, extraArgs
+  val = context.run verb, extraArgs
+  memo.level -= 1
+  val
 
 exports.runVerb = runVerb
 exports.runEval = runEval
