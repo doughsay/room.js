@@ -358,7 +358,7 @@ class EditorView
   object_deleted: (id) =>
     @removeFromTree id
     @removeFromTabs id
-    if @selectedObject().id is id
+    if @selectedObject()?.id is id
       @selectedObject null
 
   object_parent_changed: (spec) =>
