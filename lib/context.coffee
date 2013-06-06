@@ -3,6 +3,7 @@ coffee = require 'coffee-script'
 _ = require 'underscore'
 util = require 'util'
 
+config = require '../config/server'
 connections = require './connection_manager'
 mooUtil = require './util'
 mooBrowser = require './moo_browser'
@@ -23,6 +24,8 @@ class Context
       parse:      parse
       match:      (search = '') => (@db.mooMatch search, @player).map (o) => @contextify o
       do_verb:    (object, verb, time, args = []) => @do_verb object, verb, time, args
+      idle:       (player) => connections.idleTimeFor player
+      search:     (search) => @db.search(search).map (o) => @contextify o
       rm:         (idOrObject) =>
                     if idOrObject?.proxy?
                       @db.rm idOrObject.id
@@ -86,11 +89,13 @@ class Context
 
   run: (verb, extraArgs, sendOutput = false, stack = false) ->
     try
+      if @memo.level > config.maxStack
+        throw new Error 'Max stack depth reached'
       code = coffee.compile verb.code, bare: true
       ctext = _.clone @context
       if extraArgs?
         ctext.args = extraArgs
-      output = vm.runInNewContext code, ctext
+      output = vm.runInNewContext code, ctext, verb.name+'.vm', config.verbTimeout
       if sendOutput and @player isnt @db.nothing
         @player.send mooUtil.print output
       output
@@ -131,7 +136,6 @@ class EvalContext extends Context
     super @db, player
 
     @context.list       = => @db.list().map (o) => @contextify o
-    @context.search     = (search) => @db.search(search).map (o) => @contextify o
     @context.ls         = (x, depth = 2) ->
                             player.send(mooUtil.print x, depth)
                             true
@@ -192,12 +196,22 @@ class VerbContext extends Context
 
 
 runEval = (db, player, code) ->
-  (new EvalContext db, player).run code
+  context = new EvalContext db, player
+  memo = context.memo
+  memo.level = 0 if not memo.level?
+  memo.level += 1
+  val = context.run code
+  memo.level -= 1
+  val
 
 runVerb = (db, player, verb, self, dobj = db.nothing, iobj = db.nothing, verbstr, argstr, dobjstr, prepstr, iobjstr, extraArgs, memo = {}) ->
+  memo.level = 0 if not memo.level?
+  memo.level += 1
   context = new VerbContext(
     db, player, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr, memo)
-  context.run verb, extraArgs
+  val = context.run verb, extraArgs
+  memo.level -= 1
+  val
 
 exports.runVerb = runVerb
 exports.runEval = runEval

@@ -206,56 +206,27 @@ class EditorView
     found
 
   removeFromTree: (id) ->
-    removeChild = (id, p) =>
-      [match] = (child for child in p.children() when child.id is id)
-      if match?
-        p.children.remove match
-        match
-      else
-        removed = null
-        for child in p.children()
-          removed = removeChild(id, child)
-          break if removed?
-        removed
-
-    removed = null
-    for o in @objects()
-      if o.id is id
-        @objects.remove o
-        removed = true
-        break
-      removed = removeChild id, o
-      break if removed?
-
-    removed
-
-  insertIntoTree: (obj) ->
-    insertChild = (o, p) =>
-      if p.id == o.parent_id
-        if o instanceof TreeNode
-          p.children.push o
-        else
-          p.children.push new TreeNode o, @, p.level+1
-        p.children.sort (l, r) -> l.id - r.id
-        true
-      else
-        added = false
-        for child in p.children()
-          added = insertChild(o, child)
-          break if added
-        added
-
-    added = false
-    if obj.parent_id is null
-      @objects.push new TreeNode obj, @
-      @objects.sort (l, r) -> l.id - r.id
-      return true
+    node = @findInTree id
+    if not node? then return null
+    if node.parent?
+      node.parent.children.remove node
+      node.parent = null
     else
-      for o in @objects()
-        added = insertChild obj, o
-        break if added
+      @objects.remove node
+    node
 
-    added
+  insertIntoTree: (node, parent_id) ->
+    if parent_id?
+      parentNode = @findInTree parent_id
+      if not parentNode?
+        #toastr.error "couldn't find parent node"
+        return null
+      node.parent = parentNode
+      parentNode.children.push node
+      parentNode.children.sort (l, r) -> l.id - r.id
+    else
+      @objects.push node
+      @objects.sort (l, r) -> l.id - r.id
 
   findInTabs: (id) ->
     os = @tabs().map (tab) ->
@@ -353,18 +324,20 @@ class EditorView
 
   object_created: (obj) =>
     obj.children = []
-    @insertIntoTree obj
+    parent_id = obj.parent_id
+    delete obj.parent_id
+    obj = new TreeNode obj, @
+    @insertIntoTree obj, parent_id
 
   object_deleted: (id) =>
     @removeFromTree id
     @removeFromTabs id
-    if @selectedObject().id is id
+    if @selectedObject()?.id is id
       @selectedObject null
 
   object_parent_changed: (spec) =>
     o = @removeFromTree spec.id
-    o.parent_id = spec.parent_id
-    @insertIntoTree o
+    @insertIntoTree o, spec.parent_id
 
   object_name_changed: (spec) =>
     o = @findInTree spec.id

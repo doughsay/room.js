@@ -32,6 +32,7 @@ class Client
 
     # if there was a player logged in on the socket, call the `player_disconnected` verb on $sys
     if player?
+      connections.activity player
       verb = @db.sys.findVerbByName 'player_disconnected'
       if verb?
         context.runVerb @db, player, verb, @db.sys
@@ -44,6 +45,7 @@ class Client
     str = userStr || ""
     player = connections.playerFor @socket
     if player?
+      connections.activity player
       @onPlayerCommand player, str
     else
       @onCommand str
@@ -121,6 +123,7 @@ class Client
         other_socket.disconnect()
 
       connections.add player, @socket
+      connections.activity player
 
       verb = @db.sys.findVerbByName 'player_connected'
       if verb?
@@ -186,6 +189,7 @@ class Client
     else
       player = @db.createNewPlayer formData.name, formData.username, phash formData.password
       connections.add player, @socket
+      connections.activity player
 
       verb = @db.sys.findVerbByName 'player_created'
       if verb?
@@ -271,6 +275,7 @@ class Client
           object = @db.findById(id)
           object.saveVerb verb
           player.send '{green|Verb saved!}'
+          connections.activity player
           fn {error: false, verb: verb}
       else
         player.send '{red|You are not allowed to do that.}'
