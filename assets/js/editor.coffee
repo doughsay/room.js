@@ -8,6 +8,7 @@
 #= require knockout-layout
 #= require knockout-context
 #= require knockout-sortable
+#= require toastr
 
 #= require view_models/editor
 #= require view_models/editor/tree_node

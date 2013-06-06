@@ -85,7 +85,7 @@ class TreeNode
         text: "Delete '#{@name()}'",
         action: =>
           if @children().length > 0
-            bootbox.alert "You cannot delete this object because it has children. Delete it's children first."
+            toastr.error "You cannot delete this object because it has children. Delete it's children first."
           else
             bootbox.confirm "Are you sure you want to permanently delete '#{@name()}'?", (confirmed) =>
               @delete() if confirmed
