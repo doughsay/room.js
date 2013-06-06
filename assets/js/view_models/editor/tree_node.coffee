@@ -1,14 +1,14 @@
 # View model for object browser tree node
 class TreeNode
 
-  constructor: (o, @view, @level = 1) ->
+  constructor: (o, @view, @parent) ->
 
     # attributes
     @id = o.id
     @name = ko.observable o.name
     @player = ko.observable o.player
     @alias = ko.observable o.alias
-    @children = ko.observableArray o.children.map (p) => new TreeNode p, @view, @level+1
+    @children = ko.observableArray o.children.map (p) => new TreeNode p, @view, @
 
     # presenters
     @idPresenter = ko.computed =>
@@ -48,8 +48,6 @@ class TreeNode
         if @expanded() then 'icon-caret-down' else 'icon-caret-right'
       else
         if @player() then 'icon-user' else 'icon-file'
-
-    @levelClass = ko.computed => "level#{@level}"
 
     # subscriptions
     @view.filter.subscribe (filter) =>

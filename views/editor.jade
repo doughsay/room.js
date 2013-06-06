@@ -13,7 +13,7 @@ html
           span.label.label-inverse(data-bind='html: idPresenter')
           span.label(data-bind='html: aliasPresenter')
           span(data-bind='html: namePresenter')
-        ul.nav.nav-list(data-bind='visible: expanded, template: {name: "TreeNodeTemplate", foreach: children}, css: levelClass')
+        ul.nav.nav-list(data-bind='visible: expanded, template: {name: "TreeNodeTemplate", foreach: children}')
 
     .noconnection(data-bind='visible: !connected()')
       .alert.alert-error.alert-error
@@ -29,7 +29,7 @@ html
           .control-group
             label.control-label(for='username') Username
             .controls
-              input(type='text', id='username', placeholder='Username', data-bind='value: username')
+              input(type='text', autofocus=true, id='username', placeholder='Username', data-bind='value: username')
           .control-group
             label.control-label(for='password') Password
             .controls
@@ -102,7 +102,7 @@ html
             hr
             .row-fluid
               .overflow-container
-                ul.nav.nav-list(data-bind='template: {name: "TreeNodeTemplate", foreach: objects}')
+                ul.nav.nav-list.objects(data-bind='template: {name: "TreeNodeTemplate", foreach: objects}')
 
           .ui-layout-west-south(data-bind='context: attributeMenu')
             .overflow-container
