@@ -24,32 +24,29 @@ class ClientView
       .replace(/\{/g, '\\{')
       .replace(/\}/g, '\\}')
 
-  lines: ko.observableArray []
-  maxLines: ko.observable 1000
-
   history: []
   currentHistory: -1
-  maxHistory: ko.observable 1000
-
-  command: ko.observable ""
 
   socket: null
-
-  loadedVerb: ko.observable null
-
-  form: ko.observable null
 
   inputCallback: null
 
   # construct the view model
   constructor: (@body, @screen, @input) ->
+    @lines      = ko.observableArray []
+    @maxLines   = ko.observable 1000
+    @maxHistory = ko.observable 1000
+    @command    = ko.observable ""
+    @form       = ko.observable null
+
     @socket = io.connect(window.location.href+'client')
     @attachListeners()
-    @setLayout()
     @setSizes()
     @focusInput()
 
-    @loadedVerb.subscribe @verb_change
+    $(window).on 'resize', =>
+      @setSizes()
+      @scrollToBottom()
 
   # attach the websocket event listeners
   attachListeners: ->
@@ -66,48 +63,11 @@ class ClientView
     @socket.on 'request_form_input', @request_form_input
     @socket.on 'request_input', @request_input
 
-    @socket.on 'edit_verb', @edit_verb
-
-  # build the jqeury ui layout
-  # this is only used when signed in as a programmer
-  # the panes are hidden by default
-  setLayout: ->
-    @layout = @body.layout
-      livePaneResizing: true
-      onresize: =>
-        @setSizes()
-        @scrollToBottom()
-      north:
-        maxSize: '50%'
-        minSize: 200
-        slidable: false
-    @layout.hide 'north'
-
   # apply proper sizes to the input and the screen div
   setSizes: ->
     inputWidthDiff = @input.outerWidth() - @input.width()
-    @input.width($('.ui-layout-center').width() - inputWidthDiff - $('.prompt').outerWidth())
-    @screen.height($('.ui-layout-center').height() - @input.outerHeight() - 2)
-
-    # if an ace editor is present, call it's resize function
-    # and set sizes for all the form elements to make them look prettier
-    editorDiv = $ '.ace_editor'
-    if editorDiv.length != 0
-      editor = ace.edit editorDiv[0]
-      editor.resize()
-
-      editor = $ '.editor'
-      actions = $ '.editor .actions'
-      widthToSplit = editor.width() - actions.width()
-      input = editor.children 'input'
-      inputWidthDiff = input.outerWidth() - input.width() + 2
-      select = editor.children 'select'
-      selectWidthDiff = select.outerWidth() - select.width() + 2
-      label = editor.children 'label'
-      labelWidthDiff = label.outerWidth() - label.width() + 2
-      input.width (widthToSplit / 5) - inputWidthDiff
-      select.width (widthToSplit / 5) - selectWidthDiff
-      label.width (widthToSplit / 5) - labelWidthDiff
+    @input.width($(window).width() - inputWidthDiff - $('.prompt').outerWidth())
+    @screen.height($(window).height() - @input.outerHeight() - 2)
 
   # scroll the screen to the bottom
   scrollToBottom: ->
@@ -180,26 +140,6 @@ class ClientView
       else
         true
 
-  save_verb: =>
-    @socket.emit 'save_verb', @loadedVerb().serialize(), (response) =>
-      if !response.error
-        @loadedVerb().dirty false
-        @loadedVerb().original_name = response.verb.name
-
-  unload_verb: =>
-    if @loadedVerb().dirty()
-      bootbox.confirm 'Are you sure you want to unload this verb?  Your changes will be lost.', (unload) =>
-        @loadedVerb null if unload
-    else
-      @loadedVerb null
-
-  verb_change: (verb) =>
-    if verb == null
-      @layout.hide 'north'
-      @focusInput()
-    else
-      @layout.show 'north'
-
   #############################
   # websocket event listeners #
   #############################
@@ -247,7 +187,3 @@ class ClientView
   # constructed form
   request_form_input: (formDescriptor) =>
     @form new ModalFormView formDescriptor, @socket
-
-  edit_verb: (verb) =>
-    @loadedVerb new VerbView verb
-    @setSizes()

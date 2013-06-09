@@ -25,7 +25,8 @@ module.exports = class Db extends EventEmitter
 
   constructor: (@filename, @quiet = false) ->
     startTime = mooUtil.tstart()
-    for id, dbObject of JSON.parse fs.readFileSync @filename
+    {nextId: @_nextId, objects: dbObjects} = JSON.parse fs.readFileSync @filename
+    for id, dbObject of dbObjects
       if dbObject.player
         newMooObj = new RoomJsPlayer dbObject, @
       else
@@ -92,12 +93,12 @@ module.exports = class Db extends EventEmitter
     util.log "#{@filename} saved in #{mooUtil.tend startTime}" if not @quiet
 
   serialize: ->
-    # don't safe the special objects
+    # don't save the special objects
     objects = _.clone(@objects)
     delete objects[-1]
     delete objects[-2]
     delete objects[-3]
-    JSON.stringify objects
+    JSON.stringify {nextId: @_nextId, objects: objects}
 
   findById: (id) ->
     if @objects[id]? then @objects[id] else null
@@ -292,13 +293,4 @@ module.exports = class Db extends EventEmitter
     else
       false
 
-  # terrible way to get the next available id in the DB
-  nextId: ->
-    # the sorted keys of the objects hash not including the 3 special objects (-1, -2 and -3)
-    sortedKeys = (Object.keys @objects).sort((a,b)->a-b)[3..]
-    nextId = 0
-    for i in [0..sortedKeys.length+1]
-      if !@objects[i]
-        break
-      nextId++
-    nextId
+  nextId: -> @_nextId++

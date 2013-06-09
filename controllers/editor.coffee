@@ -87,11 +87,13 @@ class Editor
     @editorInterface.saveVerb verb
     fn()
 
-  createProperty: (data) =>
+  createProperty: (data, fn) =>
     @editorInterface.createProperty data.id, data.key, data.value
+    fn()
 
-  createVerb: (data) =>
+  createVerb: (data, fn) =>
     @editorInterface.createVerb data.id, data.name
+    fn()
 
   deleteProperty: (data) =>
     @editorInterface.deleteProperty data.id, data.key

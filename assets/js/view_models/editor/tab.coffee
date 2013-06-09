@@ -62,7 +62,7 @@ class PropertyTab extends Tab
   save: =>
     @view.socket.emit 'save_property', @serialize(), (error) =>
       if error?
-        bootbox.alert "There was an error saving: #{error}"
+        toastr.error "There was an error saving: #{error}"
       else
         @_value JSON.stringify @property.value()
 
@@ -119,7 +119,7 @@ class VerbTab extends Tab
   save: =>
     @view.socket.emit 'save_verb', @serialize(), (error) =>
       if error?
-        bootbox.alert "There was an error saving: #{error}"
+        toastr.error "There was an error saving: #{error}"
       else
         @_code @verb.code()
         @_dobjarg @verb.dobjarg()

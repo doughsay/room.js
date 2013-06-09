@@ -18,7 +18,6 @@ exports.RoomJsObject = class RoomJsObject extends EventEmitter
   # @name: String
   # @aliases: Array[String]
   # @location_id: Int
-  # @contents_ids: Array[Int]
   # @properties: Array[Object]
   # @verbs: Array[RoomJsVerb]
 
@@ -28,7 +27,6 @@ exports.RoomJsObject = class RoomJsObject extends EventEmitter
     @name = dbObject.name
     @aliases = dbObject.aliases
     @location_id = dbObject.location_id
-    @contents_ids = dbObject.contents_ids
     @player = !!dbObject.player
     @programmer = !!dbObject.programmer
 
@@ -54,18 +52,10 @@ exports.RoomJsObject = class RoomJsObject extends EventEmitter
       null
 
   moveTo: (target) ->
-    loc = @location()
-    if loc?
-      loc.contents_ids = loc.contents_ids.filter (id) =>
-        id != @id
-    if target?
-      target.contents_ids.push @id
-      @location_id = target.id
-    else
-      @location_id = null
+    @location_id = if target? then target.id else null
 
   contents: ->
-    @contents_ids.map (id) => @db.findById id
+    (o for id, o of @db.objects).filter (o) => o.location_id == @id
 
   chparent: (id) ->
     if not id?
@@ -202,27 +192,6 @@ exports.RoomJsObject = class RoomJsObject extends EventEmitter
       true
     else
       throw new Error "verb '#{verbName}' doesn't exist on this object."
-
-  addVerbPublic: (player, verbName, hidden, dobjarg, preparg, iobjarg) ->
-    socket = connections.socketFor player
-    verb = (@verbs.filter (v) -> v.name == verbName)[0]
-    if verb?
-      throw new Error "That verb already exists on this object."
-    else
-      newVerb = {oid: @id, name: verbName, hidden: hidden, dobjarg: dobjarg, preparg: preparg, iobjarg: iobjarg, code: ''}
-      socket.emit 'edit_verb', newVerb
-      true
-
-  editVerb: (player, verbName) ->
-    socket = connections.socketFor player
-    verb = (@verbs.filter (v) -> v.matchesName verbName)[0]
-    if verb?
-      clonedVerb = _.clone verb
-      clonedVerb.oid = @id
-      socket.emit 'edit_verb', clonedVerb
-      true
-    else
-      throw new Error "That verb does not exist on this object."
 
   hasOwnVerb: (verbName) ->
     verbName in (verb.name for verb in @verbs)

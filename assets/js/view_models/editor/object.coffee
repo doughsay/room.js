@@ -139,7 +139,13 @@ class MiniObject
     verb.active true
 
   newProperty: (name) ->
-    @view.socket.emit 'create_property', {id: @id, key: name, value: ''}
+    @view.socket.emit 'create_property', {id: @id, key: name, value: ''}, =>
+      prop = @properties().filter((prop) -> prop.key() is name)[0]
+      @selectProperty prop
+      @view.openProperty prop
 
   newVerb: (name) ->
-    @view.socket.emit 'create_verb', {id: @id, name: name}
+    @view.socket.emit 'create_verb', {id: @id, name: name}, =>
+      verb = @verbs().filter((verb) -> verb.name() is name)[0]
+      @selectVerb verb
+      @view.openVerb verb

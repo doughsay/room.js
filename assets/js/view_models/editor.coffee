@@ -219,7 +219,7 @@ class EditorView
     if parent_id?
       parentNode = @findInTree parent_id
       if not parentNode?
-        #toastr.error "couldn't find parent node"
+        toastr.error "couldn't find parent node"
         return null
       node.parent = parentNode
       parentNode.children.push node
@@ -392,21 +392,21 @@ class EditorView
   connecting: =>
 
   disconnect: =>
-    bootbox.alert 'Disconnected from server.'
+    toastr.error 'Disconnected from server.'
     @clearEditor()
     @connected false
     @authenticated false
 
   connect_failed: =>
     # this will never happen, see socket.io pull request: https://github.com/LearnBoost/socket.io-client/pull/516
-    bootbox.alert 'Connection to server failed.'
+    toastr.error 'Connection to server failed.'
 
   error: =>
-    bootbox.alert 'An unknown error occurred.'
+    toastr.error 'An unknown error occurred.'
 
   reconnect_failed: =>
     # this will never happen, see socket.io pull request: https://github.com/LearnBoost/socket.io-client/pull/516
-    bootbox.alert 'Unable to reconnect to server.'
+    toastr.error 'Unable to reconnect to server.'
 
   reconnect: =>
 
