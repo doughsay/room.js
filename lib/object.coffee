@@ -193,27 +193,6 @@ exports.RoomJsObject = class RoomJsObject extends EventEmitter
     else
       throw new Error "verb '#{verbName}' doesn't exist on this object."
 
-  addVerbPublic: (player, verbName, hidden, dobjarg, preparg, iobjarg) ->
-    socket = connections.socketFor player
-    verb = (@verbs.filter (v) -> v.name == verbName)[0]
-    if verb?
-      throw new Error "That verb already exists on this object."
-    else
-      newVerb = {oid: @id, name: verbName, hidden: hidden, dobjarg: dobjarg, preparg: preparg, iobjarg: iobjarg, code: ''}
-      socket.emit 'edit_verb', newVerb
-      true
-
-  editVerb: (player, verbName) ->
-    socket = connections.socketFor player
-    verb = (@verbs.filter (v) -> v.matchesName verbName)[0]
-    if verb?
-      clonedVerb = _.clone verb
-      clonedVerb.oid = @id
-      socket.emit 'edit_verb', clonedVerb
-      true
-    else
-      throw new Error "That verb does not exist on this object."
-
   hasOwnVerb: (verbName) ->
     verbName in (verb.name for verb in @verbs)
 

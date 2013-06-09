@@ -14,7 +14,7 @@ module.exports = (obj, context) ->
     verbs = if own then obj.getOwnVerbs() else obj.getAllVerbs()
     for verbName, verb of verbs
       ks.push verb.propName() unless verb.propName() in ks
-    ks.push 'inheritsFrom', 'create', 'editVerb', 'addVerb', 'addJob', 'rmJob', 'startJob', 'stopJob'
+    ks.push 'inheritsFrom', 'create', 'addJob', 'rmJob', 'startJob', 'stopJob'
     if obj.player
       ks.push 'send', 'input'
     ks
@@ -26,7 +26,7 @@ module.exports = (obj, context) ->
     ks = ['id', 'parent', 'name', 'aliases', 'location', 'contents', 'children', 'isPlayer', 'crontab']
     if obj.player
       ks.push 'username', 'isProgrammer', 'isOnline'
-    ks.push 'inheritsFrom', 'create', 'editVerb', 'addVerb', 'addJob', 'rmJob', 'startJob', 'stopJob'
+    ks.push 'inheritsFrom', 'create', 'addJob', 'rmJob', 'startJob', 'stopJob'
     if obj.player
       ks.push 'send', 'input'
     ks
@@ -114,13 +114,6 @@ module.exports = (obj, context) ->
             spec: job.spec
             verb: job.verb
             enabled: job.enabled
-
-        when 'editVerb'
-          (verbName) -> obj.editVerb context.player, verbName
-
-        when 'addVerb'
-          (verbName, hidden = false, dobjarg = 'none', preparg = 'none', iobjarg = 'none') ->
-            obj.addVerbPublic context.player, verbName, hidden, dobjarg, preparg, iobjarg
 
         when 'create'
           (newName, newAliases = []) ->

@@ -1,15 +1,12 @@
 extends layout
 
 block content
-  .ui-layout-center
-    .screen(data-bind='foreach: lines, click: focusInput')
-      div(data-bind='html: $data')
-    .command
-      form(data-bind='submit: sendCommand')
-        span.prompt >
-        input(type='text', data-bind="value: command, event: {keydown: recall}")
-  .ui-layout-north(data-bind='if: loadedVerb')
-    include includes/editor
+  .screen(data-bind='foreach: lines, click: focusInput')
+    div(data-bind='html: $data')
+  .command
+    form(data-bind='submit: sendCommand')
+      span.prompt &gt;
+      input(type='text', data-bind="value: command, event: {keydown: recall}")
   include includes/modal
 
 block script
