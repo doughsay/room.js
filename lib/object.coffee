@@ -18,7 +18,6 @@ exports.RoomJsObject = class RoomJsObject extends EventEmitter
   # @name: String
   # @aliases: Array[String]
   # @location_id: Int
-  # @contents_ids: Array[Int]
   # @properties: Array[Object]
   # @verbs: Array[RoomJsVerb]
 
@@ -28,7 +27,6 @@ exports.RoomJsObject = class RoomJsObject extends EventEmitter
     @name = dbObject.name
     @aliases = dbObject.aliases
     @location_id = dbObject.location_id
-    @contents_ids = dbObject.contents_ids
     @player = !!dbObject.player
     @programmer = !!dbObject.programmer
 
@@ -54,18 +52,10 @@ exports.RoomJsObject = class RoomJsObject extends EventEmitter
       null
 
   moveTo: (target) ->
-    loc = @location()
-    if loc?
-      loc.contents_ids = loc.contents_ids.filter (id) =>
-        id != @id
-    if target?
-      target.contents_ids.push @id
-      @location_id = target.id
-    else
-      @location_id = null
+    @location_id = if target? then target.id else null
 
   contents: ->
-    @contents_ids.map (id) => @db.findById id
+    (o for id, o of @db.objects).filter (o) => o.location_id == @id
 
   chparent: (id) ->
     if not id?
