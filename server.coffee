@@ -1,5 +1,8 @@
 util = require 'util'
 
+require './lib/process'
+require './lib/pid'
+
 Db               = require './lib/db'
 WebServer        = require './web_server'
 ClientController = require './controllers/client'
@@ -14,13 +17,3 @@ db               = new Db 'db.json'
 webServer        = new WebServer 8888
 clientController = new ClientController webServer.io, db
 editorController = new EditorController webServer.io, db
-
-process.on 'SIGINT', ->
-  util.log 'caught SIGINT'
-  process.exit()
-process.on 'SIGTERM', ->
-  util.log 'caught SIGTERM'
-  process.exit()
-process.on 'exit', ->
-  util.log 'exiting'
-  db.exit()

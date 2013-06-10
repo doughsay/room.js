@@ -24,8 +24,13 @@ module.exports = class Db extends EventEmitter
   players: []
 
   constructor: (@filename, @quiet = false) ->
+    if fs.existsSync @filename
+      {nextId: @_nextId, objects: dbObjects} = JSON.parse fs.readFileSync @filename
+    else
+      {nextId: @_nextId, objects: dbObjects} = JSON.parse fs.readFileSync 'db.seed.json'
+
     startTime = mooUtil.tstart()
-    {nextId: @_nextId, objects: dbObjects} = JSON.parse fs.readFileSync @filename
+
     for id, dbObject of dbObjects
       if dbObject.player
         newMooObj = new RoomJsPlayer dbObject, @
@@ -43,6 +48,8 @@ module.exports = class Db extends EventEmitter
     verb = @sys.findVerbByName 'server_started'
     if verb?
       context.runVerb @, null, verb, @sys
+
+    process.on 'exit', -> @exit()
 
   exit: ->
     for player in @players
