@@ -1,4 +1,4 @@
-class Property
+class @Property
 
   constructor: (@object, key, value) ->
     @key = ko.observable key
@@ -20,7 +20,7 @@ class Property
   delete: ->
     @object.view.socket.emit 'delete_property', {id: @object.id, key: @key()}
 
-class Verb
+class @Verb
 
   constructor: (@object, name, verb) ->
     @name = ko.observable name
@@ -29,6 +29,7 @@ class Verb
     @iobjarg = ko.observable verb.iobjarg
     @code = ko.observable verb.code
     @hidden = ko.observable verb.hidden
+    @lang = ko.observable verb.lang
 
     @active = ko.observable false
 
@@ -56,9 +57,10 @@ class Verb
     @iobjarg verb.iobjarg
     @code verb.code
     @hidden verb.hidden
+    @lang = verb.lang
 
 # view model for an object in the editor
-class MiniObject
+class @MiniObject
 
   constructor: (object, @view) ->
     @id = object.id

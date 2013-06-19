@@ -1,5 +1,5 @@
 # an open tab in the editor
-class Tab
+class @Tab
 
   constructor: ->
     @session.setUseSoftTabs true
@@ -28,7 +28,7 @@ class Tab
       }
     ]
 
-class PropertyTab extends Tab
+class @PropertyTab extends Tab
 
   type: 'property'
   iconClass: 'icon-file-alt'
@@ -82,7 +82,7 @@ class PropertyTab extends Tab
     @session.setValue JSON.stringify value, null, '  '
     @_value JSON.stringify value
 
-class VerbTab extends Tab
+class @VerbTab extends Tab
 
   type: 'verb'
   iconClass: 'icon-cog'

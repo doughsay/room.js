@@ -1,7 +1,16 @@
-//= require bootstrap
-//= require context.bootstrap
-//= require font-awesome
-//= require toastr
+@import 'flatstrap/bootstrap';
+@import 'bootstrap-context';
+@import 'toastr';
+
+// Fix flatstrap broken checkboxes
+input[type="checkbox"] {
+  -webkit-appearance: checkbox;
+  border-radius: 0;
+}
+input[type="radio"] {
+  -webkit-appearance: radio;
+  border-radius: 0;
+}
 
 .cloak {
   display: none;
@@ -154,7 +163,7 @@ ul.nav-tabs {
   .row-fluid {
     > input, > select {
       margin-right: 5px;
-      width: 20%;
+      width: 16%;
     }
   }
 }
