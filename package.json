@@ -8,18 +8,18 @@
     "start": "./node_modules/coffee-script/bin/coffee --nodejs --harmony app.coffee"
   },
   "dependencies": {
-    "express": "~3.1.0",
-    "jade": "~0.28.2",
-    "coffee-script": "~1.6.2",
-    "less": "~1.3.3",
-    "socket.io": "~0.9.16",
-    "connect-assets": "~2.4.1",
-    "asset-rack": "~2.1.5",
-    "connect": "~2.7.4",
-    "ff": "~0.1.3",
-    "gaze": "~0.3.4",
-    "underscore": "~1.4.4",
-    "cron": "~1.0.1"
+    "express": "*",
+    "jade": "*",
+    "coffee-script": "*",
+    "less": "*",
+    "socket.io": "*",
+    "connect-assets": "*",
+    "asset-rack": "*",
+    "connect": "*",
+    "ff": "*",
+    "gaze": "*",
+    "underscore": "*",
+    "cron": "*"
   },
   "engines": {
     "node": ">=0.11.3"

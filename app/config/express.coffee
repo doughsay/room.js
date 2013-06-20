@@ -15,7 +15,7 @@ module.exports = (app) ->
     app.set 'view engine', 'jade'
 
     app.use express.logger('short')
-    app.use connect.compress()
+    # app.use connect.compress()
     app.use express.favicon "#{cwd}/assets/img/favicon.ico"
     app.use assets
     app.use app.router

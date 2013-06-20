@@ -42,4 +42,4 @@ io.of('/editor').on 'connection', (socket) ->
 # start listening
 server.listen app.settings.port, ->
   time = new Date - start
-  util.log "Express server started on port/socket #{app.settings.port} (#{env} mode) in #{time}ms"
+  util.log "Room.js server started on port/socket #{app.settings.port} (#{env} mode) in #{time}ms running on Node.js #{process.versions.node}"

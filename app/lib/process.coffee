@@ -1,5 +1,5 @@
 process.on 'uncaughtException', (err) ->
-  console.error '[uncaughtException]', err
+  console.error '[uncaughtException]', err.stack
   process.exit 1
 
 process.on 'SIGTERM', ->

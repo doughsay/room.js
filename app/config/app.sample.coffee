@@ -9,4 +9,4 @@ module.exports =
 
   dbFile: 'db.json'
   verbTimeout: 2000
-  maxStack: 100
+  maxStack: 40

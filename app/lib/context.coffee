@@ -99,7 +99,7 @@ class Context
   run: (verb, extraArgs, sendOutput = false, stack = false) ->
     try
       if @memo.level > config.maxStack
-        throw new Error 'Max stack depth reached'
+        throw 'maximum stack depth reached'
       code = @compileCode verb.lang, verb.code
       ctext = _.clone @context
       if extraArgs?
@@ -119,7 +119,7 @@ class Context
 
       if @player? and @player isnt @db.nothing
         runner = @player.toString()
-        if stack
+        if stack and error.stack?
           @player.send error.stack.split('\n').map((line) -> "{inverse bold red|#{line}}").join('\n')
         else
           @player.send "{inverse bold red|#{errorStr} in '#{source}'}"
