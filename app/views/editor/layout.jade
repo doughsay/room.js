@@ -1,0 +1,16 @@
+!!!
+html
+  head
+    meta(charset='utf8')
+    title room.js editor
+    link(rel='stylesheet', href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400')
+    != assets.tag('/css/editor.css')
+    != assets.tag('/js/top.js')
+  body.cloak
+    block content
+
+    script(src='/socket.io/socket.io.js')
+    script(src='/js/es5-shim.js')
+    script(src='/js/ace/ace.js')
+    != assets.tag('/js/editor.js')
+    block script

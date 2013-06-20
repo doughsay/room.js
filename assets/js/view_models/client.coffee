@@ -1,5 +1,5 @@
 # Knockout.js view model for the room.js client
-class ClientView
+class @ClientView
 
   # apply styles to a color marked up string using a span
   colorize = (str) ->
@@ -41,12 +41,15 @@ class ClientView
 
     @socket = io.connect(window.location.href+'client')
     @attachListeners()
-    @setSizes()
     @focusInput()
 
     $(window).on 'resize', =>
       @setSizes()
       @scrollToBottom()
+
+    ko.applyBindings @
+    $('.cloak').removeClass 'cloak'
+    @setSizes()
 
   # attach the websocket event listeners
   attachListeners: ->

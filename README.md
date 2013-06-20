@@ -1,7 +1,7 @@
 room.js
 =======
 
-A [MOO](http://en.wikipedia.org/wiki/MOO) written in coffeescript running on node.js.
+A [MOO](http://en.wikipedia.org/wiki/MOO) written in [CoffeeScript](http://coffeescript.org/) running on node.js.
 
 MOO stands for Mud, Object Oriented. One of the original MOOs was [LambdaMoo](http://en.wikipedia.org/wiki/LambdaMOO), developed at Xerox PARC.
 
@@ -9,14 +9,16 @@ The basic idea is to have a MUD which (privileged) players can extend while in g
 
 room.js is different from other MOOs because:
 
-1. It uses [CoffeeScript](http://coffeescript.org/) as the programming language instead of the original MOO language or some other custom language.
+1. It uses plain JavaScript (or a language that compiles to it, such as [CoffeeScript](http://coffeescript.org/)) as the programming language instead of the original MOO language or some other custom language.
 2. You connect using a web browser, not a telnet or mud client.
 3. You can edit the game code in the browser, using a fairly decent in-browser code editor ([Ace](http://ace.ajax.org/)).
 
 Running the Server
 ------------------
 
-Assuming you already have git and node.js >= v0.7.6:
+The server currently requires version 0.11.3 of node.js.  Since this isn't even released yet, you can either compile it from the latest master yourself, or run on 0.10.x missing a few security features.
+
+Assuming you already have git and node.js ~= v0.10.x:
 
     # Get the code
     git clone git@github.com:doughsay/room.js.git
@@ -28,10 +30,15 @@ Assuming you already have git and node.js >= v0.7.6:
     # Use the starter database
     cp db.example.json db.json
 
-    # Launch the server using the start script
-    ./start.sh
+    # copy the sample config file (edit it if you choose)
+    cp app/config/app.sample.coffee app/config/app.coffee
+
+    # Launch the server using npm
+    npm run-script start
 
 Connect to it using a web browser by going to [http://localhost:8888/](http://localhost:8888/).
+
+The built-in editor is at [http://localhost:8888/editor](http://localhost:8888/editor).
 
 The provided example db has one user who is also a programmer: username=root, password=p@ssw0rd.
 
@@ -45,6 +52,8 @@ If you are signed in as a programmer, you can evaluate any CoffeeScript code by 
 
     `Math.pow 2, 4
     -> 16
+
+Note: only CoffeeScript is currently supported in eval, even though verbs support other languages.
 
 Eval Context
 ------------
@@ -63,21 +72,13 @@ Retrieve the object with the given `id`.
 
 Returns a list all objects in the database with their `id` and `name` fields.
 
+### `players()`
+
+Returns a list of all players objects.
+
 ### `search(str)`
 
 Returns a list of all objects whos name matches `str` in the database.
-
-### `tree(id = undefined)`
-
-Returns the object inheritance tree.
-
-* `id` - (int) (optional) Use object `id` as the root.
-
-### `locations(id = undefined)`
-
-Return a tree representing objects' locations.  Top level objects in this tree are 'nowhere', and inner nodes are contained within their parents.
-
-* `id` - (int) (optional) Only show object `id` and it's contents.
 
 ### `ls(x, depth = 2)`
 
@@ -86,6 +87,10 @@ Pretty print `x` to a depth of `depth`.
 ### `rm(id)`
 
 This removes object `id` from the database.  Warning: this is irreversible.
+
+...
+
+More details will eventually be available in the wiki.
 
 Objects
 -------
@@ -151,7 +156,7 @@ You can add or edit custom properties to objects by accessing them as you would 
 
     $(7).description = 'foo bar baz'
 
-To delete properties, use the `delete` keyword like normal:
+To delete properties, use `delete`:
 
     delete $(9).my_prop
 
@@ -175,14 +180,6 @@ Returns an array of all direct children of this object.
 ### `descendants()`
 
 Returns an array of all descendants of this object.
-
-### `editVerb(verb)`
-
-Load the verb named `verb` of the object into the verb editor.
-
-### `addVerb(verb, dobjarg = 'none', preparg = 'none', iobjarg = 'none')`
-
-Add a new verb to the object called `verb` and load it into the verb editor.  You can optionally specify the argument specifiers as well.
 
 ### `create(newName, newAliases = [])`
 
@@ -221,16 +218,12 @@ Stops the job specified by the (0-based) index.
 
 Return the string representation of this object.
 
-Verbs
------
+Verbs and how to edit them
+--------------------------
 
-To edit verbs on objects, use the object methods `addVerb` and `editVerb` described above.
+To edit verbs on objects, use the built in editor: [http://localhost:8888/editor](http://localhost:8888/editor)
 
-    $thing.editVerb 'examine'
-
-This will load the verb 'examine' of the 'Thing Class' into the verb editor.
-
-To remove verbs from objects, you can just use the `delete` keyword.
+To remove verbs from objects, you can just use the `delete` keyword, or use the editor.
 
     delete $thing.examine
 
@@ -247,32 +240,4 @@ The verb context has different variables available to it.  They are as follows:
 * `prepstr` - the preposition string
 * `iobjstr` - the indirect object string
 
-The verb context also has access to the `$` function.
-
-TODO
-----
-
-* A better editor (seperate page)
-
-### Bugs
-
-* Having moo objects with circular inheritence.
-    * $thing.parent == $root; $root.parent = $thing
-    * This causes `RangeError: Maximum call stack size exceeded`
-    * Solution: add a check to the parent setter.
-* Attempting to assign a circular js object as a property on a moo object causes `RangeError: Maximum call stack size exceeded`
-
-### Things that can crash the server
-
-* Writing moo code with infinite loops.
-    * Can't solve this right now as the vm module does not allow limiting execution of code.
-    * There are some github issue and pull requests out there for this.
-    * See here: (https://github.com/joyent/node/pull/4115)[https://github.com/joyent/node/pull/4115]
-    * Note: doesn't actually crash the server.  Probably just overheats it and melts it...
-* Removing an object that has children.
-
-### Feature requests
-
-* Tab completion (evan)
-* Graphical map (greg)
-* Allow verbs to be written in plain javascript (evan)
+The verb context also has access to most of the functions described in the eval context section above.

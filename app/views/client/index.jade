@@ -1,0 +1,16 @@
+extends layout
+
+block content
+  .screen(data-bind='foreach: lines, click: focusInput')
+    div(data-bind='html: $data')
+  .command
+    form(data-bind='submit: sendCommand')
+      span.prompt &gt;
+      input(type='text', autofocus=true, data-bind="value: command, event: {keydown: recall}")
+  include includes/modal
+
+block script
+  :coffeescript
+    # on dom ready, create the view model
+    $ ->
+      window.view = new ClientView $('body'), $('.screen'), $('.command input')

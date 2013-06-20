@@ -1,2 +1,6 @@
-node_modules/
+node_modules
+.DS_Store
+.cake_task_cache
+*.un~
+app/config/app.coffee
 db.json

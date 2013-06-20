@@ -1,5 +1,5 @@
 # Knockout.js view model for bootstrap modal forms
-class ModalFormView
+class @ModalFormView
 
   class Input
     constructor: (inputDescriptor) ->

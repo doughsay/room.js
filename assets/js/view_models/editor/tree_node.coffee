@@ -1,5 +1,5 @@
 # View model for object browser tree node
-class TreeNode
+class @TreeNode
 
   constructor: (o, @view, @parent) ->
 
