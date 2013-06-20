@@ -153,6 +153,7 @@ class EvalContext extends Context
     verbSpec =
       code: coffeeCode
       name: 'eval'
+      lang: 'coffeescript'
     super verbSpec, extraArgs, true
 
 class VerbContext extends Context
