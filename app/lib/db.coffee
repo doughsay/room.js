@@ -49,7 +49,7 @@ module.exports = class Db extends EventEmitter
     if verb?
       context.runVerb @, null, verb, @sys
 
-    process.on 'exit', -> @exit()
+    process.on 'exit', => @exit()
 
   exit: ->
     for player in @players

@@ -70,6 +70,7 @@ module.exports = class EditorInterface
       preparg: 'none'
       iobjarg: 'none'
       code: ''
+      lang: 'coffeescript'
     @db.findById(id).addVerb verb
 
   deleteProperty: (id, key) =>

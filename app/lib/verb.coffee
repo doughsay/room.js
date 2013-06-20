@@ -17,7 +17,7 @@ exports.RoomJsVerb = class
     @preparg = verb.preparg
     @iobjarg = verb.iobjarg
     @code = verb.code
-    @lang = verb.lang or 'coffee' # default to coffee because that's all we supported at first
+    @lang = verb.lang or 'coffeescript' # default to coffeescript because that's all we supported at first
 
   # does this verb match the search string?
   matchesName: (search) ->

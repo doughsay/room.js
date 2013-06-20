@@ -87,11 +87,20 @@ class Context
   decontextify: (contextObj) ->
     @db.findById contextObj?.id
 
+  compileCode: (lang, code) ->
+    switch lang
+      when 'coffeescript'
+        coffee.compile code, bare: true
+      when 'javascript'
+        code
+      else
+        throw new Error 'invalid verb language specified in compileCode:', lang
+
   run: (verb, extraArgs, sendOutput = false, stack = false) ->
     try
       if @memo.level > config.maxStack
         throw new Error 'Max stack depth reached'
-      code = coffee.compile verb.code, bare: true
+      code = @compileCode verb.lang, verb.code
       ctext = _.clone @context
       if extraArgs?
         ctext.args = extraArgs
@@ -183,15 +192,28 @@ class VerbContext extends Context
         else
           throw new Error 'verb has no \'super\''
 
-  run: (verb, extraArgs) ->
+  wrapCode: (verb) ->
+    switch verb.lang
+      when 'coffeescript'
+        """
+        (->
+        #{verb.code.split('\n').map((line) -> '  ' + line).join('\n')}
+        ).call($(#{@self.id}))
+        """
+      when 'javascript'
+        """
+        (function() {
+        #{verb.code.split('\n').map((line) -> '  ' + line).join('\n')}
+        }).call($(#{@self.id}));
+        """
+      else
+        throw new Error 'invalid verb language specified in wrapCode:', verb.lang
 
+  run: (verb, extraArgs) ->
     verbSpec =
-      code: """
-            (->
-            #{verb.code.split('\n').map((line) -> '  ' + line).join('\n')}
-            ).call($(#{@self.id}))
-            """
+      code: @wrapCode verb
       name: verb.name
+      lang: verb.lang
     super verbSpec, extraArgs
 
 

@@ -208,6 +208,7 @@ exports.RoomJsObject = class RoomJsObject extends EventEmitter
         verb.preparg = newVerb.preparg
         verb.iobjarg = newVerb.iobjarg
         verb.code = newVerb.code
+        verb.lang = newVerb.lang
         @db.emit 'verbUpdated', {id: @id, verb: newVerb}
         return true
     @addVerb newVerb

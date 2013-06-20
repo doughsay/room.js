@@ -6,7 +6,7 @@ block content
   .command
     form(data-bind='submit: sendCommand')
       span.prompt &gt;
-      input(type='text', data-bind="value: command, event: {keydown: recall}")
+      input(type='text', autofocus=true, data-bind="value: command, event: {keydown: recall}")
   include includes/modal
 
 block script

@@ -57,7 +57,7 @@ class @Verb
     @iobjarg verb.iobjarg
     @code verb.code
     @hidden verb.hidden
-    @lang = verb.lang
+    @lang verb.lang
 
 # view model for an object in the editor
 class @MiniObject

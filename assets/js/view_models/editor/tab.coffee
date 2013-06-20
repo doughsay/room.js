@@ -94,8 +94,19 @@ class @VerbTab extends Tab
       objName = if object.alias()? then object.alias() else "[##{object.id} #{object.name()}]"
       "#{objName}.#{@verb.name()}"
 
-    @session = new ace.EditSession @verb.code(), 'ace/mode/coffee'
+    @mode = ko.computed =>
+      switch @verb.lang()
+        when 'coffeescript'
+          'ace/mode/coffee'
+        when 'javascript'
+          'ace/mode/javascript'
+        else
+          throw new Error 'invalid language specified'
+
+    @session = new ace.EditSession @verb.code(), @mode()
     @session.on 'change', (e) => @verb.code @session.getValue()
+
+    @mode.subscribe (newMode) => @session.setMode newMode
 
     @_code = ko.observable @verb.code()
     @_dobjarg = ko.observable @verb.dobjarg()
@@ -103,6 +114,7 @@ class @VerbTab extends Tab
     @_iobjarg = ko.observable @verb.iobjarg()
     @_hidden = ko.observable @verb.hidden()
     @_name = ko.observable @verb.name()
+    @_lang = ko.observable @verb.lang()
 
     @dirty = ko.computed =>
       not (
@@ -111,7 +123,8 @@ class @VerbTab extends Tab
         @verb.preparg() is @_preparg() and
         @verb.iobjarg() is @_iobjarg() and
         @verb.hidden() is @_hidden() and
-        @verb.name() is @_name()
+        @verb.name() is @_name() and
+        @verb.lang() is @_lang()
       )
 
     super()
@@ -127,6 +140,7 @@ class @VerbTab extends Tab
         @_iobjarg @verb.iobjarg()
         @_hidden @verb.hidden()
         @_name @verb.name()
+        @_lang @verb.lang()
 
   serialize: ->
     {
@@ -138,6 +152,7 @@ class @VerbTab extends Tab
       hidden: @verb.hidden()
       name: @verb.name()
       original_name: @_name()
+      lang: @verb.lang()
     }
 
   restore: ->
@@ -147,6 +162,7 @@ class @VerbTab extends Tab
     @verb.iobjarg @_iobjarg()
     @verb.hidden @_hidden()
     @verb.name @_name()
+    @verb.lang @_lang()
 
   update: (verb) ->
     @verb.name verb.name
@@ -155,6 +171,7 @@ class @VerbTab extends Tab
     @verb.iobjarg verb.iobjarg
     @verb.code verb.code
     @verb.hidden verb.hidden
+    @verb.lang verb.lang
 
     @_name verb.name
     @_dobjarg verb.dobjarg
@@ -162,5 +179,6 @@ class @VerbTab extends Tab
     @_iobjarg verb.iobjarg
     @_code verb.code
     @_hidden verb.hidden
+    @_lang verb.lang
 
     @session.setValue verb.code
