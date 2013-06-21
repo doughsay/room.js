@@ -104,7 +104,10 @@ class Context
       ctext = _.clone @context
       if extraArgs?
         ctext.args = extraArgs
-      output = vm.runInNewContext code, ctext, verb.name+'.vm', config.verbTimeout
+      output = if @memo.level is 1
+        vm.runInNewContext code, ctext, verb.name+'.vm', config.verbTimeout
+      else
+        vm.runInNewContext code, ctext, verb.name+'.vm'
       if sendOutput and @player isnt @db.nothing
         @player.send mooUtil.print output
       output

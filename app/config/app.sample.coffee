@@ -8,5 +8,5 @@ module.exports =
   env: 'development'
 
   dbFile: 'db.json'
-  verbTimeout: 2000
+  verbTimeout: 1000
   maxStack: 40
