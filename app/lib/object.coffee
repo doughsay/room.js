@@ -83,6 +83,8 @@ exports.RoomJsObject = class RoomJsObject extends EventEmitter
       @name = nameStr
 
   updateAliases: (aliases) ->
+    if not Array.isArray aliases
+      throw new Error "`aliases` must be an array."
     for alias in aliases
       if not (alias? and alias.toString?)
         throw new Error "Invalid alias '#{alias}'"
@@ -116,6 +118,9 @@ exports.RoomJsObject = class RoomJsObject extends EventEmitter
   # array of all descendants of this object
   descendants: ->
     (o for id, o of @db.objects).filter (o) => o.inheritsFrom @id
+
+  send: ->
+    # stub
 
   ####################
   # property methods #
