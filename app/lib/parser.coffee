@@ -93,7 +93,7 @@ parse_command = (text) ->
       dobjstr = rest
   {
     verb:    verb
-    argstr:  rest
+    argstr:  rest or ''
     dobjstr: dobjstr
     prepstr: prepstr
     iobjstr: iobjstr

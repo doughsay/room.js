@@ -72,7 +72,7 @@ module.exports = class Client
     command = parse str
 
     if command.verb == 'eval' and player.programmer
-      code = if command.argstr? then command.argstr.replace(/\\\{/g, '{').replace(/\\\}/g, '}') else ''
+      code = command.argstr.replace(/\\\{/g, '{').replace(/\\\}/g, '}')
       context.runEval @db, player, code
     else if command.verb in ['logout', 'quit']
       player = connections.playerFor @socket
