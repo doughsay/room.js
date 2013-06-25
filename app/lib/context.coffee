@@ -24,7 +24,6 @@ class Context
       parse:      parse
       match:      (search = '') => (@db.mooMatch search, @player).map (o) => @contextify o
       do_verb:    (object, verb, time, args = []) => @do_verb object, verb, time, args
-      idle:       (player) => connections.idleTimeFor player
       search:     (search) => @db.search(search).map (o) => @contextify o
       rm:         (idOrObject) =>
                     if idOrObject?.proxy?
@@ -41,6 +40,10 @@ class Context
           null
         else if x._mooObject?
           @contextify @db.findById x._mooObject
+        else if x._date?
+          new Date x._date
+        else if x._regexp?
+          new RegExp x._regexp.pattern, x._regexp.flags
         else if Array.isArray x
           savecb = if top then => cb @serialize a else cb
           a = x.map (y) => @deserialize y, savecb, false
@@ -59,6 +62,12 @@ class Context
           null
         else if x.proxy
           {_mooObject: x.id}
+        else if Object.prototype.toString.call(x) is '[object Date]'
+          {_date: x.toString()}
+        else if Object.prototype.toString.call(x) is '[object RegExp]'
+          match = x.toString().match /^\/(.*)\/(.*)/
+          [regexp, pattern, flags] = match
+          {_regexp: {pattern: pattern, flags: flags}}
         else if Array.isArray x
           if x.helper_proxy
             x = x.unProxy()

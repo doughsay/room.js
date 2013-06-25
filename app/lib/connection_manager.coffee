@@ -6,7 +6,6 @@ util = require 'util'
 
 sockets = {}
 players = {}
-lastActivity = {}
 
 add = (player, socket) ->
   throw new Error 'invalid player added to connection manager' if not player? or not player.id?
@@ -30,19 +29,7 @@ playerFor = (socket) ->
   throw new Error 'invalid socket passed to playerFor' if not socket? or not socket.id?
   players[socket.id] || null
 
-activity = (player) ->
-  throw new Error 'invalid player passed to activity' if not player? or not player.id?
-  lastActivity[player.id] = new Date()
-
-idleTimeFor = (player) ->
-  throw new Error 'invalid player passed to idleTimeFor' if not player? or not player.id?
-  return null if not lastActivity[player.id]?
-  now = new Date()
-  parseInt (now - lastActivity[player.id]) / 1000
-
 exports.add = add
 exports.remove = remove
 exports.socketFor = socketFor
 exports.playerFor = playerFor
-exports.activity = activity
-exports.idleTimeFor = idleTimeFor

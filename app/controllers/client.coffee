@@ -31,7 +31,7 @@ module.exports = class Client
 
     # if there was a player logged in on the socket, call the `player_disconnected` verb on $sys
     if player?
-      connections.activity player
+      player.lastActivity = new Date()
       verb = @db.sys.findVerbByName 'player_disconnected'
       if verb?
         context.runVerb @db, player, verb, @db.sys
@@ -44,7 +44,7 @@ module.exports = class Client
     str = userStr || ""
     player = connections.playerFor @socket
     if player?
-      connections.activity player
+      player.lastActivity = new Date()
       @onPlayerCommand player, str
     else
       @onCommand str
@@ -122,7 +122,7 @@ module.exports = class Client
         other_socket.disconnect()
 
       connections.add player, @socket
-      connections.activity player
+      player.lastActivity = new Date()
 
       verb = @db.sys.findVerbByName 'player_connected'
       if verb?
@@ -188,7 +188,7 @@ module.exports = class Client
     else
       player = @db.createNewPlayer formData.name, formData.username, phash formData.password
       connections.add player, @socket
-      connections.activity player
+      player.lastActivity = new Date()
 
       verb = @db.sys.findVerbByName 'player_created'
       if verb?

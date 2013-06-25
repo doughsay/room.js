@@ -7,7 +7,7 @@ module.exports = (obj, context) ->
   keys = (own = false) ->
     ks = ['id', 'parent', 'name', 'aliases', 'location', 'contents', 'children', 'isPlayer', 'crontab']
     if obj.player
-      ks.push 'username', 'isProgrammer', 'isOnline'
+      ks.push 'username', 'isProgrammer', 'isOnline', 'lastActivity'
     props = if own then obj.getOwnProperties() else obj.getAllProperties()
     for prop of props
       ks.push prop
@@ -25,7 +25,7 @@ module.exports = (obj, context) ->
   reservedKeys = ->
     ks = ['id', 'parent', 'name', 'aliases', 'location', 'contents', 'children', 'isPlayer', 'crontab']
     if obj.player
-      ks.push 'username', 'isProgrammer', 'isOnline'
+      ks.push 'username', 'isProgrammer', 'isOnline', 'lastActivity'
     ks.push 'inheritsFrom', 'create', 'addJob', 'rmJob', 'startJob', 'stopJob'
     if obj.player
       ks.push 'send', 'input'
@@ -105,6 +105,9 @@ module.exports = (obj, context) ->
 
         when 'isOnline'
           obj.online?()
+
+        when 'lastActivity'
+          obj.lastActivity
 
         when 'children'
           obj.children().map (o) -> context.contextify o

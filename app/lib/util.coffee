@@ -58,6 +58,10 @@ print = (x, maxdepth, depth = 0, prefix = '', parents = []) ->
     when 'object'
       if x == null
         '{red|null}'
+      else if Object.prototype.toString.call(x) is '[object Date]'
+        "{yellow|#{x.toString()}}"
+      else if Object.prototype.toString.call(x) is '[object RegExp]'
+        "{red|#{x.toString()}}"
       else
         if x in parents
           '{yellow inverse|[CircularReference]}'

@@ -16,6 +16,7 @@ exports.RoomJsPlayer = class RoomJsPlayer extends RoomJsObject
     @password = player.password
     @player = true
     @programmer = player.programmer
+    @lastActivity = if player.lastActivity? then new Date player.lastActivity else undefined
 
   authenticates: (username, passwordHash) ->
     @username == username and @password == passwordHash

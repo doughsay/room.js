@@ -229,6 +229,7 @@ module.exports = class Db extends EventEmitter
       programmer: programmer
       properties: []
       verbs: []
+      lastActivity: (new Date()).toString()
 
     newPlayer = new RoomJsPlayer object, @
 
