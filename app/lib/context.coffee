@@ -4,7 +4,6 @@ _ = require 'underscore'
 util = require 'util'
 
 config = require '../config/app'
-connections = require './connection_manager'
 mooUtil = require './util'
 mooBrowser = require './moo_browser'
 parse = require('./parser').parse

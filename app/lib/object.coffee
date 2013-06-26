@@ -1,8 +1,6 @@
 _ = require 'underscore'
 EventEmitter = require('events').EventEmitter
 
-connections = require './connection_manager'
-
 RoomJsVerb = require('./verb').RoomJsVerb
 RoomJsCronJob = require './cronjob'
 
@@ -293,6 +291,7 @@ exports.RoomJsObject = class RoomJsObject extends EventEmitter
   toJSON: ->
     clone = _.clone @
     delete clone.db
+    delete clone.socket
     clone
 
   toString: ->

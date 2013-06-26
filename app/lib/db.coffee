@@ -3,7 +3,6 @@ util = require 'util'
 _ = require 'underscore'
 EventEmitter = require('events').EventEmitter
 
-connections = require './connection_manager'
 mooUtil = require './util'
 context = require './context'
 
@@ -53,10 +52,9 @@ module.exports = class Db extends EventEmitter
 
   exit: ->
     for player in @players
-      socket = connections.socketFor player
-      if socket?
-        socket.emit 'output', '{red|Server shutting down.}'
-        socket.disconnect()
+      if player.socket?
+        player.socket.emit 'output', '{red|Server shutting down.}'
+        # player.socket.disconnect()
     @saveSync()
 
   blankObject: (id, name) ->

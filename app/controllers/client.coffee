@@ -3,7 +3,6 @@ util = require 'util'
 phash = require('../lib/hash').phash
 parse = require('../lib/parser').parse
 
-connections = require '../lib/connection_manager'
 formDescriptors = require '../lib/forms'
 context = require '../lib/context'
 
@@ -22,19 +21,40 @@ module.exports = class Client
     @socket.on 'form_input_login', @onLogin
     @socket.on 'form_input_create', @onCreate
 
+    @player = null
+
+  # connect a player
+  connect: (player, verbToRun = 'player_connected') ->
+    @player = player
+    @player.socket = @socket
+    @player.lastActivity = new Date()
+
+    verb = @db.sys.findVerbByName verbToRun
+    if verb?
+      context.runVerb @db, @player, verb, @db.sys
+    util.log "#{@player.toString()} connected"
+
+  # disconnect a player
+  disconnect: (force) ->
+    @player.lastActivity = new Date()
+    verb = @db.sys.findVerbByName 'player_disconnected'
+    if verb?
+      context.runVerb @db, @player, verb, @db.sys
+    @player.socket = null
+    if force
+      @socket.disconnect()
+    util.log "#{@player.toString()} disconnected"
+    @player = null
+
+  ###################
+  # Event Listeners #
+  ###################
+
   # fires when a socket disconnects, either by the client closing the connection
   # or calling the `disconnect` method of the socket.
   onDisconnect: =>
-    # remove the socket from our list of logged in players, if it exists
-    player = connections.playerFor @socket
-    connections.remove @socket
-
-    # if there was a player logged in on the socket, call the `player_disconnected` verb on $sys
-    if player?
-      player.lastActivity = new Date()
-      verb = @db.sys.findVerbByName 'player_disconnected'
-      if verb?
-        context.runVerb @db, player, verb, @db.sys
+    if @player?
+      @disconnect()
 
     address = @socket.handshake.address
     util.log "client disconnected from #{address.address}:#{address.port}"
@@ -42,10 +62,10 @@ module.exports = class Client
   # fires when a socket sends a command
   onInput: (userStr) =>
     str = userStr || ""
-    player = connections.playerFor @socket
-    if player?
-      player.lastActivity = new Date()
-      @onPlayerCommand player, str
+
+    if @player?
+      @player.lastActivity = new Date()
+      @onPlayerCommand str
     else
       @onCommand str
 
@@ -68,39 +88,32 @@ module.exports = class Client
         @socket.emit 'output', "\nUnrecognized command. Type {magenta bold|help} for a list of available commands."
 
   # handle a player command
-  onPlayerCommand: (player, str) =>
+  onPlayerCommand: (str) =>
     command = parse str
 
-    if command.verb == 'eval' and player.programmer
+    if command.verb == 'eval' and @player.programmer
       code = command.argstr.replace(/\\\{/g, '{').replace(/\\\}/g, '}')
-      context.runEval @db, player, code
+      context.runEval @db, @player, code
     else if command.verb in ['logout', 'quit']
-      player = connections.playerFor @socket
-      connections.remove @socket
-
-      if player?
-        verb = @db.sys.findVerbByName 'player_disconnected'
-        if verb?
-          context.runVerb @db, player, verb, @db.sys
-
+      @disconnect()
       @socket.emit 'output', '\nYou have been logged out.'
     else
-      matchedObjects = @db.matchObjects player, command
-      matchedVerb = @db.matchVerb player, command, matchedObjects
+      matchedObjects = @db.matchObjects @player, command
+      matchedVerb = @db.matchVerb @player, command, matchedObjects
 
       {dobj: dobj, iobj: iobj} = matchedObjects
       {verb: verbstr, argstr: argstr, dobjstr: dobjstr, prepstr: prepstr, iobjstr: iobjstr} = command
 
       if matchedVerb?
         {verb: verb, self: self} = matchedVerb
-        context.runVerb @db, player, verb, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr
+        context.runVerb @db, @player, verb, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr
       else
-        huhVerb = player.location()?.findVerbByName 'huh'
+        huhVerb = @player.location()?.findVerbByName 'huh'
         if huhVerb?
-          self = player.location()
-          context.runVerb @db, player, huhVerb, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr
+          self = @player.location()
+          context.runVerb @db, @player, huhVerb, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr
         else
-          player.send "{gray|I didn't understand that.}"
+          @player.send "{gray|I didn't understand that.}"
 
   # handle log in form submission
   onLogin: (userData, fn) =>
@@ -116,17 +129,9 @@ module.exports = class Client
     if matches.length == 1
       player = matches[0]
 
-      other_socket = connections.socketFor player
-      if other_socket?
-        player.send "{red bold|Disconnected by another login.}"
-        other_socket.disconnect()
-
-      connections.add player, @socket
-      player.lastActivity = new Date()
-
-      verb = @db.sys.findVerbByName 'player_connected'
-      if verb?
-        context.runVerb @db, player, verb, @db.sys
+      if player.socket?
+        player.socket.disconnect()
+      @connect player
 
       fn null
     else
@@ -187,11 +192,6 @@ module.exports = class Client
       fn formDescriptor
     else
       player = @db.createNewPlayer formData.name, formData.username, phash formData.password
-      connections.add player, @socket
-      player.lastActivity = new Date()
-
-      verb = @db.sys.findVerbByName 'player_created'
-      if verb?
-        context.runVerb @db, player, verb, @db.sys
+      @connect player, 'player_created'
 
       fn null

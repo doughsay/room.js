@@ -1,5 +1,3 @@
-connections = require './connection_manager'
-
 RoomJsObject = require('./object').RoomJsObject
 
 # a RoomJsPlayer is just a slightly more specialized RoomJsObject
@@ -17,17 +15,16 @@ exports.RoomJsPlayer = class RoomJsPlayer extends RoomJsObject
     @player = true
     @programmer = player.programmer
     @lastActivity = if player.lastActivity? then new Date player.lastActivity else undefined
+    @socket = null
 
   authenticates: (username, passwordHash) ->
     @username == username and @password == passwordHash
 
-  online: ->
-    (connections.socketFor @)?
+  online: -> @socket?
 
   send: (msg) ->
-    socket = connections.socketFor @
-    if socket?
-      socket.emit 'output', "\n#{msg}"
+    if @socket?
+      @socket.emit 'output', "\n#{msg}"
       true
     else
       false
@@ -42,9 +39,8 @@ exports.RoomJsPlayer = class RoomJsPlayer extends RoomJsObject
       false
 
   input: (msg, callback) ->
-    socket = connections.socketFor @
-    if socket?
-      socket.emit 'request_input', "\n#{msg}", (response) =>
+    if @socket?
+      @socket.emit 'request_input', "\n#{msg}", (response) =>
         try
           callback?.call null, response
         catch error
