@@ -30,11 +30,11 @@ module.exports = class Db extends EventEmitter
     startTime = mooUtil.tstart()
 
     for id, dbObject of dbObjects
-      if dbObject.player
-        newMooObj = new RoomJsPlayer dbObject, @
+      newMooObj = if dbObject.player
+        new RoomJsPlayer dbObject, @
       else
-        newMooObj = new RoomJsObject dbObject, @
-      @objects[parseInt(dbObject.id)] = newMooObj
+        new RoomJsObject dbObject, @
+      @objects[dbObject.id] = newMooObj
       if newMooObj.player
         @players.push newMooObj
     @specials()
@@ -98,6 +98,64 @@ module.exports = class Db extends EventEmitter
     delete objects[-2]
     delete objects[-3]
     JSON.stringify {nextId: @_nextId, objects: objects}
+
+  reId: (oldId, newId) ->
+    like = (x, y) ->
+      if not (x? and y?)
+        return false
+      x.toString() is y.toString()
+
+    reIdVal = (x) ->
+      if not x?
+        false
+      else if x._mooObject? and like x._mooObject, oldId
+        x._mooObject = newId
+        true
+      else if typeof x is 'object'
+        answers = for key, val of x
+          reIdVal val
+        true in _.flatten answers
+
+    oldId = oldId.toString()
+    newId = newId.toString()
+
+    if @objects[newId]?
+      throw new Error "An object with id '#{newId}' already exists."
+
+    objectToChange = @objects[oldId]
+
+    if objectToChange?
+      objectToChange.id = newId
+      console.log "object id changed: #{objectToChange.toString()}"
+
+      for id, object of @objects
+        console.log "checking object: #{object.toString()}"
+        if like object.parent_id, oldId
+          object.parent_id = newId
+          console.log "changed parent of: #{object.toString()}"
+
+        if like object.location_id, oldId
+          object.location_id = newId
+          console.log "changed location of: #{object.toString()}"
+
+        for key, val of object.getOwnProperties()
+          if not val?
+            continue
+          else if val._mooObject? and like val._mooObject, oldId
+            val._mooObject = newId
+            object.setProp key, val
+            console.log "changed prop '#{key}' of: #{object.toString()}"
+          else if typeof val is 'object'
+            save = reIdVal val
+            if save
+              object.setProp key, val
+              console.log "changed prop '#{key}' of: #{object.toString()}"
+
+      delete @objects[oldId]
+      @objects[newId] = objectToChange
+      true
+    else
+      false
 
   findById: (id) ->
     if @objects[id]? then @objects[id] else null

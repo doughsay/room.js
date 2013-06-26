@@ -32,6 +32,7 @@ module.exports = class Context
       cancel:     (id) => @cancel id
       list:       => @db.list().map (o) => @contextify o
       search:     (search) => @db.search(search).map (o) => @contextify o
+      reId:       (oldId, newId) => @db.reId oldId, newId
       rm:         (idOrObject) =>
                     if idOrObject?.proxy?
                       @db.rm idOrObject.id
