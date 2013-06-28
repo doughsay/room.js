@@ -57,8 +57,7 @@ module.exports = class Editor
     @db.removeListener 'verbDeleted', @verbDeleted
     @db.removeListener 'verbUpdated', @verbUpdated
 
-    address = @socket.handshake.address
-    util.log "editor disconnected from #{address.address}:#{address.port}"
+    util.log "editor disconnected"
 
   ####################
   # Editor callbacks #

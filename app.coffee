@@ -1,4 +1,5 @@
 util = require 'util'
+fs = require 'fs'
 
 require './app/lib/process'
 require './app/lib/pid'
@@ -29,17 +30,21 @@ db = new Db config.dbFile
 # set up socket controllers
 Client = require './app/controllers/client'
 io.of('/client').on 'connection', (socket) ->
-  address = socket.handshake.address
-  util.log "new client connection from #{address.address}:#{address.port}"
+  util.log "new client connection"
   new Client db, socket
 
 Editor = require './app/controllers/editor'
 io.of('/editor').on 'connection', (socket) ->
-  address = socket.handshake.address
-  util.log "new editor connection from #{address.address}:#{address.port}"
+  util.log "new editor connection"
   new Editor db, socket
+
+# delete the socket file if it exists (from a previous crash)
+if config.socket? and fs.existsSync config.socket
+  fs.unlinkSync config.socket
 
 # start listening
 server.listen app.settings.port, ->
+  if config.socket? and fs.existsSync config.socket
+    fs.chmodSync config.socket, '777'
   time = new Date - start
   util.log "Room.js server started on port/socket #{app.settings.port} (#{env} mode) in #{time}ms running on Node.js #{process.versions.node}"

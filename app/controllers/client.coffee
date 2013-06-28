@@ -56,8 +56,7 @@ module.exports = class Client
     if @player?
       @disconnect()
 
-    address = @socket.handshake.address
-    util.log "client disconnected from #{address.address}:#{address.port}"
+    util.log "client disconnected"
 
   # fires when a socket sends a command
   onInput: (userStr) =>
