@@ -144,7 +144,7 @@ class EvalContext extends Context
       else
         delete @context.args
 
-      output = vm.runInNewContext code, @context, 'eval.vm'
+      output = vm.runInNewContext code, @context, 'eval.vm', config.verbTimeout
 
       @player.send mooUtil.print output
 
@@ -212,7 +212,11 @@ class VerbContext extends Context
       else
         delete @context.args
 
-      verb.script.runInContext @context, verb.name+'.vm'
+      if @memo.level is 1
+        verb.script.runInContext @context, verb.name+'.vm', config.verbTimeout
+      else
+        verb.script.runInContext @context, verb.name+'.vm'
+
     catch error
       source = if @self? and @self isnt @db.nothing then [@self.toString()] else []
       source.push verb.name
