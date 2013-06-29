@@ -1,4 +1,7 @@
 _ = require 'underscore'
+coffee = require 'coffee-script'
+util = require 'util'
+vm = require 'vm'
 
 # A RoomJsVerb is a js function which runs in a sandboxed context
 exports.RoomJsVerb = class
@@ -10,6 +13,7 @@ exports.RoomJsVerb = class
   # @iobjarg: String
   # @code: String
   # @lang: String
+  # @compiledCode: String
   constructor: (verb, @object) ->
     @name = verb.name
     @hidden = verb.hidden
@@ -18,6 +22,8 @@ exports.RoomJsVerb = class
     @iobjarg = verb.iobjarg
     @code = verb.code
     @lang = verb.lang or 'coffeescript' # default to coffeescript because that's all we supported at first
+    @script = null
+    @compile()
 
   # does this verb match the search string?
   matchesName: (search) ->
@@ -73,6 +79,34 @@ exports.RoomJsVerb = class
       propName = propName.replace '*', ''
 
     propName
+
+  compile: ->
+    compiledCode = switch @lang
+      when 'coffeescript'
+        coffee.compile @wrappedCode(), bare: true
+      when 'javascript'
+        @wrappedCode()
+      else
+        throw new Error 'invalid verb language specified in compileCode:', @lang
+    @script = vm.createScript compiledCode
+    true
+
+  wrappedCode: ->
+    switch @lang
+      when 'coffeescript'
+        """
+        (->
+        #{@code.split('\n').map((line) -> '  ' + line).join('\n')}
+        ).call(self)
+        """
+      when 'javascript'
+        """
+        (function() {
+        #{@code}
+        }).call(self);
+        """
+      else
+        throw new Error 'invalid verb language:', @lang
 
   toJSON: ->
     clone = _.clone @

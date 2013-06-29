@@ -1,7 +1,7 @@
 vm = require 'vm'
-coffee = require 'coffee-script'
 _ = require 'underscore'
 util = require 'util'
+coffee = require 'coffee-script'
 
 config = require '../config/app'
 mooUtil = require './util'
@@ -14,23 +14,28 @@ proxies = require './helper_proxies'
 class Context
 
   constructor: (@db, @player, @memo = {}) ->
-    base =
-      eval:       undefined
-      $:          (id) => @contextify @db.findById(id)
-      player:     if @player? then @contextify @player else @contextify @db.nothing
-      players:    => @db.players.map (player) => @contextify player
-      browser:    mooBrowser
-      parse:      parse
-      match:      (search = '') => (@db.mooMatch search, @player).map (o) => @contextify o
-      do_verb:    (object, verb, time, args = []) => @do_verb object, verb, time, args
-      search:     (search) => @db.search(search).map (o) => @contextify o
-      rm:         (idOrObject) =>
-                    if idOrObject?.proxy?
-                      @db.rm idOrObject.id
-                    else
-                      @db.rm idOrObject
 
-    @context = _.extend @globals(), base
+    if not @memo.context?
+
+      base =
+        eval:       undefined
+        $:          (id) => @contextify @db.findById(id)
+        player:     if @player? then @contextify @player else @contextify @db.nothing
+        players:    => @db.players.map (player) => @contextify player
+        browser:    mooBrowser
+        parse:      parse
+        match:      (search = '') => (@db.mooMatch search, @player).map (o) => @contextify o
+        do_verb:    (object, verb, time, args = []) => @do_verb object, verb, time, args
+        search:     (search) => @db.search(search).map (o) => @contextify o
+        rm:         (idOrObject) =>
+                      if idOrObject?.proxy?
+                        @db.rm idOrObject.id
+                      else
+                        @db.rm idOrObject
+
+      @memo.context = vm.createContext _.extend @globals(), base
+
+    @context = @memo.context
 
   deserialize: (x, cb = (->), top = true) =>
     switch typeof x
@@ -95,47 +100,8 @@ class Context
   decontextify: (contextObj) ->
     @db.findById contextObj?.id
 
-  compileCode: (lang, code) ->
-    switch lang
-      when 'coffeescript'
-        coffee.compile code, bare: true
-      when 'javascript'
-        code
-      else
-        throw new Error 'invalid verb language specified in compileCode:', lang
-
-  run: (verb, extraArgs, sendOutput = false, stack = false) ->
-    try
-      if @memo.level > config.maxStack
-        throw 'maximum stack depth reached'
-      code = @compileCode verb.lang, verb.code
-      ctext = _.clone @context
-      if extraArgs?
-        ctext.args = extraArgs
-      output = if @memo.level is 1
-        vm.runInNewContext code, ctext, verb.name+'.vm', config.verbTimeout
-      else
-        vm.runInNewContext code, ctext, verb.name+'.vm'
-      if sendOutput and @player isnt @db.nothing
-        @player.send mooUtil.print output
-      output
-    catch error
-      source = if @self? and @self isnt @db.nothing then [@self.toString()] else []
-      source.push verb.name
-      source = source.join '.'
-
-      runner = 'server'
-
-      errorStr = error.toString()
-
-      if @player? and @player isnt @db.nothing
-        runner = @player.toString()
-        if stack and error.stack?
-          @player.send error.stack.split('\n').map((line) -> "{inverse bold red|#{line}}").join('\n')
-        else
-          @player.send "{inverse bold red|#{errorStr} in '#{source}'}"
-
-      util.log "#{runner} caused exception: #{errorStr} in '#{source}'"
+  run: ->
+    throw new Error 'run must be overridden'
 
   do_verb: (mooObject, verbName, time, args) ->
     object = @decontextify mooObject
@@ -162,10 +128,41 @@ class EvalContext extends Context
 
   run: (coffeeCode, extraArgs) ->
     verbSpec =
-      code: coffeeCode
+      compiledCode: (coffee.compile coffeeCode, {bare: true})
       name: 'eval'
-      lang: 'coffeescript'
     super verbSpec, extraArgs, true
+
+  run: (coffeeCode, extraArgs, stack = false) ->
+    try
+      if @memo.level > config.maxStack
+        throw 'maximum stack depth reached'
+
+      code = coffee.compile coffeeCode, bare: true
+
+      if extraArgs?
+        @context.args = extraArgs
+      else
+        delete @context.args
+
+      output = vm.runInNewContext code, @context, 'eval.vm'
+
+      @player.send mooUtil.print output
+
+      output
+    catch error
+      source = 'eval'
+      runner = 'server'
+
+      errorStr = error.toString()
+
+      if @player? and @player isnt @db.nothing
+        runner = @player.toString()
+        if stack and error.stack?
+          @player.send error.stack.split('\n').map((line) -> "{inverse bold red|#{line}}").join('\n')
+        else
+          @player.send "{inverse bold red|#{errorStr} in '#{source}'}"
+
+      util.log "#{runner} caused exception: #{errorStr} in '#{source}'"
 
 class VerbContext extends Context
 
@@ -182,6 +179,7 @@ class VerbContext extends Context
     @context.dobjstr = dobjstr
     @context.prepstr = prepstr
     @context.iobjstr = iobjstr
+    @context.self    = @contextify @self
 
     if self?
       @context.pass  = =>
@@ -204,29 +202,34 @@ class VerbContext extends Context
         else
           throw new Error 'verb has no \'super\''
 
-  wrapCode: (verb) ->
-    switch verb.lang
-      when 'coffeescript'
-        """
-        (->
-        #{verb.code.split('\n').map((line) -> '  ' + line).join('\n')}
-        ).call($(#{@self.id}))
-        """
-      when 'javascript'
-        """
-        (function() {
-        #{verb.code.split('\n').map((line) -> '  ' + line).join('\n')}
-        }).call($(#{@self.id}));
-        """
-      else
-        throw new Error 'invalid verb language specified in wrapCode:', verb.lang
+  run: (verb, extraArgs, stack = false) ->
+    try
+      if @memo.level > config.maxStack
+        throw 'maximum stack depth reached'
 
-  run: (verb, extraArgs) ->
-    verbSpec =
-      code: @wrapCode verb
-      name: verb.name
-      lang: verb.lang
-    super verbSpec, extraArgs
+      if extraArgs?
+        @context.args = extraArgs
+      else
+        delete @context.args
+
+      verb.script.runInContext @context, verb.name+'.vm'
+    catch error
+      source = if @self? and @self isnt @db.nothing then [@self.toString()] else []
+      source.push verb.name
+      source = source.join '.'
+
+      runner = 'server'
+
+      errorStr = error.toString()
+
+      if @player? and @player isnt @db.nothing
+        runner = @player.toString()
+        if stack and error.stack?
+          @player.send error.stack.split('\n').map((line) -> "{inverse bold red|#{line}}").join('\n')
+        else
+          @player.send "{inverse bold red|#{errorStr} in '#{source}'}"
+
+      util.log "#{runner} caused exception: #{errorStr} in '#{source}'"
 
 
 runEval = (db, player, code) ->
