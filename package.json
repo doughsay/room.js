@@ -19,7 +19,8 @@
     "ff": "*",
     "gaze": "*",
     "underscore": "*",
-    "cron": "*"
+    "cron": "*",
+    "fibers": "*"
   },
   "engines": {
     "node": ">=0.11.3"

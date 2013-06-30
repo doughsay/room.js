@@ -1,4 +1,5 @@
 util = require 'util'
+Fiber = require 'fibers'
 
 phash = require('../lib/hash').phash
 parse = require('../lib/parser').parse
@@ -92,7 +93,9 @@ module.exports = class Client
 
     if command.verb == 'eval' and @player.programmer
       code = command.argstr.replace(/\\\{/g, '{').replace(/\\\}/g, '}')
-      context.runEval @db, @player, code
+      Fiber =>
+        context.runEval @db, @player, code
+      .run()
     else if command.verb in ['logout', 'quit']
       @disconnect()
       @socket.emit 'output', '\nYou have been logged out.'
@@ -105,12 +108,16 @@ module.exports = class Client
 
       if matchedVerb?
         {verb: verb, self: self} = matchedVerb
-        context.runVerb @db, @player, verb, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr
+        Fiber =>
+          context.runVerb @db, @player, verb, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr
+        .run()
       else
         huhVerb = @player.location()?.findVerbByName 'huh'
         if huhVerb?
           self = @player.location()
-          context.runVerb @db, @player, huhVerb, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr
+          Fiber =>
+            context.runVerb @db, @player, huhVerb, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr
+          .run()
         else
           @player.send "{gray|I didn't understand that.}"
 
