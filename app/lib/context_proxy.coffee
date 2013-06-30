@@ -1,4 +1,5 @@
 # Harmony proxy for RoomJsObject within a verb or eval context
+util = require 'util'
 
 contextModule = require('./context')
 
@@ -158,6 +159,33 @@ module.exports = (obj, context) ->
                 Array.prototype.slice.call(arguments),
                 context.memo
             fn.verb = true
+            fn.toString = -> verb.code
+            fn.call = (x) ->
+              contextModule.runVerb context.db,
+                context.player,
+                verb, obj,
+                context.context.dobj,
+                context.context.iobj,
+                verb.propName(), context.context.argstr,
+                context.context.dobjstr,
+                context.context.prepstr,
+                context.context.iobjstr,
+                Array.prototype.slice.call(arguments)[1..],
+                context.memo,
+                x
+            fn.apply = (x) ->
+              contextModule.runVerb context.db,
+                context.player,
+                verb, obj,
+                context.context.dobj,
+                context.context.iobj,
+                verb.propName(), context.context.argstr,
+                context.context.dobjstr,
+                context.context.prepstr,
+                context.context.iobjstr,
+                Array.prototype.slice.call(arguments)[1],
+                context.memo,
+                x
             fn.hidden = verb.hidden
             fn
           else

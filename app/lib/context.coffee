@@ -166,7 +166,7 @@ class EvalContext extends Context
 
 class VerbContext extends Context
 
-  constructor: (@db, player, self, dobj, iobj, verb, argstr, dobjstr, prepstr, iobjstr, memo = {}) ->
+  constructor: (@db, player, self, dobj, iobj, verb, argstr, dobjstr, prepstr, iobjstr, memo = {}, selfOverride) ->
     super @db, player, memo
 
     @self = if self? then self else @db.nothing
@@ -179,7 +179,7 @@ class VerbContext extends Context
     @context.dobjstr = dobjstr
     @context.prepstr = prepstr
     @context.iobjstr = iobjstr
-    @context.self    = @contextify @self
+    @context.self    = @contextify selfOverride or @self
 
     if self?
       @context.pass  = =>
@@ -245,11 +245,11 @@ runEval = (db, player, code) ->
   memo.level -= 1
   val
 
-runVerb = (db, player, verb, self, dobj = db.nothing, iobj = db.nothing, verbstr, argstr, dobjstr, prepstr, iobjstr, extraArgs, memo = {}) ->
+runVerb = (db, player, verb, self, dobj = db.nothing, iobj = db.nothing, verbstr, argstr, dobjstr, prepstr, iobjstr, extraArgs, memo = {}, selfOverride) ->
   memo.level = 0 if not memo.level?
   memo.level += 1
   context = new VerbContext(
-    db, player, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr, memo)
+    db, player, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr, memo, selfOverride)
   val = context.run verb, extraArgs
   memo.level -= 1
   val
