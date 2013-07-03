@@ -1,5 +1,4 @@
 # Harmony proxy for RoomJsObject within a verb or eval context
-Fiber = require 'fibers'
 
 contextModule = require('./context')
 
@@ -147,10 +146,6 @@ module.exports = (obj, context) ->
               obj.setProp name, o
           else if (verb = obj.findVerbByName name)
             fn = ->
-              fiber = Fiber.current
-              if fiber?
-                setImmediate -> fiber.run()
-                Fiber.yield()
               contextModule.runVerb context.db,
                 context.player,
                 verb, obj,
@@ -165,10 +160,6 @@ module.exports = (obj, context) ->
             fn.verb = true
             fn.toString = -> verb.code
             fn.call = (x) ->
-              fiber = Fiber.current
-              if fiber?
-                setImmediate -> fiber.run()
-                Fiber.yield()
               contextModule.runVerb context.db,
                 context.player,
                 verb, obj,
@@ -182,10 +173,6 @@ module.exports = (obj, context) ->
                 context.memo,
                 x
             fn.apply = (x) ->
-              fiber = Fiber.current
-              if fiber?
-                setImmediate -> fiber.run()
-                Fiber.yield()
               contextModule.runVerb context.db,
                 context.player,
                 verb, obj,
