@@ -3,6 +3,7 @@
 #= require ../../vendor/js/bootstrap
 #= require ../../vendor/js/bootbox
 #= require ../../vendor/js/knockout
+#= require ../../vendor/js/store
 
 #= require knockout-modal
 #= require view_models/modal_form

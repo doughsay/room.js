@@ -31,13 +31,57 @@ class @ClientView
 
   inputCallback: null
 
+  loadOptions: ->
+    defaultOptions =
+      maxLines: 1000
+      maxHistory: 1000
+      echo: true
+      space: true
+      theme: 'tango'
+      fancy: true
+
+    store.get('client_options') or defaultOptions
+
+  saveOptions: ->
+    store.set 'client_options',
+      maxLines: @maxLines()
+      maxHistory: @maxHistory()
+      echo: @echo()
+      space: @space()
+      theme: @theme()
+      fancy: @fancy()
+
   # construct the view model
   constructor: (@body, @screen, @input) ->
     @lines      = ko.observableArray []
-    @maxLines   = ko.observable 1000
-    @maxHistory = ko.observable 1000
     @command    = ko.observable ""
     @form       = ko.observable null
+
+    # options
+    options = @loadOptions()
+
+    @maxLines   = ko.observable options.maxLines   # max number of lines in scrollback buffer
+    @maxHistory = ko.observable options.maxHistory # max number of commands to store in command history
+    @echo       = ko.observable options.echo       # whether or not to echo the command sent
+    @space      = ko.observable options.space      # whether or not to put space between each piece of server output
+    @theme      = ko.observable options.theme      # the color theme to use
+    @fancy      = ko.observable options.fancy      # whether or not to use text-shadows, drop-shadows and rounded edges
+
+    @maxLines.subscribe (max) =>
+      @saveOptions()
+      lines = @lines()
+      if max < lines.length
+        @truncateLines()
+
+    @maxHistory.subscribe (max) =>
+      @saveOptions()
+      if max < @history.length
+        'TODO'
+
+    @echo.subscribe => @saveOptions()
+    @space.subscribe => @saveOptions()
+    @theme.subscribe => @saveOptions()
+    @fancy.subscribe => @saveOptions()
 
     @socket = io.connect(window.location.href+'client')
     @attachListeners()
@@ -76,13 +120,19 @@ class @ClientView
   scrollToBottom: ->
     @screen.scrollTop(@screen[0].scrollHeight);
 
+  truncateLines: ->
+    @lines @lines()[lines.length-max-2..]
+
   # add a line of output from the server to the screen
   addLine: (line, escape = true) ->
     line = escapeHTML line if escape
     @lines.push colorize line
     if @lines().length > @maxLines()
-      @lines.shift()
+      @truncateLines()
     @scrollToBottom()
+
+  addLines: (lines, escape = true) ->
+    @addLine line, escape for line in lines
 
   # give focus to the command input element
   focusInput: ->
@@ -94,7 +144,9 @@ class @ClientView
     command = @command()
     escapedCommand = escapeBrackets command
     if command
-      @addLine "\n{black|> #{escapedCommand}}", false
+      if @echo()
+        @addLine "\n" if @space()
+        @addLine "{black|> #{escapedCommand}}", false
       @history.unshift command
       if @history.length > @maxHistory()
         @history.pop()
@@ -176,7 +228,9 @@ class @ClientView
   # output event
   # adds a line of output to the screen
   output: (msg) =>
-    @addLine msg
+    @addLine "\n" if @space()
+    lines = msg.split '\n'
+    @addLines lines
 
   # input was requested from the server.
   # the next thing the user sends has to be returned to fn

@@ -13,8 +13,10 @@ module.exports = class Client
 
   # welcome the socket and attach the event listeners
   constructor: (@db, @socket) ->
-    @socket.emit 'output', "Welcome to {blue bold|room.js}!"
-    @socket.emit 'output', "Type {magenta bold|help} for a list of available commands."
+    @socket.emit 'output', """
+      Welcome to {blue bold|room.js}!"
+      Type {magenta bold|help} for a list of available commands.
+    """
 
     @socket.on 'disconnect', @onDisconnect
     @socket.on 'input', @onInput
@@ -73,7 +75,7 @@ module.exports = class Client
     switch str
       when "help"
         msg = """
-        \nAvailable commands:
+        Available commands:
         • {magenta bold|login}  - login to an existing account
         • {magenta bold|create} - create a new account
         • {magenta bold|help}   - show this message
@@ -84,7 +86,7 @@ module.exports = class Client
       when "create"
         @socket.emit 'request_form_input', formDescriptors.createAccount()
       else
-        @socket.emit 'output', "\nUnrecognized command. Type {magenta bold|help} for a list of available commands."
+        @socket.emit 'output', "Unrecognized command. Type {magenta bold|help} for a list of available commands."
 
   # handle a player command
   onPlayerCommand: (str) =>
@@ -95,7 +97,7 @@ module.exports = class Client
       context.runEval @db, @player, code
     else if command.verb in ['logout', 'quit']
       @disconnect()
-      @socket.emit 'output', '\nYou have been logged out.'
+      @socket.emit 'output', 'You have been logged out.'
     else
       matchedObjects = @db.matchObjects @player, command
       matchedVerb = @db.matchVerb @player, command, matchedObjects

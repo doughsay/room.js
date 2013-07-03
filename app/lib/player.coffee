@@ -24,7 +24,7 @@ exports.RoomJsPlayer = class RoomJsPlayer extends RoomJsObject
 
   send: (msg) ->
     if @socket?
-      @socket.emit 'output', "\n#{msg}"
+      @socket.emit 'output', "#{msg}"
       true
     else
       false
@@ -40,7 +40,7 @@ exports.RoomJsPlayer = class RoomJsPlayer extends RoomJsObject
 
   input: (msg, callback) ->
     if @socket?
-      @socket.emit 'request_input', "\n#{msg}", (response) =>
+      @socket.emit 'request_input', "#{msg}", (response) =>
         try
           callback?.call null, response
         catch error
