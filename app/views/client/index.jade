@@ -1,12 +1,13 @@
 extends layout
 
 block content
-  .screen(data-bind='foreach: lines, click: focusInput')
-    div(data-bind='html: $data')
-  .command
-    form(data-bind='submit: sendCommand')
-      span.prompt &gt;
-      input(type='text', autofocus=true, data-bind="value: command, event: {keydown: recall}")
+  .client(data-bind='css: themeClasses')
+    .screen(data-bind='foreach: lines, click: focusInput')
+      div(data-bind='html: $data')
+    .command
+      form(data-bind='submit: sendCommand')
+        span.prompt &gt;
+        input(type='text', autofocus=true, data-bind="value: command, event: {keydown: recall}")
   include includes/modal
 
 block script

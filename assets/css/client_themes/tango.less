@@ -1,0 +1,93 @@
+.client.tango {
+
+  @_white: #D3D7CF;   @_light_white: #EEEEEC;
+  @_gray: #888A85;    @_light_gray: #BABDB6;
+  @_black: #2E3436;   @_light_black: #555753;
+  @_blue: #3465A4;    @_light_blue: #729FCF;
+  @_cyan: #06989A;    @_light_cyan: #34E2E2;
+  @_green: #73D216;   @_light_green: #8AE234;
+  @_magenta: #75507B; @_light_magenta: #AD7FA8;
+  @_red: #CC0000;     @_light_red: #EF2929;
+  @_yellow: #EDD400;  @_light_yellow: #FCE94F;
+  @_orange: #F57900;  @_light_orange: #FCAF3E;
+
+  .embolden(@light_color) {
+    &.bold, .bold, .bold & {
+      color: @light_color;
+    }
+  }
+
+  .invert(@color) {
+    &.inverse, .inverse, .inverse & {
+      color: black;
+      background-color: @color;
+    }
+  }
+
+  .bold_invert(@light_color) {
+    &.bold.inverse,
+    & .bold.inverse,
+    & .bold .inverse,
+    & .inverse .bold,
+    .bold &.inverse,
+    .bold & .inverse,
+    .bold .inverse &,
+    .bold.inverse &,
+    .inverse &.bold,
+    .inverse & .bold,
+    .inverse .bold & {
+      color: black;
+      background-color: @light_color;
+    }
+  }
+
+  .screen {
+    background-color: black;
+    color: @_white;
+  }
+
+  .command {
+    border-top-color: @_light_black;
+    form {
+      .prompt {
+        background-color: black;
+        color: @_light_gray;
+      }
+      input {
+        background-color: black;
+        color: @_light_white;
+      }
+    }
+  }
+
+  .italic { font-style: italic; }
+  .underline { text-decoration: underline; }
+
+  .bold {
+    color: @_light_white;
+  }
+
+  .inverse {
+    color: black;
+    background-color: @_white;
+  }
+
+  .bold.inverse,
+  .bold .inverse,
+  .inverse .bold {
+    color: black;
+    background-color: @_light_white;
+  }
+
+  .white        { color: @_white;   .invert(@_white);   .embolden(@_light_white);   .bold_invert(@_light_white);   }
+  .grey, .gray  { color: @_gray;    .invert(@_gray);    .embolden(@_light_gray);    .bold_invert(@_light_gray);    }
+  .black        { color: @_black;   .invert(@_black);   .embolden(@_light_black);   .bold_invert(@_light_black);   }
+  .blue         { color: @_blue;    .invert(@_blue);    .embolden(@_light_blue);    .bold_invert(@_light_blue);    }
+  .cyan         { color: @_cyan;    .invert(@_cyan);    .embolden(@_light_cyan);    .bold_invert(@_light_cyan);    }
+  .green        { color: @_green;   .invert(@_green);   .embolden(@_light_green);   .bold_invert(@_light_green);   }
+  .magenta      { color: @_magenta; .invert(@_magenta); .embolden(@_light_magenta); .bold_invert(@_light_magenta); }
+  .red          { color: @_red;     .invert(@_red);     .embolden(@_light_red);     .bold_invert(@_light_red);     }
+  .yellow       { color: @_yellow;  .invert(@_yellow);  .embolden(@_light_yellow);  .bold_invert(@_light_yellow);  }
+  .orange       { color: @_orange;  .invert(@_orange);  .embolden(@_light_orange);  .bold_invert(@_light_orange);  }
+
+}

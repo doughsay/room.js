@@ -1,10 +1,10 @@
 @import 'flatstrap/bootstrap';
-@import 'color';
-@import 'spiffy';
+@import 'client_themes/tango';
+@import 'client_themes/tango-light';
+@import 'fancy';
 
 body {
   margin: 0;
-  background-color: black;
 }
 
 .cloak {
@@ -14,7 +14,6 @@ body {
 .screen {
   font-family: 'Source Code Pro', sans-serif;
   font-size: 12pt;
-  background-color: black;
   overflow: auto;
   padding-left: 4px;
   div {
@@ -23,13 +22,12 @@ body {
 }
 
 .command {
-  border-top: 2px solid @gray;
+  border-top: 2px solid transparent;
   form {
     margin: 0;
     .prompt {
       float: left;
       padding: 2px 4px;
-      color: @gray;
       font-family: 'Source Code Pro', sans-serif;
       font-size: 12pt;
     }
@@ -38,8 +36,6 @@ body {
       margin: 0;
       border: none;
       padding: 2px 4px;
-      background-color: black;
-      color: @white;
       font-family: 'Source Code Pro', sans-serif;
       font-size: 12pt;
       border-radius: 0;

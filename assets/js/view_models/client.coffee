@@ -67,6 +67,8 @@ class @ClientView
     @theme      = ko.observable options.theme      # the color theme to use
     @fancy      = ko.observable options.fancy      # whether or not to use text-shadows, drop-shadows and rounded edges
 
+    @themeClasses = ko.computed => @theme() + if @fancy() then ' fancy' else ''
+
     @maxLines.subscribe (max) =>
       @saveOptions()
       lines = @lines()
