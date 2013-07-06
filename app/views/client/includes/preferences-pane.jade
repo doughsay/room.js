@@ -1,0 +1,35 @@
+.options.container-fluid(data-bind='visible: preferencesPaneVisible')
+  .row-fluid.form-horizontal
+    h2
+      i.icon-wrench
+      |&nbsp;Client Preferences
+    .control-group
+      label.control-label(for='theme') Theme
+      .controls
+        select#theme(data-bind='value: theme')
+          option(value='tango') Tango
+          option(value='tango-light') Tango Light
+    .control-group
+      label.control-label(for='fancy') Fancy
+      .controls
+        input#fancy(type='checkbox', data-bind='checked: fancy')
+    .control-group
+      label.control-label(for='space') Space output
+      .controls
+        input#space(type='checkbox', data-bind='checked: space')
+    .control-group
+      label.control-label(for='echo') Echo command
+      .controls
+        input#echo(type='checkbox', data-bind='checked: echo')
+    .control-group
+      label.control-label(for='maxHistory') Max command history
+      .controls
+        input#maxHistory(type='number', data-bind='value: maxHistory')
+    .control-group
+      label.control-label(for='maxLines') Max scrollback
+      .controls
+        input#maxLines(type='number', data-bind='value: maxLines')
+
+    .alert.alert-info
+      strong Note:
+      |&nbsp;Preferences are stored locally in your browser.

@@ -14,7 +14,7 @@ module.exports = class Client
   # welcome the socket and attach the event listeners
   constructor: (@db, @socket) ->
     @socket.emit 'output', """
-      Welcome to {blue bold|room.js}!"
+      Welcome to {blue bold|room.js}!
       Type {magenta bold|help} for a list of available commands.
     """
 

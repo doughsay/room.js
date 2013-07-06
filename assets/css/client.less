@@ -3,12 +3,26 @@
 @import 'client_themes/tango-light';
 @import 'fancy';
 
+// fix flatstrap checkboxes and radio buttons
+input[type="checkbox"] {
+    -webkit-appearance: checkbox;
+    border-radius: 0;
+}
+input[type="radio"] {
+    -webkit-appearance: radio;
+    border-radius: 0;
+}
+
 body {
   margin: 0;
 }
 
 .cloak {
   display: none;
+}
+
+.options {
+  float: right;
 }
 
 .screen {
@@ -22,7 +36,15 @@ body {
 }
 
 .command {
+  position: relative;
   border-top: 2px solid transparent;
+  i {
+    position: absolute;
+    right: 10px;
+    top: 4px;
+    z-index: 100;
+    cursor: pointer;
+  }
   form {
     margin: 0;
     .prompt {

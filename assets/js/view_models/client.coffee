@@ -52,7 +52,7 @@ class @ClientView
       fancy: @fancy()
 
   # construct the view model
-  constructor: (@body, @screen, @input) ->
+  constructor: (@body, @client, @screen, @input) ->
     @lines      = ko.observableArray []
     @command    = ko.observable ""
     @form       = ko.observable null
@@ -67,6 +67,8 @@ class @ClientView
     @theme      = ko.observable options.theme      # the color theme to use
     @fancy      = ko.observable options.fancy      # whether or not to use text-shadows, drop-shadows and rounded edges
 
+    @preferencesPaneVisible = ko.observable false
+
     @themeClasses = ko.computed => @theme() + if @fancy() then ' fancy' else ''
 
     @maxLines.subscribe (max) =>
@@ -78,7 +80,7 @@ class @ClientView
     @maxHistory.subscribe (max) =>
       @saveOptions()
       if max < @history.length
-        'TODO'
+        @truncateHistory()
 
     @echo.subscribe => @saveOptions()
     @space.subscribe => @saveOptions()
@@ -97,6 +99,13 @@ class @ClientView
     $('.cloak').removeClass 'cloak'
     @setSizes()
 
+  togglePreferencesPane: ->
+    @preferencesPaneVisible not @preferencesPaneVisible()
+    @setSizes()
+    @scrollToBottom()
+    if not @preferencesPaneVisible()
+      @focusInput()
+
   # attach the websocket event listeners
   attachListeners: ->
     @socket.on 'connect', @connect
@@ -114,8 +123,11 @@ class @ClientView
 
   # apply proper sizes to the input and the screen div
   setSizes: ->
+    optionsWidth = if @preferencesPaneVisible() then $('.options').outerWidth() else 0
+    @client.width($(window).width() - optionsWidth)
+
     inputWidthDiff = @input.outerWidth() - @input.width()
-    @input.width($(window).width() - inputWidthDiff - $('.prompt').outerWidth())
+    @input.width($(window).width() - inputWidthDiff - $('.prompt').outerWidth() - optionsWidth)
     @screen.height($(window).height() - @input.outerHeight() - 2)
 
   # scroll the screen to the bottom
@@ -123,7 +135,13 @@ class @ClientView
     @screen.scrollTop(@screen[0].scrollHeight);
 
   truncateLines: ->
-    @lines @lines()[lines.length-max-2..]
+    max = @maxLines()
+    lines = @lines()
+    @lines lines[lines.length-max..]
+
+  truncateHistory: ->
+    max = @maxHistory()
+    @history = @history[0...max]
 
   # add a line of output from the server to the screen
   addLine: (line, escape = true) ->
@@ -151,7 +169,7 @@ class @ClientView
         @addLine "{black|> #{escapedCommand}}", false
       @history.unshift command
       if @history.length > @maxHistory()
-        @history.pop()
+        @truncateHistory()
       @currentHistory = -1
       if not @clientCommand command
         # if an input callback is waiting, send it to that, otherwise, send it to the server
