@@ -1,7 +1,9 @@
 fs = require 'fs'
-util = require 'util'
 _ = require 'underscore'
 EventEmitter = require('events').EventEmitter
+
+log4js = require './logger'
+logger = log4js.getLogger 'db'
 
 mooUtil = require './util'
 context = require './context'
@@ -22,7 +24,7 @@ module.exports = class Db extends EventEmitter
   objects: {}
   players: []
 
-  constructor: (@filename, @quiet = false) ->
+  constructor: (@filename) ->
     if fs.existsSync @filename
       {nextId: @_nextId, objects: dbObjects} = JSON.parse fs.readFileSync @filename
     else
@@ -39,7 +41,7 @@ module.exports = class Db extends EventEmitter
       if newMooObj.player
         @players.push newMooObj
     @specials()
-    util.log "#{@filename} loaded in #{mooUtil.tend startTime}" if not @quiet
+    logger.info "#{@filename} loaded in #{mooUtil.tend startTime}" if not @quiet
 
     @saveInterval = setInterval @save, 5*60*1000
 
@@ -81,7 +83,7 @@ module.exports = class Db extends EventEmitter
     @sys = @objects[0]
 
     @nothing.send = (msg) ->
-      util.log "$nothing got message: #{msg}"
+      logger.debug "$nothing got message: #{msg}"
 
   save: =>
     startTime = mooUtil.tstart()
@@ -89,13 +91,13 @@ module.exports = class Db extends EventEmitter
       throw err if err
       fs.rename '_' + @filename, @filename, (err) =>
         throw err if err
-        util.log "#{@filename} saved in #{mooUtil.tend startTime}" if not @quiet
+        logger.info "#{@filename} saved in #{mooUtil.tend startTime}" if not @quiet
 
   saveSync: ->
     startTime = mooUtil.tstart()
     fs.writeFileSync '_' + @filename, @serialize()
     fs.renameSync '_' + @filename, @filename
-    util.log "#{@filename} saved in #{mooUtil.tend startTime}" if not @quiet
+    logger.info "#{@filename} saved in #{mooUtil.tend startTime}" if not @quiet
 
   serialize: ->
     # don't save the special objects

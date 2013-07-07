@@ -1,5 +1,8 @@
-util = require 'util'
 fs = require 'fs'
+
+log4js = require './app/lib/logger'
+serverLogger = log4js.getLogger 'server'
+socketLogger = log4js.getLogger 'socket'
 
 require './app/lib/process'
 require './app/lib/pid'
@@ -18,7 +21,7 @@ env = app.settings.env
 
 # create the http and socket.io server
 server = require('http').createServer app
-io = require('socket.io').listen server, {'log level': 2}
+io = require('socket.io').listen server, {logger: socketLogger, 'log level': log4js.levels.INFO}
 
 # set up web controller
 require('./app/controllers/index')(app)
@@ -30,12 +33,12 @@ db = new Db config.dbFile
 # set up socket controllers
 Client = require './app/controllers/client'
 io.of('/client').on 'connection', (socket) ->
-  util.log "new client connection"
+  socketLogger.info "new client connection"
   new Client db, socket
 
 Editor = require './app/controllers/editor'
 io.of('/editor').on 'connection', (socket) ->
-  util.log "new editor connection"
+  socketLogger.info "new editor connection"
   new Editor db, socket
 
 # delete the socket file if it exists (from a previous crash)
@@ -47,4 +50,4 @@ server.listen app.settings.port, ->
   if config.socket? and fs.existsSync config.socket
     fs.chmodSync config.socket, '777'
   time = new Date - start
-  util.log "Room.js server started on port/socket #{app.settings.port} (#{env} mode) in #{time}ms running on Node.js #{process.versions.node}"
+  serverLogger.info "room.js server started on port/socket #{app.settings.port} (#{env} mode) in #{time}ms running on node.js #{process.versions.node}"

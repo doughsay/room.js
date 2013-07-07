@@ -1,4 +1,5 @@
-util = require 'util'
+log4js = require '../lib/logger'
+logger = log4js.getLogger 'socket'
 
 phash = require('../lib/hash').phash
 parse = require('../lib/parser').parse
@@ -34,7 +35,7 @@ module.exports = class Client
     verb = @db.sys.findVerbByName verbToRun
     if verb?
       context.runVerb @db, @player, verb, @db.sys
-    util.log "#{@player.toString()} connected"
+    logger.info "#{@player.toString()} connected"
 
   # disconnect a player
   disconnect: (force) ->
@@ -45,7 +46,7 @@ module.exports = class Client
     @player.socket = null
     if force
       @socket.disconnect()
-    util.log "#{@player.toString()} disconnected"
+    logger.info "#{@player.toString()} disconnected"
     @player = null
 
   ###################
@@ -58,7 +59,7 @@ module.exports = class Client
     if @player?
       @disconnect()
 
-    util.log "client disconnected"
+    logger.info "client disconnected"
 
   # fires when a socket sends a command
   onInput: (userStr) =>

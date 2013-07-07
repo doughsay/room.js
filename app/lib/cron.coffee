@@ -1,10 +1,12 @@
 CronJob = require('cron').CronJob
-util = require 'util'
+
+log4js = require './logger'
+logger = log4js.getLogger 'cron'
 
 jobs = []
 
 exports.registerJob = (job) ->
-  util.log 'registering new job: ' + job.toString()
+  logger.debug 'registering new job: ' + job.toString()
   j = new CronJob job.spec, -> job.run()
   j._job = job
   id = jobs.push j
@@ -13,7 +15,7 @@ exports.registerJob = (job) ->
 exports.unregisterJob = (id) ->
   if jobs[id]?
     job = jobs[id]._job
-    util.log 'unregistering job: ' + job.toString()
+    logger.debug 'unregistering job: ' + job.toString()
     delete jobs[id]
     jobs = jobs.filter (x) -> x?
   else
@@ -22,7 +24,7 @@ exports.unregisterJob = (id) ->
 exports.startJob = (id) ->
   if jobs[id]?
     job = jobs[id]._job
-    util.log 'starting job: ' + job.toString()
+    logger.debug 'starting job: ' + job.toString()
     jobs[id].start()
   else
     throw new Error 'No such job'
@@ -30,7 +32,7 @@ exports.startJob = (id) ->
 exports.stopJob = (id) ->
   if jobs[id]?
     job = jobs[id]._job
-    util.log 'stopping job: ' + job.toString()
+    logger.debug 'stopping job: ' + job.toString()
     jobs[id].stop()
   else
     throw new Error 'No such job'

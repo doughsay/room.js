@@ -3,6 +3,10 @@ _ = require 'underscore'
 util = require 'util'
 coffee = require 'coffee-script'
 
+log4js = require './logger'
+logger = log4js.getLogger 'context'
+logger.setLevel 'INFO'
+
 config = require '../config/app'
 mooUtil = require './util'
 mooBrowser = require './moo_browser'
@@ -126,14 +130,14 @@ class EvalContext extends Context
                             player.send(mooUtil.print x, depth)
                             true
 
-  run: (coffeeCode, extraArgs) ->
-    verbSpec =
-      compiledCode: (coffee.compile coffeeCode, {bare: true})
-      name: 'eval'
-    super verbSpec, extraArgs, true
-
   run: (coffeeCode, extraArgs, stack = false) ->
+    runner = '[server]'
+    if @player? and @player isnt @db.nothing
+      runner = @player.toString()
+
     try
+      start = new Date()
+
       if @memo.level > config.maxStack
         throw 'maximum stack depth reached'
 
@@ -148,21 +152,21 @@ class EvalContext extends Context
 
       @player.send mooUtil.print output
 
-      output
+      logger.debug "ran eval for #{runner} in #{new Date() - start}ms"
+      return output
+
     catch error
       source = 'eval'
-      runner = 'server'
 
       errorStr = error.toString()
 
       if @player? and @player isnt @db.nothing
-        runner = @player.toString()
         if stack and error.stack?
           @player.send error.stack.split('\n').map((line) -> "{inverse bold red|#{line}}").join('\n')
         else
           @player.send "{inverse bold red|#{errorStr} in '#{source}'}"
 
-      util.log "#{runner} caused exception: #{errorStr} in '#{source}'"
+      logger.warn "#{runner} caused exception: #{errorStr} in '#{source}'"
 
 class VerbContext extends Context
 
@@ -203,7 +207,13 @@ class VerbContext extends Context
           throw new Error 'verb has no \'super\''
 
   run: (verb, extraArgs, stack = false) ->
+    runner = '[server]'
+    if @player? and @player isnt @db.nothing
+      runner = @player.toString()
+
     try
+      start = new Date()
+
       if @memo.level > config.maxStack
         throw 'maximum stack depth reached'
 
@@ -212,28 +222,28 @@ class VerbContext extends Context
       else
         delete @context.args
 
-      if @memo.level is 1
+      output = if @memo.level is 1
         verb.script.runInContext @context, verb.name+'.vm', config.verbTimeout
       else
         verb.script.runInContext @context, verb.name+'.vm'
+
+      logger.debug "ran #{verb.name} for #{runner} in #{new Date() - start}ms"
+      return output
 
     catch error
       source = if @self? and @self isnt @db.nothing then [@self.toString()] else []
       source.push verb.name
       source = source.join '.'
 
-      runner = 'server'
-
       errorStr = error.toString()
 
       if @player? and @player isnt @db.nothing
-        runner = @player.toString()
         if stack and error.stack?
           @player.send error.stack.split('\n').map((line) -> "{inverse bold red|#{line}}").join('\n')
         else
           @player.send "{inverse bold red|#{errorStr} in '#{source}'}"
 
-      util.log "#{runner} caused exception: #{errorStr} in '#{source}'"
+      logger.warn "#{runner} caused exception: #{errorStr} in '#{source}'"
 
 
 runEval = (db, player, code) ->

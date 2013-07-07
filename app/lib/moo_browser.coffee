@@ -1,6 +1,8 @@
 # A simple wrapper around the http module, allowing moo code to GET (and later POST)
 http = require 'http'
-util = require 'util'
+
+log4js = require './logger'
+logger = log4js.getLogger 'moo browser'
 
 get = (host, path = '/', callback) ->
   throw new Error "No host specified" if not host?
@@ -17,13 +19,13 @@ get = (host, path = '/', callback) ->
       try
         callback?.call null, output.join ''
       catch error
-        util.log "Caught Exception in browser callback: #{error.toString()}"
+        logger.warn "Caught Exception in browser callback: #{error.toString()}"
 
   client.on 'error', (error) ->
     try
       callback?.call null, "{inverse bold red|#{error.toString()}}"
     catch error
-      util.log "Caught Exception in browser callback: #{error.toString()}"
+      logger.warn "Caught Exception in browser callback: #{error.toString()}"
 
   return undefined
 

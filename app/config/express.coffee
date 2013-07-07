@@ -4,6 +4,9 @@ connect = require 'connect'
 conf = require './app'
 assets = require './assets'
 
+log4js = require '../lib/logger'
+logger = log4js.getLogger 'server'
+
 cwd = process.cwd()
 
 module.exports = (app) ->
@@ -14,7 +17,7 @@ module.exports = (app) ->
     app.set 'views', "#{cwd}/app/views"
     app.set 'view engine', 'jade'
 
-    app.use express.logger('short')
+    app.use log4js.connectLogger logger, level: 'auto', format: ':method :url :status - :response-time ms'
     # app.use connect.compress()
     app.use express.favicon "#{cwd}/assets/img/favicon.ico"
     app.use assets

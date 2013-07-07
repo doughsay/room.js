@@ -1,4 +1,5 @@
-util = require 'util'
+log4js = require '../lib/logger'
+logger = log4js.getLogger 'socket'
 
 phash = require('../lib/hash').phash
 
@@ -57,7 +58,7 @@ module.exports = class Editor
     @db.removeListener 'verbDeleted', @verbDeleted
     @db.removeListener 'verbUpdated', @verbUpdated
 
-    util.log "editor disconnected"
+    logger.info "editor disconnected"
 
   ####################
   # Editor callbacks #
