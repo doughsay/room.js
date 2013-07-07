@@ -127,6 +127,7 @@ class @ClientView
     @fancy.subscribe => @saveOptions()
     @macros.subscribe => @saveOptions()
 
+    @connectionStatus = ko.observable 'disconnected'
     @socket = io.connect(window.location.href+'client')
     @attachListeners()
     @focusInput()
@@ -214,8 +215,10 @@ class @ClientView
         @truncateHistory()
       @currentHistory = -1
       if not @clientCommand command
+        if not @socket.socket.connected
+          @addLine '{bold red|Not connected.}'
         # if an input callback is waiting, send it to that, otherwise, send it to the server
-        if @inputCallback?
+        else if @inputCallback?
           @inputCallback command
           @inputCallback = null
         else
@@ -224,14 +227,21 @@ class @ClientView
 
   # simple client-side commands
   clientCommand: (command) ->
-    if command == 'clear'
-      @lines []
-      true
-    else if command == 'toasty!'
-      toasty()
-      true
-    else
-      false
+    switch command
+      when 'clear'
+        @lines []
+        true
+      when 'connect'
+        @reconnectSocket()
+        true
+      when 'disconnect'
+        @disconnectSocket()
+        true
+      when 'toasty!'
+        toasty()
+        true
+      else
+        false
 
   # given a javascript event for the 'up' or 'down' keys
   # scroll through history and fill the input box with
@@ -257,35 +267,63 @@ class @ClientView
       else
         true
 
+  reconnectSocket: ->
+    if @socket.socket.connected
+      @addLine '{bold red|Already connected.}'
+    else
+      @socket.socket.reconnect()
+
+  disconnectSocket: ->
+    if @socket.socket.connected
+      @socket.socket.disconnect()
+    else
+      @addLine '{bold red|Not connected.}'
+
+  toggleConnection: ->
+    old_command = @command()
+    if @socket.socket.connected
+      @command 'disconnect'
+    else
+      @command 'connect'
+    @sendCommand()
+    @command old_command
+
   #############################
   # websocket event listeners #
   #############################
 
   connect: =>
     @addLine '{bold green|Connected!}'
+    @connectionStatus 'connected'
 
   connecting: =>
     @addLine '{gray|Connecting...}'
+    @connectionStatus 'connecting'
 
   disconnect: =>
     @addLine '{bold red|Disconnected from server.}'
-    @loadedVerb null
     @form null
+    @inputCallback = null
+    @connectionStatus 'disconnected'
 
   connect_failed: =>
     @addLine '{bold red|Connection to server failed.}'
+    @connectionStatus 'dicconnected'
 
   error: =>
     @addLine '{bold red|An unknown error occurred.}'
+    @connectionStatus 'disconnected'
 
   reconnect_failed: =>
     @addLine '{bold red|Unable to reconnect to server.}'
+    @connectionStatus 'disconnected'
 
   reconnect: =>
   #  @addLine '{bold green|Reconnected!}'
 
   reconnecting: =>
     @addLine '{gray|Attempting to reconnect...}'
+    @connectionStatus 'connecting'
 
   # output event
   # adds a line of output to the screen

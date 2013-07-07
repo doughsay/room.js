@@ -50,6 +50,15 @@
     border-top-color: @_light_black;
     i {
       color: @_light_white;
+      &.connected {
+        color: @_light_green;
+      }
+      &.disconnected {
+        color: @_light_red;
+      }
+      &.connecting {
+        color: @_light_orange;
+      }
     }
     form {
       .prompt {
