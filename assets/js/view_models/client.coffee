@@ -1,3 +1,19 @@
+class Macro
+
+  constructor: (@view, macro = {replace: '', withValue: ''}) ->
+    @replace = ko.observable macro.replace
+    @withValue = ko.observable macro.withValue
+
+    @replace.subscribe => @view.saveOptions()
+    @withValue.subscribe => @view.saveOptions()
+
+  serialize: ->
+    replace: @replace()
+    withValue: @withValue()
+
+  remove: ->
+    @view.macros.remove @
+
 # Knockout.js view model for the room.js client
 class @ClientView
 
@@ -32,15 +48,25 @@ class @ClientView
   inputCallback: null
 
   loadOptions: ->
-    defaultOptions =
-      maxLines: 1000
-      maxHistory: 1000
-      echo: true
-      space: true
-      theme: 'tango'
-      fancy: true
 
-    store.get('client_options') or defaultOptions
+    defaultMacros = [
+      {replace: '"', withValue: 'say'},
+      {replace: ':', withValue: 'emote'},
+      {replace: ';', withValue: 'eval'}
+    ]
+
+    o = store.get('client_options') or {}
+
+    options =
+      maxLines:   o.maxLines   or 1000
+      maxHistory: o.maxHistory or 1000
+      echo:       o.echo       or true
+      space:      o.space      or true
+      theme:      o.theme      or 'tango'
+      fancy:      o.fancy      or true
+      macros:     o.macros     or defaultMacros
+
+    return options
 
   saveOptions: ->
     store.set 'client_options',
@@ -50,6 +76,18 @@ class @ClientView
       space: @space()
       theme: @theme()
       fancy: @fancy()
+      macros: @macros().map (macro) -> macro.serialize()
+
+  addMacro: ->
+    @macros.push new Macro @
+    @setSizes()
+
+  applyMacros: (command) ->
+    for macro in @macros()
+      if command.indexOf(macro.replace()) is 0
+        command = command.replace macro.replace(), macro.withValue() + ' '
+        break;
+    return command
 
   # construct the view model
   constructor: (@body, @client, @screen, @input) ->
@@ -66,6 +104,7 @@ class @ClientView
     @space      = ko.observable options.space      # whether or not to put space between each piece of server output
     @theme      = ko.observable options.theme      # the color theme to use
     @fancy      = ko.observable options.fancy      # whether or not to use text-shadows, drop-shadows and rounded edges
+    @macros     = ko.observableArray options.macros.map (macro) => new Macro @, macro
 
     @preferencesPaneVisible = ko.observable false
 
@@ -86,6 +125,7 @@ class @ClientView
     @space.subscribe => @saveOptions()
     @theme.subscribe => @saveOptions()
     @fancy.subscribe => @saveOptions()
+    @macros.subscribe => @saveOptions()
 
     @socket = io.connect(window.location.href+'client')
     @attachListeners()
@@ -130,6 +170,8 @@ class @ClientView
     @input.width($(window).width() - inputWidthDiff - $('.prompt').outerWidth() - optionsWidth)
     @screen.height($(window).height() - @input.outerHeight() - 2)
 
+    $('.options').height($(window).height())
+
   # scroll the screen to the bottom
   scrollToBottom: ->
     @screen.scrollTop(@screen[0].scrollHeight);
@@ -162,7 +204,7 @@ class @ClientView
   # and add it to the command history
   sendCommand: ->
     command = @command()
-    escapedCommand = escapeBrackets command
+    escapedCommand = escapeBrackets @applyMacros command
     if command
       if @echo()
         @addLine "\n" if @space()

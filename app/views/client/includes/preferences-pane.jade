@@ -3,6 +3,11 @@
     h2
       i.icon-wrench
       |&nbsp;Client Preferences
+
+    .alert.alert-info
+      strong Note:
+      |&nbsp;Preferences are stored locally in your browser.
+
     .control-group
       label.control-label(for='theme') Theme
       .controls
@@ -30,6 +35,28 @@
       .controls
         input#maxLines(type='number', data-bind='value: maxLines')
 
-    .alert.alert-info
-      strong Note:
-      |&nbsp;Preferences are stored locally in your browser.
+  .row-fluid
+    h3 Macros
+
+    table.table.table-striped.table-condensed
+      thead
+        tr
+          th Replace
+          th With
+          th
+      tbody(data-bind='foreach: macros')
+        tr
+          td
+            input(type='text', data-bind='value: replace')
+          td
+            input(type='text', data-bind='value: withValue')
+          td
+            button.btn.btn-mini.btn-danger(data-bind='click: remove')
+              i.icon-remove
+
+        //- tr(data-bind='visible: macros().length == 0')
+        //-   td(colspan=2) You have no macros defined.
+
+    button.btn.btn-mini.btn-primary(data-bind='click: addMacro')
+      i.icon-plus
+      |&nbsp;Add macro
