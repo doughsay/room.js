@@ -1,7 +1,5 @@
 # Harmony proxy for RoomJsObject within a verb or eval context
 
-contextModule = require('./context')
-
 module.exports = (obj, context) ->
 
   keys = (own = false) ->
@@ -146,45 +144,40 @@ module.exports = (obj, context) ->
               obj.setProp name, o
           else if (verb = obj.findVerbByName name)
             fn = ->
-              contextModule.runVerb context.db,
-                context.player,
+              context.runVerb context.vmContext.stack[0].player,
                 verb, obj,
-                context.context.dobj,
-                context.context.iobj,
-                verb.propName(), context.context.argstr,
-                context.context.dobjstr,
-                context.context.prepstr,
-                context.context.iobjstr,
-                Array.prototype.slice.call(arguments),
-                context.memo
+                context.vmContext.stack[0].dobj,
+                context.vmContext.stack[0].iobj,
+                verb.propName(),
+                context.vmContext.stack[0].argstr,
+                context.vmContext.stack[0].dobjstr,
+                context.vmContext.stack[0].prepstr,
+                context.vmContext.stack[0].iobjstr,
+                Array.prototype.slice.call(arguments)
             fn.verb = true
             fn.toString = -> verb.code
             fn.call = (x) ->
-              contextModule.runVerb context.db,
-                context.player,
-                verb, obj,
-                context.context.dobj,
-                context.context.iobj,
-                verb.propName(), context.context.argstr,
-                context.context.dobjstr,
-                context.context.prepstr,
-                context.context.iobjstr,
-                Array.prototype.slice.call(arguments)[1..],
-                context.memo,
-                x
+              context.runVerb context.vmContext.stack[0].player,
+                verb, x,
+                context.vmContext.stack[0].dobj,
+                context.vmContext.stack[0].iobj,
+                verb.propName(),
+                context.vmContext.stack[0].argstr,
+                context.vmContext.stack[0].dobjstr,
+                context.vmContext.stack[0].prepstr,
+                context.vmContext.stack[0].iobjstr,
+                Array.prototype.slice.call(arguments)[1..]
             fn.apply = (x) ->
-              contextModule.runVerb context.db,
-                context.player,
-                verb, obj,
-                context.context.dobj,
-                context.context.iobj,
-                verb.propName(), context.context.argstr,
-                context.context.dobjstr,
-                context.context.prepstr,
-                context.context.iobjstr,
-                Array.prototype.slice.call(arguments)[1],
-                context.memo,
-                x
+              context.runVerb context.vmContext.stack[0].player,
+                verb, x,
+                context.vmContext.stack[0].dobj,
+                context.vmContext.stack[0].iobj,
+                verb.propName(),
+                context.vmContext.stack[0].argstr,
+                context.vmContext.stack[0].dobjstr,
+                context.vmContext.stack[0].prepstr,
+                context.vmContext.stack[0].iobjstr,
+                Array.prototype.slice.call(arguments)[1]
             fn.hidden = verb.hidden
             fn
           else

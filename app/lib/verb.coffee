@@ -5,15 +5,7 @@ vm = require 'vm'
 
 # A RoomJsVerb is a js function which runs in a sandboxed context
 exports.RoomJsVerb = class
-  # @name: String
-  # @hidden: Bool
-  # @aliases: Array[String]
-  # @dobjarg: String
-  # @preparg: String
-  # @iobjarg: String
-  # @code: String
-  # @lang: String
-  # @compiledCode: String
+
   constructor: (verb, @object) ->
     @name = verb.name
     @hidden = verb.hidden
@@ -95,15 +87,15 @@ exports.RoomJsVerb = class
     switch @lang
       when 'coffeescript'
         """
-        (->
+        ((player, dobj, iobj, verb, argstr, args, dobjstr, prepstr, iobjstr, pass) ->
         #{@code.split('\n').map((line) -> '  ' + line).join('\n')}
-        ).call(self)
+        ).call(stack[0].self, stack[0].player, stack[0].dobj, stack[0].iobj, stack[0].verb, stack[0].argstr, stack[0].args, stack[0].dobjstr, stack[0].prepstr, stack[0].iobjstr, stack[0].pass)
         """
       when 'javascript'
         """
-        (function() {
+        (function(player, dobj, iobj, verb, argstr, args, dobjstr, prepstr, iobjstr, pass) {
         #{@code}
-        }).call(self);
+        }).call(stack[0].self, stack[0].player, stack[0].dobj, stack[0].iobj, stack[0].verb, stack[0].argstr, stack[0].args, stack[0].dobjstr, stack[0].prepstr, stack[0].iobjstr, stack[0].pass);
         """
       else
         throw new Error 'invalid verb language:', @lang

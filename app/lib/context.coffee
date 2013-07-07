@@ -1,11 +1,9 @@
 vm = require 'vm'
 _ = require 'underscore'
-util = require 'util'
 coffee = require 'coffee-script'
 
 log4js = require './logger'
 logger = log4js.getLogger 'context'
-logger.setLevel 'INFO'
 
 config = require '../config/app'
 mooUtil = require './util'
@@ -15,32 +13,32 @@ parse = require('./parser').parse
 contextProxyFor = require './context_proxy'
 proxies = require './helper_proxies'
 
-class Context
+module.exports = class Context
 
-  constructor: (@db, @player, @memo = {}) ->
+  constructor: (@db) ->
 
-    if not @memo.context?
+    @memo = {}
 
-      base =
-        eval:       undefined
-        $:          (id) => @contextify @db.findById(id)
-        player:     if @player? then @contextify @player else @contextify @db.nothing
-        players:    => @db.players.map (player) => @contextify player
-        browser:    mooBrowser
-        parse:      parse
-        match:      (search = '') => (@db.mooMatch search, @player).map (o) => @contextify o
-        do_verb:    (object, verb, time, args = []) => @do_verb object, verb, time, args
-        list:       => @db.list().map (o) => @contextify o
-        search:     (search) => @db.search(search).map (o) => @contextify o
-        rm:         (idOrObject) =>
-                      if idOrObject?.proxy?
-                        @db.rm idOrObject.id
-                      else
-                        @db.rm idOrObject
+    base =
+      eval:       undefined
+      Proxy:      undefined
+      stack:      []
+      $:          (id) => @contextify @db.findById(id)
+      players:    => @db.players.map (player) => @contextify player
+      browser:    mooBrowser
+      parse:      parse
+      match:      (search = '') => (@db.mooMatch search, @player).map (o) => @contextify o
+      schedule:   (object, verb, seconds, args = []) => @schedule object, verb, seconds, args
+      cancel:     (id) => @cancel id
+      list:       => @db.list().map (o) => @contextify o
+      search:     (search) => @db.search(search).map (o) => @contextify o
+      rm:         (idOrObject) =>
+                    if idOrObject?.proxy?
+                      @db.rm idOrObject.id
+                    else
+                      @db.rm idOrObject
 
-      @memo.context = vm.createContext _.extend @globals(), base
-
-    @context = @memo.context
+    @vmContext = vm.createContext _.extend @globals(), base
 
   deserialize: (x, cb = (->), top = true) =>
     switch typeof x
@@ -105,165 +103,139 @@ class Context
   decontextify: (contextObj) ->
     @db.findById contextObj?.id
 
-  run: ->
-    throw new Error 'run must be overridden'
+  popStack: -> @vmContext.stack.shift()
 
-  do_verb: (mooObject, verbName, time, args) ->
+  pushEvalStackVars: (player) ->
+    newStack =
+      player : if player? then @contextify player else @contextify @db.nothing
+      ls     : (x, depth = 2) -> player.send(mooUtil.print x, depth); return true
+
+    @vmContext.stack.unshift newStack
+
+  runEval: (player, coffeeCode, stack = false) ->
+
+    start = new Date()
+    wrappedCode = """
+    ((player, ls) ->
+      #{coffeeCode}
+    ).call(stack[0].player, stack[0].player, stack[0].ls)
+    """
+
+    @pushEvalStackVars player
+
+    @memo.level = 0 if not @memo.level?
+    @memo.level += 1
+
+    output = undefined
+    source = '[eval]'
+    runner = '[server]'
+    if player? and player isnt @db.nothing
+      runner = player.toString()
+
+    try
+      code = coffee.compile wrappedCode, bare: true
+      output = vm.runInContext code, @vmContext, 'eval.vm', config.verbTimeout
+      player.send mooUtil.print output
+    catch error
+      errorStr = error.toString()
+
+      if player? and player isnt @db.nothing
+        if stack and error.stack?
+          player.send error.stack.split('\n').map((line) -> "{inverse bold red|#{line}}").join('\n')
+        else
+          player.send "{inverse bold red|#{errorStr} in #{source}}"
+
+      logger.warn "#{runner} caused exception: #{errorStr} in #{source}"
+
+    @memo.level -= 1
+    if @memo.level is 0
+      delete @memo.level
+
+    @popStack()
+
+    logger.debug "#{runner} ran #{source} in #{new Date() - start}ms"
+    return output
+
+  pushVerbStackVars: (player, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr) ->
+
+    newStack =
+      player  : if player? then @contextify player else @contextify @db.nothing
+      self    : if self? then @contextify self else @contextify @db.nothing
+      dobj    : if dobj? then @contextify dobj else @contextify @db.nothing
+      iobj    : if iobj? then @contextify iobj else @contextify @db.nothing
+      verb    : verbstr
+      argstr  : argstr
+      args    : if argstr? then argstr.split ' ' else []
+      dobjstr : dobjstr
+      prepstr : prepstr
+      iobjstr : iobjstr
+      pass    : =>
+        thisVerb = self.findVerbByName verbstr
+        thisObject = thisVerb.object
+        superObject = thisObject.parent()
+        superVerb = superObject?.findVerbByName verbstr
+        if superVerb?
+          @runVerb player, superVerb, self, dobj, iobj, superVerb.propName(), argstr, dobjstr, prepstr, iobjstr, Array.prototype.slice.call(arguments)
+        else
+          throw new Error 'verb has no \'super\''
+
+    @vmContext.stack.unshift newStack
+
+  runVerb: (player, verb, self, dobj, iobj, verbstr, argstr = '', dobjstr, prepstr, iobjstr, extraArgs, stack = false) ->
+
+    start = new Date()
+    @pushVerbStackVars player, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr
+
+    @memo.level = 0 if not @memo.level?
+    @memo.level += 1
+
+    output = undefined
+    source = if self? and self isnt @db.nothing then [self.toString()] else []
+      source.push verb.name
+      source = source.join '.'
+    runner = '[server]'
+    if player? and player isnt @db.nothing
+      runner = player.toString()
+
+    try
+      if @memo.level > config.maxStack
+        throw 'maximum stack depth reached'
+
+      if extraArgs?
+        @vmContext.stack[0].args = extraArgs
+
+      output = if @memo.level is 1
+        verb.script.runInContext @vmContext, verb.name+'.vm', config.verbTimeout
+      else
+        verb.script.runInContext @vmContext, verb.name+'.vm'
+
+    catch error
+      errorStr = error.toString()
+
+      if player? and player isnt @db.nothing
+        if stack and error.stack?
+          player.send error.stack.split('\n').map((line) -> "{inverse bold red|#{line}}").join('\n')
+        else
+          player.send "{inverse bold red|#{errorStr} in '#{source}'}"
+
+      logger.warn "#{runner} caused exception: #{errorStr} in '#{source}'"
+
+    @memo.level -= 1
+    if @memo.level is 0
+      delete @memo.level
+
+    @popStack()
+
+    logger.debug "#{runner} ran #{source} in #{new Date() - start}ms"
+    return output
+
+  schedule: (mooObject, verbName, seconds, args) ->
     object = @decontextify mooObject
     verb = object.findVerbByName verbName
 
     setTimeout((=>
-      newContext = new VerbContext(
-        @db, null, object, null, null,
-        verbName, undefined, undefined, undefined, undefined, @memo)
-      newContext.run verb, args
-    ), time)
+      @runVerb null, verb, object, undefined, undefined, verbName, undefined, undefined, undefined, undefined, args
+    ), seconds*1000)
 
-    true
-
-class EvalContext extends Context
-
-  constructor: (@db, player) ->
-    super @db, player
-
-    @context.ls         = (x, depth = 2) ->
-                            player.send(mooUtil.print x, depth)
-                            true
-
-  run: (coffeeCode, extraArgs, stack = false) ->
-    runner = '[server]'
-    if @player? and @player isnt @db.nothing
-      runner = @player.toString()
-
-    try
-      start = new Date()
-
-      if @memo.level > config.maxStack
-        throw 'maximum stack depth reached'
-
-      code = coffee.compile coffeeCode, bare: true
-
-      if extraArgs?
-        @context.args = extraArgs
-      else
-        delete @context.args
-
-      output = vm.runInNewContext code, @context, 'eval.vm', config.verbTimeout
-
-      @player.send mooUtil.print output
-
-      logger.debug "ran eval for #{runner} in #{new Date() - start}ms"
-      return output
-
-    catch error
-      source = 'eval'
-
-      errorStr = error.toString()
-
-      if @player? and @player isnt @db.nothing
-        if stack and error.stack?
-          @player.send error.stack.split('\n').map((line) -> "{inverse bold red|#{line}}").join('\n')
-        else
-          @player.send "{inverse bold red|#{errorStr} in '#{source}'}"
-
-      logger.warn "#{runner} caused exception: #{errorStr} in '#{source}'"
-
-class VerbContext extends Context
-
-  constructor: (@db, player, self, dobj, iobj, verb, argstr, dobjstr, prepstr, iobjstr, memo = {}, selfOverride) ->
-    super @db, player, memo
-
-    @self = if self? then self else @db.nothing
-
-    @context.dobj    = if dobj? then @contextify dobj else @contextify @db.nothing
-    @context.iobj    = if iobj? then @contextify iobj else @contextify @db.nothing
-    @context.verb    = verb
-    @context.argstr  = argstr
-    @context.args    = if argstr? then argstr.split ' ' else ''
-    @context.dobjstr = dobjstr
-    @context.prepstr = prepstr
-    @context.iobjstr = iobjstr
-    @context.self    = @contextify selfOverride or @self
-
-    if self?
-      @context.pass  = =>
-        thisVerb = self.findVerbByName verb
-        thisObject = thisVerb.object
-        superObject = thisObject.parent()
-        superVerb = superObject?.findVerbByName verb
-        if superVerb?
-          runVerb @db,
-            @player,
-            superVerb, self,
-            @context.dobj,
-            @context.iobj,
-            superVerb.propName(), @context.argstr,
-            @context.dobjstr,
-            @context.prepstr,
-            @context.iobjstr,
-            Array.prototype.slice.call(arguments),
-            @memo
-        else
-          throw new Error 'verb has no \'super\''
-
-  run: (verb, extraArgs, stack = false) ->
-    runner = '[server]'
-    if @player? and @player isnt @db.nothing
-      runner = @player.toString()
-
-    try
-      start = new Date()
-
-      if @memo.level > config.maxStack
-        throw 'maximum stack depth reached'
-
-      if extraArgs?
-        @context.args = extraArgs
-      else
-        delete @context.args
-
-      output = if @memo.level is 1
-        verb.script.runInContext @context, verb.name+'.vm', config.verbTimeout
-      else
-        verb.script.runInContext @context, verb.name+'.vm'
-
-      logger.debug "ran #{verb.name} for #{runner} in #{new Date() - start}ms"
-      return output
-
-    catch error
-      source = if @self? and @self isnt @db.nothing then [@self.toString()] else []
-      source.push verb.name
-      source = source.join '.'
-
-      errorStr = error.toString()
-
-      if @player? and @player isnt @db.nothing
-        if stack and error.stack?
-          @player.send error.stack.split('\n').map((line) -> "{inverse bold red|#{line}}").join('\n')
-        else
-          @player.send "{inverse bold red|#{errorStr} in '#{source}'}"
-
-      logger.warn "#{runner} caused exception: #{errorStr} in '#{source}'"
-
-
-runEval = (db, player, code) ->
-  context = new EvalContext db, player
-  memo = context.memo
-  memo.level = 0 if not memo.level?
-  memo.level += 1
-  val = context.run code
-  memo.level -= 1
-  val
-
-runVerb = (db, player, verb, self, dobj = db.nothing, iobj = db.nothing, verbstr, argstr, dobjstr, prepstr, iobjstr, extraArgs, memo = {}, selfOverride) ->
-  memo.level = 0 if not memo.level?
-  memo.level += 1
-  context = new VerbContext(
-    db, player, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr, memo, selfOverride)
-  val = context.run verb, extraArgs
-  memo.level -= 1
-  val
-
-exports.runVerb = runVerb
-exports.runEval = runEval
-exports.VerbContext = VerbContext
+  cancel: (id) ->
+    clearTimeout id

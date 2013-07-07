@@ -5,7 +5,6 @@ phash = require('../lib/hash').phash
 parse = require('../lib/parser').parse
 
 formDescriptors = require '../lib/forms'
-context = require '../lib/context'
 
 
 # A Client represents a socket.io connection from the web client.
@@ -13,7 +12,7 @@ context = require '../lib/context'
 module.exports = class Client
 
   # welcome the socket and attach the event listeners
-  constructor: (@db, @socket) ->
+  constructor: (@db, @context, @socket) ->
     @socket.emit 'output', """
       Welcome to {blue bold|room.js}!
       Type {magenta bold|help} for a list of available commands.
@@ -34,7 +33,7 @@ module.exports = class Client
 
     verb = @db.sys.findVerbByName verbToRun
     if verb?
-      context.runVerb @db, @player, verb, @db.sys
+      @context.runVerb @player, verb, @db.sys
     logger.info "#{@player.toString()} connected"
 
   # disconnect a player
@@ -42,7 +41,7 @@ module.exports = class Client
     @player.lastActivity = new Date()
     verb = @db.sys.findVerbByName 'player_disconnected'
     if verb?
-      context.runVerb @db, @player, verb, @db.sys
+      @context.runVerb @player, verb, @db.sys
     @player.socket = null
     if force
       @socket.disconnect()
@@ -63,7 +62,7 @@ module.exports = class Client
 
   # fires when a socket sends a command
   onInput: (userStr) =>
-    str = userStr || ""
+    str = userStr.trim() || ""
 
     if @player?
       @player.lastActivity = new Date()
@@ -95,7 +94,7 @@ module.exports = class Client
 
     if command.verb == 'eval' and @player.programmer
       code = command.argstr.replace(/\\\{/g, '{').replace(/\\\}/g, '}')
-      context.runEval @db, @player, code
+      @context.runEval @player, code
     else if command.verb in ['logout', 'quit']
       @disconnect()
       @socket.emit 'output', 'You have been logged out.'
@@ -108,12 +107,12 @@ module.exports = class Client
 
       if matchedVerb?
         {verb: verb, self: self} = matchedVerb
-        context.runVerb @db, @player, verb, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr
+        @context.runVerb @player, verb, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr
       else
         huhVerb = @player.location()?.findVerbByName 'huh'
         if huhVerb?
           self = @player.location()
-          context.runVerb @db, @player, huhVerb, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr
+          @context.runVerb @player, huhVerb, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr
         else
           @player.send "{gray|I didn't understand that.}"
 
