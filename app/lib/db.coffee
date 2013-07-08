@@ -21,7 +21,7 @@ module.exports = class Db extends EventEmitter
   objects: {}
   players: []
 
-  constructor: (@filename) ->
+  constructor: (@filename, @getContext) ->
     if fs.existsSync @filename
       {nextId: @_nextId, objects: dbObjects} = JSON.parse fs.readFileSync @filename
     else

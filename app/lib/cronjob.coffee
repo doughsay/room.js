@@ -2,7 +2,6 @@ _ = require 'underscore'
 
 log4js = require './logger'
 logger = log4js.getLogger 'cron'
-logger.setLevel 'INFO'
 
 Cron = require './cron'
 
@@ -17,8 +16,9 @@ class RoomJsCronJob
   run: ->
     logger.debug 'running job: ' + @toString()
     verb = @object.findVerbByName @verb
-    # if verb?
-    #   context.runVerb null, verb, @object
+    context = @db.getContext()
+    if verb? and context? # context may not have been initialized yet
+      context.runVerb null, verb, @object
 
   enable: ->
     if not @enabled

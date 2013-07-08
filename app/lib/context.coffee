@@ -128,9 +128,7 @@ module.exports = class Context
 
     output = undefined
     source = '[eval]'
-    runner = '[server]'
-    if player? and player isnt @db.nothing
-      runner = player.toString()
+    runner = player.toString()
 
     try
       code = coffee.compile wrappedCode, bare: true
@@ -139,11 +137,10 @@ module.exports = class Context
     catch error
       errorStr = error.toString()
 
-      if player? and player isnt @db.nothing
-        if stack and error.stack?
-          player.send error.stack.split('\n').map((line) -> "{inverse bold red|#{line}}").join('\n')
-        else
-          player.send "{inverse bold red|#{errorStr} in #{source}}"
+      if stack and error.stack?
+        player.send error.stack.split('\n').map((line) -> "{inverse bold red|#{line}}").join('\n')
+      else
+        player.send "{inverse bold red|#{errorStr} in #{source}}"
 
       logger.warn "#{runner} caused exception: #{errorStr} in #{source}"
 
@@ -190,11 +187,9 @@ module.exports = class Context
     @memo.level += 1
 
     output = undefined
-    source = if self? and self isnt @db.nothing then [self.toString()] else []
-      source.push verb.name
-      source = source.join '.'
+    source = (if self? and self isnt @db.nothing then [self.toString(), verb.name] else [verb.name]).join '.'
     runner = '[server]'
-    if player? and player isnt @db.nothing
+    if player? and player.id isnt -1 # nothing
       runner = player.toString()
 
     try

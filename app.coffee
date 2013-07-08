@@ -21,14 +21,18 @@ env = app.settings.env
 
 # create the http and socket.io server
 server = require('http').createServer app
-io = require('socket.io').listen server, {logger: socketLogger, 'log level': log4js.levels.INFO}
+io = require('socket.io').listen server, logger: socketLogger, 'log level': log4js.levels[config.logLevel]
 
 # set up web controller
 require('./app/controllers/index')(app)
 
+# db needs a reference to context, but context needs db to initialize
+context = null
+getContext = -> context
+
 # load the room.js database
 Db = require './app/lib/db'
-db = new Db config.dbFile
+db = new Db config.dbFile, getContext
 
 # create the context to run eval code and verbs in
 Context = require './app/lib/context'
