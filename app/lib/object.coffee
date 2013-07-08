@@ -11,13 +11,6 @@ PARTIAL_MATCH = 2
 
 # A RoomJsObject has properties and RoomJsVerbs
 exports.RoomJsObject = class RoomJsObject extends EventEmitter
-  # @id: Int
-  # @parent_id: Int
-  # @name: String
-  # @aliases: Array[String]
-  # @location_id: Int
-  # @properties: Array[Object]
-  # @verbs: Array[RoomJsVerb]
 
   constructor: (dbObject, @db) ->
     @id = dbObject.id

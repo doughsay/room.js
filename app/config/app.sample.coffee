@@ -10,3 +10,5 @@ module.exports =
   dbFile: 'db.json'
   verbTimeout: 1000
   maxStack: 40
+
+  logLevel: 'INFO' # TRACE, DEBUG, INFO, WARN, ERROR, FATAL

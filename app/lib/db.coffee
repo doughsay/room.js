@@ -6,7 +6,6 @@ log4js = require './logger'
 logger = log4js.getLogger 'db'
 
 mooUtil = require './util'
-context = require './context'
 
 RoomJsObject = require('./object').RoomJsObject
 RoomJsPlayer = require('./player').RoomJsPlayer
@@ -18,13 +17,11 @@ PARTIAL_MATCH = 2
 
 # A Db is a collection of RoomJsObjects
 module.exports = class Db extends EventEmitter
-  # @objects: Array[RoomJsObject]
-  # @players: Array[RoomJsPlayer]
 
   objects: {}
   players: []
 
-  constructor: (@filename) ->
+  constructor: (@filename, @getContext) ->
     if fs.existsSync @filename
       {nextId: @_nextId, objects: dbObjects} = JSON.parse fs.readFileSync @filename
     else
@@ -44,11 +41,6 @@ module.exports = class Db extends EventEmitter
     logger.info "#{@filename} loaded in #{mooUtil.tend startTime}" if not @quiet
 
     @saveInterval = setInterval @save, 5*60*1000
-
-    # call server started verb
-    verb = @sys.findVerbByName 'server_started'
-    if verb?
-      context.runVerb @, null, verb, @sys
 
     process.on 'exit', => @exit()
 
