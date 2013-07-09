@@ -60,10 +60,10 @@ class @ClientView
     options =
       maxLines:   o.maxLines   or 1000
       maxHistory: o.maxHistory or 1000
-      echo:       o.echo       or true
-      space:      o.space      or true
+      echo:       if o.echo?   then o.echo  else true
+      space:      if o.space?  then o.space else true
       theme:      o.theme      or 'tango'
-      fancy:      o.fancy      or true
+      fancy:      if o.fancy?  then o.fancy else true
       macros:     o.macros     or defaultMacros
 
     return options
@@ -90,7 +90,15 @@ class @ClientView
     return command
 
   # construct the view model
-  constructor: (@body, @client, @screen, @input) ->
+  constructor: ->
+    @body        = $ 'body'
+    @client      = $ '.client'
+    @terminal    = $ '.terminal'
+    @screen      = $ '.screen'
+    @input       = $ '.command input'
+    @prompt      = $ '.prompt'
+    @optionsPane = $ '.options'
+
     @lines      = ko.observableArray []
     @command    = ko.observable ""
     @form       = ko.observable null
@@ -164,14 +172,20 @@ class @ClientView
 
   # apply proper sizes to the input and the screen div
   setSizes: ->
-    optionsWidth = if @preferencesPaneVisible() then $('.options').outerWidth() else 0
-    @client.width($(window).width() - optionsWidth)
+    gutter = 50
+
+    @client.width $(window).outerWidth() - gutter
+    @client.height $(window).outerHeight() - gutter
+
+    optionsWidth = if @preferencesPaneVisible() then @optionsPane.outerWidth() else 0
+    @terminal.width(@client.width() - optionsWidth)
+    @terminal.height(@client.height())
 
     inputWidthDiff = @input.outerWidth() - @input.width()
-    @input.width($(window).width() - inputWidthDiff - $('.prompt').outerWidth() - optionsWidth)
-    @screen.height($(window).height() - @input.outerHeight() - 2)
+    @input.width(@client.width() - inputWidthDiff - @prompt.outerWidth() - optionsWidth)
+    @screen.height(@client.height() - @input.outerHeight() - 2)
 
-    $('.options').height($(window).height())
+    @optionsPane.height(@client.height())
 
   # scroll the screen to the bottom
   scrollToBottom: ->

@@ -15,68 +15,117 @@ input[type="radio"] {
 
 body {
   margin: 0;
-}
+  overflow: hidden;
 
-.cloak {
-  display: none;
-}
-
-.options {
-  float: right;
-  overflow: auto;
-}
-
-.screen {
-  font-family: 'Source Code Pro', sans-serif;
-  font-size: 12pt;
-  overflow: auto;
-  padding-left: 4px;
-  div {
-    white-space: pre-wrap;
+  .cloak {
+    display: none;
   }
-}
 
-.command {
-  position: relative;
-  border-top: 2px solid transparent;
-  i {
-    position: absolute;
-    top: 5px;
-    z-index: 100;
-    cursor: pointer;
+  .client {
+    padding: 25px;
 
-    &.icon-wrench {
-      right: 10px;
-    }
-    &.icon-off {
-      right: 30px;
-    }
-  }
-  form {
-    margin: 0;
-    .prompt {
-      float: left;
-      padding: 2px 4px;
-      font-family: 'Source Code Pro', sans-serif;
-      font-size: 12pt;
-    }
-    input {
-      position: absolute;
-      margin: 0;
-      border: none;
-      padding: 2px 4px;
-      font-family: 'Source Code Pro', sans-serif;
-      font-size: 12pt;
-      border-radius: 0;
-      -webkit-border-radius: 0;
-      -moz-border-radius: 0;
-      box-shadow: none !important;
-      -webkit-box-shadow: none !important;
-      -moz-box-shadow: none !important;
+    .wrapper {
+      -webkit-box-shadow: 0px 0px 20px rgba(0, 0, 0, 1);
+      -moz-box-shadow:    0px 0px 20px rgba(0, 0, 0, 1);
+      box-shadow:         0px 0px 20px rgba(0, 0, 0, 1);
 
-      &:focus {
-        outline: none;
+      .options {
+        float: right;
+        overflow: auto;
+        font-family: 'Source Code Pro', sans-serif;
+
+        input, select {
+          font-family: 'Source Code Pro', sans-serif;
+          font-weight: bold;
+        }
+
+        table {
+          margin-bottom: 9px;
+
+          tr {
+            td {
+              input {
+                margin-bottom: 0;
+              }
+
+              &.actions {
+                padding-top: 7px;
+              }
+            }
+          }
+        }
+
+        button.btn-primary {
+          margin-right: 5px;
+        }
+      } // options
+
+      .modal {
+        font-family: 'Source Code Pro', sans-serif;
+
+        input, select {
+          font-family: 'Source Code Pro', sans-serif;
+          font-weight: bold;
+        }
       }
-    }
-  }
-}
+
+      .terminal {
+
+        .screen {
+          font-family: 'Source Code Pro', sans-serif;
+          font-size: 12pt;
+          overflow: auto;
+          padding-left: 4px;
+          div {
+            white-space: pre-wrap;
+          }
+        }
+
+        .command {
+          position: relative;
+          border-top: 2px solid transparent;
+          i {
+            position: absolute;
+            top: 5px;
+            z-index: 100;
+            cursor: pointer;
+
+            &.icon-wrench {
+              right: 10px;
+            }
+            &.icon-off {
+              right: 30px;
+            }
+          }
+          form {
+            margin: 0;
+            .prompt {
+              float: left;
+              padding: 2px 4px;
+              font-family: 'Source Code Pro', sans-serif;
+              font-size: 12pt;
+            }
+            input {
+              position: absolute;
+              margin: 0;
+              border: none;
+              padding: 2px 4px;
+              font-family: 'Source Code Pro', sans-serif;
+              font-size: 12pt;
+              border-radius: 0;
+              -webkit-border-radius: 0;
+              -moz-border-radius: 0;
+              box-shadow: none !important;
+              -webkit-box-shadow: none !important;
+              -moz-box-shadow: none !important;
+
+              &:focus {
+                outline: none;
+              }
+            }
+          }
+        } // command
+      } // terminal
+    } // wrapper
+  } // client
+} // body

@@ -1,15 +1,17 @@
 .client.tango-light {
 
-  @_white: #D3D7CF;   @_light_white: #EEEEEC;
-  @_gray: #888A85;    @_light_gray: #BABDB6;
-  @_black: #2E3436;   @_light_black: #555753;
-  @_blue: #3465A4;    @_light_blue: #729FCF;
-  @_cyan: #06989A;    @_light_cyan: #34E2E2;
-  @_green: #73D216;   @_light_green: #8AE234;
-  @_magenta: #75507B; @_light_magenta: #AD7FA8;
-  @_red: #CC0000;     @_light_red: #EF2929;
-  @_yellow: #C4A000;  @_light_yellow: #EDD400;
-  @_orange: #F57900;  @_light_orange: #FCAF3E;
+  background: black url(/img/tango-light/background.png) repeat;
+
+  @white: #D3D7CF;   @light_white: #EEEEEC;
+  @gray: #888A85;    @light_gray: #BABDB6;
+  @black: #2E3436;   @light_black: #555753;
+  @blue: #3465A4;    @light_blue: #729FCF;
+  @cyan: #06989A;    @light_cyan: #34E2E2;
+  @green: #73D216;   @light_green: #8AE234;
+  @magenta: #75507B; @light_magenta: #AD7FA8;
+  @red: #CC0000;     @light_red: #EF2929;
+  @yellow: #C4A000;  @light_yellow: #EDD400;
+  @orange: #F57900;  @light_orange: #FCAF3E;
 
   .embolden(@light_color) {
     &.bold, .bold, .bold & {
@@ -41,65 +43,122 @@
     }
   }
 
-  .screen {
-    background-color: white;
-    color: @_black;
-  }
-
-  .command {
-    border-top-color: @_black;
-    i {
-      color: @_black;
-      &.connected {
-        color: @_green;
-      }
-      &.disconnected {
-        color: @_red;
-      }
-      &.connecting {
-        color: @_orange;
-      }
-    }
-    form {
-      .prompt {
-        background-color: white;
-        color: @_black;
-      }
-      input {
-        background-color: white;
-        color: @_black;
-      }
-    }
-  }
-
   .italic { font-style: italic; }
   .underline { text-decoration: underline; }
 
   .bold {
-    color: @_light_black;
+    color: @light_black;
   }
 
   .inverse {
     color: white;
-    background-color: @_black;
+    background-color: @black;
   }
 
   .bold.inverse,
   .bold .inverse,
   .inverse .bold {
     color: white;
-    background-color: @_light_black;
+    background-color: @light_black;
   }
 
-  .white        { color: @_white;   .invert(@_white);   .embolden(@_light_white);   .bold_invert(@_light_white);   }
-  .grey, .gray  { color: @_gray;    .invert(@_gray);    .embolden(@_light_gray);    .bold_invert(@_light_gray);    }
-  .black        { color: @_black;   .invert(@_black);   .embolden(@_light_black);   .bold_invert(@_light_black);   }
-  .blue         { color: @_blue;    .invert(@_blue);    .embolden(@_light_blue);    .bold_invert(@_light_blue);    }
-  .cyan         { color: @_cyan;    .invert(@_cyan);    .embolden(@_light_cyan);    .bold_invert(@_light_cyan);    }
-  .green        { color: @_green;   .invert(@_green);   .embolden(@_light_green);   .bold_invert(@_light_green);   }
-  .magenta      { color: @_magenta; .invert(@_magenta); .embolden(@_light_magenta); .bold_invert(@_light_magenta); }
-  .red          { color: @_red;     .invert(@_red);     .embolden(@_light_red);     .bold_invert(@_light_red);     }
-  .yellow       { color: @_yellow;  .invert(@_yellow);  .embolden(@_light_yellow);  .bold_invert(@_light_yellow);  }
-  .orange       { color: @_orange;  .invert(@_orange);  .embolden(@_light_orange);  .bold_invert(@_light_orange);  }
+  .white        { color: @white;   .invert(@white);   .embolden(@light_white);   .bold_invert(@light_white);   }
+  .grey, .gray  { color: @gray;    .invert(@gray);    .embolden(@light_gray);    .bold_invert(@light_gray);    }
+  .black        { color: @black;   .invert(@black);   .embolden(@light_black);   .bold_invert(@light_black);   }
+  .blue         { color: @blue;    .invert(@blue);    .embolden(@light_blue);    .bold_invert(@light_blue);    }
+  .cyan         { color: @cyan;    .invert(@cyan);    .embolden(@light_cyan);    .bold_invert(@light_cyan);    }
+  .green        { color: @green;   .invert(@green);   .embolden(@light_green);   .bold_invert(@light_green);   }
+  .magenta      { color: @magenta; .invert(@magenta); .embolden(@light_magenta); .bold_invert(@light_magenta); }
+  .red          { color: @red;     .invert(@red);     .embolden(@light_red);     .bold_invert(@light_red);     }
+  .yellow       { color: @yellow;  .invert(@yellow);  .embolden(@light_yellow);  .bold_invert(@light_yellow);  }
+  .orange       { color: @orange;  .invert(@orange);  .embolden(@light_orange);  .bold_invert(@light_orange);  }
+
+  .screen {
+    background-color: white;
+    color: @black;
+  }
+
+  .command {
+    border-top-color: @black !important;
+    i {
+      color: @black;
+      &.connected {
+        color: @green;
+      }
+      &.disconnected {
+        color: @red;
+      }
+      &.connecting {
+        color: @orange;
+      }
+    }
+    form {
+      .prompt {
+        background-color: white;
+        color: @black;
+      }
+      input {
+        background-color: white;
+        color: @black;
+      }
+    }
+  }
+
+  .options {
+    background-color: white;
+    color: @black;
+    border-left: 2px solid @black;
+
+    p.info {
+      color: @blue;
+    }
+
+    input, select {
+      background-color: @white;
+      color: @black;
+      border-color: @black;
+    }
+
+    .btn-primary {
+      background-color: @light_blue;
+    }
+
+    .btn-danger {
+      background-color: @light_red;
+    }
+
+    table {
+      border-bottom: 1px solid @black;
+
+      tr {
+        td {
+          border-top-color: @black;
+        }
+      }
+    }
+  }
+
+  .modal {
+
+    .modal-header {
+      border-bottom-color: @black;
+    }
+
+    input, select {
+      background-color: @white;
+      color: @black;
+      border-color: @black;
+    }
+
+    .modal-footer {
+      background-color: @white;
+      border-top-color: @black;
+
+      .btn {
+        background-color: @gray;
+        &.btn-primary {background-color: @light_blue;}
+      }
+    }
+  }
 
 }
