@@ -76,6 +76,7 @@ exports.RoomJsVerb = class
   toJSON: ->
     clone = _.clone @
     delete clone.object
+    delete clone.script
     clone
 
   toString: ->

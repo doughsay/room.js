@@ -27,7 +27,6 @@ module.exports = class Context
       players:    => @db.players.map (player) => @contextify player
       browser:    mooBrowser
       parse:      parse
-      match:      (search = '') => (@db.mooMatch search, @player).map (o) => @contextify o
       schedule:   (object, verb, seconds, args = []) => @schedule object, verb, seconds, args
       cancel:     (id) => @cancel id
       list:       => @db.list().map (o) => @contextify o
@@ -109,6 +108,7 @@ module.exports = class Context
     newStack =
       player : if player? then @contextify player else @contextify @db.nothing
       ls     : (x, depth = 2) -> player.send(mooUtil.print x, depth); return true
+      match  : (search = '') => (@db.mooMatch search, player).map (o) => @contextify o
 
     @vmContext.stack.unshift newStack
 
@@ -116,9 +116,9 @@ module.exports = class Context
 
     start = new Date()
     wrappedCode = """
-    ((player, ls) ->
+    ((player, ls, match) ->
       #{coffeeCode}
-    ).call(stack[0].player, stack[0].player, stack[0].ls)
+    ).call(stack[0].player, stack[0].player, stack[0].ls, stack[0].match)
     """
 
     @pushEvalStackVars player
@@ -166,6 +166,7 @@ module.exports = class Context
       dobjstr : dobjstr
       prepstr : prepstr
       iobjstr : iobjstr
+      match   : (search = '') => (@db.mooMatch search, player).map (o) => @contextify o
       pass    : =>
         thisVerb = self.findVerbByName verbstr
         thisObject = thisVerb.object

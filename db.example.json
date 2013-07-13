@@ -1,5 +1,5 @@
 {
-  "nextId": 104,
+  "nextId": 105,
   "objects": {
     "0": {
       "id": 0,
@@ -7,7 +7,6 @@
       "name": "System Object",
       "aliases": [],
       "location_id": null,
-      "contents_ids": [],
       "player": false,
       "programmer": false,
       "properties": [
@@ -91,7 +90,8 @@
           "dobjarg": "none",
           "preparg": "none",
           "iobjarg": "none",
-          "code": "# TODO"
+          "code": "# TODO",
+          "lang": "coffeescript"
         },
         {
           "name": "player_created",
@@ -99,7 +99,8 @@
           "dobjarg": "none",
           "preparg": "none",
           "iobjarg": "none",
-          "code": "player.parent = $player\n$sys.player_connected()"
+          "code": "player.parent = $player\n$sys.player_connected()",
+          "lang": "coffeescript"
         },
         {
           "name": "player_connected",
@@ -107,7 +108,8 @@
           "dobjarg": "none",
           "preparg": "none",
           "iobjarg": "none",
-          "code": "player.location = $(6)\nplayer.tell \"{blue bold|Welcome, #{player.name}!}\"\nplayer.location.player_connected?()"
+          "code": "player.location = $(6)\nplayer.tell \"{blue bold|Welcome, #{player.name}!}\"\nplayer.location.player_connected?()",
+          "lang": "coffeescript"
         },
         {
           "name": "player_disconnected",
@@ -115,7 +117,8 @@
           "dobjarg": "none",
           "preparg": "none",
           "iobjarg": "none",
-          "code": "player.location.player_disconnected?()\nplayer.location = null"
+          "code": "player.location.player_disconnected?()\nplayer.location = null",
+          "lang": "coffeescript"
         }
       ],
       "crontab": []
@@ -126,7 +129,6 @@
       "name": "Root Class",
       "aliases": [],
       "location_id": null,
-      "contents_ids": [],
       "player": false,
       "programmer": false,
       "properties": [],
@@ -137,7 +139,8 @@
           "dobjarg": "none",
           "preparg": "none",
           "iobjarg": "none",
-          "code": "[msg] = args\n\nif @player\n  @send msg"
+          "code": "[msg] = args\n\nif @isPlayer\n  @send msg",
+          "lang": "coffeescript"
         }
       ],
       "crontab": []
@@ -150,7 +153,6 @@
         "player"
       ],
       "location_id": null,
-      "contents_ids": [],
       "player": false,
       "programmer": false,
       "properties": [
@@ -166,7 +168,8 @@
           "dobjarg": "none",
           "preparg": "none",
           "iobjarg": "none",
-          "code": "names = @contents.map (i) -> i.name\nnames.unshift \"You are carrying:\"\n@tell names.join \"\\n\""
+          "code": "names = @contents.map (i) -> i.name\nnames.unshift \"You are carrying:\"\n@tell names.join \"\\n\"",
+          "lang": "coffeescript"
         }
       ],
       "crontab": []
@@ -176,10 +179,7 @@
       "parent_id": 2,
       "name": "Gandalf",
       "aliases": [],
-      "location_id": null,
-      "contents_ids": [
-        14
-      ],
+      "location_id": 6,
       "player": true,
       "programmer": true,
       "properties": [
@@ -197,7 +197,8 @@
       "verbs": [],
       "crontab": [],
       "username": "root",
-      "password": "a075d17f3d453073853f813838c15b8023b8c487038436354fe599c3942e1f95"
+      "password": "a075d17f3d453073853f813838c15b8023b8c487038436354fe599c3942e1f95",
+      "lastActivity": "2013-07-13T17:50:30.323Z"
     },
     "4": {
       "id": 4,
@@ -207,7 +208,6 @@
         "room"
       ],
       "location_id": null,
-      "contents_ids": [],
       "player": false,
       "programmer": false,
       "properties": [
@@ -227,7 +227,8 @@
           "dobjarg": "none",
           "preparg": "none",
           "iobjarg": "none",
-          "code": "output = [\"{yellow bold|#{player.location.name}}\"]\noutput.push player.location.description\nthings = (thing for thing in player.location.contents when thing != player)\nif things.length > 0\n  output.push '{cyan|You see here:}'\n  for thing in things\n    output.push \"{cyan|#{thing.name}}\"\n\nplayer.tell output.join '\\n'"
+          "code": "output = [\"{yellow bold|#{player.location.name}}\"]\noutput.push player.location.description\nthings = (thing for thing in player.location.contents when thing != player)\nif things.length > 0\n  output.push '{cyan|You see here:}'\n  for thing in things\n    output.push \"{cyan|#{thing.name}}\"\n\nplayer.tell output.join '\\n'",
+          "lang": "coffeescript"
         },
         {
           "name": "say",
@@ -235,7 +236,8 @@
           "dobjarg": "any",
           "preparg": "any",
           "iobjarg": "any",
-          "code": "msg = \"\\\"{white|#{argstr.trim()}}\\\"\"\nplayer.tell \"{gray|You say #{msg}}\"\nplayer.location.announce \"{gray|{#{player.color}|#{player.name}} says #{msg}}\""
+          "code": "msg = \"\\\"{white|#{argstr.trim()}}\\\"\"\nplayer.tell \"{gray|You say #{msg}}\"\nplayer.location.announce \"{gray|{#{player.color}|#{player.name}} says #{msg}}\"",
+          "lang": "coffeescript"
         },
         {
           "name": "huh",
@@ -243,7 +245,8 @@
           "dobjarg": "none",
           "preparg": "none",
           "iobjarg": "none",
-          "code": "handleFailedOrAmbiguous = ->\n  if dobj == $ambiguous_match\n    objects = $util.orjoin match(dobjstr).map (o) -> o.name\n    player.tell \"{gray|I couldn't tell if you meant #{objects}.}\"\n  else if iobj == $ambiguous_match\n    objects = $util.orjoin match(iobjstr).map (o) -> o.name\n    player.tell \"{gray|I couldn't tell if you meant #{objects}.}\"\n  else if dobj == $failed_match\n    player.tell \"{gray|I don't see any #{dobjstr} here.}\"\n  else if iobj == $failed_match\n    player.tell \"{gray|I don't see any #{iobjstr} here.}\"\n  else\n    player.tell \"{gray|I didn't understand that.}\"\n\nmatches = (direction for direction of player.location.exits).filter (direction) ->\n  direction.indexOf(verb) == 0\n\nswitch matches.length\n  when 0\n    handleFailedOrAmbiguous()\n  when 1\n    player.location.exits[matches[0]].invoke()\n  else\n    directions = $util.orjoin matches\n    player.tell \"Did you mean #{directions}?\""
+          "code": "handleFailedOrAmbiguous = ->\n  if dobj == $ambiguous_match\n    objects = $util.orjoin match(dobjstr).map (o) -> o.name\n    player.tell \"{gray|I couldn't tell if you meant #{objects}.}\"\n  else if iobj == $ambiguous_match\n    objects = $util.orjoin match(iobjstr).map (o) -> o.name\n    player.tell \"{gray|I couldn't tell if you meant #{objects}.}\"\n  else if dobj == $failed_match\n    player.tell \"{gray|I don't see any #{dobjstr} here.}\"\n  else if iobj == $failed_match\n    player.tell \"{gray|I don't see any #{iobjstr} here.}\"\n  else\n    player.tell \"{gray|I didn't understand that.}\"\n\nmatches = (direction for direction of player.location.exits).filter (direction) ->\n  direction.indexOf(verb) == 0\n\nswitch matches.length\n  when 0\n    handleFailedOrAmbiguous()\n  when 1\n    player.location.exits[matches[0]].invoke()\n  else\n    directions = $util.orjoin matches\n    player.tell \"Did you mean #{directions}?\"",
+          "lang": "coffeescript"
         },
         {
           "name": "player_connected",
@@ -251,7 +254,8 @@
           "dobjarg": "none",
           "preparg": "none",
           "iobjarg": "none",
-          "code": "player.location.look()\nplayer.location.announce \"#{player.name} pops into existence.\""
+          "code": "player.location.look()\nplayer.location.announce \"#{player.name} pops into existence.\"",
+          "lang": "coffeescript"
         },
         {
           "name": "player_disconnected",
@@ -259,7 +263,8 @@
           "dobjarg": "none",
           "preparg": "none",
           "iobjarg": "none",
-          "code": "player.location.announce \"#{player.name} fades away.\""
+          "code": "player.location.announce \"#{player.name} fades away.\"",
+          "lang": "coffeescript"
         },
         {
           "name": "go",
@@ -267,7 +272,8 @@
           "dobjarg": "any",
           "preparg": "none",
           "iobjarg": "none",
-          "code": "matched_exits = (name for name, exit of player.location.exits when argstr == name)\nswitch matched_exits.length\n  when 0\n    player.tell \"You can't go #{argstr}.\"\n  when 1\n    portal = player.location.exits[matched_exits[0]]\n    retreats = (retreat for retreat, exit of portal.destination.exits when exit.destination == player.location)\n    switch retreats.length\n      when 0\n        player.bearings = []\n      else\n        player.bearings = retreats\n    portal.invoke()\n  else\n    directions = $util.orjoin matched_exits\n    player.tell \"Did you mean #{directions}?\""
+          "code": "matched_exits = (name for name, exit of player.location.exits when argstr == name)\nswitch matched_exits.length\n  when 0\n    player.tell \"You can't go #{argstr}.\"\n  when 1\n    portal = player.location.exits[matched_exits[0]]\n    retreats = (retreat for retreat, exit of portal.destination.exits when exit.destination == player.location)\n    switch retreats.length\n      when 0\n        player.bearings = []\n      else\n        player.bearings = retreats\n    portal.invoke()\n  else\n    directions = $util.orjoin matched_exits\n    player.tell \"Did you mean #{directions}?\"",
+          "lang": "coffeescript"
         },
         {
           "name": "player_left",
@@ -275,7 +281,8 @@
           "dobjarg": "none",
           "preparg": "none",
           "iobjarg": "none",
-          "code": "[direction] = args\nplayer.tell \"You go #{direction}.\"\nplayer.location.announce \"#{player.name} goes #{direction}.\""
+          "code": "[direction] = args\nplayer.tell \"You go #{direction}.\"\nplayer.location.announce \"#{player.name} goes #{direction}.\"",
+          "lang": "coffeescript"
         },
         {
           "name": "player_arrived",
@@ -283,7 +290,8 @@
           "dobjarg": "none",
           "preparg": "none",
           "iobjarg": "none",
-          "code": "player.location.look()\nplayer.location.announce \"#{player.name} arrives.\""
+          "code": "player.location.look()\nplayer.location.announce \"#{player.name} arrives.\"",
+          "lang": "coffeescript"
         },
         {
           "name": "emote",
@@ -291,7 +299,8 @@
           "dobjarg": "any",
           "preparg": "any",
           "iobjarg": "any",
-          "code": "msg = ['{bold magenta|*}', player.name, argstr.trim()].join ' '\nplayer.tell msg\nplayer.location.announce msg"
+          "code": "msg = ['{bold magenta|*}', player.name, argstr.trim()].join ' '\nplayer.tell msg\nplayer.location.announce msg",
+          "lang": "coffeescript"
         },
         {
           "name": "announce",
@@ -299,14 +308,16 @@
           "dobjarg": "none",
           "preparg": "none",
           "iobjarg": "none",
-          "code": "[msg] = args\n\nfor obj in @contents\n  if obj != player\n    obj.tell?(msg)"
+          "code": "[msg] = args\n\nfor obj in @contents\n  if obj != player\n    obj.tell?(msg)",
+          "lang": "coffeescript"
         },
         {
           "name": "help",
           "dobjarg": "none",
           "preparg": "none",
           "iobjarg": "none",
-          "code": "player.tell \"Basic commands: look, say [anything], examine [object], get [object], drop [object], inventory, help\""
+          "code": "player.tell \"Basic commands: look, say [anything], examine [object], get [object], drop [object], inventory, help\"",
+          "lang": "coffeescript"
         }
       ],
       "crontab": []
@@ -319,7 +330,6 @@
         "item"
       ],
       "location_id": null,
-      "contents_ids": [],
       "player": false,
       "programmer": false,
       "properties": [
@@ -335,21 +345,24 @@
           "dobjarg": "this",
           "preparg": "none",
           "iobjarg": "none",
-          "code": "msg = []\nmsg.push \"#{@name}:\"\nmsg.push @description\navailable_actions = $util.orjoin (key for key, value of @ when value.verb and not value.hidden)\nmsg.push \"Available actions: #{available_actions}\"\nplayer.tell msg.join '\\n'"
+          "code": "msg = []\nmsg.push \"#{@name}:\"\nmsg.push @description\navailable_actions = $util.orjoin (key for key, value of @ when value.verb and not value.hidden)\nmsg.push \"Available actions: #{available_actions}\"\nplayer.tell msg.join '\\n'",
+          "lang": "coffeescript"
         },
         {
           "name": "g*et t*ake gr*ab",
           "dobjarg": "this",
           "preparg": "none",
           "iobjarg": "none",
-          "code": "if @location == player\n  player.tell \"You're already holding the #{@name}.\"\nelse\n  @location = player\n  player.tell \"You pick up the #{@name}.\"\n  player.location.announce \"#{player.name} picks up the #{@name}.\""
+          "code": "if @location == player\n  player.tell \"You're already holding the #{@name}.\"\nelse\n  @location = player\n  player.tell \"You pick up the #{@name}.\"\n  player.location.announce \"#{player.name} picks up the #{@name}.\"",
+          "lang": "coffeescript"
         },
         {
           "name": "d*rop",
           "dobjarg": "this",
           "preparg": "none",
           "iobjarg": "none",
-          "code": "if @location == player\n  @location = player.location\n  player.tell \"You drop the #{@name}.\"\n  player.location.announce \"#{player.name} drops the #{@name}.\"\nelse\n  player.tell \"You're not holding the #{@name}.\""
+          "code": "if @location == player\n  @location = player.location\n  player.tell \"You drop the #{@name}.\"\n  player.location.announce \"#{player.name} drops the #{@name}.\"\nelse\n  player.tell \"You're not holding the #{@name}.\"",
+          "lang": "coffeescript"
         }
       ],
       "crontab": []
@@ -362,12 +375,6 @@
         "clearing"
       ],
       "location_id": null,
-      "contents_ids": [
-        34,
-        28,
-        26,
-        7
-      ],
       "player": false,
       "programmer": false,
       "properties": [
@@ -399,13 +406,12 @@
     },
     "7": {
       "id": 7,
-      "parent_id": 5,
+      "parent_id": 104,
       "name": "wooden sword",
       "aliases": [
         "sword"
       ],
       "location_id": 6,
-      "contents_ids": [],
       "player": false,
       "programmer": false,
       "properties": [
@@ -414,15 +420,7 @@
           "value": "A simple wooden sword."
         }
       ],
-      "verbs": [
-        {
-          "name": "swing",
-          "dobjarg": "this",
-          "preparg": "none",
-          "iobjarg": "none",
-          "code": "if @location == player\n  player.tell \"You swing the wooden sword around. You look a bit silly.\"\n  player.location.announce \"#{player.name} swings a wooden sword around.\"\nelse\n  player.tell \"You're not holding the sword.\""
-        }
-      ],
+      "verbs": [],
       "crontab": []
     },
     "8": {
@@ -431,7 +429,6 @@
       "name": "Exit Class",
       "aliases": [],
       "location_id": null,
-      "contents_ids": [],
       "player": false,
       "programmer": false,
       "properties": [],
@@ -442,7 +439,8 @@
           "dobjarg": "none",
           "preparg": "none",
           "iobjarg": "none",
-          "code": "direction = @name\ndestination = @destination\n\nplayer.location.player_left?(direction)\n\nplayer.location = destination\n\ndestination.player_arrived?()"
+          "code": "direction = @name\ndestination = @destination\n\nplayer.location.player_left?(direction)\n\nplayer.location = destination\n\ndestination.player_arrived?()",
+          "lang": "coffeescript"
         }
       ],
       "crontab": []
@@ -453,7 +451,6 @@
       "name": "north",
       "aliases": [],
       "location_id": null,
-      "contents_ids": [],
       "player": false,
       "programmer": false,
       "properties": [
@@ -473,7 +470,6 @@
       "name": "A Cave",
       "aliases": [],
       "location_id": null,
-      "contents_ids": [],
       "player": false,
       "programmer": false,
       "properties": [
@@ -499,7 +495,6 @@
       "name": "south",
       "aliases": [],
       "location_id": null,
-      "contents_ids": [],
       "player": false,
       "programmer": false,
       "properties": [
@@ -519,7 +514,6 @@
       "name": "tunneler",
       "aliases": [],
       "location_id": 3,
-      "contents_ids": [],
       "player": false,
       "programmer": false,
       "properties": [
@@ -535,7 +529,8 @@
           "dobjarg": "any",
           "preparg": "with/using",
           "iobjarg": "this",
-          "code": "if not (player.programmer or player.builder)\n  throw new Error \"You're not allowed to use the tunneler\"\n\ndirection = dobjstr\nif not direction\n  throw new Error \"Invalid direction\"\n\nif player.location.exits[direction]?\n  throw new Error \"That direction already exists!\"\n\nplayer.tell \"Going #{direction} #{prepstr} the tunneler!\"\n\nconnectTo = (room) ->\n  exit = $exit.create direction\n  exit.destination = room\n  \n  player.location.exits[direction] = exit\n\n  exit.invoke()\n\nplayer.input \"Connect to an {magenta|existing} room or a {magenta|new} room?\", (response) ->\n  switch response\n    when 'existing'\n      player.input \"ID of existing room:\", (id) ->\n        if (room = $(id)) # TODO check if room is descendant of room class?\n          connectTo room\n        else\n          throw new Error \"Couldn't find room with id '#{id}'\"\n    when 'new'\n      player.input \"Give me a name for the new room:\", (name) ->\n        player.input \"Descripe the new room:\", (description) ->\n          newRoom = $room.create name\n          newRoom.description = description\n          connectTo newRoom\n    else\n      player.tell \"{red|Unknown response. Was expecting either 'existing' or 'new'}\""
+          "code": "if not (player.programmer or player.builder)\n  throw new Error \"You're not allowed to use the tunneler\"\n\ndirection = dobjstr\nif not direction\n  throw new Error \"Invalid direction\"\n\nif player.location.exits[direction]?\n  throw new Error \"That direction already exists!\"\n\nplayer.tell \"Going #{direction} #{prepstr} the tunneler!\"\n\nconnectTo = (room) ->\n  exit = $exit.create direction\n  exit.destination = room\n  \n  player.location.exits[direction] = exit\n\n  exit.invoke()\n\nplayer.input \"Connect to an {magenta|existing} room or a {magenta|new} room?\", (response) ->\n  switch response\n    when 'existing'\n      player.input \"ID of existing room:\", (id) ->\n        if (room = $(id)) # TODO check if room is descendant of room class?\n          connectTo room\n        else\n          throw new Error \"Couldn't find room with id '#{id}'\"\n    when 'new'\n      player.input \"Give me a name for the new room:\", (name) ->\n        player.input \"Descripe the new room:\", (description) ->\n          newRoom = $room.create name\n          newRoom.description = description\n          connectTo newRoom\n    else\n      player.tell \"{red|Unknown response. Was expecting either 'existing' or 'new'}\"",
+          "lang": "coffeescript"
         }
       ],
       "crontab": []
@@ -546,7 +541,6 @@
       "name": "Dungeon cell",
       "aliases": [],
       "location_id": null,
-      "contents_ids": [],
       "player": false,
       "programmer": false,
       "properties": [
@@ -575,7 +569,6 @@
       "name": "down",
       "aliases": [],
       "location_id": null,
-      "contents_ids": [],
       "player": false,
       "programmer": false,
       "properties": [
@@ -595,7 +588,6 @@
       "name": "up",
       "aliases": [],
       "location_id": null,
-      "contents_ids": [],
       "player": false,
       "programmer": false,
       "properties": [
@@ -615,7 +607,6 @@
       "name": "Nowhere",
       "aliases": [],
       "location_id": null,
-      "contents_ids": [],
       "player": false,
       "programmer": false,
       "properties": [
@@ -641,7 +632,6 @@
       "name": "nowhere",
       "aliases": [],
       "location_id": null,
-      "contents_ids": [],
       "player": false,
       "programmer": false,
       "properties": [
@@ -663,7 +653,6 @@
         "elsewhere"
       ],
       "location_id": null,
-      "contents_ids": [],
       "player": false,
       "programmer": false,
       "properties": [
@@ -683,7 +672,6 @@
       "name": "Utility Verbs",
       "aliases": [],
       "location_id": null,
-      "contents_ids": [],
       "player": false,
       "programmer": false,
       "properties": [
@@ -701,7 +689,8 @@
           "dobjarg": "none",
           "preparg": "none",
           "iobjarg": "none",
-          "code": "a = args[0]\na[0..a.length-2].join(', ') + ' or ' + a[a.length-1]"
+          "code": "a = args[0]\na[0..a.length-2].join(', ') + ' or ' + a[a.length-1]",
+          "lang": "coffeescript"
         }
       ],
       "crontab": []
@@ -712,7 +701,6 @@
       "name": "west",
       "aliases": [],
       "location_id": null,
-      "contents_ids": [],
       "player": false,
       "programmer": false,
       "properties": [],
@@ -722,50 +710,20 @@
           "dobjarg": "none",
           "preparg": "none",
           "iobjarg": "none",
-          "code": "player.tell 'The door is locked.'"
-        }
-      ],
-      "crontab": []
-    },
-    "26": {
-      "id": 26,
-      "parent_id": 5,
-      "name": "Larry the bird",
-      "aliases": [
-        "larry",
-        "bird"
-      ],
-      "location_id": 6,
-      "contents_ids": [],
-      "player": false,
-      "programmer": false,
-      "properties": [
-        {
-          "key": "description",
-          "value": "A small blue bird conversant in the conversations of the hottest social media superstars. Ask him about someone!"
-        }
-      ],
-      "verbs": [
-        {
-          "name": "ask",
-          "hidden": false,
-          "dobjarg": "this",
-          "preparg": "for/about",
-          "iobjarg": "any",
-          "code": "browser.get 'api.twitter.com', \"/1/statuses/user_timeline/#{iobjstr}.json?count=1&include_rts=0\", (response) ->\n  \n  player.location.announce \"{gray|#{player.name} asks Larry about #{iobjstr}}\"\n  \n  tweets = JSON.parse response\n  if tweets?[0]?.text?\n    tweet = tweets[0].text\n    say = \"I heard {blue bold|@#{iobjstr}} recently saying: \\\"#{tweet}\\\"\"\n  else\n    say = \"I don't know about anyone called #{iobjstr}\"\n    \n  msg = \"{gray|Larry says \\\"{white|#{say}}\\\"}\"\n  player.tell msg\n  player.location.announce msg"
+          "code": "player.tell 'The door is locked.'",
+          "lang": "coffeescript"
         }
       ],
       "crontab": []
     },
     "28": {
       "id": 28,
-      "parent_id": 5,
+      "parent_id": 104,
       "name": "iron sword",
       "aliases": [
         "sword"
       ],
       "location_id": 6,
-      "contents_ids": [],
       "player": false,
       "programmer": false,
       "properties": [
@@ -783,7 +741,6 @@
       "name": "blinker",
       "aliases": [],
       "location_id": 6,
-      "contents_ids": [],
       "player": false,
       "programmer": false,
       "properties": [
@@ -799,7 +756,8 @@
           "dobjarg": "none",
           "preparg": "none",
           "iobjarg": "none",
-          "code": "@location.announce? \"The blinker flashes {bold|bright white light} in all directions! You are momentarily blinded.\""
+          "code": "@location.announce? \"The blinker flashes {bold|bright white light} in all directions! You are momentarily blinded.\"",
+          "lang": "coffeescript"
         }
       ],
       "crontab": [
@@ -809,6 +767,33 @@
           "enabled": true
         }
       ]
+    },
+    "104": {
+      "id": 104,
+      "parent_id": 5,
+      "name": "Sword Class",
+      "aliases": [],
+      "location_id": null,
+      "player": false,
+      "programmer": false,
+      "properties": [
+        {
+          "key": "description",
+          "value": "a sword"
+        }
+      ],
+      "verbs": [
+        {
+          "name": "sw*ing",
+          "hidden": false,
+          "dobjarg": "this",
+          "preparg": "none",
+          "iobjarg": "none",
+          "code": "if @location == player\n  player.tell \"You swing the #{@name} around. You look a bit silly.\"\n  player.location.announce \"#{player.name} swings a wooden sword around.\"\nelse\n  player.tell \"You're not holding the sword.\"",
+          "lang": "coffeescript"
+        }
+      ],
+      "crontab": []
     }
   }
 }

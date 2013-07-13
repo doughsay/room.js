@@ -27,15 +27,15 @@ wrapCode = (lang, code) ->
   switch lang
     when 'coffeescript'
       """
-      ((player, dobj, iobj, verb, argstr, args, dobjstr, prepstr, iobjstr, pass) ->
+      ((player, dobj, iobj, verb, argstr, args, dobjstr, prepstr, iobjstr, pass, match) ->
       #{code.split('\n').map((line) -> '  ' + line).join('\n')}
-      ).call(stack[0].self, stack[0].player, stack[0].dobj, stack[0].iobj, stack[0].verb, stack[0].argstr, stack[0].args, stack[0].dobjstr, stack[0].prepstr, stack[0].iobjstr, stack[0].pass)
+      ).call(stack[0].self, stack[0].player, stack[0].dobj, stack[0].iobj, stack[0].verb, stack[0].argstr, stack[0].args, stack[0].dobjstr, stack[0].prepstr, stack[0].iobjstr, stack[0].pass, stack[0].match)
       """
     when 'javascript'
       """
-      (function(player, dobj, iobj, verb, argstr, args, dobjstr, prepstr, iobjstr, pass) {
+      (function(player, dobj, iobj, verb, argstr, args, dobjstr, prepstr, iobjstr, pass, match) {
       #{code}
-      }).call(stack[0].self, stack[0].player, stack[0].dobj, stack[0].iobj, stack[0].verb, stack[0].argstr, stack[0].args, stack[0].dobjstr, stack[0].prepstr, stack[0].iobjstr, stack[0].pass);
+      }).call(stack[0].self, stack[0].player, stack[0].dobj, stack[0].iobj, stack[0].verb, stack[0].argstr, stack[0].args, stack[0].dobjstr, stack[0].prepstr, stack[0].iobjstr, stack[0].pass, stack[0].match);
       """
     else
       throw new Error 'invalid verb language:', lang
