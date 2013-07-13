@@ -1,5 +1,5 @@
-Room.js Programmer's Manual
-===========================
+Programmer's Manual
+===================
 
 This document should describe:
 

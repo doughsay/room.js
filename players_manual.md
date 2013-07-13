@@ -1,5 +1,5 @@
-Room.js Player's Manal
-======================
+Player's Manual
+===============
 
 This document should describe:
 
