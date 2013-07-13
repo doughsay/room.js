@@ -16,11 +16,11 @@ room.js is different from other MOOs because:
 Live Demo
 ---------
 
-There is a live demo of room.js running at: rjs.infinitymotel.net
+There is a live demo of room.js running at: http://rjs.infinitymotel.net
 
 All players that sign up are automatically granted programmer privileges; any objects you pick up get dropped back into the main room once you leave. (for demo purposes)
 
-The built-in editor is accessible at: rjs.infinitymotel.net/editor
+The built-in editor is accessible at: http://rjs.infinitymotel.net/editor
 
 Running the Server
 ------------------
