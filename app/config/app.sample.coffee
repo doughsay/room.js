@@ -11,4 +11,14 @@ module.exports =
   verbTimeout: 1000
   maxStack: 40
 
-  logLevel: 'INFO' # TRACE, DEBUG, INFO, WARN, ERROR, FATAL
+  # log levels per module
+  # available levels: (each module only outputs certain levels as marked)
+  # TRACE, DEBUG, INFO, WARN, ERROR, FATAL
+  logLevel:
+    socket:  'INFO' # DEBUG and INFO
+    cron:    'INFO' # DEBUG
+    context: 'INFO' # DEBUG and WARN
+    db:      'INFO' # DEBUG and INFO
+    server:  'INFO' # INFO, WARN, and ERROR
+    client:  'INFO' # INFO
+    editor:  'INFO' # DEBUG, INFO, and WARN
