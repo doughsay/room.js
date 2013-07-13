@@ -49,3 +49,11 @@ Connect to it using a web browser by going to [http://localhost:8888/](http://lo
 The built-in editor is at [http://localhost:8888/editor](http://localhost:8888/editor).
 
 The provided seed database has one user who is also a programmer: username=root, password=p@ssw0rd.
+
+Further Reading
+---------------
+
+There are in depth manuals being written for room.js here:
+
+* [Player's Manual](https://github.com/doughsay/room.js/wiki/Player%27s-Manual)
+* [Programmer's Manual](https://github.com/doughsay/room.js/wiki/Programmer%27s-Manual)
