@@ -267,10 +267,7 @@ class @ClientView
         if @currentHistory < @history.length - 1
           @currentHistory++
         @command @history[@currentHistory]
-        # the up arrow likes to move the cursor to the beginning of the line
-        # move it back!
-        l = @command().length
-        e.target.setSelectionRange(l,l)
+        e.preventDefault() # prevent the default behavior of moving the cursor
       when 40 # down
         if @currentHistory > -1
           @currentHistory--

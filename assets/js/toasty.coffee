@@ -9,6 +9,7 @@ imageData = 'iVBORw0KGgoAAAANSUhEUgAAAG4AAABtCAYAAABAz1RVAABOmklEQVR42ux9BXgcV5q
     right: 0
     overflow: 'hidden'
     lineHeight: 0
+    zIndex: 9001
   image.find('img').css
     position: 'relative',
     bottom: 0
