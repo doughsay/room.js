@@ -32,7 +32,7 @@ The server currently requires version 0.11.3 or higher of node.js (0.10.x works 
 Assuming you already have git and node.js installed:
 
     # Get the code
-    git clone git@github.com:doughsay/room.js.git
+    git clone https://github.com/doughsay/room.js.git
     cd room.js
 
     # Install supporting libraries
