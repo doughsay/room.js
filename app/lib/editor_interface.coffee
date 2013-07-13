@@ -1,3 +1,5 @@
+compile = require('./compiler').compile
+
 module.exports = class EditorInterface
 
   constructor: (@db) ->
@@ -56,8 +58,15 @@ module.exports = class EditorInterface
   saveProperty: (property) ->
     @db.findById(property.object_id).setProp property.key, property.value
 
+  validateVerb: (verb) ->
+    return !!compile verb.lang, verb.code
+
   saveVerb: (verb) ->
-    @db.findById(verb.object_id).saveVerb verb
+    if @validateVerb verb
+      @db.findById(verb.object_id).saveVerb verb
+      true
+    else
+      false
 
   createProperty: (id, key, value) =>
     @db.findById(id).addProp key, value

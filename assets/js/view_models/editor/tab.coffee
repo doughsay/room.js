@@ -130,9 +130,9 @@ class @VerbTab extends Tab
     super()
 
   save: =>
-    @view.socket.emit 'save_verb', @serialize(), (error) =>
-      if error?
-        toastr.error "There was an error saving: #{error}"
+    @view.socket.emit 'save_verb', @serialize(), (valid) =>
+      if not valid
+        toastr.error "There was an error saving this verb. Please check your code for syntax errors."
       else
         @_code @verb.code()
         @_dobjarg @verb.dobjarg()

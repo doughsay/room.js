@@ -11,3 +11,5 @@ log4js.getLogger('cron').setLevel config.logLevel
 log4js.getLogger('context').setLevel config.logLevel
 log4js.getLogger('db').setLevel config.logLevel
 log4js.getLogger('server').setLevel config.logLevel
+log4js.getLogger('client').setLevel config.logLevel
+log4js.getLogger('editor').setLevel config.logLevel

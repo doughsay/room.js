@@ -1,5 +1,5 @@
 log4js = require '../lib/logger'
-logger = log4js.getLogger 'socket'
+logger = log4js.getLogger 'client'
 
 phash = require('../lib/hash').phash
 parse = require('../lib/parser').parse
@@ -13,6 +13,8 @@ module.exports = class Client
 
   # welcome the socket and attach the event listeners
   constructor: (@db, @context, @socket) ->
+    logger.info 'new socket connection'
+
     @socket.emit 'output', """
       Welcome to {blue bold|room.js}!
       Type {magenta bold|help} for a list of available commands.
@@ -34,7 +36,7 @@ module.exports = class Client
     verb = @db.sys.findVerbByName verbToRun
     if verb?
       @context.runVerb @player, verb, @db.sys
-    logger.info "#{@player.toString()} connected"
+    logger.info "#{@player} connected"
 
   # disconnect a player
   disconnect: (force) ->
@@ -45,7 +47,7 @@ module.exports = class Client
     @player.socket = null
     if force
       @socket.disconnect()
-    logger.info "#{@player.toString()} disconnected"
+    logger.info "#{@player} disconnected"
     @player = null
 
   ###################
@@ -58,7 +60,7 @@ module.exports = class Client
     if @player?
       @disconnect()
 
-    logger.info "client disconnected"
+    logger.info "socket disconnected"
 
   # fires when a socket sends a command
   onInput: (userStr) =>

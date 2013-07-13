@@ -21,7 +21,7 @@ env = app.settings.env
 
 # create the http and socket.io server
 server = require('http').createServer app
-io = require('socket.io').listen server, logger: socketLogger, 'log level': log4js.levels[config.logLevel]
+io = require('socket.io').listen server, logger: socketLogger, 'log level': log4js.levels.INFO #log4js.levels[config.logLevel]
 
 # set up web controller
 require('./app/controllers/index')(app)
@@ -41,12 +41,10 @@ context = new Context db
 # set up socket controllers
 Client = require './app/controllers/client'
 io.of('/client').on 'connection', (socket) ->
-  socketLogger.info "new client connection"
   new Client db, context, socket
 
 Editor = require './app/controllers/editor'
 io.of('/editor').on 'connection', (socket) ->
-  socketLogger.info "new editor connection"
   new Editor db, socket
 
 # delete the socket file if it exists (from a previous crash)
