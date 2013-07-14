@@ -14,7 +14,7 @@ module.exports = (obj, context) ->
       ks.push verb.propName() unless verb.propName() in ks
     ks.push 'inheritsFrom', 'create', 'addJob', 'rmJob', 'startJob', 'stopJob'
     if obj.player
-      ks.push 'send', 'input'
+      ks.push 'send', 'input', 'setPrompt'
     ks
 
   ownKeys = ->
@@ -26,7 +26,7 @@ module.exports = (obj, context) ->
       ks.push 'username', 'isProgrammer', 'isOnline', 'lastActivity'
     ks.push 'inheritsFrom', 'create', 'addJob', 'rmJob', 'startJob', 'stopJob'
     if obj.player
-      ks.push 'send', 'input'
+      ks.push 'send', 'input', 'setPrompt'
     ks
 
   getOwnPropertyDescriptor: (name) ->
@@ -137,6 +137,9 @@ module.exports = (obj, context) ->
 
         when 'input'
           (msg, fn) -> obj.input msg, fn
+
+        when 'setPrompt'
+          (str) -> obj.setPrompt if str? then str.toString() else ''
 
         else
           if obj.hasProp name

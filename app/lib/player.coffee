@@ -46,6 +46,13 @@ exports.RoomJsPlayer = class RoomJsPlayer extends RoomJsObject
     else
       false
 
+  setPrompt: (str) ->
+    if @socket?
+      @socket.emit 'set prompt', str
+      true
+    else
+      false
+
   setProgrammer: (programmer) ->
     @programmer = !!programmer
 

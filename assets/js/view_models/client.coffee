@@ -100,8 +100,11 @@ class @ClientView
     @optionsPane = $ '.options'
 
     @lines      = ko.observableArray []
-    @command    = ko.observable ""
+    @command    = ko.observable ''
+    @promptStr  = ko.observable ''
     @form       = ko.observable null
+
+    @promptFormatted = ko.computed => (colorize @promptStr()) + ' &gt;'
 
     # options
     options = @loadOptions()
@@ -167,6 +170,7 @@ class @ClientView
     @socket.on 'reconnecting', @reconnecting
 
     @socket.on 'output', @output
+    @socket.on 'set prompt', @set_prompt
     @socket.on 'request_form_input', @request_form_input
     @socket.on 'request_input', @request_input
 
@@ -223,7 +227,7 @@ class @ClientView
     if command
       if @echo()
         @addLine "\n" if @space()
-        @addLine "{black|> #{escapedCommand}}", false
+        @addLine "{black|> #{escapeHTML escapedCommand}}", false
       @history.unshift command
       if @history.length > @maxHistory()
         @truncateHistory()
@@ -342,6 +346,10 @@ class @ClientView
     @addLine "\n" if @space()
     lines = msg.split '\n'
     @addLines lines
+
+  set_prompt: (str) =>
+    @promptStr escapeHTML str
+    @setSizes()
 
   # input was requested from the server.
   # the next thing the user sends has to be returned to fn
