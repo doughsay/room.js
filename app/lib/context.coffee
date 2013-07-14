@@ -9,6 +9,7 @@ config = require '../config/app'
 mooUtil = require './util'
 mooBrowser = require './moo_browser'
 parse = require('./parser').parse
+compileEval = require('./compiler').compileEval
 
 contextProxyFor = require './context_proxy'
 proxies = require './helper_proxies'
@@ -112,14 +113,9 @@ module.exports = class Context
 
     @vmContext.stack.unshift newStack
 
-  runEval: (player, coffeeCode, stack = false) ->
+  runEval: (player, lang, code, stack = false) ->
 
     start = new Date()
-    wrappedCode = """
-    ((player, ls, match) ->
-      #{coffeeCode}
-    ).call(stack[0].player, stack[0].player, stack[0].ls, stack[0].match)
-    """
 
     @pushEvalStackVars player
 
@@ -131,8 +127,8 @@ module.exports = class Context
     runner = player.toString()
 
     try
-      code = coffee.compile wrappedCode, bare: true
-      output = vm.runInContext code, @vmContext, 'eval.vm', config.verbTimeout
+      script = compileEval lang, code
+      output = script.runInContext @vmContext, 'eval.vm', config.verbTimeout
       player.send mooUtil.print output
     catch error
       errorStr = error.toString()

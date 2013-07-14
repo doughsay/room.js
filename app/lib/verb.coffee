@@ -1,6 +1,6 @@
 _ = require 'underscore'
 
-compile = require('./compiler').compile
+compileVerb = require('./compiler').compileVerb
 
 # A RoomJsVerb is a js function which runs in a sandboxed context
 exports.RoomJsVerb = class
@@ -71,7 +71,7 @@ exports.RoomJsVerb = class
 
     propName
 
-  compile: -> @script = compile @lang, @code
+  compile: -> @script = compileVerb @lang, @code
 
   toJSON: ->
     clone = _.clone @

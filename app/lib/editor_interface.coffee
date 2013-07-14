@@ -1,4 +1,4 @@
-compile = require('./compiler').compile
+compileVerb = require('./compiler').compileVerb
 
 module.exports = class EditorInterface
 
@@ -59,7 +59,11 @@ module.exports = class EditorInterface
     @db.findById(property.object_id).setProp property.key, property.value
 
   validateVerb: (verb) ->
-    return !!compile verb.lang, verb.code
+    try
+      compileVerb verb.lang, verb.code
+      return true
+    catch e
+      return false
 
   saveVerb: (verb) ->
     if @validateVerb verb

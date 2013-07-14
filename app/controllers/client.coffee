@@ -94,9 +94,10 @@ module.exports = class Client
   onPlayerCommand: (str) =>
     command = parse str
 
-    if command.verb == 'eval' and @player.programmer
+    if command.verb in ['eval', 'evalc'] and @player.programmer
       code = command.argstr.replace(/\\\{/g, '{').replace(/\\\}/g, '}')
-      @context.runEval @player, code
+      lang = if command.verb is 'eval' then 'javascript' else 'coffeescript'
+      @context.runEval @player, lang, code
     else if command.verb in ['logout', 'quit']
       @disconnect()
       @socket.emit 'output', 'You have been logged out.'
