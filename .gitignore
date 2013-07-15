@@ -4,3 +4,4 @@ node_modules
 *.un~
 app/config/app.coffee
 db.json
+log/*
