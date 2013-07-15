@@ -12,8 +12,8 @@ PARTIAL_MATCH = 2
 # A RoomJsObject has properties and RoomJsVerbs
 exports.RoomJsObject = class RoomJsObject extends EventEmitter
 
-  constructor: (dbObject, @db) ->
-    @id = dbObject.id
+  constructor: (id, dbObject, @db) ->
+    @id = id
     @parent_id = dbObject.parent_id
     @name = dbObject.name
     @aliases = dbObject.aliases
@@ -284,6 +284,7 @@ exports.RoomJsObject = class RoomJsObject extends EventEmitter
   # remove properties which cause json serialization to fail
   toJSON: ->
     clone = _.clone @
+    delete clone.id
     delete clone.db
     delete clone.socket
     clone

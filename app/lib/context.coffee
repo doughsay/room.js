@@ -24,13 +24,13 @@ module.exports = class Context
       eval:       undefined
       Proxy:      undefined
       stack:      []
-      $:          (id) => @contextify @db.findById(id)
+      $:          (selector) => @contextify @query selector
       players:    => @db.players.map (player) => @contextify player
       browser:    mooBrowser
       parse:      parse
       schedule:   (object, verb, seconds, args = []) => @schedule object, verb, seconds, args
       cancel:     (id) => @cancel id
-      list:       => @db.list().map (o) => @contextify o
+      list:       => @db.objectsAsArray().map (o) => @contextify o
       search:     (search) => @db.search(search).map (o) => @contextify o
       reId:       (oldId, newId) => @db.reId oldId, newId
       rm:         (idOrObject) =>
@@ -39,7 +39,14 @@ module.exports = class Context
                     else
                       @db.rm idOrObject
 
-    @vmContext = vm.createContext _.extend @globals(), base
+    @vmContext = vm.createContext base
+
+  query: (selector) ->
+    if selector.indexOf('#') is 0
+      id = selector[1..]
+      @db.findById(id)
+    else
+      null
 
   deserialize: (x, cb = (->), top = true) =>
     switch typeof x
@@ -86,10 +93,6 @@ module.exports = class Context
           mooUtil.hmap x, @serialize
       else
         x
-
-  globals: ->
-    mooUtil.hkmap @db.sys.getAllProperties(), (key, value) =>
-      ["$#{key}", @deserialize value]
 
   # return a context object for the given object
   # also, memoize all the context objects within this context

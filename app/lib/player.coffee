@@ -3,8 +3,8 @@ RoomJsObject = require('./object').RoomJsObject
 # a RoomJsPlayer is just a slightly more specialized RoomJsObject
 exports.RoomJsPlayer = class RoomJsPlayer extends RoomJsObject
 
-  constructor: (player, db) ->
-    super player, db
+  constructor: (id, player, db) ->
+    super id, player, db
     @username = player.username
     @password = player.password
     @player = true

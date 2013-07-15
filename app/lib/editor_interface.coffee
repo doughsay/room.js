@@ -5,12 +5,9 @@ module.exports = class EditorInterface
   constructor: (@db) ->
 
   objects: ->
-    objects = @db.objectsAsArray()
-    objects[0...objects.length-3]
+    @db.objectsAsArray()
 
   objectsTree: ->
-    aliases = @db.globalAliases()
-
     objects = @objects()
 
     children = (o) =>
@@ -23,8 +20,6 @@ module.exports = class EditorInterface
         id: o.id
         name: o.name
         player: o.player
-      if aliases[o.id]?
-        x.alias = aliases[o.id]
       x.children = children o
       x
 
@@ -35,22 +30,18 @@ module.exports = class EditorInterface
 
   getObjectNode: (id) ->
     object = @db.findById id
-    alias = @db.aliasFor id
     {
       id: object.id
       parent_id: object.parent_id
       name: object.name
       player: object.player
-      alias: alias
     }
 
   getObject: (id) ->
     object = @db.findById id
-    alias = @db.aliasFor id
     {
       id: object.id
       name: object.name
-      alias: alias
       properties: object.getOwnProperties()
       verbs: object.getOwnVerbs()
     }
