@@ -119,17 +119,19 @@ module.exports = class Db extends EventEmitter
 
     if objectToChange?
       objectToChange.id = newId
-      console.log "object id changed: #{objectToChange.toString()}"
+      # console.log "object id changed: #{objectToChange.toString()}"
 
       for id, object of @objects
-        console.log "checking object: #{object.toString()}"
+        # console.log "checking object: #{object.toString()}"
         if like object.parent_id, oldId
           object.parent_id = newId
-          console.log "changed parent of: #{object.toString()}"
+          # we don't need to emit an event here, because according to the editor, the parent didn't really change
+          # console.log "changed parent of: #{object.toString()}"
 
         if like object.location_id, oldId
           object.location_id = newId
-          console.log "changed location of: #{object.toString()}"
+          # no event needed, editor doesn't care about object locations
+          # console.log "changed location of: #{object.toString()}"
 
         for key, val of object.getOwnProperties()
           if not val?
@@ -137,15 +139,18 @@ module.exports = class Db extends EventEmitter
           else if val._mooObject? and like val._mooObject, oldId
             val._mooObject = newId
             object.setProp key, val
-            console.log "changed prop '#{key}' of: #{object.toString()}"
+            # setProp emits its own event
+            # console.log "changed prop '#{key}' of: #{object.toString()}"
           else if typeof val is 'object'
             save = reIdVal val
             if save
               object.setProp key, val
-              console.log "changed prop '#{key}' of: #{object.toString()}"
+              # setProp emits its own event
+              # console.log "changed prop '#{key}' of: #{object.toString()}"
 
       delete @objects[oldId]
       @objects[newId] = objectToChange
+      @emit 'objectIDChanged', oldId, newId
       true
     else
       false

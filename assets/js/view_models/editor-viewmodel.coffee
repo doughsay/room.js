@@ -164,6 +164,7 @@ class @EditorView
     @socket.on 'object_created', @object_created
     @socket.on 'object_deleted', @object_deleted
     @socket.on 'object_parent_changed', @object_parent_changed
+    @socket.on 'object_id_changed', @object_id_changed
     @socket.on 'object_name_changed', @object_name_changed
 
     @socket.on 'property_added', @property_added
@@ -345,6 +346,9 @@ class @EditorView
   object_parent_changed: (spec) =>
     o = @removeFromTree spec.id
     @insertIntoTree o, spec.parent_id
+
+  object_id_changed: (oldId, newId) =>
+    console.log 'TODO', oldId, newId
 
   object_name_changed: (spec) =>
     o = @findInTree spec.id
