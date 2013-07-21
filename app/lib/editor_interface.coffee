@@ -1,5 +1,13 @@
 compileVerb = require('./compiler').compileVerb
 
+isIntString = (x) -> "#{parseInt(x)}" is x
+
+coersiveIDSort = ({id: a}, {id: b}) ->
+  if isIntString(a) and isIntString(b)
+    a = parseInt a
+    b = parseInt b
+  if a < b then -1 else if a > b then 1 else 0
+
 module.exports = class EditorInterface
 
   constructor: (@db) ->
@@ -21,10 +29,13 @@ module.exports = class EditorInterface
         name: o.name
         player: o.player
       x.children = children o
+      x.children.sort coersiveIDSort
       x
 
     top = objects.filter (o) ->
       o.parent_id == null
+
+    top.sort coersiveIDSort
 
     top.map show
 
