@@ -1,3 +1,13 @@
+isIntString = (x) -> "#{parseInt(x)}" is x
+
+coersiveIDSort = ({id: aIDAccessor}, {id: bIDAccessor}) ->
+  a = aIDAccessor()
+  b = bIDAccessor()
+  if isIntString(a) and isIntString(b)
+    a = parseInt a
+    b = parseInt b
+  if a < b then -1 else if a > b then 1 else 0
+
 # View model for object browser tree node
 class @TreeNode
 
@@ -46,6 +56,9 @@ class @TreeNode
     @view.filter.subscribe (filter) =>
       if filter isnt '' and @visible()
         @expanded true
+
+  sortChildren: ->
+    @children.sort coersiveIDSort
 
   newChild: (name) ->
     @view.socket.emit 'create_child', {id: @id(), name: name}

@@ -1,9 +1,12 @@
 isIntString = (x) -> "#{parseInt(x)}" is x
 
-coersiveIDSort = ({id: a}, {id: b}) ->
+coersiveIDSort = ({id: aIDAccessor}, {id: bIDAccessor}) ->
+  a = aIDAccessor()
+  b = bIDAccessor()
   if isIntString(a) and isIntString(b)
     a = parseInt a
     b = parseInt b
+  console.log 'comparing', a, 'and', b
   if a < b then -1 else if a > b then 1 else 0
 
 # Knockout.js view model for the room.js editor
@@ -231,7 +234,7 @@ class @EditorViewModel
         return null
       node.parent = parentNode
       parentNode.children.push node
-      parentNode.children.sort coersiveIDSort
+      parentNode.sortChildren()
     else
       @objects.push node
       @objects.sort coersiveIDSort
@@ -349,7 +352,9 @@ class @EditorViewModel
 
   object_id_changed: (oldId, newId) =>
     o = @findInTree oldId
-    o.id newId if o?
+    if o?
+      o.id newId
+      o.parent?.sortChildren()
     o = @findInTabs oldId
     o.id newId if o?
 
