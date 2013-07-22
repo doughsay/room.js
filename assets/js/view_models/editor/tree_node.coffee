@@ -4,14 +4,14 @@ class @TreeNode
   constructor: (o, @view, @parent) ->
 
     # attributes
-    @id = o.id
+    @id = ko.observable o.id
     @name = ko.observable o.name
     @player = ko.observable o.player
     @children = ko.observableArray o.children.map (p) => new TreeNode p, @view, @
 
     # presenters
     @idPresenter = ko.computed =>
-      id = "\##{@id}"
+      id = "\##{@id()}"
       filter = @view.filter()
       @highlight id, filter
 
@@ -33,7 +33,7 @@ class @TreeNode
       if not selected?
         false
       else
-        selected.id == @id
+        selected.id() == @id()
 
     # classes
     @iconClass = ko.computed =>
@@ -48,13 +48,13 @@ class @TreeNode
         @expanded true
 
   newChild: (name) ->
-    @view.socket.emit 'create_child', {id: @id, name: name}
+    @view.socket.emit 'create_child', {id: @id(), name: name}
 
   rename: (name) ->
-    @view.socket.emit 'rename_object', {id: @id, name: name}
+    @view.socket.emit 'rename_object', {id: @id(), name: name}
 
   delete: ->
-    @view.socket.emit 'delete_object', {id: @id}
+    @view.socket.emit 'delete_object', {id: @id()}
 
   menu: =>
     @view.selectObject @
@@ -94,7 +94,7 @@ class @TreeNode
     matches = (str) =>
       str.toLowerCase().indexOf(filter.toLowerCase()) != -1
 
-    matches(@name()) or matches("\##{@id}")
+    matches(@name()) or matches("\##{@id()}")
 
   highlight: (str, needle) ->
     if needle is ''

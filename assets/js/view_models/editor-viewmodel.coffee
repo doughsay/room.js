@@ -7,7 +7,7 @@ coersiveIDSort = ({id: a}, {id: b}) ->
   if a < b then -1 else if a > b then 1 else 0
 
 # Knockout.js view model for the room.js editor
-class @EditorView
+class @EditorViewModel
 
   socket: null
 
@@ -24,7 +24,7 @@ class @EditorView
 
     @filter = ko.computed( =>
       @filter_text()
-    ).extend throttle: 500
+    ).extend throttle: 250
 
     @selectedObject = ko.observable null
 
@@ -95,16 +95,16 @@ class @EditorView
 
   # triggered by clicking an object in the object browser
   selectObject: (node) =>
-    o = @findInTabs node.id
+    o = @findInTabs node.id()
     if o?
       @selectedObject o
     else
-      @socket.emit 'get_object', node.id, (object) =>
+      @socket.emit 'get_object', node.id(), (object) =>
         @selectedObject new MiniObject object, @
 
   # triggered by double-clicking a property in the object attribute list
   openProperty: (property) =>
-    tab = @tabs().filter((t) -> t.type is 'property' and t.property.object.id is property.object.id and t.property.key() is property.key())[0]
+    tab = @tabs().filter((t) -> t.type is 'property' and t.property.object.id() is property.object.id() and t.property.key() is property.key())[0]
     if tab?
       @selectTab(tab)
     else
@@ -114,7 +114,7 @@ class @EditorView
 
   # triggered by double-clicking a verb in the object attribute list
   openVerb: (verb) =>
-    tab = @tabs().filter((t) -> t.type is 'verb' and t.verb.object.id is verb.object.id and t.verb.name() is verb.name())[0]
+    tab = @tabs().filter((t) -> t.type is 'verb' and t.verb.object.id() is verb.object.id() and t.verb.name() is verb.name())[0]
     if tab?
       @selectTab(tab)
     else
@@ -198,7 +198,7 @@ class @EditorView
 
   findInTree: (id) ->
     find = (id, o) ->
-      if o.id == id
+      if o.id() == id
         o
       else
         for child in o.children()
@@ -244,13 +244,13 @@ class @EditorView
         when 'verb'
           tab.verb.object
 
-    [match] = os.filter (o) -> o.id is id
+    [match] = os.filter (o) -> o.id() is id
 
     match || null
 
   updatePropertyInTabs: (id, key, value) ->
     for tab in @tabs()
-      if tab.type is 'property' and tab.property.key() is key and tab.property.object.id is id
+      if tab.type is 'property' and tab.property.key() is key and tab.property.object.id() is id
         tab.update value
 
   removeFromTabs: (id) ->
@@ -261,7 +261,7 @@ class @EditorView
           o = tab.property.object
         when 'verb'
           o = tab.verb.object
-      if o.id is id
+      if o.id() is id
         tabsToRemove.push tab
 
     @removeTab tab for tab in tabsToRemove
@@ -269,7 +269,7 @@ class @EditorView
   removePropertyFromTabs: (id, key) ->
     tabsToRemove = []
     for tab in @tabs()
-      if tab.type is 'property' and tab.property.key() is key and tab.property.object.id is id
+      if tab.type is 'property' and tab.property.key() is key and tab.property.object.id() is id
         tabsToRemove.push tab
 
     @removeTab tab for tab in tabsToRemove
@@ -277,7 +277,7 @@ class @EditorView
   removeVerbFromTabs: (id, verbName) ->
     tabsToRemove = []
     for tab in @tabs()
-      if tab.type is 'verb' and tab.verb.name() is verbName and tab.verb.object.id is id
+      if tab.type is 'verb' and tab.verb.name() is verbName and tab.verb.object.id() is id
         tabsToRemove.push tab
 
     @removeTab tab for tab in tabsToRemove
@@ -298,7 +298,7 @@ class @EditorView
 
   updateVerbInTabs: (id, verb) ->
     for tab in @tabs()
-      if tab.type is 'verb' and tab.verb.name() is verb.original_name and tab.verb.object.id is id
+      if tab.type is 'verb' and tab.verb.name() is verb.original_name and tab.verb.object.id() is id
         tab.update verb
 
   newObject: (name) ->
@@ -340,7 +340,7 @@ class @EditorView
   object_deleted: (id) =>
     @removeFromTree id
     @removeFromTabs id
-    if @selectedObject()?.id is id
+    if @selectedObject()?.id() is id
       @selectedObject null
 
   object_parent_changed: (spec) =>
@@ -348,21 +348,23 @@ class @EditorView
     @insertIntoTree o, spec.parent_id
 
   object_id_changed: (oldId, newId) =>
-    console.log 'TODO', oldId, newId
+    o = @findInTree oldId
+    o.id newId if o?
+    o = @findInTabs oldId
+    o.id newId if o?
 
   object_name_changed: (spec) =>
     o = @findInTree spec.id
     o.name spec.name if o?
-
     o = @findInTabs spec.id
     o.name spec.name if o?
 
   property_added: (spec) =>
-    if @selectedObject().id is spec.id
+    if @selectedObject().id() is spec.id
       @selectedObject().addProperty spec.key, spec.value
 
   property_deleted: (spec) =>
-    if @selectedObject().id is spec.id
+    if @selectedObject().id() is spec.id
       @selectedObject().rmProperty spec.key
 
     @removePropertyFromTabs spec.id, spec.key
@@ -370,15 +372,15 @@ class @EditorView
   property_updated: (spec) =>
     @updatePropertyInTabs spec.id, spec.key, spec.value
 
-    if @selectedObject().id is spec.id
+    if @selectedObject().id() is spec.id
       @selectedObject().updateProperty spec.key, spec.value
 
   verb_added: (spec) =>
-    if @selectedObject().id is spec.id
+    if @selectedObject().id() is spec.id
       @selectedObject().addVerb spec.verb
 
   verb_deleted: (spec) =>
-    if @selectedObject().id is spec.id
+    if @selectedObject().id() is spec.id
       @selectedObject().rmVerb spec.verbName
 
     @removeVerbFromTabs spec.id, spec.verbName
@@ -386,7 +388,7 @@ class @EditorView
   verb_updated: (spec) =>
     @updateVerbInTabs spec.id, spec.verb
 
-    if @selectedObject().id is spec.id
+    if @selectedObject().id() is spec.id
       @selectedObject().updateVerb spec.verb
 
   # TODO

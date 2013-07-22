@@ -119,6 +119,7 @@ module.exports = class Db extends EventEmitter
 
     if objectToChange?
       objectToChange.id = newId
+      @emit 'objectIDChanged', oldId, newId
       # console.log "object id changed: #{objectToChange.toString()}"
 
       for id, object of @objects
@@ -138,19 +139,16 @@ module.exports = class Db extends EventEmitter
             continue
           else if val._mooObject? and like val._mooObject, oldId
             val._mooObject = newId
-            object.setProp key, val
-            # setProp emits its own event
+            @emit 'propertyUpdated', {id: newId, key: key, value: val}
             # console.log "changed prop '#{key}' of: #{object.toString()}"
           else if typeof val is 'object'
-            save = reIdVal val
-            if save
-              object.setProp key, val
-              # setProp emits its own event
+            changed = reIdVal val
+            if changed
+              @emit 'propertyUpdated', {id: newId, key: key, value: val}
               # console.log "changed prop '#{key}' of: #{object.toString()}"
 
       delete @objects[oldId]
       @objects[newId] = objectToChange
-      @emit 'objectIDChanged', oldId, newId
       true
     else
       false

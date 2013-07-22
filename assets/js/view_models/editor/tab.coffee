@@ -37,7 +37,7 @@ class @PropertyTab extends Tab
 
     @displayName = ko.computed =>
       object = @property.object
-      objName = if object.alias()? then object.alias() else "[##{object.id} #{object.name()}]"
+      objName = if object.alias()? then object.alias() else "[##{object.id()} #{object.name()}]"
       "#{objName}.#{@property.key()}"
 
     value = @property.value()
@@ -68,7 +68,7 @@ class @PropertyTab extends Tab
 
   serialize: ->
     {
-      object_id: @property.object.id
+      object_id: @property.object.id()
       key: @property.key()
       value: @property.value()
     }
@@ -91,7 +91,7 @@ class @VerbTab extends Tab
 
     @displayName = ko.computed =>
       object = @verb.object
-      objName = if object.alias()? then object.alias() else "[##{object.id} #{object.name()}]"
+      objName = if object.alias()? then object.alias() else "[##{object.id()} #{object.name()}]"
       "#{objName}.#{@verb.name()}"
 
     @mode = ko.computed =>
@@ -144,7 +144,7 @@ class @VerbTab extends Tab
 
   serialize: ->
     {
-      object_id: @verb.object.id
+      object_id: @verb.object.id()
       code: @verb.code()
       dobjarg: @verb.dobjarg()
       preparg: @verb.preparg()
