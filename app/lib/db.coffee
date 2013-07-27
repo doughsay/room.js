@@ -22,27 +22,31 @@ module.exports = class Db extends EventEmitter
   players: []
 
   constructor: (@filename, @getContext) ->
+    startTime = mooUtil.tstart()
+
     if fs.existsSync @filename
       {nextId: @_nextId, objects: dbObjects} = JSON.parse fs.readFileSync @filename
     else
       {nextId: @_nextId, objects: dbObjects} = JSON.parse fs.readFileSync 'db.seed.json'
 
-    startTime = mooUtil.tstart()
-
     for id, dbObject of dbObjects
-      if dbObject.player
-        newMooObj = new RoomJsPlayer dbObject, @
+      newMooObj = if dbObject.player
+        new RoomJsPlayer id, dbObject, @
       else
-        newMooObj = new RoomJsObject dbObject, @
-      @objects[parseInt(dbObject.id)] = newMooObj
+        new RoomJsObject id, dbObject, @
+
+      @objects[id] = newMooObj
+
       if newMooObj.player
         @players.push newMooObj
+
     @specials()
-    logger.info "#{@filename} loaded in #{mooUtil.tend startTime}" if not @quiet
 
     @saveInterval = setInterval @save, 5*60*1000
 
     process.on 'exit', => @exit()
+
+    logger.info "#{@filename} loaded in #{mooUtil.tend startTime}"
 
   exit: ->
     for player in @players
@@ -63,19 +67,13 @@ module.exports = class Db extends EventEmitter
       programmer: false
       properties: []
       verbs: []
-    new RoomJsObject x, @
+    new RoomJsObject id, x, @
 
   specials: ->
-    @objects[-1] = @blankObject -1, 'nothing'
-    @objects[-2] = @blankObject -2, 'ambiguous_match'
-    @objects[-3] = @blankObject -3, 'failed_match'
-    @nothing = @objects[-1]
-    @ambiguous_match = @objects[-2]
-    @failed_match = @objects[-3]
-    @sys = @objects[0]
-
-    @nothing.send = (msg) ->
-      logger.debug "$nothing got message: #{msg}"
+    @nothing         = @blankObject 'nothing', 'nothing'
+    @ambiguous_match = @blankObject 'ambiguous_match', 'ambiguous_match'
+    @failed_match    = @blankObject 'failed_match', 'failed_match'
+    @sys             = @objects.sys
 
   save: =>
     startTime = mooUtil.tstart()
@@ -83,30 +81,88 @@ module.exports = class Db extends EventEmitter
       throw err if err
       fs.rename '_' + @filename, @filename, (err) =>
         throw err if err
-        logger.info "#{@filename} saved in #{mooUtil.tend startTime}" if not @quiet
+        logger.info "#{@filename} saved in #{mooUtil.tend startTime}"
 
   saveSync: ->
     startTime = mooUtil.tstart()
     fs.writeFileSync '_' + @filename, @serialize()
     fs.renameSync '_' + @filename, @filename
-    logger.info "#{@filename} saved in #{mooUtil.tend startTime}" if not @quiet
+    logger.info "#{@filename} saved in #{mooUtil.tend startTime}"
 
   serialize: ->
-    # don't save the special objects
-    objects = _.clone(@objects)
-    delete objects[-1]
-    delete objects[-2]
-    delete objects[-3]
-    JSON.stringify {nextId: @_nextId, objects: objects}
+    JSON.stringify {nextId: @_nextId, objects: @objects}
+
+  reId: (oldId, newId) ->
+    like = (x, y) ->
+      if not (x? and y?)
+        return false
+      x.toString() is y.toString()
+
+    reIdVal = (x) ->
+      if not x?
+        false
+      else if x._mooObject? and like x._mooObject, oldId
+        x._mooObject = newId
+        true
+      else if typeof x is 'object'
+        answers = for key, val of x
+          reIdVal val
+        true in _.flatten answers
+
+    oldId = oldId.toString()
+    newId = newId.toString()
+
+    if @objects[newId]?
+      throw new Error "An object with id '#{newId}' already exists."
+
+    objectToChange = @objects[oldId]
+
+    if objectToChange?
+      objectToChange.id = newId
+      @emit 'objectIDChanged', oldId, newId
+      # console.log "object id changed: #{objectToChange.toString()}"
+
+      for id, object of @objects
+        # console.log "checking object: #{object.toString()}"
+        if like object.parent_id, oldId
+          object.parent_id = newId
+          # we don't need to emit an event here, because according to the editor, the parent didn't really change
+          # console.log "changed parent of: #{object.toString()}"
+
+        if like object.location_id, oldId
+          object.location_id = newId
+          # no event needed, editor doesn't care about object locations
+          # console.log "changed location of: #{object.toString()}"
+
+        for key, val of object.getOwnProperties()
+          if not val?
+            continue
+          else if val._mooObject? and like val._mooObject, oldId
+            val._mooObject = newId
+            @emit 'propertyUpdated', {id: newId, key: key, value: val}
+            # console.log "changed prop '#{key}' of: #{object.toString()}"
+          else if typeof val is 'object'
+            changed = reIdVal val
+            if changed
+              @emit 'propertyUpdated', {id: newId, key: key, value: val}
+              # console.log "changed prop '#{key}' of: #{object.toString()}"
+
+      delete @objects[oldId]
+      @objects[newId] = objectToChange
+      true
+    else
+      false
 
   findById: (id) ->
-    if @objects[id]? then @objects[id] else null
-
-  findByNum: (numStr) ->
-    @findById parseInt numStr.match(/^#([0-9]+)$/)?[1]
-
-  aliasFor: (id) ->
-    @globalAliases()[id]
+    switch id
+      when 'nothing'
+        @nothing
+      when 'ambiguous_match'
+        @ambiguous_match
+      when 'failed_match'
+        @failed_match
+      else
+        if @objects[id]? then @objects[id] else null
 
   # find the objects matched by the command
   matchObjects: (player, command) ->
@@ -119,7 +175,6 @@ module.exports = class Db extends EventEmitter
   findObject: (search, player) ->
     return player if search == 'me'
     return player.location() if search == 'here'
-    #return @findByNum search if search.match /^#[0-9]+$/
     @findNearby search, player
 
   # find objects "nearby"
@@ -180,24 +235,11 @@ module.exports = class Db extends EventEmitter
     else
       null
 
-  objectsAsArray: ->
-    for id,object of @objects
-      object
-
-  globalAliases: ->
-    @sys.properties.filter((prop) -> prop.value._mooObject?).reduce(((map, prop) ->
-      map[prop.value._mooObject] = '$' + prop.key
-      map
-    ), {})
-
-  list: ->
-    objectsArray = @objectsAsArray()
-    objectsArray[0...objectsArray.length-3]
+  objectsAsArray: -> object for id, object of @objects
 
   search: (search) ->
-    regex = new RegExp "#{search}", 'i'
-    @list().filter (object) ->
-      !!object.name.match regex
+    @objectsAsArray().filter (object) ->
+      object.name.toLowerCase().indexOf(search.toLowerCase()) >= 0
 
   usernameTaken: (username) ->
     !!(@players.filter (player) -> player.username == username).length
@@ -209,7 +251,6 @@ module.exports = class Db extends EventEmitter
     nextId = @nextId()
 
     object =
-      id: nextId
       parent_id: null
       name: name
       aliases: []
@@ -223,7 +264,7 @@ module.exports = class Db extends EventEmitter
       verbs: []
       lastActivity: (new Date()).toString()
 
-    newPlayer = new RoomJsPlayer object, @
+    newPlayer = new RoomJsPlayer nextId, object, @
 
     @objects[nextId] = newPlayer
     @players.push newPlayer
@@ -247,11 +288,10 @@ module.exports = class Db extends EventEmitter
         throw new Error "Invalid alias '#{alias}'"
     nextId = @nextId()
     rawObject = JSON.parse JSON.stringify object
-    rawObject.id = nextId
     rawObject.parent_id = object.parent_id
     rawObject.name = newName
     rawObject.aliases = newAliases
-    newObject = new RoomJsObject rawObject, @
+    newObject = new RoomJsObject nextId, rawObject, @
     newObject.moveTo object.location()
     @objects[nextId] = newObject
     @emit 'objectCreated', nextId
@@ -269,18 +309,17 @@ module.exports = class Db extends EventEmitter
     rawObject = JSON.parse JSON.stringify object
     rawObject.properties = []
     rawObject.verbs = []
-    rawObject.id = nextId
     rawObject.parent_id = object.id
     rawObject.name = newName
     rawObject.aliases = newAliases
-    newObject = new RoomJsObject rawObject, @
+    newObject = new RoomJsObject nextId, rawObject, @
     newObject.moveTo object.location()
     @objects[nextId] = newObject
     @emit 'objectCreated', nextId
     newObject
 
   rm: (id) ->
-    if id > -1 and @findById(id)?
+    if id not in ['nothing', 'ambiguous_match', 'failed_match'] and @findById(id)?
       object = @findById id
       if object.children().length > 0
         throw new Error 'That object cannot be removed because it has children'
@@ -293,4 +332,4 @@ module.exports = class Db extends EventEmitter
     else
       false
 
-  nextId: -> @_nextId++
+  nextId: -> (@_nextId++).toString()

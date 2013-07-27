@@ -1,16 +1,21 @@
 compileVerb = require('./compiler').compileVerb
 
+isIntString = (x) -> "#{parseInt(x)}" is x
+
+coersiveIDSort = ({id: a}, {id: b}) ->
+  if isIntString(a) and isIntString(b)
+    a = parseInt a
+    b = parseInt b
+  if a < b then -1 else if a > b then 1 else 0
+
 module.exports = class EditorInterface
 
   constructor: (@db) ->
 
   objects: ->
-    objects = @db.objectsAsArray()
-    objects[0...objects.length-3]
+    @db.objectsAsArray()
 
   objectsTree: ->
-    aliases = @db.globalAliases()
-
     objects = @objects()
 
     children = (o) =>
@@ -23,34 +28,31 @@ module.exports = class EditorInterface
         id: o.id
         name: o.name
         player: o.player
-      if aliases[o.id]?
-        x.alias = aliases[o.id]
       x.children = children o
+      x.children.sort coersiveIDSort
       x
 
     top = objects.filter (o) ->
       o.parent_id == null
 
+    top.sort coersiveIDSort
+
     top.map show
 
   getObjectNode: (id) ->
     object = @db.findById id
-    alias = @db.aliasFor id
     {
       id: object.id
       parent_id: object.parent_id
       name: object.name
       player: object.player
-      alias: alias
     }
 
   getObject: (id) ->
     object = @db.findById id
-    alias = @db.aliasFor id
     {
       id: object.id
       name: object.name
-      alias: alias
       properties: object.getOwnProperties()
       verbs: object.getOwnVerbs()
     }

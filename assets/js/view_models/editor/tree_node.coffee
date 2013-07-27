@@ -1,18 +1,27 @@
+isIntString = (x) -> "#{parseInt(x)}" is x
+
+coersiveIDSort = ({id: aIDAccessor}, {id: bIDAccessor}) ->
+  a = aIDAccessor()
+  b = bIDAccessor()
+  if isIntString(a) and isIntString(b)
+    a = parseInt a
+    b = parseInt b
+  if a < b then -1 else if a > b then 1 else 0
+
 # View model for object browser tree node
 class @TreeNode
 
   constructor: (o, @view, @parent) ->
 
     # attributes
-    @id = o.id
+    @id = ko.observable o.id
     @name = ko.observable o.name
     @player = ko.observable o.player
-    @alias = ko.observable o.alias
     @children = ko.observableArray o.children.map (p) => new TreeNode p, @view, @
 
     # presenters
     @idPresenter = ko.computed =>
-      id = "\##{@id}"
+      id = "\##{@id()}"
       filter = @view.filter()
       @highlight id, filter
 
@@ -20,12 +29,6 @@ class @TreeNode
       name = @name()
       filter = @view.filter()
       @highlight name, filter
-
-    @aliasPresenter = ko.computed =>
-      return '' if not @alias()?
-      alias = "#{@alias()}"
-      filter = @view.filter()
-      @highlight alias, filter
 
     # state
     @expanded = ko.observable false
@@ -40,7 +43,7 @@ class @TreeNode
       if not selected?
         false
       else
-        selected.id == @id
+        selected.id() == @id()
 
     # classes
     @iconClass = ko.computed =>
@@ -54,14 +57,17 @@ class @TreeNode
       if filter isnt '' and @visible()
         @expanded true
 
+  sortChildren: ->
+    @children.sort coersiveIDSort
+
   newChild: (name) ->
-    @view.socket.emit 'create_child', {id: @id, name: name}
+    @view.socket.emit 'create_child', {id: @id(), name: name}
 
   rename: (name) ->
-    @view.socket.emit 'rename_object', {id: @id, name: name}
+    @view.socket.emit 'rename_object', {id: @id(), name: name}
 
   delete: ->
-    @view.socket.emit 'delete_object', {id: @id}
+    @view.socket.emit 'delete_object', {id: @id()}
 
   menu: =>
     @view.selectObject @
@@ -101,7 +107,7 @@ class @TreeNode
     matches = (str) =>
       str.toLowerCase().indexOf(filter.toLowerCase()) != -1
 
-    matches(@name()) or matches("#{@alias()}") or matches("\##{@id}")
+    matches(@name()) or matches("\##{@id()}")
 
   highlight: (str, needle) ->
     if needle is ''

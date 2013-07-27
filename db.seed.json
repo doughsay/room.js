@@ -1,88 +1,349 @@
 {
-  "nextId": 105,
+  "nextId": "105",
   "objects": {
-    "0": {
-      "id": 0,
-      "parent_id": null,
-      "name": "System Object",
+    "6": {
+      "parent_id": "room",
+      "name": "A forest clearing",
+      "aliases": [
+        "clearing"
+      ],
+      "location_id": null,
+      "player": false,
+      "programmer": false,
+      "properties": [
+        {
+          "key": "description",
+          "value": "The forest thins out here a bit. To the north you can see the entrance to a cave through the bushes. There is also a trap door barely visible in the grass."
+        },
+        {
+          "key": "exits",
+          "value": {
+            "north": {
+              "_mooObject": "9"
+            },
+            "down": {
+              "_mooObject": "16"
+            },
+            "nowhere": {
+              "_mooObject": "19"
+            }
+          }
+        },
+        {
+          "key": "description",
+          "value": "The forest thins out here a bit. To the north you can see the entrance to a cave through the bushes."
+        }
+      ],
+      "verbs": [],
+      "crontab": []
+    },
+    "7": {
+      "parent_id": "sword",
+      "name": "wooden sword",
+      "aliases": [
+        "sword"
+      ],
+      "location_id": "6",
+      "player": false,
+      "programmer": false,
+      "properties": [
+        {
+          "key": "description",
+          "value": "A simple wooden sword."
+        }
+      ],
+      "verbs": [],
+      "crontab": []
+    },
+    "9": {
+      "parent_id": "exit",
+      "name": "north",
       "aliases": [],
       "location_id": null,
       "player": false,
       "programmer": false,
       "properties": [
         {
-          "key": "failed_match",
+          "key": "destination",
           "value": {
-            "_mooObject": -3
-          }
-        },
-        {
-          "key": "ambiguous_match",
-          "value": {
-            "_mooObject": -2
-          }
-        },
-        {
-          "key": "nothing",
-          "value": {
-            "_mooObject": -1
-          }
-        },
-        {
-          "key": "sys",
-          "value": {
-            "_mooObject": 0
-          }
-        },
-        {
-          "key": "root",
-          "value": {
-            "_mooObject": 1
-          }
-        },
-        {
-          "key": "player",
-          "value": {
-            "_mooObject": 2
-          }
-        },
-        {
-          "key": "room",
-          "value": {
-            "_mooObject": 4
-          }
-        },
-        {
-          "key": "thing",
-          "value": {
-            "_mooObject": 5
-          }
-        },
-        {
-          "key": "exit",
-          "value": {
-            "_mooObject": 8
-          }
-        },
-        {
-          "key": "tunneler",
-          "value": {
-            "_mooObject": 14
-          }
-        },
-        {
-          "key": "wizard",
-          "value": {
-            "_mooObject": 3
-          }
-        },
-        {
-          "key": "util",
-          "value": {
-            "_mooObject": 21
+            "_mooObject": "10"
           }
         }
       ],
+      "verbs": [],
+      "crontab": []
+    },
+    "10": {
+      "parent_id": "room",
+      "name": "A Cave",
+      "aliases": [],
+      "location_id": null,
+      "player": false,
+      "programmer": false,
+      "properties": [
+        {
+          "key": "description",
+          "value": "This is a dark and slightly damp cave. You can barely see anything except the light coming from the opening to the south."
+        },
+        {
+          "key": "exits",
+          "value": {
+            "south": {
+              "_mooObject": "11"
+            }
+          }
+        }
+      ],
+      "verbs": [],
+      "crontab": []
+    },
+    "11": {
+      "parent_id": "exit",
+      "name": "south",
+      "aliases": [],
+      "location_id": null,
+      "player": false,
+      "programmer": false,
+      "properties": [
+        {
+          "key": "destination",
+          "value": {
+            "_mooObject": "6"
+          }
+        }
+      ],
+      "verbs": [],
+      "crontab": []
+    },
+    "14": {
+      "parent_id": "thing",
+      "name": "tunneler",
+      "aliases": [],
+      "location_id": null,
+      "player": false,
+      "programmer": false,
+      "properties": [
+        {
+          "key": "description",
+          "value": "A device used for tunneling into new areas. Only usable by programmers or builders. To use it, type 'go <direction> with tunneler'."
+        }
+      ],
+      "verbs": [
+        {
+          "name": "go",
+          "hidden": false,
+          "dobjarg": "any",
+          "preparg": "with/using",
+          "iobjarg": "this",
+          "code": "if not (player.programmer or player.builder)\n  throw new Error \"You're not allowed to use the tunneler\"\n\ndirection = dobjstr\nif not direction\n  throw new Error \"Invalid direction\"\n\nif player.location.exits[direction]?\n  throw new Error \"That direction already exists!\"\n\nplayer.tell \"Going #{direction} #{prepstr} the tunneler!\"\n\nconnectTo = (room) ->\n  exit = $('#exit').create direction\n  exit.destination = room\n  \n  player.location.exits[direction] = exit\n\n  exit.invoke()\n\nplayer.input \"Connect to an {magenta|existing} room or a {magenta|new} room?\", (response) ->\n  switch response\n    when 'existing'\n      player.input \"ID of existing room:\", (id) ->\n        if (room = $(id)) # TODO check if room is descendant of room class?\n          connectTo room\n        else\n          throw new Error \"Couldn't find room with id '#{id}'\"\n    when 'new'\n      player.input \"Give me a name for the new room:\", (name) ->\n        player.input \"Descripe the new room:\", (description) ->\n          newRoom = $('#room').create name\n          newRoom.description = description\n          connectTo newRoom\n    else\n      player.tell \"{red|Unknown response. Was expecting either 'existing' or 'new'}\"",
+          "lang": "coffeescript"
+        }
+      ],
+      "crontab": []
+    },
+    "15": {
+      "parent_id": "room",
+      "name": "Dungeon cell",
+      "aliases": [],
+      "location_id": null,
+      "player": false,
+      "programmer": false,
+      "properties": [
+        {
+          "key": "description",
+          "value": "A small cell in what appears to be a dungeon. There are 3 stone walls and metal bars to the west. The bars have a door built into them. A ladder on the north wall goes up to a trap door."
+        },
+        {
+          "key": "exits",
+          "value": {
+            "west": {
+              "_mooObject": "25"
+            },
+            "up": {
+              "_mooObject": "17"
+            }
+          }
+        }
+      ],
+      "verbs": [],
+      "crontab": []
+    },
+    "16": {
+      "parent_id": "exit",
+      "name": "down",
+      "aliases": [],
+      "location_id": null,
+      "player": false,
+      "programmer": false,
+      "properties": [
+        {
+          "key": "destination",
+          "value": {
+            "_mooObject": "15"
+          }
+        }
+      ],
+      "verbs": [],
+      "crontab": []
+    },
+    "17": {
+      "parent_id": "exit",
+      "name": "up",
+      "aliases": [],
+      "location_id": null,
+      "player": false,
+      "programmer": false,
+      "properties": [
+        {
+          "key": "destination",
+          "value": {
+            "_mooObject": "6"
+          }
+        }
+      ],
+      "verbs": [],
+      "crontab": []
+    },
+    "18": {
+      "parent_id": "room",
+      "name": "Nowhere",
+      "aliases": [],
+      "location_id": null,
+      "player": false,
+      "programmer": false,
+      "properties": [
+        {
+          "key": "description",
+          "value": "You are nowhere. For real. Maybe you should go somewhere?"
+        },
+        {
+          "key": "exits",
+          "value": {
+            "somewhere": {
+              "_mooObject": "20"
+            }
+          }
+        }
+      ],
+      "verbs": [],
+      "crontab": []
+    },
+    "19": {
+      "parent_id": "exit",
+      "name": "nowhere",
+      "aliases": [],
+      "location_id": null,
+      "player": false,
+      "programmer": false,
+      "properties": [
+        {
+          "key": "destination",
+          "value": {
+            "_mooObject": "18"
+          }
+        }
+      ],
+      "verbs": [],
+      "crontab": []
+    },
+    "20": {
+      "parent_id": "exit",
+      "name": "somewhere",
+      "aliases": [
+        "elsewhere"
+      ],
+      "location_id": null,
+      "player": false,
+      "programmer": false,
+      "properties": [
+        {
+          "key": "destination",
+          "value": {
+            "_mooObject": "6"
+          }
+        }
+      ],
+      "verbs": [],
+      "crontab": []
+    },
+    "25": {
+      "parent_id": "exit",
+      "name": "west",
+      "aliases": [],
+      "location_id": null,
+      "player": false,
+      "programmer": false,
+      "properties": [],
+      "verbs": [
+        {
+          "name": "invoke",
+          "dobjarg": "none",
+          "preparg": "none",
+          "iobjarg": "none",
+          "code": "player.tell 'The door is locked.'",
+          "lang": "coffeescript"
+        }
+      ],
+      "crontab": []
+    },
+    "28": {
+      "parent_id": "sword",
+      "name": "iron sword",
+      "aliases": [
+        "sword"
+      ],
+      "location_id": "6",
+      "player": false,
+      "programmer": false,
+      "properties": [
+        {
+          "key": "description",
+          "value": "A dull iron sword."
+        }
+      ],
+      "verbs": [],
+      "crontab": []
+    },
+    "34": {
+      "parent_id": "thing",
+      "name": "blinker",
+      "aliases": [],
+      "location_id": "6",
+      "player": false,
+      "programmer": false,
+      "properties": [
+        {
+          "key": "description",
+          "value": "A thing that blinks"
+        }
+      ],
+      "verbs": [
+        {
+          "name": "blink",
+          "hidden": true,
+          "dobjarg": "none",
+          "preparg": "none",
+          "iobjarg": "none",
+          "code": "@location.announce? \"The blinker flashes {bold|bright white light} in all directions! You are momentarily blinded.\"",
+          "lang": "coffeescript"
+        }
+      ],
+      "crontab": [
+        {
+          "spec": "*/5 * * * *",
+          "verb": "blink",
+          "enabled": true
+        }
+      ]
+    },
+    "sys": {
+      "parent_id": null,
+      "name": "System Object",
+      "aliases": [],
+      "location_id": null,
+      "player": false,
+      "programmer": false,
+      "properties": [],
       "verbs": [
         {
           "name": "server_started",
@@ -99,7 +360,7 @@
           "dobjarg": "none",
           "preparg": "none",
           "iobjarg": "none",
-          "code": "player.parent = $player\n$sys.player_connected()",
+          "code": "player.parent = $ '#player'\n$('#sys').player_connected()",
           "lang": "coffeescript"
         },
         {
@@ -108,7 +369,7 @@
           "dobjarg": "none",
           "preparg": "none",
           "iobjarg": "none",
-          "code": "player.location = $(6)\nplayer.tell \"{blue bold|Welcome, #{player.name}!}\"\nplayer.location.player_connected?()",
+          "code": "player.location = $ '#6'\nplayer.tell \"{blue bold|Welcome, #{player.name}!}\"\nplayer.location.player_connected?()",
           "lang": "coffeescript"
         },
         {
@@ -123,8 +384,7 @@
       ],
       "crontab": []
     },
-    "1": {
-      "id": 1,
+    "root": {
       "parent_id": null,
       "name": "Root Class",
       "aliases": [],
@@ -145,9 +405,8 @@
       ],
       "crontab": []
     },
-    "2": {
-      "id": 2,
-      "parent_id": 1,
+    "player": {
+      "parent_id": "root",
       "name": "Player Class",
       "aliases": [
         "player"
@@ -174,12 +433,11 @@
       ],
       "crontab": []
     },
-    "3": {
-      "id": 3,
-      "parent_id": 2,
+    "wizard": {
+      "parent_id": "player",
       "name": "Gandalf",
       "aliases": [],
-      "location_id": 6,
+      "location_id": "6",
       "player": true,
       "programmer": true,
       "properties": [
@@ -198,11 +456,10 @@
       "crontab": [],
       "username": "root",
       "password": "a075d17f3d453073853f813838c15b8023b8c487038436354fe599c3942e1f95",
-      "lastActivity": "2013-07-13T17:50:30.323Z"
+      "lastActivity": "2013-07-15T01:51:04.198Z"
     },
-    "4": {
-      "id": 4,
-      "parent_id": 1,
+    "room": {
+      "parent_id": "root",
       "name": "Room Class",
       "aliases": [
         "room"
@@ -245,7 +502,7 @@
           "dobjarg": "none",
           "preparg": "none",
           "iobjarg": "none",
-          "code": "handleFailedOrAmbiguous = ->\n  if dobj == $ambiguous_match\n    objects = $util.orjoin match(dobjstr).map (o) -> o.name\n    player.tell \"{gray|I couldn't tell if you meant #{objects}.}\"\n  else if iobj == $ambiguous_match\n    objects = $util.orjoin match(iobjstr).map (o) -> o.name\n    player.tell \"{gray|I couldn't tell if you meant #{objects}.}\"\n  else if dobj == $failed_match\n    player.tell \"{gray|I don't see any #{dobjstr} here.}\"\n  else if iobj == $failed_match\n    player.tell \"{gray|I don't see any #{iobjstr} here.}\"\n  else\n    player.tell \"{gray|I didn't understand that.}\"\n\nmatches = (direction for direction of player.location.exits).filter (direction) ->\n  direction.indexOf(verb) == 0\n\nswitch matches.length\n  when 0\n    handleFailedOrAmbiguous()\n  when 1\n    player.location.exits[matches[0]].invoke()\n  else\n    directions = $util.orjoin matches\n    player.tell \"Did you mean #{directions}?\"",
+          "code": "handleFailedOrAmbiguous = ->\n  if dobj == $('#ambiguous_match')\n    objects = $('#util').orjoin match(dobjstr).map (o) -> o.name\n    player.tell \"{gray|I couldn't tell if you meant #{objects}.}\"\n  else if iobj == $('#ambiguous_match')\n    objects = $('#util').orjoin match(iobjstr).map (o) -> o.name\n    player.tell \"{gray|I couldn't tell if you meant #{objects}.}\"\n  else if dobj == $('#failed_match')\n    player.tell \"{gray|I don't see any #{dobjstr} here.}\"\n  else if iobj == $('#failed_match')\n    player.tell \"{gray|I don't see any #{iobjstr} here.}\"\n  else\n    player.tell \"{gray|I didn't understand that.}\"\n\nmatches = (direction for direction of player.location.exits).filter (direction) ->\n  direction.indexOf(verb) == 0\n\nswitch matches.length\n  when 0\n    handleFailedOrAmbiguous()\n  when 1\n    player.location.exits[matches[0]].invoke()\n  else\n    directions = $('#util').orjoin matches\n    player.tell \"Did you mean #{directions}?\"",
           "lang": "coffeescript"
         },
         {
@@ -272,7 +529,7 @@
           "dobjarg": "any",
           "preparg": "none",
           "iobjarg": "none",
-          "code": "matched_exits = (name for name, exit of player.location.exits when argstr == name)\nswitch matched_exits.length\n  when 0\n    player.tell \"You can't go #{argstr}.\"\n  when 1\n    portal = player.location.exits[matched_exits[0]]\n    retreats = (retreat for retreat, exit of portal.destination.exits when exit.destination == player.location)\n    switch retreats.length\n      when 0\n        player.bearings = []\n      else\n        player.bearings = retreats\n    portal.invoke()\n  else\n    directions = $util.orjoin matched_exits\n    player.tell \"Did you mean #{directions}?\"",
+          "code": "matched_exits = (name for name, exit of player.location.exits when argstr == name)\nswitch matched_exits.length\n  when 0\n    player.tell \"You can't go #{argstr}.\"\n  when 1\n    portal = player.location.exits[matched_exits[0]]\n    retreats = (retreat for retreat, exit of portal.destination.exits when exit.destination == player.location)\n    switch retreats.length\n      when 0\n        player.bearings = []\n      else\n        player.bearings = retreats\n    portal.invoke()\n  else\n    directions = $('#util').orjoin matched_exits\n    player.tell \"Did you mean #{directions}?\"",
           "lang": "coffeescript"
         },
         {
@@ -322,9 +579,8 @@
       ],
       "crontab": []
     },
-    "5": {
-      "id": 5,
-      "parent_id": 1,
+    "thing": {
+      "parent_id": "root",
       "name": "Thing Class",
       "aliases": [
         "item"
@@ -345,7 +601,7 @@
           "dobjarg": "this",
           "preparg": "none",
           "iobjarg": "none",
-          "code": "msg = []\nmsg.push \"#{@name}:\"\nmsg.push @description\navailable_actions = $util.orjoin (key for key, value of @ when value.verb and not value.hidden)\nmsg.push \"Available actions: #{available_actions}\"\nplayer.tell msg.join '\\n'",
+          "code": "msg = []\nmsg.push \"#{@name}:\"\nmsg.push @description\navailable_actions = $('#util').orjoin (key for key, value of @ when value.verb and not value.hidden)\nmsg.push \"Available actions: #{available_actions}\"\nplayer.tell msg.join '\\n'",
           "lang": "coffeescript"
         },
         {
@@ -367,65 +623,8 @@
       ],
       "crontab": []
     },
-    "6": {
-      "id": 6,
-      "parent_id": 4,
-      "name": "A forest clearing",
-      "aliases": [
-        "clearing"
-      ],
-      "location_id": null,
-      "player": false,
-      "programmer": false,
-      "properties": [
-        {
-          "key": "description",
-          "value": "The forest thins out here a bit. To the north you can see the entrance to a cave through the bushes. There is also a trap door barely visible in the grass."
-        },
-        {
-          "key": "exits",
-          "value": {
-            "north": {
-              "_mooObject": 9
-            },
-            "down": {
-              "_mooObject": 16
-            },
-            "nowhere": {
-              "_mooObject": 19
-            }
-          }
-        },
-        {
-          "key": "description",
-          "value": "The forest thins out here a bit. To the north you can see the entrance to a cave through the bushes."
-        }
-      ],
-      "verbs": [],
-      "crontab": []
-    },
-    "7": {
-      "id": 7,
-      "parent_id": 104,
-      "name": "wooden sword",
-      "aliases": [
-        "sword"
-      ],
-      "location_id": 6,
-      "player": false,
-      "programmer": false,
-      "properties": [
-        {
-          "key": "description",
-          "value": "A simple wooden sword."
-        }
-      ],
-      "verbs": [],
-      "crontab": []
-    },
-    "8": {
-      "id": 8,
-      "parent_id": 1,
+    "exit": {
+      "parent_id": "root",
       "name": "Exit Class",
       "aliases": [],
       "location_id": null,
@@ -445,230 +644,8 @@
       ],
       "crontab": []
     },
-    "9": {
-      "id": 9,
-      "parent_id": 8,
-      "name": "north",
-      "aliases": [],
-      "location_id": null,
-      "player": false,
-      "programmer": false,
-      "properties": [
-        {
-          "key": "destination",
-          "value": {
-            "_mooObject": 10
-          }
-        }
-      ],
-      "verbs": [],
-      "crontab": []
-    },
-    "10": {
-      "id": 10,
-      "parent_id": 4,
-      "name": "A Cave",
-      "aliases": [],
-      "location_id": null,
-      "player": false,
-      "programmer": false,
-      "properties": [
-        {
-          "key": "description",
-          "value": "This is a dark and slightly damp cave. You can barely see anything except the light coming from the opening to the south."
-        },
-        {
-          "key": "exits",
-          "value": {
-            "south": {
-              "_mooObject": 11
-            }
-          }
-        }
-      ],
-      "verbs": [],
-      "crontab": []
-    },
-    "11": {
-      "id": 11,
-      "parent_id": 8,
-      "name": "south",
-      "aliases": [],
-      "location_id": null,
-      "player": false,
-      "programmer": false,
-      "properties": [
-        {
-          "key": "destination",
-          "value": {
-            "_mooObject": 6
-          }
-        }
-      ],
-      "verbs": [],
-      "crontab": []
-    },
-    "14": {
-      "id": 14,
-      "parent_id": 5,
-      "name": "tunneler",
-      "aliases": [],
-      "location_id": 3,
-      "player": false,
-      "programmer": false,
-      "properties": [
-        {
-          "key": "description",
-          "value": "A device used for tunneling into new areas. Only usable by programmers or builders. To use it, type 'go <direction> with tunneler'."
-        }
-      ],
-      "verbs": [
-        {
-          "name": "go",
-          "hidden": false,
-          "dobjarg": "any",
-          "preparg": "with/using",
-          "iobjarg": "this",
-          "code": "if not (player.programmer or player.builder)\n  throw new Error \"You're not allowed to use the tunneler\"\n\ndirection = dobjstr\nif not direction\n  throw new Error \"Invalid direction\"\n\nif player.location.exits[direction]?\n  throw new Error \"That direction already exists!\"\n\nplayer.tell \"Going #{direction} #{prepstr} the tunneler!\"\n\nconnectTo = (room) ->\n  exit = $exit.create direction\n  exit.destination = room\n  \n  player.location.exits[direction] = exit\n\n  exit.invoke()\n\nplayer.input \"Connect to an {magenta|existing} room or a {magenta|new} room?\", (response) ->\n  switch response\n    when 'existing'\n      player.input \"ID of existing room:\", (id) ->\n        if (room = $(id)) # TODO check if room is descendant of room class?\n          connectTo room\n        else\n          throw new Error \"Couldn't find room with id '#{id}'\"\n    when 'new'\n      player.input \"Give me a name for the new room:\", (name) ->\n        player.input \"Descripe the new room:\", (description) ->\n          newRoom = $room.create name\n          newRoom.description = description\n          connectTo newRoom\n    else\n      player.tell \"{red|Unknown response. Was expecting either 'existing' or 'new'}\"",
-          "lang": "coffeescript"
-        }
-      ],
-      "crontab": []
-    },
-    "15": {
-      "id": 15,
-      "parent_id": 4,
-      "name": "Dungeon cell",
-      "aliases": [],
-      "location_id": null,
-      "player": false,
-      "programmer": false,
-      "properties": [
-        {
-          "key": "description",
-          "value": "A small cell in what appears to be a dungeon. There are 3 stone walls and metal bars to the west. The bars have a door built into them. A ladder on the north wall goes up to a trap door."
-        },
-        {
-          "key": "exits",
-          "value": {
-            "west": {
-              "_mooObject": 25
-            },
-            "up": {
-              "_mooObject": 17
-            }
-          }
-        }
-      ],
-      "verbs": [],
-      "crontab": []
-    },
-    "16": {
-      "id": 16,
-      "parent_id": 8,
-      "name": "down",
-      "aliases": [],
-      "location_id": null,
-      "player": false,
-      "programmer": false,
-      "properties": [
-        {
-          "key": "destination",
-          "value": {
-            "_mooObject": 15
-          }
-        }
-      ],
-      "verbs": [],
-      "crontab": []
-    },
-    "17": {
-      "id": 17,
-      "parent_id": 8,
-      "name": "up",
-      "aliases": [],
-      "location_id": null,
-      "player": false,
-      "programmer": false,
-      "properties": [
-        {
-          "key": "destination",
-          "value": {
-            "_mooObject": 6
-          }
-        }
-      ],
-      "verbs": [],
-      "crontab": []
-    },
-    "18": {
-      "id": 18,
-      "parent_id": 4,
-      "name": "Nowhere",
-      "aliases": [],
-      "location_id": null,
-      "player": false,
-      "programmer": false,
-      "properties": [
-        {
-          "key": "description",
-          "value": "You are nowhere. For real. Maybe you should go somewhere?"
-        },
-        {
-          "key": "exits",
-          "value": {
-            "somewhere": {
-              "_mooObject": 20
-            }
-          }
-        }
-      ],
-      "verbs": [],
-      "crontab": []
-    },
-    "19": {
-      "id": 19,
-      "parent_id": 8,
-      "name": "nowhere",
-      "aliases": [],
-      "location_id": null,
-      "player": false,
-      "programmer": false,
-      "properties": [
-        {
-          "key": "destination",
-          "value": {
-            "_mooObject": 18
-          }
-        }
-      ],
-      "verbs": [],
-      "crontab": []
-    },
-    "20": {
-      "id": 20,
-      "parent_id": 8,
-      "name": "somewhere",
-      "aliases": [
-        "elsewhere"
-      ],
-      "location_id": null,
-      "player": false,
-      "programmer": false,
-      "properties": [
-        {
-          "key": "destination",
-          "value": {
-            "_mooObject": 6
-          }
-        }
-      ],
-      "verbs": [],
-      "crontab": []
-    },
-    "21": {
-      "id": 21,
-      "parent_id": 1,
+    "util": {
+      "parent_id": "root",
       "name": "Utility Verbs",
       "aliases": [],
       "location_id": null,
@@ -695,82 +672,8 @@
       ],
       "crontab": []
     },
-    "25": {
-      "id": 25,
-      "parent_id": 8,
-      "name": "west",
-      "aliases": [],
-      "location_id": null,
-      "player": false,
-      "programmer": false,
-      "properties": [],
-      "verbs": [
-        {
-          "name": "invoke",
-          "dobjarg": "none",
-          "preparg": "none",
-          "iobjarg": "none",
-          "code": "player.tell 'The door is locked.'",
-          "lang": "coffeescript"
-        }
-      ],
-      "crontab": []
-    },
-    "28": {
-      "id": 28,
-      "parent_id": 104,
-      "name": "iron sword",
-      "aliases": [
-        "sword"
-      ],
-      "location_id": 6,
-      "player": false,
-      "programmer": false,
-      "properties": [
-        {
-          "key": "description",
-          "value": "A dull iron sword."
-        }
-      ],
-      "verbs": [],
-      "crontab": []
-    },
-    "34": {
-      "id": 34,
-      "parent_id": 5,
-      "name": "blinker",
-      "aliases": [],
-      "location_id": 6,
-      "player": false,
-      "programmer": false,
-      "properties": [
-        {
-          "key": "description",
-          "value": "A thing that blinks"
-        }
-      ],
-      "verbs": [
-        {
-          "name": "blink",
-          "hidden": true,
-          "dobjarg": "none",
-          "preparg": "none",
-          "iobjarg": "none",
-          "code": "@location.announce? \"The blinker flashes {bold|bright white light} in all directions! You are momentarily blinded.\"",
-          "lang": "coffeescript"
-        }
-      ],
-      "crontab": [
-        {
-          "spec": "*/5 * * * *",
-          "verb": "blink",
-          "enabled": true
-        }
-      ]
-    },
-    "104": {
-      "id": 104,
-      "parent_id": 5,
+    "sword": {
+      "parent_id": "thing",
       "name": "Sword Class",
       "aliases": [],
       "location_id": null,

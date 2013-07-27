@@ -18,7 +18,7 @@ class @Property
     ]
 
   delete: ->
-    @object.view.socket.emit 'delete_property', {id: @object.id, key: @key()}
+    @object.view.socket.emit 'delete_property', {id: @object.id(), key: @key()}
 
 class @Verb
 
@@ -48,7 +48,7 @@ class @Verb
     ]
 
   delete: ->
-    @object.view.socket.emit 'delete_verb', {id: @object.id, name: @name()} # TODO this will fail when someone has edited the name but not saved yet
+    @object.view.socket.emit 'delete_verb', {id: @object.id(), name: @name()} # TODO this will fail when someone has edited the name but not saved yet
 
   update: (verb) ->
     @name verb.name
@@ -63,7 +63,7 @@ class @Verb
 class @MiniObject
 
   constructor: (object, @view) ->
-    @id = object.id
+    @id = ko.observable object.id
     @name = ko.observable object.name
     @alias = ko.observable object.alias
 
@@ -141,13 +141,13 @@ class @MiniObject
     verb.active true
 
   newProperty: (name) ->
-    @view.socket.emit 'create_property', {id: @id, key: name, value: ''}, =>
+    @view.socket.emit 'create_property', {id: @id(), key: name, value: ''}, =>
       prop = @properties().filter((prop) -> prop.key() is name)[0]
       @selectProperty prop
       @view.openProperty prop
 
   newVerb: (name) ->
-    @view.socket.emit 'create_verb', {id: @id, name: name}, =>
+    @view.socket.emit 'create_verb', {id: @id(), name: name}, =>
       verb = @verbs().filter((verb) -> verb.name() is name)[0]
       @selectVerb verb
       @view.openVerb verb
