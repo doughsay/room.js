@@ -27,7 +27,7 @@ module.exports = class Db extends EventEmitter
     if fs.existsSync @filename
       {nextId: @_nextId, objects: dbObjects} = JSON.parse fs.readFileSync @filename
     else
-      {nextId: @_nextId, objects: dbObjects} = JSON.parse fs.readFileSync 'db.seed.json'
+      {nextId: @_nextId, objects: dbObjects} = JSON.parse fs.readFileSync 'db/db.seed.json'
 
     for id, dbObject of dbObjects
       newMooObj = if dbObject.player
@@ -85,8 +85,7 @@ module.exports = class Db extends EventEmitter
 
   saveSync: ->
     startTime = mooUtil.tstart()
-    fs.writeFileSync '_' + @filename, @serialize()
-    fs.renameSync '_' + @filename, @filename
+    fs.writeFileSync @filename, @serialize() # TODO 2 stage write for data integrity
     logger.info "#{@filename} saved in #{mooUtil.tend startTime}"
 
   serialize: ->
