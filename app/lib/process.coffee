@@ -2,8 +2,7 @@ log4js = require '../lib/logger'
 logger = log4js.getLogger 'process'
 
 process.on 'uncaughtException', (err) ->
-  logger.fatal 'Uncaught Exception', err
-  console.log err.stack
+  logger.fatal "Uncaught Exception [#{err.toString()}]\n#{err.stack}"
   process.exit 1
 
 process.on 'SIGTERM', ->

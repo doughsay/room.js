@@ -60,5 +60,6 @@ server.listen app.settings.port, ->
   if verb?
     context.runVerb null, verb, db.sys
 
+  port = if config.socket? then 'socket' else 'port'
   time = new Date - start
-  serverLogger.info "room.js server started on port/socket #{app.settings.port} (#{env} mode) in #{time}ms running on node.js #{process.versions.node}"
+  serverLogger.info "#{config.appName} started on #{port} #{app.settings.port} (#{env} mode) in #{time}ms running on node.js #{process.versions.node}"

@@ -189,6 +189,7 @@ module.exports = (grunt) ->
           watchedFolders: ['app', 'node_modules']
           exec: './node_modules/.bin/coffee --nodejs --harmony'
 
+    # forever start --killSignal=SIGTERM -c "coffee --nodejs --harmony" app.coffee
     forever:
       options:
         index: 'app/app.coffee'
