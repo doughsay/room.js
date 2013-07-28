@@ -36,6 +36,7 @@ module.exports = class Editor
     @db.on 'objectCreated', @objectCreated
     @db.on 'objectDeleted', @objectDeleted
     @db.on 'objectParentChanged', @objectParentChanged
+    @db.on 'objectIDChanged', @objectIDChanged
     @db.on 'objectNameChanged', @objectNameChanged
 
     @db.on 'propertyAdded', @propertyAdded
@@ -54,6 +55,7 @@ module.exports = class Editor
     @db.removeListener 'objectCreated', @objectCreated
     @db.removeListener 'objectDeleted', @objectDeleted
     @db.removeListener 'objectParentChanged', @objectParentChanged
+    @db.removeListener 'objectIDChanged', @objectIDChanged
     @db.removeListener 'objectNameChanged', @objectNameChanged
 
     @db.removeListener 'propertyAdded', @propertyAdded
@@ -153,6 +155,7 @@ module.exports = class Editor
   objectCreated: (id) => @socket.emit 'object_created', @editorInterface.getObjectNode id
   objectDeleted: (id) => @socket.emit 'object_deleted', id
   objectParentChanged: (spec) => @socket.emit 'object_parent_changed', spec
+  objectIDChanged: (oldId, newId) => @socket.emit 'object_id_changed', oldId, newId
   objectNameChanged: (spec) => @socket.emit 'object_name_changed', spec
 
   propertyAdded: (spec) => @socket.emit 'property_added', spec

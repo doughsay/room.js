@@ -7,7 +7,6 @@ block content
         i(data-bind='css: iconClass, click: toggle')
       a(href='#', data-bind='click: $root.selectObject, event: {dblclick: toggle}')
         span.label.label-inverse(data-bind='html: idPresenter')
-        span.label(data-bind='html: aliasPresenter')
         span(data-bind='html: namePresenter')
       ul.nav.nav-list(data-bind='visible: expanded, template: {name: "TreeNodeTemplate", foreach: children}')
 
@@ -125,4 +124,4 @@ block script
   :coffeescript
     # on dom ready, create the view model
     $ ->
-      window.view = new EditorView
+      window.view = new EditorViewModel
