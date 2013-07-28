@@ -31,18 +31,25 @@ The server currently requires version 0.11.3 or higher of node.js (0.10.x works 
 
 Assuming you already have git and node.js installed:
 
+    # You need grunt and bower to download and build the client-side assets.
+    # If you don't already have them:
+    npm install -g bower grunt-cli
+
     # Get the code
-    $ git clone https://github.com/doughsay/room.js.git
-    $ cd room.js
+    git clone https://github.com/doughsay/room.js.git
+    cd room.js
 
     # Install supporting libraries
-    $ npm install
+    npm install
+
+    # Install client-side assets
+    bower install
 
     # copy the sample config file (edit it if you choose)
     cp app/config/app.sample.coffee app/config/app.coffee
 
-    # Launch the server using npm
-    $ npm start
+    # Launch the server using grunt
+    grunt
 
 Connect to it using a web browser by going to [http://localhost:8888/](http://localhost:8888/).
 

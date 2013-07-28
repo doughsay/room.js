@@ -22,4 +22,5 @@ module.exports =
     server:   'INFO' # INFO, WARN, and ERROR
     client:   'INFO' # INFO
     editor:   'INFO' # DEBUG, INFO, and WARN
-    compiler: 'INFO'  # DEBUG and WARN
+    compiler: 'INFO' # DEBUG and WARN
+    process:  'INFO' # INFO and FATAL

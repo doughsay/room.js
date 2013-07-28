@@ -14,3 +14,4 @@ log4js.getLogger('server').setLevel   config.logLevel.server
 log4js.getLogger('client').setLevel   config.logLevel.client
 log4js.getLogger('editor').setLevel   config.logLevel.editor
 log4js.getLogger('compiler').setLevel config.logLevel.compiler
+log4js.getLogger('process').setLevel  config.logLevel.process

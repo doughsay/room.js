@@ -1,0 +1,20 @@
+{
+  "name": "room.js",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "es5-shim": "latest",
+    "jquery": "latest",
+    "jquery-ui": "latest",
+    "flatstrap": "git://github.com/immense/flatstrap.git",
+    "font-awesome": "latest",
+    "modernizr": "latest",
+    "knockout.js": "latest",
+    "bootbox": "latest",
+    "store.js": "latest",
+    "underscore": "latest",
+    "toastr": "latest",
+    "ace-builds": "latest",
+    "knockout-sortable": "4649a8c710983b237efbf4c7fe1129149e2e1684"
+  }
+}
