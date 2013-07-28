@@ -43,19 +43,19 @@ exports.RoomJsVerb = class
     return false if not @matchesName command.verb
     switch @dobjarg
       when 'none'
-        return false if objects.dobj not in [@object.db.nothing, @object.db.failed_match, @object.db.ambiguous_match]
+        return false if command.dobjstr? # objects.dobj not in [@object.db.nothing, @object.db.failed_match, @object.db.ambiguous_match]
       # when 'any' anything goes!
       when 'this'
         return false if objects.dobj isnt self
     switch @iobjarg
       when 'none'
-        return false if objects.iobj not in [@object.db.nothing, @object.db.failed_match, @object.db.ambiguous_match]
+        return false if command.iobjstr? # objects.iobj not in [@object.db.nothing, @object.db.failed_match, @object.db.ambiguous_match]
       # when 'any' anything goes!
       when 'this'
         return false if objects.iobj isnt self
     switch @preparg
       when 'none'
-        return false if command.prepstr isnt undefined
+        return false if command.prepstr?
       when 'any' # anything goes!
         return true
       else

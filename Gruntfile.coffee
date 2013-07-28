@@ -115,6 +115,7 @@ module.exports = (grunt) ->
           'bower_components/jquery/jquery.js',
           'bower_components/jquery-ui/ui/jquery-ui.js',
           'vendor_components/jquery-layout/jquery-layout.js',
+          'bower_components/flatstrap/assets/js/bootstrap.js',
           'bower_components/underscore/underscore.js',
           'bower_components/knockout.js/knockout.js',
           'bower_components/knockout-sortable/build/knockout-sortable.js',
