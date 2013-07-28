@@ -4,7 +4,7 @@ bower_components
 .cake_task_cache
 *.un~
 app/config/app.coffee
-db.json
+db
 log/*
 notes
 app/config/mongo.sample.coffee
