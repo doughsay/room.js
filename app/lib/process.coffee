@@ -1,14 +1,18 @@
+log4js = require '../lib/logger'
+logger = log4js.getLogger 'process'
+
 process.on 'uncaughtException', (err) ->
-  console.error '[uncaughtException]', err.stack
+  logger.fatal 'Uncaught Exception', err
+  console.log err.stack
   process.exit 1
 
 process.on 'SIGTERM', ->
-  console.log 'caught SIGTERM'
+  logger.info 'caught SIGTERM'
   process.exit 0
 
 process.on 'SIGINT', ->
-  console.log 'caught SIGINT'
+  logger.info 'caught SIGINT'
   process.exit 0
 
 process.on 'exit', ->
-  console.log('exiting...')
+  logger.info 'exiting...'

@@ -1,0 +1,185 @@
+@import 'bootstrap'; // actually flatstrap
+@import 'font-awesome';
+@import 'toastr';
+
+// Fix flatstrap broken checkboxes
+input[type="checkbox"] {
+  -webkit-appearance: checkbox;
+  border-radius: 0;
+}
+input[type="radio"] {
+  -webkit-appearance: radio;
+  border-radius: 0;
+}
+
+.cloak {
+  display: none;
+}
+
+.editor-layout {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.noconnection {
+  .alert {
+    margin: 100px auto;
+    width: 250px;
+  }
+}
+
+.login {
+  .well.form-horizontal {
+    width: 340px;
+    margin: 100px auto;
+    .control-label {
+      width: 80px;
+    }
+    .controls {
+      margin-left: 100px;
+    }
+    .form-actions {
+      padding-left: 100px;
+      margin-bottom: 0px;
+      padding-bottom: 0px;
+    }
+  }
+}
+
+.ui-layout-pane {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.ui-layout-resizer {
+  background: gray;
+
+  &.ui-layout-resizer-open-hover,
+  &.ui-layout-resizer-dragging {
+    background-color: #0088cc;
+
+    &.ui-layout-resizer-dragging-limit {
+      background-color: red;
+    }
+  }
+
+  &.ui-layout-resizer-west, &.ui-layout-resizer-east {
+    cursor: col-resize !important;
+  }
+  &.ui-layout-resizer-north, &.ui-layout-resizer-south {
+    cursor: row-resize !important;
+  }
+}
+
+hr {
+  margin: 5px 0;
+}
+
+.search {
+  padding: 5px 5px 0;
+}
+
+.overflow-container {
+  width: 1000px;
+}
+
+.highlight {
+  background-color: yellow;
+}
+li.active {
+  > a .highlight {
+    background-color: #004F73;
+  }
+  > a .label .highlight {
+    background-color: gray;
+  }
+}
+.label {
+  .highlight {
+    background-color: gray;
+  }
+}
+
+ul.nav-list, ul.nav-tabs, ul.dropdown-menu {
+  user-select: none;
+  -o-user-select:none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+}
+
+ul.nav-list {
+  li {
+    i {
+      color: black;
+      &.icon-caret-right, &.icon-caret-down {
+        cursor: pointer;
+      }
+    }
+    &.active {
+      & > span i, & > a i {
+        color: white;
+      }
+    }
+    a {
+      span.label {
+        margin-right: 3px;
+        vertical-align: 1px;
+      }
+    }
+    span.pull-left {
+      margin-top: 3px;
+      width: 16px;
+    }
+  }
+  &.objects {
+    li a {
+      margin-left: -1000px;
+    }
+  }
+}
+
+ul.nav-tabs {
+  i {
+    margin-right: 2px;
+    color: black;
+    &.close {
+      margin-right: 0;
+      margin-left: 2px;
+      font-size: 1.2em;
+      line-height: 1.1em;
+    }
+  }
+  li a {
+    padding-right: 4px;
+    padding-left: 4px;
+  }
+}
+
+.toolbar {
+  margin-top: -20px;
+  .row-fluid {
+    > input, > select {
+      margin-right: 5px;
+      width: 16%;
+    }
+  }
+}
+
+.property-toolbar {
+  .error {
+    margin-top: 10px;
+    margin-right: 10px;
+  }
+}
+
+.editor {
+  background-color: gray;
+}
+
+.dropdown-menu.open {
+  display: block;
+}

@@ -77,11 +77,9 @@ module.exports = class Db extends EventEmitter
 
   save: =>
     startTime = mooUtil.tstart()
-    fs.writeFile '_' + @filename, @serialize(), (err) =>
+    fs.writeFile @filename, @serialize(), (err) =>  # TODO 2 stage write for data integrity
       throw err if err
-      fs.rename '_' + @filename, @filename, (err) =>
-        throw err if err
-        logger.info "#{@filename} saved in #{mooUtil.tend startTime}"
+      logger.info "#{@filename} saved in #{mooUtil.tend startTime}"
 
   saveSync: ->
     startTime = mooUtil.tstart()

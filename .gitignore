@@ -8,3 +8,4 @@ db.json
 log/*
 notes
 app/config/mongo.sample.coffee
+public

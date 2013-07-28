@@ -12,16 +12,25 @@
     "express": "*",
     "jade": "*",
     "coffee-script": "*",
-    "less": "*",
     "socket.io": "*",
-    "connect-assets": "*",
-    "asset-rack": "*",
-    "connect": "*",
     "ff": "*",
-    "gaze": "*",
     "underscore": "*",
     "cron": "*",
     "log4js": "*"
+  },
+  "devDependencies": {
+    "grunt": "*",
+    "grunt-contrib-jshint": "*",
+    "grunt-contrib-uglify": "*",
+    "grunt-contrib-coffee": "*",
+    "grunt-contrib-concat": "*",
+    "grunt-contrib-less": "*",
+    "grunt-contrib-clean": "*",
+    "grunt-contrib-copy": "*",
+    "grunt-contrib-watch": "*",
+    "grunt-nodemon": "*",
+    "grunt-concurrent": "*",
+    "grunt-forever": "*"
   },
   "engines": {
     "node": ">=0.11.3"
