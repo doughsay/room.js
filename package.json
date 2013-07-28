@@ -6,7 +6,7 @@
   "private": true,
   "repository": "https://github.com/doughsay/room.js",
   "scripts": {
-    "start": "./node_modules/coffee-script/bin/coffee --nodejs --harmony app/app.coffee"
+    "start": "grunt"
   },
   "dependencies": {
     "express": "*",
