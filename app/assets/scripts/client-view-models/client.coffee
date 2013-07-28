@@ -302,6 +302,7 @@ class @ClientView
       @command 'connect'
     @sendCommand()
     @command old_command
+    @focusInput()
 
   #############################
   # websocket event listeners #
