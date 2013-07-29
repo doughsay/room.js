@@ -7,11 +7,10 @@ process.on 'uncaughtException', (err) ->
 
 process.on 'SIGTERM', ->
   logger.info 'caught SIGTERM'
-  process.exit 0
+  process.nextTick ->
+    process.exit 0
 
 process.on 'SIGINT', ->
   logger.info 'caught SIGINT'
-  process.exit 0
-
-process.on 'exit', ->
-  logger.info 'exiting...'
+  process.nextTick ->
+    process.exit 0
