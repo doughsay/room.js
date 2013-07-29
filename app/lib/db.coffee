@@ -44,8 +44,7 @@ module.exports = class Db extends EventEmitter
 
     @saveInterval = setInterval @save, 5*60*1000
 
-    process.on 'SIGTERM', => @exit()
-    process.on 'SIGINT', => @exit()
+    process.on 'cleanup', => @exit()
 
     logger.info "#{@filename} loaded in #{mooUtil.tend startTime}"
 
