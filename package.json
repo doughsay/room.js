@@ -30,7 +30,7 @@
     "grunt-contrib-watch": "*",
     "grunt-nodemon": "*",
     "grunt-concurrent": "*",
-    "grunt-forever": "*"
+    "grunt-forever": "git://github.com/doughsay/grunt-forever.git"
   },
   "engines": {
     "node": ">=0.11.3"

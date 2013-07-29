@@ -197,6 +197,7 @@ module.exports = (grunt) ->
         logFile: 'forever.log'
         errFile: 'forever-err.log'
         command: './node_modules/.bin/coffee --nodejs --harmony'
+        killSignal: 'SIGTERM'
 
     concurrent:
       dev:
