@@ -3,7 +3,8 @@ logger = log4js.getLogger 'process'
 
 process.on 'uncaughtException', (err) ->
   logger.fatal "Uncaught Exception [#{err.toString()}]\n#{err.stack}"
-  process.exit 1
+  process.nextTick ->
+    process.exit 1
 
 process.on 'SIGTERM', ->
   logger.info 'caught SIGTERM'
