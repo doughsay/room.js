@@ -6,7 +6,9 @@
   "private": true,
   "repository": "https://github.com/doughsay/room.js",
   "scripts": {
-    "start": "grunt"
+    "dev": "node --harmony ./node_modules/.bin/coffee app/app.coffee",
+    "start": "./node_modules/.bin/forever start --killSignal=SIGTERM -c \"node --harmony ./node_modules/.bin/coffee\" app/app.coffee",
+    "stop": "./node_modules/.bin/forever stop app/app.coffee"
   },
   "dependencies": {
     "express": "*",
@@ -16,7 +18,8 @@
     "ff": "*",
     "underscore": "*",
     "cron": "*",
-    "log4js": "*"
+    "log4js": "*",
+    "forever": "*"
   },
   "devDependencies": {
     "grunt": "*",
@@ -27,10 +30,7 @@
     "grunt-contrib-less": "*",
     "grunt-contrib-clean": "*",
     "grunt-contrib-copy": "*",
-    "grunt-contrib-watch": "*",
-    "grunt-nodemon": "*",
-    "grunt-concurrent": "*",
-    "grunt-forever": "git://github.com/doughsay/grunt-forever.git"
+    "grunt-contrib-watch": "*"
   },
   "engines": {
     "node": ">=0.11.3"

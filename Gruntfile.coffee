@@ -182,28 +182,41 @@ module.exports = (grunt) ->
         files: 'Gruntfile.coffee'
         tasks: ['deploy-assets']
 
-    nodemon:
-      dev:
-        options:
-          file: 'app/app.coffee'
-          watchedFolders: ['app', 'node_modules']
-          exec: './node_modules/.bin/coffee --nodejs --harmony'
+    # nodemon --watch app --watch node_modules --exec "./node_modules/.bin/coffee --nodejs --harmony" app/app.coffee
+    # nodemon --watch app --watch node_modules --exec "node --harmony ./node_modules/.bin/coffee" app/app.coffee
+    # nodemon:
+    #   dev:
+    #     options:
+    #       file: 'app/app.coffee'
+    #       watchedFolders: ['app', 'node_modules']
+    #       exec: './node_modules/.bin/coffee --nodejs --harmony'
 
-    # forever start --killSignal=SIGTERM -c "coffee --nodejs --harmony" app.coffee
-    forever:
-      options:
-        index: 'app/app.coffee'
-        logDir: 'log'
-        logFile: 'forever.log'
-        errFile: 'forever-err.log'
-        command: './node_modules/.bin/coffee --nodejs --harmony'
-        killSignal: 'SIGTERM'
+    # forever start --killSignal=SIGTERM -c "./node_modules/.bin/coffee --nodejs --harmony" app/app.coffee
+    # forever:
+    #   options:
+    #     index: 'app/app.coffee'
+    #     logDir: 'log'
+    #     logFile: 'forever.log'
+    #     errFile: 'forever-err.log'
+    #     command: './node_modules/.bin/coffee --nodejs --harmony'
+    #     killSignal: 'SIGTERM'
 
-    concurrent:
-      dev:
-        tasks: ['nodemon:dev', 'watch']
-        options:
-          logConcurrentOutput: true
+    # concurrent:
+    #   start:
+    #     tasks: ['shell:start', 'watch']
+    #     options:
+    #       logConcurrentOutput: true
+
+    # shell:
+    #   start:
+    #     command: 'node --harmony ./node_modules/.bin/coffee app/app.coffee',
+    #     options: stdout: true
+    #   forever_start:
+    #     command: './node_modules/.bin/forever start --killSignal=SIGTERM -c "./node_modules/.bin/coffee --nodejs --harmony" app/app.coffee'
+    #     options: stdout: true
+    #   forever_stop:
+    #     command: './node_modules/.bin/forever stop 0'
+    #     options: stdout: true
   }
 
   grunt.loadNpmTasks 'grunt-contrib-concat'
@@ -213,9 +226,8 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-contrib-clean'
   grunt.loadNpmTasks 'grunt-contrib-copy'
   grunt.loadNpmTasks 'grunt-contrib-watch'
-  grunt.loadNpmTasks 'grunt-nodemon'
-  grunt.loadNpmTasks 'grunt-concurrent'
-  grunt.loadNpmTasks 'grunt-forever'
+  # grunt.loadNpmTasks 'grunt-concurrent'
+  # grunt.loadNpmTasks 'grunt-shell'
 
   grunt.registerTask 'deploy-assets', [
     'clean:pre',
@@ -226,21 +238,7 @@ module.exports = (grunt) ->
     'clean:post'
   ]
 
-  if config.env is 'development'
-
-    grunt.registerTask('default', [
-      'deploy-assets',
-      'concurrent:dev'
-    ])
-
-  else if config.env is 'production'
-
-    grunt.registerTask('default', [
-      'deploy-assets',
-      'uglify',
-      'forever:start'
-    ])
-
-    grunt.registerTask('start', ['forever:start'])
-    grunt.registerTask('stop', ['forever:stop'])
-    grunt.registerTask('restart', ['deploy-assets', 'uglify', 'forever:restart'])
+  grunt.registerTask('default', [
+    'deploy-assets',
+    'watch'
+  ])

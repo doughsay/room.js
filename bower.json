@@ -15,6 +15,6 @@
     "underscore": "latest",
     "toastr": "latest",
     "ace-builds": "latest",
-    "knockout-sortable": "4649a8c710983b237efbf4c7fe1129149e2e1684"
+    "knockout-sortable": "latest"
   }
 }
