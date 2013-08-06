@@ -23,7 +23,6 @@
   },
   "devDependencies": {
     "grunt": "*",
-    "grunt-contrib-jshint": "*",
     "grunt-contrib-uglify": "*",
     "grunt-contrib-coffee": "*",
     "grunt-contrib-concat": "*",
