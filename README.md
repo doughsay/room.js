@@ -48,8 +48,11 @@ Assuming you already have git and node.js installed:
     # copy the sample config file (edit it if you choose)
     cp app/config/app.sample.coffee app/config/app.coffee
 
-    # Launch the server using grunt
-    grunt
+    # Deploy the client-side assets
+    grunt deploy-assets
+
+    # Start the server
+    npm start
 
 Connect to it using a web browser by going to [http://localhost:8888/](http://localhost:8888/).
 
