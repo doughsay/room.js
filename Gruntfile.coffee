@@ -181,42 +181,6 @@ module.exports = (grunt) ->
       gruntfile:
         files: 'Gruntfile.coffee'
         tasks: ['deploy-assets']
-
-    # nodemon --watch app --watch node_modules --exec "./node_modules/.bin/coffee --nodejs --harmony" app/app.coffee
-    # nodemon --watch app --watch node_modules --exec "node --harmony ./node_modules/.bin/coffee" app/app.coffee
-    # nodemon:
-    #   dev:
-    #     options:
-    #       file: 'app/app.coffee'
-    #       watchedFolders: ['app', 'node_modules']
-    #       exec: './node_modules/.bin/coffee --nodejs --harmony'
-
-    # forever start --killSignal=SIGTERM -c "./node_modules/.bin/coffee --nodejs --harmony" app/app.coffee
-    # forever:
-    #   options:
-    #     index: 'app/app.coffee'
-    #     logDir: 'log'
-    #     logFile: 'forever.log'
-    #     errFile: 'forever-err.log'
-    #     command: './node_modules/.bin/coffee --nodejs --harmony'
-    #     killSignal: 'SIGTERM'
-
-    # concurrent:
-    #   start:
-    #     tasks: ['shell:start', 'watch']
-    #     options:
-    #       logConcurrentOutput: true
-
-    # shell:
-    #   start:
-    #     command: 'node --harmony ./node_modules/.bin/coffee app/app.coffee',
-    #     options: stdout: true
-    #   forever_start:
-    #     command: './node_modules/.bin/forever start --killSignal=SIGTERM -c "./node_modules/.bin/coffee --nodejs --harmony" app/app.coffee'
-    #     options: stdout: true
-    #   forever_stop:
-    #     command: './node_modules/.bin/forever stop 0'
-    #     options: stdout: true
   }
 
   grunt.loadNpmTasks 'grunt-contrib-concat'
@@ -226,8 +190,6 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-contrib-clean'
   grunt.loadNpmTasks 'grunt-contrib-copy'
   grunt.loadNpmTasks 'grunt-contrib-watch'
-  # grunt.loadNpmTasks 'grunt-concurrent'
-  # grunt.loadNpmTasks 'grunt-shell'
 
   grunt.registerTask 'deploy-assets', [
     'clean:pre',

@@ -6,9 +6,7 @@
   "private": true,
   "repository": "https://github.com/doughsay/room.js",
   "scripts": {
-    "dev": "node --harmony ./node_modules/.bin/coffee app/app.coffee",
-    "start": "./node_modules/.bin/forever start --killSignal=SIGTERM -c \"node --harmony ./node_modules/.bin/coffee\" app/app.coffee",
-    "stop": "./node_modules/.bin/forever stop app/app.coffee"
+    "start": "node --harmony ./node_modules/.bin/coffee app/app.coffee"
   },
   "dependencies": {
     "express": "*",
@@ -18,8 +16,7 @@
     "ff": "*",
     "underscore": "*",
     "cron": "*",
-    "log4js": "*",
-    "forever": "*"
+    "log4js": "*"
   },
   "devDependencies": {
     "grunt": "*",
