@@ -76,8 +76,7 @@ module.exports = (grunt) ->
         options:
           paths: [
             'bower_components/flatstrap/assets/less',
-            'bower_components/font-awesome/less',
-            'bower_components/toastr'
+            'bower_components/font-awesome/less'
           ]
           compress: config.env is 'production'
         files:
@@ -97,7 +96,7 @@ module.exports = (grunt) ->
           'bower_components/es5-shim/es5-shim.js',
           'bower_components/jquery/jquery.js',
           'bower_components/flatstrap/assets/js/bootstrap.js',
-          'bower_components/knockout.js/knockout-2.3.0.debug.js',
+          'bower_components/knockout.js/knockout.debug.js',
           'bower_components/store.js/store.js',
 
           'node_modules/socket.io/node_modules/socket.io-client/dist/socket.io.js',
@@ -142,7 +141,10 @@ module.exports = (grunt) ->
       editor_css:
         options:
           separator: '\n'
-        src: ['tmp/less_output/editor.css']
+        src: [
+          'tmp/less_output/editor.css',
+          'bower_components/toastr/toastr.css'
+        ]
         dest: 'public/css/editor.css'
 
     # uglifyjs files

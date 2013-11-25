@@ -1,17 +1,18 @@
-config = require '../config/app'
+config = require '../config/logger'
+app_config = require '../config/app'
 module.exports = log4js = require 'log4js'
 
-log4js.configure
-  appenders: [
-    { type: 'console' },
-    { type: 'file', filename: 'log/server.log'}
-  ]
+appenders = [{
+  type: 'file',
+  filename: config.file,
+  backups: config.backups,
+  maxLogSize: config.max_size,
+  layout: type: 'colored'
+}]
+appenders.push {type: 'console'} if app_config.env is 'development'
 
-log4js.getLogger('cron').setLevel     config.logLevel.cron
-log4js.getLogger('context').setLevel  config.logLevel.context
-log4js.getLogger('db').setLevel       config.logLevel.db
-log4js.getLogger('server').setLevel   config.logLevel.server
-log4js.getLogger('client').setLevel   config.logLevel.client
-log4js.getLogger('editor').setLevel   config.logLevel.editor
-log4js.getLogger('compiler').setLevel config.logLevel.compiler
-log4js.getLogger('process').setLevel  config.logLevel.process
+log4js.configure appenders: appenders
+
+# set log levels from config
+for logger, level of config.levels
+  log4js.getLogger(logger).setLevel level

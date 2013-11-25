@@ -4,6 +4,7 @@ fs = require 'fs'
 require './lib/process'
 require './lib/pid'
 config = require './config/app'
+loggerConfig = require './config/logger'
 if config.socket? then require './lib/socket'
 
 log4js = require './lib/logger'
@@ -19,7 +20,7 @@ env = app.settings.env
 
 # create the http and socket.io server
 server = require('http').createServer app
-io = require('socket.io').listen server, logger: socketLogger, 'log level': log4js.levels[config.logLevel.socket]
+io = require('socket.io').listen server, logger: socketLogger, 'log level': log4js.levels[loggerConfig.levels.socket]
 
 # set up web controller
 require('./controllers/index')(app)
