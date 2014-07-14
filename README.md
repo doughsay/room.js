@@ -1,10 +1,22 @@
-# Room.js Server
+# room.js
 
-This is the Room.js server app.
+A [MOO](http://en.wikipedia.org/wiki/MOO) running on node.js.
+
+MOO stands for Mud, Object Oriented. One of the original MOOs was [LambdaMoo](http://en.wikipedia.org/wiki/LambdaMOO), developed at Xerox PARC.
+
+The basic idea is to have a MUD which (privileged) players can extend while in game.  You can create and edit objects, locations, and code from inside the MOO.
+
+room.js is different from other MOOs because:
+
+1. It uses plain JavaScript as the programming language instead of the original MOO language or some other custom language.
+2. You connect using a web browser, not a telnet or mud client.
+3. You can edit the game code in the browser, using a fairly decent in-browser code editor ([Ace](http://ace.ajax.org/)).
+
+This repository contains the room.js server.
 
 ## Connecting and basic usage
 
-To interact with the Room.js server, you must use the client app.  The client lives at http://infinitymotel.net.  It's mostly self explanatory, you type commands to send to the server and the server responds.
+To interact with the room.js server, you must use the client app.  The [client](https://github.com/doughsay/room.js-client) is in a separate repository [here](https://github.com/doughsay/room.js-client).  It's mostly self explanatory, you type commands to send to the server and the server responds.
 
 ## API
 
