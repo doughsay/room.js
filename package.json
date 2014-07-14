@@ -1,34 +1,34 @@
 {
-  "name": "room.js",
-  "version": "0.0.1",
+  "name": "rjs-server",
+  "version": "0.0.0",
   "author": "Chris Dosé <chris.dose@gmail.com>",
-  "description": "A MOO in CoffeeScript",
-  "private": true,
-  "repository": "https://github.com/doughsay/room.js",
+  "description": "Room.js server.",
   "scripts": {
-    "start": "node --harmony ./node_modules/.bin/coffee app/app.coffee"
+    "start": "gulp dev",
+    "console": "node --harmony src/repl.js"
   },
+  "main": "server.js",
   "dependencies": {
-    "express": "*",
-    "jade": "*",
-    "coffee-script": "*",
-    "socket.io": "*",
-    "ff": "*",
-    "underscore": "*",
-    "cron": "*",
-    "log4js": "*"
+    "bson": "^0.2.9",
+    "co": "^3.0.6",
+    "cron": "^1.0.4",
+    "escodegen": "^1.3.3",
+    "esprima": "^1.2.2",
+    "harmony-reflect": "1.0.1",
+    "js-schema": "^0.6.2",
+    "mongoose": "^3.8.12",
+    "socket.io": "^1.0.6",
+    "winston": "^0.7.3"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=0.11.9"
   },
   "devDependencies": {
-    "grunt": "*",
-    "grunt-contrib-uglify": "*",
-    "grunt-contrib-coffee": "*",
-    "grunt-contrib-concat": "*",
-    "grunt-contrib-less": "*",
-    "grunt-contrib-clean": "*",
-    "grunt-contrib-copy": "*",
-    "grunt-contrib-watch": "*"
-  },
-  "engines": {
-    "node": ">=0.11.3"
+    "nodemon": "^1.2.1",
+    "jshint-stylish": "^0.4.0",
+    "gulp-nodemon": "^1.0.4",
+    "gulp-jshint": "^1.7.1",
+    "gulp": "^3.8.6"
   }
 }

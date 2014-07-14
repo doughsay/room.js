@@ -1,0 +1,19 @@
+{
+  "camelcase" : true,
+  "indent": 2,
+  "undef": true,
+  "quotmark": "single",
+  "trailing": true,
+  "curly": true,
+  "laxcomma": true,
+  "asi": true,
+  "node": true,
+  "esnext": true,
+  "noyield": true,
+  "validthis": true,
+  "predef": [
+    "Reflect",
+    "escape",
+    "unescape"
+  ]
+}

@@ -1,69 +1,240 @@
-room.js
-=======
+# Room.js Server
 
-A [MOO](http://en.wikipedia.org/wiki/MOO) written in [CoffeeScript](http://coffeescript.org/) running on node.js.
+This is the Room.js server app.
 
-MOO stands for Mud, Object Oriented. One of the original MOOs was [LambdaMoo](http://en.wikipedia.org/wiki/LambdaMOO), developed at Xerox PARC.
+## Connecting and basic usage
 
-The basic idea is to have a MUD which (privileged) players can extend while in game.  You can create and edit objects, locations, and code from inside the MOO.
+To interact with the Room.js server, you must use the client app.  The client lives at http://infinitymotel.net.  It's mostly self explanatory, you type commands to send to the server and the server responds.
 
-room.js is different from other MOOs because:
+## API
 
-1. It uses plain JavaScript (or a language that compiles to it, such as [CoffeeScript](http://coffeescript.org/)) as the programming language instead of the original MOO language or some other custom language.
-2. You connect using a web browser, not a telnet or mud client.
-3. You can edit the game code in the browser, using a fairly decent in-browser code editor ([Ace](http://ace.ajax.org/)).
+### Global functions and getters
 
-Live Demo
----------
+#### `verb(pattern, dobjarg = 'none', preparg = 'none', iobjarg = 'none', code = 'function() {}') -> verb`
 
-There is a live demo of room.js running at: http://rjs.infinitymotel.net
+Create a new verb. Example usage: `Room.look = verb('l*ook')`.  See the section about writing verbs below for more details.
 
-All players that sign up are automatically granted programmer privileges; any objects you pick up get dropped back into the main room once you leave. (for demo purposes)
+#### `search(string) -> [worldObject]`
 
-The built-in editor is accessible at: http://rjs.infinitymotel.net/editor
+Get an array of all world objects that match a search string. Searches names, ids, and aliases.
 
-Running the Server
-------------------
+#### `$(idString) -> worldObject`
 
-If you'd like to run your own copy of the server, follow the below instructions to get started. If you do start running an actual game using this server, please let me know about it so I can come check it out!
+Return a world object based on its id.  Of course, you can also refer to them as global objects, i.e. `Root` instead of `$('Root')`.
 
-The server currently requires version 0.11.3 or higher of node.js (0.10.x works too, but will be missing some security features). It also needs to be run with the --harmony flag to enable ES6 features.
+#### `nextId(string) -> string`
 
-Assuming you already have git and node.js installed:
+Returns the next available id by maybe appending a number to the end of the input string.
 
-    # You need grunt and bower to download and build the client-side assets.
-    # If you don't already have them:
-    npm install -g bower grunt-cli
+Example:
 
-    # Get the code
-    git clone https://github.com/doughsay/room.js.git
-    cd room.js
+```javascript
+nextId('Root') // -> 'Root1'
+```
 
-    # Install supporting libraries
-    npm install
+#### `getter Cron`
 
-    # Install client-side assets
-    bower install
+The Cron object.  See section below on scheduling and managing cron jobs.
 
-    # copy the sample config file (edit it if you choose)
-    cp app/config/app.sample.coffee app/config/app.coffee
+#### `getter players`
 
-    # Deploy the client-side assets
-    grunt deploy-assets
+An array of all player objects.
 
-    # Start the server
-    npm start
+#### `getter all`
 
-Connect to it using a web browser by going to [http://localhost:8888/](http://localhost:8888/).
+An array of all world objects.
 
-The built-in editor is at [http://localhost:8888/editor](http://localhost:8888/editor).
+### Object API
 
-The provided seed database has one user who is also a programmer: username=root, password=p@ssw0rd.
+All functions / properties below are on world objects (or players where indicated).
 
-Further Reading
----------------
+#### `worldObject.toString() -> string`
 
-There are in depth manuals being written for room.js here:
+String representation of an object.
 
-* [Player's Manual](https://github.com/doughsay/room.js/wiki/Player%27s-Manual)
-* [Programmer's Manual](https://github.com/doughsay/room.js/wiki/Programmer%27s-Manual)
+#### `worldObject.isA(worldObject) -> boolean`
+
+Checks if an object inherits from another object.
+
+#### `worldObject.destroy()`
+
+Permanently removes an object from the world.
+
+#### `worldObject.new(params) -> worldObject`
+
+Creates a new child of an object.
+
+Example:
+
+```javascript
+Root.new({id: 'Apple', name: 'Apple'})
+```
+
+`id` and `name` are required, but you may also pass `aliases` as an array of strings.
+
+Note: the `nextId` helper function can help in generating uniqe ids.
+
+#### `worldObject.contents() -> [worldObject]`
+
+Returns all objects within an object.
+
+#### `worldObject.children() -> [worldObject]`
+
+Returns all objects that are children of an object.
+
+#### `getter/setter worldObject.parent -> worldObject`
+
+Get or set the parent of an object. Can be `null`.
+
+#### `getter/setter worldObject.location -> worldObject
+
+Get or set the location of an object. Can be `null`.
+
+#### `getter/setter worldObject.name -> string`
+
+Get or set the name of an object. Must be a string.
+
+#### `getter/setter worldObject.aliases -> [string]`
+
+Get or set the aliases of an object. Must be an array of strings.
+
+Note: because this is a getter, you can't directly manipulate the array.
+
+Example:
+
+```javascript
+// instead of:
+Sword.aliases.push('sword')
+// do
+Sword.aliases = ['sword']
+// or
+Sword.aliases = Sword.aliases.concat(['sword'])
+```
+
+#### `getter worldObject.isPlayer -> boolean`
+
+Check if an object is a player or not.
+
+#### `getter player.isOnline -> boolean`
+
+Checks if the player is online or not.
+
+#### `getter/setter player.isProgrammer -> boolean`
+
+Get or set the `isProgrammer` field of a player. A programmer is allowed access to the `eval` command, as well as the ability to edit verbs and functions using the build in editor.
+
+#### `getter player.lastActivity -> Date`
+
+Gets the last activity time of a player.
+
+#### `player.send(string) -> boolean`
+
+Sends a message to a player. If the player is online, returns `true`, otherwise `false`.
+
+#### `player.ask(message, callback) -> boolean`
+
+Asks for input from a player. If the player is online, returns `true`, otherwise `false`. `message` can be a string, or an object with optional keys:
+
+* `string: message` will be a message sent to the player upon requesting input.
+* `string: prompt` will (temporarily) set the player's prompt to the given string.
+* `boolean: password` will hide what the player types (i.e. a password field).
+
+#### `player.prompt(string) -> boolean`
+
+Sets the prompt of a player. If the player is online, returns `true`, otherwise `false`.
+
+#### `worldObject.edit(propertyName)`
+
+Opens an edit tab for the given property on an object. `propertyName` must be the name of a function or a verb on the object.
+
+Example:
+
+```javascript
+Room.edit('look') // opens the verb "Room.look" in a new editor tab.
+```
+
+#### `worldObject.addVerb(name, pattern)`
+
+Adds a new verb to an object and immediately opens an edit tab with the new verb.
+
+Example:
+
+```javascript
+Room.addVerb('look', 'l*ook') // adds and opens the verb "Room.look" in a new editor tab.
+```
+
+#### `worldObject.addFunction(name)`
+
+Adds a new function to an object and immediately opens an edit tab with the new function.
+
+Example:
+
+```javascript
+Room.addFunction('foo') // adds and opens the function "Room.foo" in a new editor tab.
+```
+
+### Internal global stuff you probably won't need
+
+#### `parse(string) -> command`
+
+Parse an input string into a command object.
+
+#### `matchVerb(player, command, matchedObjects) -> matchedVerb`
+
+Match a verb based on a player and matched objects.
+
+### Internal stuff on objects you probably won't need
+
+#### `worldObject.reload()`
+
+Reloads an object from the database.
+
+#### `worldObject.matchObjects(command) -> matchedObjects`
+
+Finds the direct and indirect objects mentioned in a command.
+
+#### `worldObject.findObject(searchString) -> worldObject`
+
+TODO
+
+#### `worldObject.findNearby(searchString) -> worldObject`
+
+TODO
+
+#### `worldObject.matches(string) -> 0|1|2`
+
+Checks if an object matches a given string. Returns:
+
+* 0: does not match
+* 1: exact match
+* 2: partial match
+
+Examples:
+
+```javascript
+Root.matches('root') // -> 1
+Root.matches('roo') // -> 2
+Root.matches('room') // -> 0
+```
+
+Note: also checks `aliases` of an object.
+
+#### `worldObject.findVerb(command, matchedObjects, self = this) -> verb`
+
+Given a command and a set of matched objects, returns a verb (or `undefined` if no match).
+
+Example:
+
+```javascript
+command = parse('say hello!')
+matchedObjects = this.matchObjects(command)
+this.findVerb(command, matchedObjects) -> 'say'
+```
+
+## Creating and editing verbs
+
+TODO
+
+## Scheduling and managing cron tasks
+
+TODO
