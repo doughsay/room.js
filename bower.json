@@ -6,7 +6,7 @@
     "es5-shim": "latest",
     "jquery": "latest",
     "jquery-ui": "latest",
-    "flatstrap": "git://github.com/immense/flatstrap.git",
+    "bootstrap": "latest",
     "font-awesome": "~3.2.1",
     "modernizr": "latest",
     "knockout.js": "latest",

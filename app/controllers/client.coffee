@@ -161,31 +161,31 @@ module.exports = class Client
 
       if formData.name.length < 2
         valid = false
-        formDescriptor.inputs[0].error = "Not long enough"
+        formDescriptor.inputs[0].error = "is not long enough"
 
       if @db.playerNameTaken formData.name
         valid = false
-        formDescriptor.inputs[0].error = "Already taken"
+        formDescriptor.inputs[0].error = "is already taken"
 
       if formData.username.length < 2
         valid = false
-        formDescriptor.inputs[1].error = "Not long enough"
+        formDescriptor.inputs[1].error = "is not long enough"
 
       if not formData.username.match /^[_a-zA-Z0-9]*$/
         valid = false
-        formDescriptor.inputs[1].error = "Alphanumeric only"
+        formDescriptor.inputs[1].error = "must be alphanumeric only"
 
       if @db.usernameTaken formData.username
         valid = false
-        formDescriptor.inputs[1].error = "Already taken"
+        formDescriptor.inputs[1].error = "is already taken"
 
       if formData.password.length < 8
         valid = false
-        formDescriptor.inputs[2].error = "Not long enough"
+        formDescriptor.inputs[2].error = "is not long enough"
 
       if formData.password != formData.password2
         valid = false
-        formDescriptor.inputs[3].error = "Doesn't match"
+        formDescriptor.inputs[3].error = "does not match"
 
       [valid, formDescriptor]
 

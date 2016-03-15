@@ -66,7 +66,7 @@ module.exports = (grunt) ->
       client:
         options:
           paths: [
-            'bower_components/flatstrap/assets/less',
+            'bower_components/bootstrap/less',
             'bower_components/font-awesome/less'
           ]
           compress: config.env is 'production'
@@ -75,7 +75,7 @@ module.exports = (grunt) ->
       editor:
         options:
           paths: [
-            'bower_components/flatstrap/assets/less',
+            'bower_components/bootstrap/less',
             'bower_components/font-awesome/less'
           ]
           compress: config.env is 'production'
@@ -94,8 +94,8 @@ module.exports = (grunt) ->
       client_js:
         src: [
           'bower_components/es5-shim/es5-shim.js',
-          'bower_components/jquery/jquery.js',
-          'bower_components/flatstrap/assets/js/bootstrap.js',
+          'bower_components/jquery/dist/jquery.js',
+          'bower_components/bootstrap/dist/js/bootstrap.js',
           'bower_components/knockout.js/knockout.debug.js',
           'bower_components/store.js/store.js',
 
@@ -111,10 +111,10 @@ module.exports = (grunt) ->
       editor_js:
         src: [
           'bower_components/es5-shim/es5-shim.js',
-          'bower_components/jquery/jquery.js',
-          'bower_components/jquery-ui/ui/jquery-ui.js',
+          'bower_components/jquery/dist/jquery.js',
+          'bower_components/jquery-ui/jquery-ui.js',
           'vendor_components/jquery-layout/jquery-layout.js',
-          'bower_components/flatstrap/assets/js/bootstrap.js',
+          'bower_components/bootstrap/dist/js/bootstrap.js',
           'bower_components/underscore/underscore.js',
           'bower_components/knockout.js/knockout.js',
           'bower_components/knockout-sortable/build/knockout-sortable.js',

@@ -101,6 +101,7 @@ class @ClientView
 
     @lines      = ko.observableArray []
     @command    = ko.observable ''
+    @inputType  = ko.observable 'text'
     @promptStr  = ko.observable ''
     @form       = ko.observable null
 
@@ -223,8 +224,11 @@ class @ClientView
   # and add it to the command history
   sendCommand: ->
     command = @command()
-    escapedCommand = escapeBrackets @applyMacros command
     if command
+      if @captureNextUserInput?
+        @command ""
+        return @captureNextUserInput command
+      escapedCommand = escapeBrackets @applyMacros command
       if @echo()
         @addLine "\n" if @space()
         @addLine "{black|> #{escapeHTML escapedCommand}}", false
@@ -360,7 +364,35 @@ class @ClientView
 
   # request_form_input event
   # the server has requested some form input
-  # so we display a modal with a dynamically
-  # constructed form
+  # so we ask the user for the requested input
   request_form_input: (formDescriptor) =>
-    @form new ModalFormView formDescriptor, @socket
+    promptWas = @promptStr()
+    @getInputFromUser {}, formDescriptor.inputs, (formData) =>
+      @promptStr promptWas
+      @inputType 'text'
+      @setSizes()
+      @socket.emit "form_input_#{formDescriptor.event}", formData, (response) =>
+        if response?
+          message = if response.error?
+            response.error
+          else
+            message = response.inputs.map (input) ->
+              "#{input.label} #{input.error}" if input.error?
+            .filter (x) => x?
+            .join(', ')
+          @addLine "\n" if @space()
+          @addLine "{bold red|#{message}}"
+
+  getInputFromUser: (data, inputs, done) =>
+    return done(data) if inputs.length == 0
+    [input, inputs] = [inputs[0], inputs[1..]]
+    @set_prompt input.label
+    @inputType input.type
+    @onNextUserInput (userInput) =>
+      data[input.name] = userInput
+      @getInputFromUser(data, inputs, done)
+
+  onNextUserInput: (done) =>
+    @captureNextUserInput = (userInput) =>
+      @captureNextUserInput = null
+      done userInput

@@ -1,5 +1,4 @@
 vm = require 'vm'
-_ = require 'underscore'
 coffee = require 'coffee-script'
 
 log4js = require './logger'
@@ -42,7 +41,7 @@ module.exports = class Context
     @vmContext = vm.createContext base
 
   query: (selector) ->
-    if selector.indexOf('#') is 0
+    if typeof selector is 'string' and selector.indexOf('#') is 0
       id = selector[1..]
       @db.findById(id)
     else

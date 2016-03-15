@@ -12,8 +12,7 @@ block content
           i.icon-wrench(data-bind='click: togglePreferencesPane')
           form(data-bind='submit: sendCommand')
             span.prompt(data-bind='html: promptFormatted')
-            input(type='text', autofocus=true, data-bind="value: command, event: {keydown: recall}")
-      include includes/modal
+            input(autofocus=true, data-bind="value: command, attr: {type: inputType}, event: {keydown: recall}")
 
 block script
   :coffeescript
