@@ -1,3 +1,5 @@
+chalk = require 'chalk'
+
 RoomJsObject = require('./object').RoomJsObject
 
 # a RoomJsPlayer is just a slightly more specialized RoomJsObject
@@ -41,14 +43,14 @@ exports.RoomJsPlayer = class RoomJsPlayer extends RoomJsObject
         catch error
           errorStr = error.toString()
           source = 'input callback'
-          @send "{inverse bold red|#{errorStr} in '#{source}'}"
+          @send chalk.bold.bgRed("#{errorStr} in '#{source}'")
       true
     else
       false
 
   setPrompt: (str) ->
     if @socket?
-      @socket.emit 'set prompt', str
+      @socket.emit 'set-prompt', str
       true
     else
       false

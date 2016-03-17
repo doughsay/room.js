@@ -1,5 +1,6 @@
 vm = require 'vm'
 coffee = require 'coffee-script'
+chalk = require 'chalk'
 
 log4js = require './logger'
 logger = log4js.getLogger 'context'
@@ -12,6 +13,8 @@ compileEval = require('./compiler').compileEval
 
 contextProxyFor = require './context_proxy'
 proxies = require './helper_proxies'
+
+colorError = chalk.bold.bgRed
 
 module.exports = class Context
 
@@ -26,6 +29,7 @@ module.exports = class Context
       $:          (selector) => @contextify @query selector
       players:    => @db.players.map (player) => @contextify player
       browser:    mooBrowser
+      chalk:      chalk
       parse:      parse
       schedule:   (object, verb, seconds, args = []) => @schedule object, verb, seconds, args
       cancel:     (id) => @cancel id
@@ -137,9 +141,9 @@ module.exports = class Context
       errorStr = error.toString()
 
       if stack and error.stack?
-        player.send error.stack.split('\n').map((line) -> "{inverse bold red|#{line}}").join('\n')
+        player.send error.stack.split('\n').map((line) -> colorError(line)).join('\n')
       else
-        player.send "{inverse bold red|#{errorStr} in #{source}}"
+        player.send colorError "#{errorStr} in #{source}"
 
       logger.warn "#{runner} caused exception: #{errorStr} in #{source}"
 
@@ -209,9 +213,9 @@ module.exports = class Context
 
       if player? and player isnt @db.nothing
         if stack and error.stack?
-          player.send error.stack.split('\n').map((line) -> "{inverse bold red|#{line}}").join('\n')
+          player.send error.stack.split('\n').map((line) -> colorError(line)).join('\n')
         else
-          player.send "{inverse bold red|#{errorStr} in '#{source}'}"
+          player.send colorError "#{errorStr} in '#{source}'"
 
       logger.warn "#{runner} caused exception: #{errorStr} in '#{source}'"
 

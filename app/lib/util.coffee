@@ -1,3 +1,5 @@
+chalk = require 'chalk'
+
 # Some usful utlity functions.
 
 # replace newlines in a string with '\n'
@@ -37,41 +39,41 @@ print = (x, maxdepth, depth = 0, prefix = '', parents = []) ->
 
   output = do -> switch typeof x
     when 'number'
-      "{yellow|#{x}}"
+      chalk.yellow x
     when 'string'
       if depth == 0
-        "'{green|#{safeString x}}'"
+        chalk.green safeString x
       else
-        "'{green|#{truncate safeString x}}'"
+        chalk.green truncate safeString x
     when 'boolean'
-      "{magenta|#{x.toString()}}"
+      chalk.magenta x.toString()
     when 'undefined'
-      '{black|undefined}'
+      chalk.bold.black 'undefined'
     when 'function'
       if x.verb
         if x.hidden
-          '{cyan|[{bold|Private} Verb]}'
+          chalk.cyan('[') + chalk.bold.cyan('Private') + chalk.reset.cyan(' Verb]')
         else
-          '{cyan|[Verb]}'
+          chalk.cyan '[Verb]'
       else
-        '{gray|[Function]}'
+        chalk.gray '[Function]'
     when 'object'
       if x == null
-        '{red|null}'
+        chalk.red 'null'
       else if Object.prototype.toString.call(x) is '[object Date]'
-        "{yellow|#{x.toString()}}"
+        chalk.yellow x.toString()
       else if Object.prototype.toString.call(x) is '[object RegExp]'
-        "{red|#{x.toString()}}"
+        chalk.red x.toString()
       else
         if x in parents
-          '{yellow inverse|[CircularReference]}'
+          chalk.black.bgYellow '[CircularReference]'
         else
           parents.push x
           if Array.isArray(x) or x.isArray?()
             if x.length == 0
               output = '[]'
             else if maxdepth == depth
-              output = "{blue|[Array(#{x.length})]}"
+              output = chalk.blue('[Array(' + x.length + ')]')
             else
               xs = (x.map (y) -> print y, maxdepth, depth+1, '', parents)
               xs[0] = '[ ' + (xs[0].replace indent + '  ', '')
@@ -81,15 +83,15 @@ print = (x, maxdepth, depth = 0, prefix = '', parents = []) ->
               output = xs.join ',\n'
           else
             if (key for key of x).length == 0
-              output = '\\{\\}'
+              output = '{}'
             else if maxdepth == depth
-              output = "{blue|#{x.toString()}}"
+              output = chalk.blue x.toString()
             else
               xs = []
               for key, value of x
-                xs.push print value, maxdepth, depth+1, "{blue|#{key}}" + ': ', parents
-              xs[0] = '\\{ ' + (xs[0].replace indent + '  ', '')
-              xs[xs.length-1] += ' \\}'
+                xs.push print value, maxdepth, depth+1, chalk.blue(key) + ': ', parents
+              xs[0] = '{ ' + (xs[0].replace indent + '  ', '')
+              xs[xs.length-1] += ' }'
               if prefix != ''
                 xs[0] = '\n' + indent + xs[0]
               output = xs.join ',\n'

@@ -1,3 +1,4 @@
+chalk = require 'chalk'
 fs = require 'fs'
 _ = require 'underscore'
 EventEmitter = require('events').EventEmitter
@@ -51,7 +52,7 @@ module.exports = class Db extends EventEmitter
   exit: ->
     for player in @players
       if player.socket?
-        player.socket.emit 'output', '{red|Server shutting down.}'
+        player.socket.emit 'output', chalk.red('Server shutting down.')
         # player.socket.disconnect()
     @saveSync()
 

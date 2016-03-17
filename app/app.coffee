@@ -55,7 +55,7 @@ server.listen app.settings.port, ->
   if config.socket? and fs.existsSync config.socket
     fs.chmodSync config.socket, '777'
 
-  verb = db.sys.findVerbByName 'server_started'
+  verb = db.sys.findVerbByName 'serverStarted'
   if verb?
     context.runVerb null, verb, db.sys
 

@@ -1,5 +1,6 @@
 # A simple wrapper around the http module, allowing moo code to GET (and later POST)
 http = require 'http'
+chalk = require 'chalk'
 
 log4js = require './logger'
 logger = log4js.getLogger 'moo browser'
@@ -23,7 +24,7 @@ get = (host, path = '/', callback) ->
 
   client.on 'error', (error) ->
     try
-      callback?.call null, "{inverse bold red|#{error.toString()}}"
+      callback?.call null, chalk.bold.bgRed(error.toString())
     catch error
       logger.warn "Caught Exception in browser callback: #{error.toString()}"
 

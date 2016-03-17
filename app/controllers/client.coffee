@@ -1,3 +1,5 @@
+chalk = require 'chalk'
+
 log4js = require '../lib/logger'
 logger = log4js.getLogger 'client'
 
@@ -16,19 +18,19 @@ module.exports = class Client
     logger.info 'new socket connection'
 
     @socket.emit 'output', """
-      Welcome to {blue bold|room.js}!
-      Type {magenta bold|help} for a list of available commands.
+      Welcome to #{chalk.bold.blue('room.js')}!
+      Type #{chalk.bold.magenta('help')} for a list of available commands.
     """
 
     @socket.on 'disconnect', @onDisconnect
     @socket.on 'input', @onInput
-    @socket.on 'form_input_login', @onLogin
-    @socket.on 'form_input_create', @onCreate
+    @socket.on 'form-input-login', @onLogin
+    @socket.on 'form-input-create', @onCreate
 
     @player = null
 
   # connect a player
-  connect: (player, verbToRun = 'player_connected') ->
+  connect: (player, verbToRun = 'playerConnected') ->
     @player = player
     @player.socket = @socket
     @player.lastActivity = new Date()
@@ -41,7 +43,7 @@ module.exports = class Client
   # disconnect a player
   disconnect: (force) ->
     @player.lastActivity = new Date()
-    verb = @db.sys.findVerbByName 'player_disconnected'
+    verb = @db.sys.findVerbByName 'playerDisconnected'
     if verb?
       @context.runVerb @player, verb, @db.sys
     @player.socket = null
@@ -78,20 +80,29 @@ module.exports = class Client
       when "help"
         msg = """
         Available commands:
-        • {magenta bold|login}  - login to an existing account
-        • {magenta bold|create} - create a new account
-        • {magenta bold|help}   - show this message
+        • #{chalk.bold.magenta('login')}  - login to an existing account
+        • #{chalk.bold.magenta('create')} - create a new account
+        • #{chalk.bold.magenta('help')}   - show this message
         """
         @socket.emit 'output', msg
       when "login"
-        @socket.emit 'request_form_input', formDescriptors.login()
+        @socket.emit 'request-form-input', formDescriptors.login()
       when "create"
-        @socket.emit 'request_form_input', formDescriptors.createAccount()
+        @socket.emit 'request-form-input', formDescriptors.createAccount()
       else
-        @socket.emit 'output', "Unrecognized command. Type {magenta bold|help} for a list of available commands."
+        @socket.emit 'output', "Unrecognized command. Type #{chalk.bold.magenta('help')} for a list of available commands."
 
   # handle a player command
   onPlayerCommand: (str) =>
+    pre = @db.sys.findVerbByName 'preprocessCommand'
+    if pre?
+      str = @context.runVerb @player, pre, @db.sys, undefined, undefined, undefined, str
+
+    if !str || !str? || !str.toString?
+      return
+    else
+      str = str.toString()
+
     command = parse str
 
     if command.verb in ['eval', 'evalc'] and @player.programmer
@@ -117,7 +128,7 @@ module.exports = class Client
           self = @player.location()
           @context.runVerb @player, huhVerb, self, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr
         else
-          @player.send "{gray|I didn't understand that.}"
+          @player.send chalk.gray('I didn\'t understand that.')
 
   # handle log in form submission
   onLogin: (userData, fn) =>
@@ -196,6 +207,6 @@ module.exports = class Client
       fn formDescriptor
     else
       player = @db.createNewPlayer formData.name, formData.username, phash formData.password
-      @connect player, 'player_created'
+      @connect player, 'playerCreated'
 
       fn null
