@@ -16,9 +16,7 @@
     "jade": "*",
     "log4js": "*",
     "socket.io": "0.9.16",
-    "underscore": "*"
-  },
-  "devDependencies": {
+    "underscore": "*",
     "grunt": "*",
     "grunt-contrib-clean": "*",
     "grunt-contrib-coffee": "*",
