@@ -1,40 +1,39 @@
-'use strict';
 // this creates an object graph with prototypal inheritence
 // based on the world objects in the db.
-var worldObjectProxy = require('./world-object-proxy')
-  , World = require('./world')
-  , db = require('./db')
-  , initCron = require('./cron').init
+
+import worldObjectProxy from './world-object-proxy';
+import World from './world';
+import db from './db';
+import { initCron } from './cron';
 
 function loadDescendentsOf(parentId) {
-  var objects = db.findBy('parentId', parentId)
+  let objects = db.findBy('parentId', parentId);
 
   if (!parentId && objects.length === 0) {
     // No objects in the DB!  Let's create at least an empty Root object.
-    let Root =  { id: 'Root'
-                , name: 'Root'
-                , type: 'WorldObject'
-                , aliases: []
-                , properties: []
-                , verbs: []
-                , createdAt: new Date()
-                }
-    db.insert(Root)
-    objects = [Root]
+    const Root = {
+      id: 'Root',
+      name: 'Root',
+      type: 'WorldObject',
+      aliases: [],
+      properties: [],
+      verbs: [],
+      createdAt: new Date(),
+    };
+    db.insert(Root);
+    objects = [Root];
   }
 
-  for(let i = 0; i < objects.length; i++) {
-    load(objects[i])
-  }
+  objects.forEach((object) => load(object)); // eslint-disable-line no-use-before-define
 }
 
 function load(object) {
-  World[object.id] = worldObjectProxy(object)
-  loadDescendentsOf(object.id)
+  World[object.id] = worldObjectProxy(object);
+  loadDescendentsOf(object.id);
 }
 
-module.exports = function() {
-  loadDescendentsOf()
-  initCron()
-  return World
+export default function loadWorld() {
+  loadDescendentsOf();
+  initCron();
+  return World;
 }

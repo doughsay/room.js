@@ -1,26 +1,22 @@
-'use strict';
-
 function makeSpecialObject(name) {
-  var obj = { id: name }
+  const obj = { id: name };
 
-  function makeToString(name) {
-    return  function() {
-              return '[object ' + name + ']'
-            }
+  function makeToString(str) {
+    return () => `[object ${str}]`;
   }
 
-  Object.defineProperty ( obj
-                        , 'toString'
-                        , { enumerable: false
-                          , value: makeToString(name)
-                          }
-                        )
-  Object.freeze(obj)
+  Object.defineProperty(obj, 'toString', {
+    enumerable: false,
+    value: makeToString(name),
+  });
+  Object.freeze(obj);
 
-  return obj
+  return obj;
 }
 
-module.exports =  { Nothing: makeSpecialObject('Nothing')
-                  , FailedMatch: makeSpecialObject('FailedMatch')
-                  , AmbiguousMatch: makeSpecialObject('AmbiguousMatch')
-                  }
+const Nothing = makeSpecialObject('Nothing');
+const FailedMatch = makeSpecialObject('FailedMatch');
+const AmbiguousMatch = makeSpecialObject('AmbiguousMatch');
+const World = { Nothing, FailedMatch, AmbiguousMatch };
+
+export default World;

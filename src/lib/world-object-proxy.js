@@ -1,124 +1,92 @@
-'use strict';
-var World = require('./world')
-  , SocketMap = require('./socket-map')
-  , targets = {}
-  , base = require('./base')
-  , util = require('./util')
+import base from './base';
+import { deserialize, buildVerb, deserializeReferences, serializeVerb, serialize } from './util';
 
-function create(dbObject) {
-  var parentTarget = dbObject.parentId ? targets[dbObject.parentId] : base
-    , target = Object.create(parentTarget)
-    , reservedNames = require('./reserved').base
+const targets = {};
 
-  targets[dbObject.id] = target
+export default function worldObjectProxy(dbObject) {
+  const parentTarget = dbObject.parentId ? targets[dbObject.parentId] : base;
+  const target = Object.create(parentTarget);
+  const reservedNames = require('./reserved').base;
 
-  Object.defineProperty ( target, 'id',
-                        { writable: false
-                        , configurable: false
-                        , enumerable: true
-                        , value: dbObject.id
-                        })
+  targets[dbObject.id] = target;
 
-  dbObject.properties.forEach(function(property) {
-    target[property.key] = util.deserialize ( property.value
-                                            , target.id
-                                            , property.key
-                                            )
-  })
+  Object.defineProperty(target, 'id', {
+    writable: false,
+    configurable: false,
+    enumerable: true,
+    value: dbObject.id,
+  });
 
-  dbObject.verbs.forEach(function(verb) {
-    target[verb.name] = util.buildVerb(verb)
-  })
+  dbObject.properties.forEach((property) => {
+    target[property.key] = deserialize(property.value, target.id, property.key);
+  });
 
-  function get(target, name, receiver) {
-    return util.deserializeReferences(Reflect.get(target, name, receiver))
+  dbObject.verbs.forEach((verb) => {
+    target[verb.name] = buildVerb(verb);
+  });
+
+  function get(trgt, name, receiver) {
+    return deserializeReferences(Reflect.get(trgt, name, receiver));
   }
 
   // helpers for set
 
   function updateDbObjectVerb(name, valueToStore) {
-    var verb      = dbObject.verbs.filter(function(v) {
-                      return v.name === name
-                    })[0]
-      , property  = dbObject.properties.filter(function(prop) {
-                      return prop.key === name
-                    })[0]
+    const verb = dbObject.verbs.filter((v) => v.name === name)[0];
+    const property = dbObject.properties.filter((prop) => prop.key === name)[0];
 
     if (!verb) {
-      dbObject.verbs.push(valueToStore)
-    }
-    else {
-      let index = dbObject.verbs.indexOf(verb)
-      dbObject.verbs[index] = valueToStore
+      dbObject.verbs.push(valueToStore);
+    } else {
+      const index = dbObject.verbs.indexOf(verb);
+      dbObject.verbs[index] = valueToStore;
     }
 
     // remove property with same name if it exists
     if (property) {
-      dbObject.properties = dbObject.properties.filter(function(prop) {
-        return prop.key !== property.key
-      })
+      dbObject.properties = dbObject.properties.filter((prop) => prop.key !== property.key);
     }
   }
 
   function updateDbObjectProperty(name, valueToStore) {
-    var verb      = dbObject.verbs.filter(function(v) {
-                      return v.name === name
-                    })[0]
-      , property  = dbObject.properties.filter(function(prop) {
-                      return prop.key === name
-                    })[0]
+    const verb = dbObject.verbs.filter((v) => v.name === name)[0];
+    const property = dbObject.properties.filter((prop) => prop.key === name)[0];
 
     if (!property) {
-      dbObject.properties.push({key: name, value: valueToStore})
-    }
-    else {
-      property.value = valueToStore
+      dbObject.properties.push({ key: name, value: valueToStore });
+    } else {
+      property.value = valueToStore;
     }
 
     // remove verb with same name if it exists
     if (verb) {
-      dbObject.verbs = dbObject.verbs.filter(function(v) {
-        return v.name !== verb.name
-      })
+      dbObject.verbs = dbObject.verbs.filter((v) => v.name !== verb.name);
     }
   }
 
-  function set(target, name, value, receiver) {
-    var isVerb         = (value && value.__verb__)
-      , valueToStore   = isVerb ? util.serializeVerb(name, value)
-                                : util.serialize(value)
-      , valueToSet     = isVerb ? util.buildVerb(util.serializeVerb(name, value))
-                                : util.deserialize(util.serialize(value), target.id, name)
-      , updateDbObject = isVerb ? updateDbObjectVerb
-                                : updateDbObjectProperty
+  function set(trgt, name, value, receiver) {
+    const isVerb = (value && value.__verb__);
+    const valueToStore = isVerb ? serializeVerb(name, value) : serialize(value);
+    const valueToSet = isVerb ? buildVerb(serializeVerb(name, value))
+                              : deserialize(serialize(value), trgt.id, name);
+    const updateDbObject = isVerb ? updateDbObjectVerb : updateDbObjectProperty;
 
     if (reservedNames.indexOf(name) === -1) {
-      updateDbObject(name, valueToStore)
+      updateDbObject(name, valueToStore);
     }
-    return Reflect.set(target, name, valueToSet, receiver)
+    return Reflect.set(trgt, name, valueToSet, receiver);
   }
 
-  function deleteProperty(target, name) {
+  function deleteProperty(trgt, name) {
     if (reservedNames.indexOf(name) === -1) {
-      if (target[name] && target[name].__verb__) {
-        dbObject.verbs = dbObject.verbs.filter(function(v) {
-          return v.name !== name
-        })
-      }
-      else {
-        dbObject.properties = dbObject.properties.filter(function(prop) {
-          return prop.key !== name
-        })
+      if (trgt[name] && trgt[name].__verb__) {
+        dbObject.verbs = dbObject.verbs.filter((v) => v.name !== name);
+      } else {
+        dbObject.properties = dbObject.properties.filter((prop) => prop.key !== name);
       }
     }
-    return Reflect.deleteProperty(target, name)
+    return Reflect.deleteProperty(trgt, name);
   }
 
-  return new Proxy( target, { get: get
-                            , set: set
-                            , deleteProperty: deleteProperty
-                            }
-                  )
+  return new Proxy(target, { get, set, deleteProperty });
 }
-
-module.exports = create

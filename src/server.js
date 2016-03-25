@@ -1,42 +1,23 @@
-'use strict';
-require('harmony-reflect') // remove this once harmony proxies are real in v8
-require('rjs-strings').attach(global)
-var start = new Date()
-  , World = require('./lib/load-world')()
-  , winston = require('./lib/winston')
-  , logger = winston.loggers.get('server')
-  , socketController = require('./controllers/socket-controller')
-  , coPatchSockets = require('./lib/co-patch-sockets')
-  , server = require('http').createServer()
-  , io = require('socket.io')(server)
-  , config = require('./config/app')
-  , fs = require('fs')
-  , runHook = require('./lib/run-hook')
+import http from 'http';
+import socketIo from 'socket.io';
 
-io.on('connection', coPatchSockets(socketController))
+import * as config from './config/app';
 
-// Delete the socket file if it exists (from a previous crash)
-// and set up a listener to remove it on clean exit
-if (config.socket && fs.existsSync(config.socket)) {
-  fs.unlinkSync(config.socket)
-  process.on('exit', function() {
-    fs.unlinkSync(config.socket)
-  })
-}
+import { serverLogger } from './lib/logger';
+import loadWorld from './lib/load-world';
+import runHook from './lib/run-hook';
 
-// Start the server.
-server.listen(config.port || config.socket, function(err) {
-  if (err) {
-    throw err
-  }
-  // Fix socket permissions
-  if(config.socket && fs.existsSync(config.socket)) {
-    fs.chmodSync(config.socket, '777')
-  }
-  runHook(null, 'System', 'onServerStarted')
-  logger.info ( '%s started on %s in %sms'
-              , config.appName
-              , (config.port || config.socket)
-              , new Date() - start
-              )
-})
+import socketController from './controllers/socket-controller';
+
+loadWorld();
+
+const server = http.createServer();
+const io = socketIo(server);
+
+io.on('connection', socketController);
+
+server.listen(config.port, (err) => {
+  if (err) { throw err; }
+  runHook(null, 'System', 'onServerStarted');
+  serverLogger.info('%s started on %s', config.appName, config.port);
+});

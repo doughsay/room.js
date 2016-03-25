@@ -1,157 +1,117 @@
-'use strict';
 // This module pretty prints a js object using room.js color markup
-var util = require('./util')
 
-function defined(x) {
-  return typeof x !== 'undefined' && x !== null
+import chalk from 'chalk';
+
+function truncate(s, length = 25) {
+  if (s.length <= length) { return s; }
+  return `${s.slice(0, length + 1)}...`;
 }
 
-function isFormattedString(data) {
-  if (!defined(data)) {
-    return false
-  }
-  return     typeof data.text === 'string'
-          || typeof data.color === 'string'
-          || typeof data.bold === 'boolean'
-          || typeof data.inverse === 'boolean'
-          || typeof data.pre === 'boolean'
-}
+function print(x, maxdepth, depth = 0, prefix = '', parents = []) {
+  const indent = '  '.repeat(depth);
 
-function truncate(s, length) {
-  if (typeof length === 'undefined') { length = 25 }
-
-  if (s.length <= 25) {
-    return s
-  }
-  else {
-    return s.slice(0, length + 1) + '...'
-  }
-}
-
-function print(x, maxdepth, depth, prefix, parents) {
-  var indent
-    , output
-
-  // defaults
-  if (typeof depth === 'undefined') { depth = 0 }
-  if (typeof prefix === 'undefined') { prefix = '' }
-  if (typeof parents === 'undefined') { parents = [] }
-
-  indent = '  '.repeat(depth)
-
-  output = (function() {
-    var output
-
+  const output = (() => {
     switch (typeof x) {
-      case 'number':
-        return yellow(x)
+      case 'number': {
+        return chalk.yellow(x);
+      }
 
-      case 'string':
+      case 'string': {
         if (depth === 0) {
-          return ['\'', green(x), '\''] // escape?
+          return `'${chalk.green(x)}'`;
         }
-        else {
-          return ['\'', green(truncate(x)), '\''] // escape?
-        }
-        break
+        return `'${chalk.green(truncate(x))}'`;
+      }
 
-      case 'boolean':
-        return magenta(x.toString())
+      case 'boolean': {
+        return chalk.magenta(x.toString());
+      }
 
-      case 'undefined':
-        return black('undefined')
+      case 'undefined': {
+        return chalk.gray('undefined');
+      }
 
-      case 'function':
+      case 'function': {
         if (x.__verb__) {
-          let args = [x.dobjarg, x.preparg, x.iobjarg].join(', ')
-
-          return cyan(bold(['[Verb ', x.pattern, '(', args, ')]']))
+          const args = [x.dobjarg, x.preparg, x.iobjarg].join(', ');
+          return chalk.cyan.bold(`[Verb ${x.pattern}(${args})]`);
         }
-        else {
-          return cyan('[Function]')
-        }
-        break
+        return chalk.cyan('[Function]');
+      }
 
-      case 'object':
+      case 'object': {
         if (x === null) {
-          return gray('null')
+          return chalk.gray('null');
         }
-        else if (Object.prototype.toString.call(x) === '[object Date]') {
-          return orange(x.toString())
+
+        if (Object.prototype.toString.call(x) === '[object Date]') {
+          return chalk.yellow(x.toString());
         }
-        else if (Object.prototype.toString.call(x) === '[object RegExp]') {
-          return red(x.toString())
+
+        if (Object.prototype.toString.call(x) === '[object RegExp]') {
+          return chalk.red(x.toString());
         }
-        else if (x.constructor.name === 'JobProxy') {
-          return orange(bold(x.toString()))
+
+        if (x.constructor.name === 'JobProxy') {
+          return chalk.yellow.bold(x.toString());
         }
-        else if (isFormattedString(x)) {
-          return magenta(bold(['[FormattedString "', truncate(render(x, false)) ,'"]']))
+
+        if (parents.indexOf(x) >= 0) {
+          return chalk.black.bgYellow('[CircularReference]');
         }
-        else {
-          if (parents.indexOf(x) >= 0) {
-            return yellow(inverse('[CircularReference]'))
+
+        parents.push(x);
+
+        if (Array.isArray(x)) {
+          if (x.length === 0) {
+            parents.pop(); return '[]';
+          } else if (maxdepth === depth) {
+            parents.pop(); return chalk.blue(`[Array(${x.length})]`);
           }
-          else {
-            parents.push(x)
-            if (Array.isArray(x)) {
-              if (x.length === 0) {
-                output = '[]'
-              }
-              else if (maxdepth === depth) {
-                output = blue(['[Array(', x.length, ')]'])
-              }
-              else {
-                let xs = x.map(function(y) {
-                  return print(y, maxdepth, depth + 1, '', parents)
-                })
-                xs[0].shift()
-                xs[0].unshift('[ ')
-                xs[xs.length-1].push(' ]')
-                if (prefix !== '') {
-                  xs[0].unshift('\n', indent)
-                }
-                output = util.intersperse(',\n', xs)
-              }
-            }
-            else {
-              if (Object.keys(x).length === 0) {
-                output = '{}'
-              }
-              else if (maxdepth === depth) {
-                output = blue(x.toString())
-              }
-              else {
-                let xs = []
-                for (let key in x) {
-                  let value = x[key]
-                    , color = x.hasOwnProperty(key) ? blue : gray
-                    , prefix = [color(key), ': ']
-                  xs.push(print(value, maxdepth, depth + 1, prefix, parents))
-                }
-                xs[0].shift()
-                xs[0].unshift('{ ')
-                xs[xs.length-1].push(' }')
-                if (prefix !== '') {
-                  xs[0].unshift('\n', indent)
-                }
-                output = util.intersperse(',\n', xs)
-              }
-            }
-            parents.pop()
-            return output
+
+          const xs = x.map((y) => print(y, maxdepth, depth + 1, '', parents));
+
+          xs[0].shift();
+          xs[0].unshift('[ ');
+          xs[xs.length - 1].push(' ]');
+          if (prefix !== '') {
+            xs[0].unshift('\n', indent);
           }
+          parents.pop(); return xs.map((y) => y.join('')).join(',\n');
         }
+
+        if (Object.keys(x).length === 0) {
+          parents.pop(); return '{}';
+        } else if (maxdepth === depth) {
+          parents.pop(); return chalk.blue(x.toString());
+        }
+
+        const xs = [];
+        for (const key in x) { // eslint-disable-line guard-for-in
+          const value = x[key];
+          const color = x.hasOwnProperty(key) ? chalk.blue : chalk.gray;
+          const pfx = `${color(key)}: `;
+          xs.push(print(value, maxdepth, depth + 1, pfx, parents));
+        }
+
+        xs[0].shift();
+        xs[0].unshift('{ ');
+        xs[xs.length - 1].push(' }');
+        if (prefix !== '') {
+          xs[0].unshift('\n', indent);
+        }
+        parents.pop(); return xs.map((y) => y.join('')).join(',\n');
+      }
+      default: {
+        throw new Error('Unexpected case in print.');
+      }
     }
-  })()
-  return [indent, prefix, output]
+  })();
+  return [indent, prefix, output];
 }
 
-function printHelper(x, maxdepth) {
-  if (typeof maxdepth === 'undefined') {
-    maxdepth = 1
-  }
-  return print(x, maxdepth)
+function printHelper(x, maxdepth = 1) {
+  return print(x, maxdepth).join('');
 }
 
-module.exports = printHelper
+export default printHelper;

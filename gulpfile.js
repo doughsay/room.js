@@ -6,7 +6,7 @@ var SRC     = './src'
   , SERVER  = SRC + '/server.js'
   , NODEMON = { script: SERVER
               , env: { 'NODE_ENV': 'development' }
-              , nodeArgs: ['--harmony']
+              , nodeArgs: ['--harmony', '--harmony-proxies']
               , watch: [SRC]
               }
 

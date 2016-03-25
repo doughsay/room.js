@@ -1,12 +1,12 @@
 import SimpleDB from './simple-db';
 import { serverLogger } from './logger';
 
-const crondb = new SimpleDB('cron.bson');
+const userdb = new SimpleDB('users.bson');
 
 function save() {
   const time = new Date();
-  crondb.saveSync();
-  serverLogger.info('CronDB saved in %sms', new Date() - time);
+  userdb.saveSync();
+  serverLogger.info('UserDB saved in %sms', new Date() - time);
 }
 
 function gracefulExitOn(signal) {
@@ -25,4 +25,4 @@ gracefulExitOn('SIGINT');
 // save every 30 minutes
 setInterval(save, 30 * 60 * 1000);
 
-export default crondb;
+export default userdb;

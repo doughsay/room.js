@@ -1,40 +1,34 @@
-'use strict';
-var World = require('./world')
-  , winston = require('./winston')
-  , vmLogger = winston.loggers.get('vm')
-  , context = require('./context')
-  , vm = require('vm')
-  , util = require('./util')
+import vm from 'vm';
+
+import World from './world';
+import context from './context';
+import util from './util';
+import { vmLogger } from './logger';
 
 function hookExists(object, hookName) {
-  return World[object] && typeof World[object][hookName] === 'function'
+  return World[object] && typeof World[object][hookName] === 'function';
 }
 
 // run an event hook if it exists
-function runHook() {
-  var args = [].slice.call(arguments)
-    , playerId = args.shift()
-    , object = args.shift()
-    , hook = args.shift()
-    , player = playerId ? World[playerId] : void 0
+export default function runHook(...args) {
+  const playerId = args.shift();
+  const object = args.shift();
+  const hook = args.shift();
+  const player = playerId ? World[playerId] : void 0;
 
   if (hookExists(object, hook)) {
-    let code = object + '.' + hook + '(' + args.join(', ') + ')'
+    const code = `${object}.${hook}(${args.join(', ')})`;
 
-    vmLogger.debug(code)
+    vmLogger.debug(code);
 
     try {
-      vm.runInContext(code, context, {filename: 'Hook::' + object + '.' + hook, timeout: 500})
-    }
-    catch (err) {
+      vm.runInContext(code, context, { filename: `Hook::${object}.${hook}`, timeout: 500 });
+    } catch (err) {
       if (player && player.isOnline) {
-        util.sendError(player, err)
-      }
-      else {
-        vmLogger.error(err.toString())
+        util.sendError(player, err);
+      } else {
+        vmLogger.error(err.toString());
       }
     }
   }
 }
-
-module.exports = runHook

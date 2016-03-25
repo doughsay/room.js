@@ -1,63 +1,50 @@
-module.exports =
-  // reserved global names in the context
-  { globals:  [ 'parse'
-              , 'matchVerb'
-              , 'verb'
-              , 'search'
-              , '$'
-              , 'Cron'
-              , 'players'
-              , 'all'
-              , 'Nothing'
-              , 'FailedMatch'
-              , 'AmbiguousMatch'
-              , 'nextId'
-              , 'eval'
-              , 'white'
-              , 'gray'
-              , 'black'
-              , 'blue'
-              , 'cyan'
-              , 'green'
-              , 'magenta'
-              , 'red'
-              , 'yellow'
-              , 'orange'
-              , 'bold'
-              , 'inverse'
-              , 'format'
-              , 'compose'
-              , 'intersperse'
-              ]
-  // reserved property names on the base object
-  , base:     [ 'id'
-              , 'toString'
-              , 'isA'
-              , 'send'
-              , 'ask'
-              , 'prompt'
-              , 'matches'
-              , 'findVerb'
-              , 'destroy'
-              , 'reload'
-              , 'matchObjects'
-              , 'findObject'
-              , 'findNearby'
-              , 'new'
-              , '__proxy__'
-              , 'contents'
-              , 'children'
-              , 'parent'
-              , 'location'
-              , 'name'
-              , 'aliases'
-              , 'isPlayer'
-              , 'isOnline'
-              , 'isProgrammer'
-              , 'lastActivity'
-              , 'edit'
-              , 'addVerb'
-              , 'addFunction'
-              , '__proto__'
-              ]
-}
+// reserved global names in the context
+export const globals = [
+  'parse',
+  'matchVerb',
+  'verb',
+  'search',
+  '$',
+  'Cron',
+  'players',
+  'all',
+  'Nothing',
+  'FailedMatch',
+  'AmbiguousMatch',
+  'nextId',
+  'eval',
+  // 'intersperse',
+];
+
+// reserved property names on the base object
+export const base = [
+  'id',
+  'toString',
+  'isA',
+  'send',
+  'ask',
+  'prompt',
+  'matches',
+  'findVerb',
+  'destroy',
+  'reload',
+  'matchObjects',
+  'findObject',
+  'findNearby',
+  'new',
+  '__proxy__',
+  'contents',
+  'children',
+  'parent',
+  'location',
+  'name',
+  'aliases',
+  'isPlayer',
+  'isOnline',
+  'isProgrammer',
+  'lastActivity',
+  'edit',
+  'addVerb',
+  'addFunction',
+  '__proto__',
+];

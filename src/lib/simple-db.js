@@ -1,56 +1,47 @@
-'use strict';
-var fs = require('fs')
-  , BSON = require('bson').pure().BSON
+import fs from 'fs';
+import bson from 'bson';
 
-function SimpleDB(filename) {
-  var db = {}
+const BSON = bson.pure().BSON;
 
-  this.loadSync = function(done) {
-    db = BSON.deserialize(fs.readFileSync(filename))
-    return true
-  }
+export default function SimpleDB(filename) {
+  let db = {};
 
-  this.saveSync = function() {
-    fs.writeFileSync(filename, BSON.serialize(db))
-    return true
-  }
+  this.loadSync = () => {
+    db = BSON.deserialize(fs.readFileSync(filename));
+    return true;
+  };
 
-  this.insert = function(object) {
+  this.saveSync = () => {
+    fs.writeFileSync(filename, BSON.serialize(db));
+    return true;
+  };
+
+  this.insert = (object) => {
     if (typeof object.id !== 'string') {
-      throw new Error('Object must contain a string id property.')
+      throw new Error('Object must contain a string id property.');
     }
     if (object.id in db) {
-      throw new Error('An object with that ID already exists.')
+      throw new Error('An object with that ID already exists.');
     }
-    db[object.id] = object
-    return object
-  }
+    db[object.id] = object;
+    return object;
+  };
 
-  this.remove = function(object) {
-    delete db[object.id]
-  }
+  this.remove = (object) => {
+    delete db[object.id];
+  };
 
-  this.removeById = function(id) {
-    delete db[id]
-  }
+  this.removeById = (id) => {
+    delete db[id];
+  };
 
-  this.findById = function(id) {
-    return db[id]
-  }
+  this.findById = (id) => db[id];
 
-  this.findBy = function(field, value) {
-    return this.all().filter(function(object) {
-      return object[field] === value
-    })
-  }
+  this.findBy = (field, value) => this.all().filter((object) => object[field] === value);
 
-  this.all = function() {
-    return Object.keys(db).map(function(id) { return db[id] })
-  }
+  this.all = () => Object.keys(db).map((id) => db[id]);
 
   if (fs.existsSync(filename)) {
-    this.loadSync()
+    this.loadSync();
   }
 }
-
-module.exports = SimpleDB
