@@ -79,7 +79,7 @@ function onEval(input) {
 function onCommand(input) {
   const player = World[this.rjs.playerId];
   const [hookRan, processedInput] = runHook(
-    player.id, 'System', 'preprocessCommand', util.wrapString(input)
+    player.id, 'System', 'preprocessCommand', player.id, util.wrapString(input)
   );
   const command = parse(hookRan ? processedInput : input);
 

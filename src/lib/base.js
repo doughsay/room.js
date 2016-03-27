@@ -38,6 +38,15 @@ function send(msg) {
   return false;
 }
 
+function setPrompt(str) {
+  const socket = SocketMap[this.id];
+  if (socket) {
+    socket.emit('set-prompt', str);
+    return true;
+  }
+  return false;
+}
+
 function ask(params, callback) {
   const socket = SocketMap[this.id];
   const player = this;
@@ -372,6 +381,7 @@ function addFunction(name) {
 util.overrideToString(toString, 'toString');
 util.overrideToString(isA, 'isA');
 util.overrideToString(send, 'send');
+util.overrideToString(setPrompt, 'setPrompt');
 util.overrideToString(ask, 'ask');
 util.overrideToString(prompt, 'prompt');
 util.overrideToString(matches, 'matches');
@@ -391,6 +401,7 @@ util.modifyObject(base, (property, accessor) => {
   property('toString', toString);
   property('isA', isA);
   property('send', send);
+  property('setPrompt', setPrompt);
   property('ask', ask);
   property('prompt', prompt);
   property('matches', matches);

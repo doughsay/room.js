@@ -1,4 +1,5 @@
 import vm from 'vm';
+import chalk from 'chalk';
 
 import World from './world';
 import parse from './parser';
@@ -125,6 +126,7 @@ util.modifyObject(sandbox, (property, accessor) => {
   property('eval', void 0);
 
   // color functions and helpers
+  property('chalk', chalk);
   // property('white', white)
   // property('gray', gray)
   // property('black', black)
