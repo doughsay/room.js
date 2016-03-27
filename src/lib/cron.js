@@ -115,9 +115,7 @@ function schedule(id, inPattern, fn, start = true) {
 function getJobs() {
   const output = {};
   for (const id in jobs) {
-    if ({}.hasOwnProperty.call(jobs, id)) {
-      output[id] = new JobProxy(jobs[id]);
-    }
+    output[id] = new JobProxy(jobs[id]);
   }
   return output;
 }

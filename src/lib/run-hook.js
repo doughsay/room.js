@@ -22,13 +22,20 @@ export default function runHook(...args) {
     vmLogger.debug(code);
 
     try {
-      vm.runInContext(code, context, { filename: `Hook::${object}.${hook}`, timeout: 500 });
+      const retval = vm.runInContext(code, context, {
+        filename: `Hook::${object}.${hook}`,
+        timeout: 500,
+      });
+      return [true, retval];
     } catch (err) {
       if (player && player.isOnline) {
         util.sendError(player, err);
       } else {
         vmLogger.error(err.toString());
       }
+      return [false];
     }
   }
+
+  return [false];
 }

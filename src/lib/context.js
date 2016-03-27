@@ -48,12 +48,10 @@ function search(str) {
   const objects = [];
 
   for (const id in World) {
-    if ({}.hasOwnProperty.call(World, id)) {
-      const object = World[id];
-      // matches return 0 1 or 2, in this case we care about 1 and 2
-      if (typeof object.matches === 'function' && object.matches(str)) {
-        objects.push(object);
-      }
+    const object = World[id];
+    // matches return 0 1 or 2, in this case we care about 1 and 2
+    if (typeof object.matches === 'function' && object.matches(str)) {
+      objects.push(object);
     }
   }
 
@@ -64,11 +62,9 @@ function getPlayers() {
   const players = [];
 
   for (const id in World) {
-    if ({}.hasOwnProperty.call(World, id)) {
-      const object = World[id];
-      if (object.isPlayer) {
-        players.push(object);
-      }
+    const object = World[id];
+    if (object.isPlayer) {
+      players.push(object);
     }
   }
 
@@ -79,9 +75,7 @@ function getAll() {
   const objects = [];
 
   for (const id in World) {
-    if ({}.hasOwnProperty.call(World, id)) {
-      objects.push(World[id]);
-    }
+    objects.push(World[id]);
   }
 
   return objects;

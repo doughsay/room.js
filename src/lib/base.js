@@ -114,11 +114,9 @@ function matches(search) {
 
 function findVerb(command, objects, self = this) {
   for (const key in this) {
-    if ({}.hasOwnProperty.call(this, key)) {
-      const prop = this[key];
-      if (prop && prop.__verb__ && prop.matchesCommand(command, objects, self)) {
-        return key;
-      }
+    const prop = this[key];
+    if (prop && prop.__verb__ && prop.matchesCommand(command, objects, self)) {
+      return key;
     }
   }
   return void 0;
@@ -203,12 +201,10 @@ function getName() {
 
 function nameTaken(player, name) {
   for (const id in World) {
-    if ({}.hasOwnProperty.call(World, id)) {
-      const object = World[id];
+    const object = World[id];
 
-      if (object !== player && object.name === name) {
-        return true;
-      }
+    if (object !== player && object.name === name) {
+      return true;
     }
   }
   return false;
@@ -341,8 +337,16 @@ function newObject(object) {
   return World[id];
 }
 
+function withSocket(fn) {
+  return {
+    __requires_socket__: (socket) => {
+      fn.call(this, socket);
+    },
+  };
+}
+
 function edit(name) {
-  const e = (socket) => {
+  return withSocket((socket) => {
     if (this[name] && this[name].__verb__) {
       socket.emit('edit-verb', { objectId: this.id, verb: util.serializeVerb(name, this[name]) });
     } else if (this[name] && this[name].__source__) {
@@ -350,9 +354,7 @@ function edit(name) {
     } else {
       throw new Error(`Invalid edit call. Usage: ${this.id}.edit(verbOrFunctionName)`);
     }
-  };
-
-  return { __requires_socket__: e };
+  });
 }
 
 function addVerb(name, pattern, dobjarg, preparg, iobjarg, code) {

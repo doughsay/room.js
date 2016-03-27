@@ -61,9 +61,7 @@ function makeObject(object) {
 
   // whitelist properties and fill in defaults
   for (const key in defaults) {
-    if ({}.hasOwnProperty.call(defaults, key)) {
-      newObject[key] = object[key] || defaults[key];
-    }
+    newObject[key] = object[key] || defaults[key];
   }
 
   // always set type and createdAt to default

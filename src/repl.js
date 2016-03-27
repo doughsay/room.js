@@ -10,7 +10,5 @@ const repl = require('repl').start('rjs-server > ');
 const World = require('./lib/world').default;
 
 for (const id in World) {
-  if ({}.hasOwnProperty.call(World, id)) {
-    repl.context[id] = World[id];
-  }
+  repl.context[id] = World[id];
 }

@@ -59,15 +59,15 @@ function onEval(input) {
 
     vmLogger.debug(code);
 
-    const retVal = vm.runInContext(code, context, {
+    let retVal = vm.runInContext(code, context, {
       filename: `Eval::${this.rjs.playerId}`,
       timeout: 500,
     });
 
-    // if (retVal && retVal.__requires_socket__) {
-    //   // TODO: we're trusting this code more than usual
-    //   retVal = retVal.__requires_socket__(this);
-    // }
+    if (retVal && retVal.__requires_socket__) {
+      // TODO: we're trusting this code more than usual
+      retVal = retVal.__requires_socket__(this);
+    }
 
     this.emit('output', print(retVal, 1));
   } catch (err) {
@@ -77,8 +77,11 @@ function onEval(input) {
 
 // parse and process a player's command
 function onCommand(input) {
-  const command = parse(input);
   const player = World[this.rjs.playerId];
+  const [hookRan, processedInput] = runHook(
+    player.id, 'System', 'preprocessCommand', util.wrapString(input)
+  );
+  const command = parse(hookRan ? processedInput : input);
 
   db.findById(player.id).lastActivity = new Date();
 
@@ -86,7 +89,8 @@ function onCommand(input) {
     onEval.call(this, command.argstr);
   } else if (command.verb === 'quit') {
     runHook(player.id, 'System', 'onPlayerDisconnected', player.id);
-    this.emit('output', { message: 'Bye!', prompt: this.rjs.user.username });
+    this.emit('set-prompt', this.rjs.user.id);
+    this.emit('output', 'Bye!');
     delete SocketMap[player.id];
     delete this.rjs.playerId;
   } else {
@@ -234,8 +238,10 @@ function onCreatePlayer() {
 
 function logoutOtherInstance(player) {
   if (SocketMap[player.id]) {
+    const socket = SocketMap[player.id];
     const msg = `You're playing as ${player.name} from another login session. Quitting...`;
-    SocketMap[player.id].emit('output', msg);
+    socket.emit('output', msg);
+    socket.emit('set-prompt', socket.rjs.user.id);
     delete SocketMap[player.id].rjs.playerId;
   }
 }
@@ -350,6 +356,48 @@ function onInput(input) {
   }
 }
 
+function onSaveVerb(data, fn) {
+  const worldObject = World[data.objectId];
+  const verb = data.verb;
+  const player = World[this.rjs.playerId];
+
+  if (!player || !player.isProgrammer) {
+    fn('Unauthorized');
+    return;
+  }
+
+  try {
+    const newVerb = makeVerb(verb.pattern, verb.dobjarg, verb.preparg, verb.iobjarg, verb.code);
+
+    worldObject[verb.name] = newVerb;
+    fn('saved');
+  } catch (err) {
+    fn(err.toString());
+  }
+}
+
+function onSaveFunction(data, fn) {
+  const objectId = data.objectId;
+  const worldObject = World[objectId];
+  const src = data.src;
+  const name = data.name;
+  const player = World[this.rjs.playerId];
+
+  if (!player || !player.isProgrammer) {
+    fn('Unauthorized');
+    return;
+  }
+
+  try {
+    const newfunction = util.buildFunction({ __function__: src }, objectId, name);
+
+    worldObject[name] = newfunction;
+    fn('saved');
+  } catch (err) {
+    fn(err.toString());
+  }
+}
+
 function onConnect() {
   const welcome =
     `Welcome to ${bb('room.js')}!\nType ${bm('help')} for a list of available commands.`;
@@ -359,59 +407,10 @@ function onConnect() {
   this.emit('output', welcome);
   this.on('disconnect', onDisconnect.bind(this));
   this.on('input', onInput.bind(this));
-  // this.on('save-verb', onSaveVerb);
-  // this.on('save-function', onSaveFunction);
+  this.on('save-verb', onSaveVerb.bind(this));
+  this.on('save-function', onSaveFunction.bind(this));
 }
 
 export default function init(socket) {
   onConnect.call(socket);
 }
-
-// function onSaveVerb(data, fn) {
-//   var worldObject = World[data.objectId]
-//     , verb = data.verb
-//     , player = World[this.rjs.playerId];
-//
-//   if (!player || !player.isProgrammer) {
-//     fn('Unauthorized');
-//     return;
-//   }
-//
-//   try {
-//     let newVerb = makeVerb(verb.pattern
-//                           , verb.dobjarg
-//                           , verb.preparg
-//                           , verb.iobjarg
-//                           , verb.code
-//                           );
-//
-//     worldObject[verb.name] = newVerb;
-//     fn('saved');
-//   }
-//   catch (err) {
-//     fn(err.toString());
-//   }
-// }
-//
-// function onSaveFunction(data, fn) {
-//   var objectId = data.objectId
-//     , worldObject = World[objectId]
-//     , src = data.src
-//     , name = data.name
-//     , player = World[this.rjs.playerId];
-//
-//   if (!player || !player.isProgrammer) {
-//     fn('Unauthorized');
-//     return;
-//   }
-//
-//   try {
-//     let newfunction = util.buildFunction({ __function__: src }, objectId, name);
-//
-//     worldObject[name] = newfunction;
-//     fn('saved');
-//   }
-//   catch (err) {
-//     fn(err.toString());
-//   }
-// }
