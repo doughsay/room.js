@@ -398,6 +398,13 @@ function onSaveFunction(data, fn) {
   }
 }
 
+function onTabKeyPress({ direction }) {
+  if (this.rjs.playerId) {
+    const player = World[this.rjs.playerId];
+    runHook(player.id, player.id, 'onTabKeyPress', direction);
+  }
+}
+
 function onConnect() {
   const welcome =
     `Welcome to ${bb('room.js')}!\nType ${bm('help')} for a list of available commands.`;
@@ -409,6 +416,7 @@ function onConnect() {
   this.on('input', onInput.bind(this));
   this.on('save-verb', onSaveVerb.bind(this));
   this.on('save-function', onSaveFunction.bind(this));
+  this.on('tab-key-press', onTabKeyPress.bind(this));
 }
 
 export default function init(socket) {
