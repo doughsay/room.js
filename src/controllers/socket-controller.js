@@ -1,5 +1,6 @@
 import vm from 'vm';
 import chalk from 'chalk';
+import Fuse from 'fuse.js';
 
 import parse from '../lib/parser';
 import print from '../lib/print';
@@ -21,6 +22,8 @@ const bm = chalk.bold.magenta;
 const bb = chalk.bold.blue;
 const red = chalk.red;
 const gray = chalk.gray;
+
+const fuse = new Fuse([], { keys: ['objectId', 'verb', 'function'] });
 
 // Socket events
 
@@ -405,6 +408,49 @@ function onTabKeyPress({ direction }) {
   }
 }
 
+// TODO: this is incredibly innedfficient, but works for now
+function onSearch(str, fn) {
+  if (!str || !this.rjs.playerId || !World[this.rjs.playerId].isProgrammer) {
+    fn([]);
+  } else {
+    const searchable = [];
+    for (const objectId in World) {
+      const object = World[objectId];
+      for (const key in object) {
+        const value = object[key];
+        if (object.hasOwnProperty(key) && value) {
+          if (value.__verb__) {
+            searchable.push({ objectId, verb: key });
+          } else if (value.__source__) {
+            searchable.push({ objectId, function: key });
+          }
+        }
+      }
+    }
+    fuse.set(searchable);
+    const results = fuse.search(str);
+    fn(results);
+  }
+}
+
+function onGetVerb({ objectId, name }, fn) {
+  if (!this.rjs.playerId || !World[this.rjs.playerId].isProgrammer) { fn(void 0); return; }
+  const worldObject = World[objectId];
+  if (!worldObject) { fn(void 0); return; }
+  const verb = worldObject[name];
+  if (!verb || !verb.__verb__) { fn(void 0); return; }
+  fn({ objectId, verb: util.serializeVerb(name, verb) });
+}
+
+function onGetFunction({ objectId, name }, fn) {
+  if (!this.rjs.playerId || !World[this.rjs.playerId].isProgrammer) { fn(void 0); return; }
+  const worldObject = World[objectId];
+  if (!worldObject) { fn(void 0); return; }
+  const func = worldObject[name];
+  if (!func || !func.__source__) { fn(void 0); return; }
+  fn({ objectId, src: func.__source__, name });
+}
+
 function onConnect() {
   const welcome =
     `Welcome to ${bb('room.js')}!\nType ${bm('help')} for a list of available commands.`;
@@ -417,6 +463,9 @@ function onConnect() {
   this.on('save-verb', onSaveVerb.bind(this));
   this.on('save-function', onSaveFunction.bind(this));
   this.on('tab-key-press', onTabKeyPress.bind(this));
+  this.on('search', onSearch.bind(this));
+  this.on('get-verb', onGetVerb.bind(this));
+  this.on('get-function', onGetFunction.bind(this));
 }
 
 export default function init(socket) {
