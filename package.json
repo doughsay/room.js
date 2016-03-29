@@ -30,9 +30,6 @@
   },
   "devDependencies": {
     "eslint": "^2.4.0",
-    "eslint-config-airbnb": "^6.2.0",
-    "gulp": "^3.8.6",
-    "gulp-nodemon": "^1.0.4",
-    "nodemon": "^1.2.1"
+    "eslint-config-airbnb": "^6.2.0"
   }
 }
