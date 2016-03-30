@@ -10,7 +10,7 @@ room.js is different from other MOOs because:
 
 1. It uses plain JavaScript as the programming language instead of the original MOO language or some other custom language.
 2. You connect using a web browser, not a telnet or mud client.
-3. You can edit the game code in the browser, using a fairly decent in-browser code editor ([Ace](http://ace.ajax.org/)).
+3. You can edit the game code in the browser, using a fairly decent in-browser code editor ([CodeMirror](https://codemirror.net/)).
 
 This repository contains the room.js server.
 

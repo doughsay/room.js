@@ -28,11 +28,11 @@ const fuse = new Fuse([], { keys: ['objectId', 'verb', 'function'] });
 // Socket events
 
 // run a verb
-function onRunVerb(command, matchedObjects, matchedVerb, verbstrOverride) {
+function onRunVerb(command, matchedObjects, matchedVerb) {
   const playerId = this.rjs.playerId;
   const dobjId = matchedObjects.dobj.id;
   const iobjId = matchedObjects.iobj.id;
-  const verbstr = util.wrapString(verbstrOverride || matchedVerb.verb);
+  const verbstr = util.wrapString(command.verb);
   const argstr = util.wrapString(command.argstr);
   const dobjstr = util.wrapString(command.dobjstr);
   const prepstr = util.wrapString(command.prepstr);
@@ -104,7 +104,7 @@ function onCommand(input) {
       onRunVerb.call(this, command, matchedObjects, matchedVerb);
     } else if (player.location && player.location.verbMissing) {
       const verbMissing = { verb: 'verbMissing', self: player.location };
-      onRunVerb.call(this, command, matchedObjects, verbMissing, command.verb);
+      onRunVerb.call(this, command, matchedObjects, verbMissing);
     } else {
       this.emit('output', gray("I didn't understand that."));
     }

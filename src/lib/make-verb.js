@@ -29,8 +29,9 @@ function makeVerb(
     'off/off of',
   ];
 
+  const args = 'player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr';
   const code = rawCode
-    || `function ${name}(player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr) {\n  \n}`;
+    || `function ${name}(${args}) {\n  \n}\n`;
 
   if (!pattern || pattern.constructor.name !== 'String') {
     throw new Error('Pattern must be a non-empty string.');

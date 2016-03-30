@@ -9,7 +9,7 @@ const fmtErr = chalk.black.bgRed;
 
 function buildFunction(x, id, key) {
   const context = require('./context'); // TODO: circular import?
-  const code = `(${x.__function__})`;
+  const code = `'use strict';\n(${x.__function__})`;
   const script = new vm.Script(code, { filename: `${id}.${key}` });
 
   function f(...args) {
@@ -30,7 +30,7 @@ function buildFunction(x, id, key) {
 
 function buildCronFunction(fn, id, onError, afterRun) {
   var context = require('./context')
-    , code = '(' + fn.toString() + ')'
+    , code = "'use strict';\n(" + fn.toString() + ')'
     , script = new vm.Script(code, { filename: 'Cron.jobs.' + id })
     , f = function () {
       vmLogger.debug(code);
@@ -61,7 +61,7 @@ function buildCronFunction(fn, id, onError, afterRun) {
 
 function buildVerb(verb) {
   var context = require('./context')
-    , script = new vm.Script('(' + verb.code + ')', { filename: verb.name || verb.pattern })
+    , script = new vm.Script("'use strict';\n(" + verb.code + ')', { filename: verb.name || verb.pattern })
     , f = function () { return script.runInContext(context).apply(this, arguments); };
 
   modifyObject(f, function (property, accessor) {
