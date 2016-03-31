@@ -23,7 +23,7 @@ const bb = chalk.bold.blue;
 const red = chalk.red;
 const gray = chalk.gray;
 
-const fuse = new Fuse([], { keys: ['objectId', 'verb', 'function'] });
+const fuse = new Fuse([], { keys: ['searchStr'] });
 
 // Socket events
 
@@ -420,9 +420,9 @@ function onSearch(str, fn) {
         const value = object[key];
         if (object.hasOwnProperty(key) && value) {
           if (value.__verb__) {
-            searchable.push({ objectId, verb: key });
+            searchable.push({ searchStr: `${objectId}.${key}`, objectId, verb: key });
           } else if (value.__source__) {
-            searchable.push({ objectId, function: key });
+            searchable.push({ searchStr: `${objectId}.${key}`, objectId, function: key });
           }
         }
       }
