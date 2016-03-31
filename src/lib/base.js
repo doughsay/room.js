@@ -306,9 +306,21 @@ function findNearby(search) {
     return World.FailedMatch;
   }
 
-  const searchItems = this.contents
-    .concat((this.location ? this.location.contents : [])
-    .filter((object) => object !== this));
+  let searchItems = [];
+
+  // Stuff you're carrying
+  searchItems = searchItems.concat(this.contents);
+  if (this.location) {
+    // Stuff in the place you're in
+    searchItems = searchItems.concat(this.location.contents);
+
+    if (Array.isArray(this.location.relatedObjects)) {
+      // Stuff related to the place you're in
+      searchItems = searchItems.concat(this.location.relatedObjects || []);
+    }
+  }
+
+  searchItems = searchItems.filter((object) => object !== this);
 
   const potentialMatches = searchItems.map((object) => [object.matches(search), object]);
   const exactMatches = potentialMatches.filter((m) => m[0] === EXACT_MATCH);
