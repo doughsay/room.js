@@ -1,6 +1,6 @@
 import vm from 'vm';
 import chalk from 'chalk';
-import Fuse from 'fuse.js';
+import { filter } from 'fuzzaldrin-plus';
 
 import parse from '../lib/parser';
 import print from '../lib/print';
@@ -22,8 +22,6 @@ const bm = chalk.bold.magenta;
 const bb = chalk.bold.blue;
 const red = chalk.red;
 const gray = chalk.gray;
-
-const fuse = new Fuse([], { keys: ['searchStr'] });
 
 // Socket events
 
@@ -409,26 +407,25 @@ function onTabKeyPress({ direction }) {
 }
 
 // TODO: this is incredibly innedfficient, but works for now
-function onSearch(str, fn) {
-  if (!str || !this.rjs.playerId || !World[this.rjs.playerId].isProgrammer) {
+function onSearch(query, fn) {
+  if (!query || !this.rjs.playerId || !World[this.rjs.playerId].isProgrammer) {
     fn([]);
   } else {
-    const searchable = [];
+    const candidates = [];
     for (const objectId in World) {
       const object = World[objectId];
       for (const key in object) {
         const value = object[key];
         if (object.hasOwnProperty(key) && value) {
           if (value.__verb__) {
-            searchable.push({ searchStr: `${objectId}.${key}`, objectId, verb: key });
+            candidates.push({ searchStr: `${objectId}.${key}`, objectId, verb: key });
           } else if (value.__source__) {
-            searchable.push({ searchStr: `${objectId}.${key}`, objectId, function: key });
+            candidates.push({ searchStr: `${objectId}.${key}`, objectId, function: key });
           }
         }
       }
     }
-    fuse.set(searchable);
-    const results = fuse.search(str);
+    const results = filter(candidates, query, { key: 'searchStr', maxResults: 50 });
     fn(results);
   }
 }

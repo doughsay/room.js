@@ -7,7 +7,6 @@ BUGS:
 TODO:
 =====
 
-* better fuzzy searching (what does atom use?)
 * Fix remaining eslint errors
 * Fix circular require problems
 * clean up logging
