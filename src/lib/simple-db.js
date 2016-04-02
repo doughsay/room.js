@@ -3,45 +3,56 @@ import bson from 'bson';
 
 const BSON = bson.pure().BSON;
 
-export default function SimpleDB(filename) {
-  let db = {};
+export class SimpleDB {
+  constructor(filename) {
+    this.filename = filename;
+    this._db = {};
 
-  this.loadSync = () => {
-    db = BSON.deserialize(fs.readFileSync(filename));
+    if (fs.existsSync(filename)) {
+      this.loadSync();
+    }
+  }
+
+  loadSync() {
+    this._db = BSON.deserialize(fs.readFileSync(this.filename));
     return true;
-  };
+  }
 
-  this.saveSync = () => {
-    fs.writeFileSync(filename, BSON.serialize(db));
+  saveSync() {
+    fs.writeFileSync(this.filename, BSON.serialize(this._db));
     return true;
-  };
+  }
 
-  this.insert = object => {
+  insert(object) {
     if (typeof object.id !== 'string') {
       throw new Error('Object must contain a string id property.');
     }
-    if (object.id in db) {
+    if (object.id in this._db) {
       throw new Error('An object with that ID already exists.');
     }
-    db[object.id] = object;
+    this._db[object.id] = object;
     return object;
-  };
+  }
 
-  this.remove = object => {
-    delete db[object.id];
-  };
+  remove(object) {
+    delete this._db[object.id];
+  }
 
-  this.removeById = id => {
-    delete db[id];
-  };
+  removeById(id) {
+    delete this._db[id];
+  }
 
-  this.findById = id => db[id];
+  findById(id) {
+    return this._db[id];
+  }
 
-  this.findBy = (field, value) => this.all().filter(object => object[field] === value);
+  findBy(field, value) {
+    return this.all().filter(object => object[field] === value);
+  }
 
-  this.all = () => Object.keys(db).map(id => db[id]);
-
-  if (fs.existsSync(filename)) {
-    this.loadSync();
+  all() {
+    return Object.keys(this._db).map(id => this._db[id]);
   }
 }
+
+export default SimpleDB;
