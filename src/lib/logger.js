@@ -1,15 +1,15 @@
 import winston from 'winston';
 
-winston.loggers.add('mongo', {
+winston.loggers.add('output', {
   console: {
     level: 'silly',
-    label: 'mongo',
+    label: 'output',
     colorize: true,
     timestamp: true,
   },
 });
 
-export const mongoLogger = winston.loggers.get('mongo');
+export const outputLogger = winston.loggers.get('output');
 
 winston.loggers.add('socket', {
   console: {

@@ -1,6 +1,5 @@
-config/app.js
-config/mongo.js
 node_modules
 cron.bson
 world.bson
 users.bson
+.env

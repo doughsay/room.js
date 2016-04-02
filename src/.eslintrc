@@ -3,6 +3,9 @@
   "rules": {
     "no-param-reassign": [2, {"props": false}],
     "strict": [2, "never"],
-    "no-multiple-empty-lines": [2, {"max": 1}]
+    "no-multiple-empty-lines": [2, {"max": 1}],
+    "arrow-parens": [2, "as-needed"],
+    "no-confusing-arrow": [0],
+    "guard-for-in": [0]
   }
 }

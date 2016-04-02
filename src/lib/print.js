@@ -13,51 +13,51 @@ function print(x, maxdepth, depth = 0, prefix = '', parents = []) {
   const output = (() => {
     switch (typeof x) {
       case 'number': {
-        return chalk.yellow(x);
+        return chalk.reset.yellow(x);
       }
 
       case 'string': {
         if (depth === 0) {
-          return `'${chalk.green(x)}'`;
+          return `'${chalk.reset.green(x)}'`;
         }
-        return `'${chalk.green(truncate(x))}'`;
+        return `'${chalk.reset.green(truncate(x))}'`;
       }
 
       case 'boolean': {
-        return chalk.magenta(x.toString());
+        return chalk.reset.magenta(x.toString());
       }
 
       case 'undefined': {
-        return chalk.gray('undefined');
+        return chalk.reset.gray('undefined');
       }
 
       case 'function': {
         if (x.__verb__) {
           const args = [x.dobjarg, x.preparg, x.iobjarg].join(', ');
-          return chalk.cyan.bold(`[Verb ${x.pattern}(${args})]`);
+          return chalk.reset.bold.cyan(`[Verb ${x.pattern}(${args})]`);
         }
-        return chalk.cyan('[Function]');
+        return chalk.reset.cyan('[Function]');
       }
 
       case 'object': {
         if (x === null) {
-          return chalk.gray('null');
+          return chalk.reset.gray('null');
         }
 
         if (Object.prototype.toString.call(x) === '[object Date]') {
-          return chalk.yellow(x.toString());
+          return chalk.reset.yellow(x.toString());
         }
 
         if (Object.prototype.toString.call(x) === '[object RegExp]') {
-          return chalk.red(x.toString());
+          return chalk.reset.red(x.toString());
         }
 
         if (x.constructor.name === 'JobProxy') {
-          return chalk.yellow.bold(x.toString());
+          return chalk.reset.bold.yellow(x.toString());
         }
 
         if (parents.indexOf(x) >= 0) {
-          return chalk.black.bgYellow('[CircularReference]');
+          return chalk.reset.black.bgYellow('[CircularReference]');
         }
 
         parents.push(x);
@@ -66,10 +66,10 @@ function print(x, maxdepth, depth = 0, prefix = '', parents = []) {
           if (x.length === 0) {
             parents.pop(); return '[]';
           } else if (maxdepth === depth) {
-            parents.pop(); return chalk.blue(`[Array(${x.length})]`);
+            parents.pop(); return chalk.reset.blue(`[Array(${x.length})]`);
           }
 
-          const xs = x.map((y) => print(y, maxdepth, depth + 1, '', parents));
+          const xs = x.map(y => print(y, maxdepth, depth + 1, '', parents));
 
           xs[0].shift();
           xs[0].unshift('[ ');
@@ -77,19 +77,19 @@ function print(x, maxdepth, depth = 0, prefix = '', parents = []) {
           if (prefix !== '') {
             xs[0].unshift('\n', indent);
           }
-          parents.pop(); return xs.map((y) => y.join('')).join(',\n');
+          parents.pop(); return xs.map(y => y.join('')).join(',\n');
         }
 
         if (Object.keys(x).length === 0) {
           parents.pop(); return '{}';
         } else if (maxdepth === depth) {
-          parents.pop(); return chalk.blue(x.toString());
+          parents.pop(); return chalk.reset.blue(x.toString());
         }
 
         const xs = [];
         for (const key in x) { // eslint-disable-line guard-for-in
           const value = x[key];
-          const color = x.hasOwnProperty(key) ? chalk.blue : chalk.gray;
+          const color = x.hasOwnProperty(key) ? chalk.reset.blue : chalk.reset.gray;
           const pfx = `${color(key)}: `;
           xs.push(print(value, maxdepth, depth + 1, pfx, parents));
         }
@@ -100,7 +100,7 @@ function print(x, maxdepth, depth = 0, prefix = '', parents = []) {
         if (prefix !== '') {
           xs[0].unshift('\n', indent);
         }
-        parents.pop(); return xs.map((y) => y.join('')).join(',\n');
+        parents.pop(); return xs.map(y => y.join('')).join(',\n');
       }
       default: {
         throw new Error('Unexpected case in print.');

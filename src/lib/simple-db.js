@@ -16,7 +16,7 @@ export default function SimpleDB(filename) {
     return true;
   };
 
-  this.insert = (object) => {
+  this.insert = object => {
     if (typeof object.id !== 'string') {
       throw new Error('Object must contain a string id property.');
     }
@@ -27,19 +27,19 @@ export default function SimpleDB(filename) {
     return object;
   };
 
-  this.remove = (object) => {
+  this.remove = object => {
     delete db[object.id];
   };
 
-  this.removeById = (id) => {
+  this.removeById = id => {
     delete db[id];
   };
 
-  this.findById = (id) => db[id];
+  this.findById = id => db[id];
 
-  this.findBy = (field, value) => this.all().filter((object) => object[field] === value);
+  this.findBy = (field, value) => this.all().filter(object => object[field] === value);
 
-  this.all = () => Object.keys(db).map((id) => db[id]);
+  this.all = () => Object.keys(db).map(id => db[id]);
 
   if (fs.existsSync(filename)) {
     this.loadSync();

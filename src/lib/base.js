@@ -5,6 +5,7 @@ import util from './util';
 import makeObject from './make-object';
 import makeVerb from './make-verb';
 import { globals } from './reserved';
+import { outputLogger } from './logger';
 
 const base = {};
 
@@ -32,6 +33,7 @@ function isA(obj) {
 function send(msg) {
   const socket = SocketMap[this.id];
   if (socket) {
+    outputLogger.debug(msg);
     socket.emit('output', msg);
     return true;
   }
@@ -75,7 +77,7 @@ function ask(params, callback) {
   }
 
   if (socket) {
-    socket.emit('request-input', data, (response) => {
+    socket.emit('request-input', data, response => {
       try {
         callback(response);
       } catch (err) {
@@ -110,7 +112,7 @@ function match(x, y) {
 }
 
 function matches(search) {
-  const _matches = this.aliases.concat([this.name]).map((name) => match(name, search));
+  const _matches = this.aliases.concat([this.name]).map(name => match(name, search));
 
   if (_matches.indexOf(EXACT_MATCH) >= 0) {
     return EXACT_MATCH;
@@ -141,7 +143,7 @@ function destroy() {
   if (children.length > 0) {
     const grandParent = this.parent;
 
-    this.children.forEach((child) => {
+    this.children.forEach(child => {
       child.parent = grandParent;
     });
   }
@@ -152,11 +154,11 @@ function destroy() {
 }
 
 function getContents() {
-  return db.findBy('locationId', this.id).map((object) => World[object.id]);
+  return db.findBy('locationId', this.id).map(object => World[object.id]);
 }
 
 function getChildren() {
-  return db.findBy('parentId', this.id).map((object) => World[object.id]);
+  return db.findBy('parentId', this.id).map(object => World[object.id]);
 }
 
 function getParent() {
@@ -183,7 +185,7 @@ function reload() {
   const worldObjectProxy = require('./world-object-proxy').default; // TODO: import?
 
   World[this.id] = worldObjectProxy(db.findById(this.id));
-  World[this.id].children.forEach((child) => {
+  World[this.id].children.forEach(child => {
     child.reload();
   });
   return true;
@@ -240,7 +242,7 @@ function getAliases() {
 
 function setAliases(newAliases) {
   if (newAliases && newAliases.constructor.name === 'Array') {
-    newAliases.forEach((x) => {
+    newAliases.forEach(x => {
       if (!(x && x.constructor.name === 'String')) {
         throw new Error('Aliases must be an array of non-empty strings.');
       }
@@ -320,11 +322,11 @@ function findNearby(search) {
     }
   }
 
-  searchItems = searchItems.filter((object) => object !== this);
+  searchItems = searchItems.filter(object => object !== this);
 
-  const potentialMatches = searchItems.map((object) => [object.matches(search), object]);
-  const exactMatches = potentialMatches.filter((m) => m[0] === EXACT_MATCH);
-  const partialMatches = potentialMatches.filter((m) => m[0] === PARTIAL_MATCH);
+  const potentialMatches = searchItems.map(object => [object.matches(search), object]);
+  const exactMatches = potentialMatches.filter(m => m[0] === EXACT_MATCH);
+  const partialMatches = potentialMatches.filter(m => m[0] === PARTIAL_MATCH);
 
   if (exactMatches.length === 1) {
     return exactMatches[0][1];
@@ -360,14 +362,14 @@ function newObject(object) {
 
 function withSocket(fn) {
   return {
-    __requires_socket__: (socket) => {
+    __requires_socket__: socket => {
       fn.call(this, socket);
     },
   };
 }
 
 function edit(name) {
-  return withSocket((socket) => {
+  return withSocket(socket => {
     if (this[name] && this[name].__verb__) {
       socket.emit('edit-verb', { objectId: this.id, verb: util.serializeVerb(name, this[name]) });
     } else if (this[name] && this[name].__source__) {

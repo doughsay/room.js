@@ -17,11 +17,11 @@ export default function worldObjectProxy(dbObject) {
     value: dbObject.id,
   });
 
-  dbObject.properties.forEach((property) => {
+  dbObject.properties.forEach(property => {
     target[property.key] = deserialize(property.value, target.id, property.key);
   });
 
-  dbObject.verbs.forEach((verb) => {
+  dbObject.verbs.forEach(verb => {
     target[verb.name] = buildVerb(verb);
   });
 
@@ -32,8 +32,8 @@ export default function worldObjectProxy(dbObject) {
   // helpers for set
 
   function updateDbObjectVerb(name, valueToStore) {
-    const verb = dbObject.verbs.filter((v) => v.name === name)[0];
-    const property = dbObject.properties.filter((prop) => prop.key === name)[0];
+    const verb = dbObject.verbs.filter(v => v.name === name)[0];
+    const property = dbObject.properties.filter(prop => prop.key === name)[0];
 
     if (!verb) {
       dbObject.verbs.push(valueToStore);
@@ -44,13 +44,13 @@ export default function worldObjectProxy(dbObject) {
 
     // remove property with same name if it exists
     if (property) {
-      dbObject.properties = dbObject.properties.filter((prop) => prop.key !== property.key);
+      dbObject.properties = dbObject.properties.filter(prop => prop.key !== property.key);
     }
   }
 
   function updateDbObjectProperty(name, valueToStore) {
-    const verb = dbObject.verbs.filter((v) => v.name === name)[0];
-    const property = dbObject.properties.filter((prop) => prop.key === name)[0];
+    const verb = dbObject.verbs.filter(v => v.name === name)[0];
+    const property = dbObject.properties.filter(prop => prop.key === name)[0];
 
     if (!property) {
       dbObject.properties.push({ key: name, value: valueToStore });
@@ -60,7 +60,7 @@ export default function worldObjectProxy(dbObject) {
 
     // remove verb with same name if it exists
     if (verb) {
-      dbObject.verbs = dbObject.verbs.filter((v) => v.name !== verb.name);
+      dbObject.verbs = dbObject.verbs.filter(v => v.name !== verb.name);
     }
   }
 
@@ -80,9 +80,9 @@ export default function worldObjectProxy(dbObject) {
   function deleteProperty(trgt, name) {
     if (reservedNames.indexOf(name) === -1) {
       if (trgt[name] && trgt[name].__verb__) {
-        dbObject.verbs = dbObject.verbs.filter((v) => v.name !== name);
+        dbObject.verbs = dbObject.verbs.filter(v => v.name !== name);
       } else {
-        dbObject.properties = dbObject.properties.filter((prop) => prop.key !== name);
+        dbObject.properties = dbObject.properties.filter(prop => prop.key !== name);
       }
     }
     return Reflect.deleteProperty(trgt, name);

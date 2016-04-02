@@ -1,7 +1,7 @@
 import http from 'http';
 import socketIo from 'socket.io';
 
-import * as config from './config/app';
+import { appName, version, port } from './config/config';
 
 import { serverLogger } from './lib/logger';
 import loadWorld from './lib/load-world';
@@ -16,8 +16,8 @@ const io = socketIo(server);
 
 io.on('connection', socketController);
 
-server.listen(config.port, (err) => {
+server.listen(port, err => {
   if (err) { throw err; }
   runHook(null, 'System', 'onServerStarted');
-  serverLogger.info('%s started on %s', config.appName, config.port);
+  serverLogger.info('%s %s started on %s', appName, version, port);
 });

@@ -129,7 +129,7 @@ util.modifyObject(Cron, (property, accessor) => {
 
 // load initial state of cron
 export function initCron() {
-  crondb.all().forEach((jd) => {
+  crondb.all().forEach(jd => {
     jobs[jd.id] = new Job(jd.id, jd.pattern, jd.code, false, jd.running);
   });
   cronLogger.info('cronjobs loaded and started');

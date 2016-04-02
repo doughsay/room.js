@@ -275,7 +275,7 @@ function onPlay() {
     this.emit('request-input', inputs, ({ selection }) => {
       const n = parseInt(selection, 10);
 
-      const lowerCaseNames = players.map((p) => p.name.toLowerCase());
+      const lowerCaseNames = players.map(p => p.name.toLowerCase());
       const i = lowerCaseNames.indexOf(selection.toLowerCase());
       if (!isNaN(n) && n > 0 && n <= players.length) {
         loginPlayer.call(this, players[n - 1]);

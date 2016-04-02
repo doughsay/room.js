@@ -24,7 +24,7 @@ function loadDescendentsOf(parentId) {
     objects = [Root];
   }
 
-  objects.forEach((object) => load(object)); // eslint-disable-line no-use-before-define
+  objects.forEach(object => load(object)); // eslint-disable-line no-use-before-define
 }
 
 function load(object) {
