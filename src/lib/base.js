@@ -303,31 +303,7 @@ function findObject(search) {
   return this.findNearby(search);
 }
 
-function findNearby(search) {
-  if (search === '') {
-    return World.FailedMatch;
-  }
-
-  let searchItems = [];
-
-  // Stuff you're carrying
-  searchItems = searchItems.concat(this.contents);
-  if (this.location) {
-    // Stuff in the place you're in
-    searchItems = searchItems.concat(this.location.contents);
-
-    if (Array.isArray(this.location.relatedObjects)) {
-      // Stuff related to the place you're in
-      searchItems = searchItems.concat(this.location.relatedObjects || []);
-    }
-  }
-
-  searchItems = searchItems.filter(object => object !== this);
-
-  const potentialMatches = searchItems.map(object => [object.matches(search), object]);
-  const exactMatches = potentialMatches.filter(m => m[0] === EXACT_MATCH);
-  const partialMatches = potentialMatches.filter(m => m[0] === PARTIAL_MATCH);
-
+function findMatch(partialMatches, exactMatches) {
   if (exactMatches.length === 1) {
     return exactMatches[0][1];
   } else if (exactMatches.length > 1) {
@@ -341,6 +317,54 @@ function findNearby(search) {
   }
 
   return World.FailedMatch;
+}
+
+function findNearby(search) {
+  if (search === '') {
+    return World.FailedMatch;
+  }
+
+  let searchItems = [];
+
+  // Stuff inside this object.
+  searchItems = searchItems.concat(this.contents);
+
+  if (this.location) {
+    // Stuff in the location this object is in.
+    searchItems = searchItems.concat(this.location.contents);
+
+    // Maybe add extra match objects from the location this object is in.
+    let extraMatchObjects = [];
+
+    if (Array.isArray(this.location.extraMatchObjects)) {
+      extraMatchObjects = this.location.extraMatchObjects;
+    }
+
+    if (typeof this.location.extraMatchObjects === 'function') {
+      const potentialExtraMatchObjects = this.location.extraMatchObjects();
+      if (Array.isArray(potentialExtraMatchObjects)) {
+        extraMatchObjects = potentialExtraMatchObjects;
+      }
+    }
+
+    searchItems = searchItems.concat(extraMatchObjects);
+  }
+
+  searchItems = searchItems.filter(object => object !== this);
+
+  const potentialMatches = searchItems.map(object => [object.matches(search), object]);
+  const exactMatches = potentialMatches.filter(m => m[0] === EXACT_MATCH);
+  const partialMatches = potentialMatches.filter(m => m[0] === PARTIAL_MATCH);
+
+  return findMatch(exactMatches, partialMatches);
+}
+
+function findInside(search) {
+  if (search === '') { return World.FailedMatch; }
+  const potentialMatches = this.contents.map(object => [object.matches(search), object]);
+  const exactMatches = potentialMatches.filter(m => m[0] === EXACT_MATCH);
+  const partialMatches = potentialMatches.filter(m => m[0] === PARTIAL_MATCH);
+  return findMatch(exactMatches, partialMatches);
 }
 
 function newObject(object) {
@@ -405,6 +429,7 @@ util.overrideToString(reload, 'reload');
 util.overrideToString(matchObjects, 'matchObjects');
 util.overrideToString(findObject, 'findObject');
 util.overrideToString(findNearby, 'findNearby');
+util.overrideToString(findInside, 'findInside');
 util.overrideToString(newObject, 'newObject');
 util.overrideToString(edit, 'edit');
 util.overrideToString(addVerb, 'addVerb');
@@ -425,6 +450,7 @@ util.modifyObject(base, (property, accessor) => {
   property('matchObjects', matchObjects);
   property('findObject', findObject);
   property('findNearby', findNearby);
+  property('findInside', findInside);
   property('new', newObject);
   property('edit', edit);
   property('addVerb', addVerb);
