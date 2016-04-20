@@ -1,5 +1,5 @@
-import esprima from 'esprima';
-import escodegen from 'escodegen';
+const esprima = require('esprima');
+const escodegen = require('escodegen');
 
 // Generate AST from statement list and playerId
 function makeAST(statements, playerId) {
@@ -35,31 +35,15 @@ function makeAST(statements, playerId) {
         },
         arguments: [
           {
-            type: 'MemberExpression',
-            computed: false,
-            object: {
-              type: 'Identifier',
-              name: 'players', // TODO: hardcoded players pkg
-            },
-            property: {
-              type: 'Identifier',
-              name: playerId,
-            },
+            type: 'Identifier',
+            name: playerId,
           },
           {
             type: 'MemberExpression',
             computed: false,
             object: {
-              type: 'MemberExpression',
-              computed: false,
-              object: {
-                type: 'Identifier',
-                name: 'players', // TODO: hardcoded players pkg
-              },
-              property: {
-                type: 'Identifier',
-                name: playerId,
-              },
+              type: 'Identifier',
+              name: playerId,
             },
             property: {
               type: 'Identifier',
@@ -86,11 +70,11 @@ function addReturn(statements) {
 
 // Given a piece of input JS, wrap it in an immediately executing function that
 // returns the last expression statement found.
-export default function rewriteEval(input, playerId) {
+module.exports = function rewriteEval(input, playerId) {
   const inputStatements = esprima.parse(input).body;
   const statementsWithReturn = addReturn(inputStatements);
   const newAST = makeAST(statementsWithReturn, playerId);
   const newCode = escodegen.generate(newAST);
 
   return newCode;
-}
+};

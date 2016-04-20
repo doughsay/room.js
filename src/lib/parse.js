@@ -80,7 +80,7 @@ function parsePreposition(text) {
   return [true, [dobjstr, prepstr, iobjstr]];
 }
 
-export default function parseCommand(text) {
+module.exports = function parse(text) {
   const [verb, rest] = chomp(sanitize(text));
   const argstr = rest;
   let dobjstr;
@@ -97,4 +97,4 @@ export default function parseCommand(text) {
   }
 
   return { verb, dobjstr, prepstr, iobjstr, argstr };
-}
+};

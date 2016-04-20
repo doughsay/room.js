@@ -1,4 +1,5 @@
-import crypto from 'crypto';
+const crypto = require('crypto');
+const DIGEST = 'sha1';
 
 function uid(len) {
   return crypto.randomBytes(len).toString('base64').slice(0, len);
@@ -43,6 +44,7 @@ class Pbkdf2 {
       randomSalt,
       this.iterations,
       this.derivedKeyLength,
+      DIGEST,
       (err, derivedKey) => {
         if (err) {
           cb(err);
@@ -78,6 +80,7 @@ class Pbkdf2 {
       salt,
       iterations,
       derivedKeyLength,
+      DIGEST,
       (err, candidateDerivedKey) => {
         if (err) {
           cb(err);
@@ -94,4 +97,4 @@ class Pbkdf2 {
   }
 }
 
-export default Pbkdf2;
+module.exports = Pbkdf2;

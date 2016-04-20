@@ -1,23 +1,25 @@
-import http from 'http';
-import socketIo from 'socket.io';
+const http = require('http');
+const socketIo = require('socket.io');
 
-import { appName, version, port } from './config/config';
-
-import { serverLogger } from './lib/logger';
-import loadWorld from './lib/load-world';
-import runHook from './lib/run-hook';
-
-import socketController from './controllers/socket-controller';
-
-loadWorld();
+const { version, port } = require('./config/config');
+const logger = require('./config/logger');
+const SocketController = require('./controllers/socket-controller');
 
 const server = http.createServer();
 const io = socketIo(server);
 
-io.on('connection', socketController);
+const world = require('./state/world');
+const db = require('./state/db');
+const userDb = require('./state/user-db');
+const controllerMap = require('./state/controller-map');
+
+io.on('connection', socket => {
+  const controller = new SocketController(socket, world, db, userDb, controllerMap);
+  controller.onConnection();
+});
 
 server.listen(port, err => {
   if (err) { throw err; }
-  runHook(null, 'System', 'onServerStarted');
-  serverLogger.info('%s %s started on %s', appName, version, port);
+  world.runHook('system', 'onServerStarted');
+  logger.info({ version, port }, 'started');
 });

@@ -1,4 +1,4 @@
-export default class C3 {
+module.exports = class C3 {
   constructor(object) {
     this.object = object;
     this.map = new Map();
@@ -85,4 +85,4 @@ export default class C3 {
 
     return run(this.object);
   }
-}
+};

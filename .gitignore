@@ -1,6 +1,4 @@
 node_modules
-cron.bson
-world.bson
-users.bson
+/state
 .env
-db
+bin

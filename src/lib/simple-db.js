@@ -1,9 +1,6 @@
-import fs from 'fs';
-import bson from 'bson';
+const fs = require('fs');
 
-const BSON = bson.pure().BSON;
-
-export class SimpleDB {
+class SimpleDB {
   constructor(filename) {
     this.filename = filename;
     this._db = {};
@@ -14,12 +11,12 @@ export class SimpleDB {
   }
 
   loadSync() {
-    this._db = BSON.deserialize(fs.readFileSync(this.filename));
+    this._db = JSON.parse(fs.readFileSync(this.filename));
     return true;
   }
 
   saveSync() {
-    fs.writeFileSync(this.filename, BSON.serialize(this._db));
+    fs.writeFileSync(this.filename, `${JSON.stringify(this._db, null, '  ')}\n`);
     return true;
   }
 
@@ -55,4 +52,4 @@ export class SimpleDB {
   }
 }
 
-export default SimpleDB;
+module.exports = SimpleDB;

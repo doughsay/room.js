@@ -1,11 +1,12 @@
-import dotenv from 'dotenv';
+const dotenv = require('dotenv');
 
-import { loadIntegerFromEnv } from './environment-config';
-import * as pkg from '../../package.json';
+const { loadFromEnv, loadIntegerFromEnv } = require('./environment-config');
+const pkg = require('../../package.json');
 
 dotenv.config();
 
-export const env = process.env.NODE_ENV || 'development';
-export const appName = pkg.name;
-export const version = pkg.version;
-export const port = loadIntegerFromEnv('PORT');
+module.exports.env = process.env.NODE_ENV || 'development';
+module.exports.appName = pkg.name;
+module.exports.version = pkg.version;
+module.exports.port = loadIntegerFromEnv('PORT');
+module.exports.logLevel = loadFromEnv('LOG_LEVEL');
