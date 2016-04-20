@@ -21,6 +21,8 @@
     "fuzzaldrin-plus": "^0.3.1",
     "harmony-reflect": "1.0.1",
     "js-schema": "^0.6.2",
+    "mkdirp": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.5.1.tgz",
+    "remove": "^0.1.5",
     "socket.io": "^1.0.6",
     "winston": "^2.2.0"
   },

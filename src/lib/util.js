@@ -351,8 +351,13 @@ function classify(str) {
   return titleize(String(str).replace(/[\W_]/g, ' ')).replace(/\s/g, '');
 }
 
+function camelcase(str) {
+  const output = classify(str);
+  return output[0].toLowerCase() + output.slice(1);
+}
+
 function nextId(raw) {
-  var str = classify(raw);
+  var str = camelcase(raw);
   if (!World[str]) {
     return str;
   }

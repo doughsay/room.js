@@ -157,27 +157,51 @@ function getContents() {
   return db.findBy('locationId', this.id).map(object => World[object.id]);
 }
 
-function getChildren() {
-  return db.findBy('parentId', this.id).map(object => World[object.id]);
+// function getChildren() {
+//   return db.findBy('parentId', this.id).map(object => World[object.id]);
+// }
+
+// function getParent() {
+//   return World[db.findById(this.id).parentId];
+// }
+//
+// function setParent(newParent) {
+//   const dbObject = db.findById(this.id);
+//   const parentObj = util.deserializeReferences(newParent);
+//   const newParentId = parentObj ? parentObj.id : void 0;
+//
+//   if (!parentObj || !(newParentId in World)) {
+//     throw new Error('Parent must be a valid world object.');
+//   }
+//
+//   if (dbObject.parentId !== newParentId) {
+//     dbObject.parentId = newParentId;
+//     this.reload();
+//   }
+// }
+
+function getTraits() {
+  return db.findById(this.id).traitIds.map(id => World[id]);
 }
 
-function getParent() {
-  return World[db.findById(this.id).parentId];
-}
-
-function setParent(newParent) {
+function setTraits(newTraits) {
   const dbObject = db.findById(this.id);
-  const parentObj = util.deserializeReferences(newParent);
-  const newParentId = parentObj ? parentObj.id : void 0;
+  const newTraitIds = [];
 
-  if (!parentObj || !(newParentId in World)) {
-    throw new Error('Parent must be a valid world object.');
-  }
+  newTraits.forEach(newTrait => {
+    const traitObj = util.deserializeReferences(newTrait);
+    const newTraitId = traitObj ? traitObj.id : void 0;
 
-  if (dbObject.parentId !== newParentId) {
-    dbObject.parentId = newParentId;
-    this.reload();
-  }
+    if (!traitObj || !(newTraitId in World)) {
+      throw new Error('All traits must be a valid world objects.');
+    }
+
+    newTraitIds.push(newTraitId);
+  });
+
+  // TODO: check for circular deps
+  // TODO: linearize now?
+  dbObject.traitIds = newTraitIds;
 }
 
 function reload() {
@@ -459,8 +483,9 @@ util.modifyObject(base, (property, accessor) => {
 
   // attach getters/setters
   accessor('contents', getContents);
-  accessor('children', getChildren);
-  accessor('parent', getParent, setParent);
+  // accessor('children', getChildren);
+  // accessor('parent', getParent, setParent);
+  accessor('traits', getTraits, setTraits);
   accessor('location', getLocation, setLocation);
   accessor('name', getName, setName);
   accessor('aliases', getAliases, setAliases);

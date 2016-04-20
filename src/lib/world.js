@@ -14,9 +14,11 @@ function makeSpecialObject(name) {
   return obj;
 }
 
-const Nothing = makeSpecialObject('Nothing');
-const FailedMatch = makeSpecialObject('FailedMatch');
-const AmbiguousMatch = makeSpecialObject('AmbiguousMatch');
-const World = { Nothing, FailedMatch, AmbiguousMatch };
+const nothing = makeSpecialObject('nothing');
+const failed = makeSpecialObject('failed');
+const ambiguous = makeSpecialObject('ambiguous');
 
-export default World;
+const match = { nothing, failed, ambiguous }; // the 'match' pkg
+const world = { match };
+
+module.exports = world;

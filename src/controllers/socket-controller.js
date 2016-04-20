@@ -4,7 +4,7 @@ import { filter } from 'fuzzaldrin-plus';
 
 import parse from '../lib/parser';
 import print from '../lib/print';
-import World from '../lib/world';
+// import world from '../lib/world';
 import db from '../lib/db';
 import userdb from '../lib/user-db';
 import SocketMap from '../lib/socket-map';
@@ -16,6 +16,9 @@ import makeVerb from '../lib/make-verb';
 import rewriteEval from '../lib/rewrite-eval';
 import Pbkdf2 from '../lib/pbkdf2';
 import { socketLogger, vmLogger } from '../lib/logger';
+import makeObject from '../lib/make-object';
+
+const world = require('../lib/world');
 
 const hasher = new Pbkdf2();
 const bm = chalk.bold.magenta;
@@ -35,7 +38,7 @@ function onRunVerb(command, matchedObjects, matchedVerb) {
   const dobjstr = util.wrapString(command.dobjstr);
   const prepstr = util.wrapString(command.prepstr);
   const iobjstr = util.wrapString(command.iobjstr);
-  const player = World[playerId];
+  const player = world.players[playerId];
 
   const args = [playerId, dobjId, iobjId, verbstr, argstr, dobjstr, prepstr, iobjstr];
   const verbStatement = `${matchedVerb.self.id}[${util.wrapString(matchedVerb.verb)}]`;
@@ -78,15 +81,16 @@ function onEval(input) {
 
 // parse and process a player's command
 function onCommand(input) {
-  const player = World[this.rjs.playerId];
+  // console.log('playerId', this.rjs.playerId);
+  // console.log('world', world);
+  // console.log('players', world.players);
+  const player = world.players[this.rjs.playerId];
   const [hookRan, processedInput] = runHook(
     player.id, 'System', 'preprocessCommand', player.id, util.wrapString(input)
   );
   const command = parse(hookRan ? processedInput : input);
 
-  db.findById(player.id).lastActivity = new Date();
-
-  if (command.verb === 'eval' && player.isProgrammer) {
+  if (true /* command.verb === 'eval' && player.isProgrammer */) {
     onEval.call(this, command.argstr);
   } else if (command.verb === 'quit') {
     runHook(player.id, 'System', 'onPlayerDisconnected', player.id);
@@ -95,8 +99,10 @@ function onCommand(input) {
     delete SocketMap[player.id];
     delete this.rjs.playerId;
   } else {
-    const matchedObjects = World[this.rjs.playerId].matchObjects(command);
-    const matchedVerb = context.matchVerb(World[this.rjs.playerId], command, matchedObjects);
+    const matchedObjects = world.players[this.rjs.playerId].matchObjects(command);
+    const matchedVerb = context.matchVerb(
+      world.players[this.rjs.playerId], command, matchedObjects
+    );
 
     if (matchedVerb) {
       onRunVerb.call(this, command, matchedObjects, matchedVerb);
@@ -203,7 +209,7 @@ function onCreatePlayer() {
 
   this.emit('request-input', inputs, ({ playerName }) => {
     const playerId = util.nextId(playerName); // should produce a new unique ID
-    const playerObj = db.findBy('name', playerName)[0];
+    const playerObj = db.findBy('players', 'name', playerName)[0];
 
     if (playerId === '') {
       // if the name produces an invalid ID, let's just call the name invalid.
@@ -217,20 +223,18 @@ function onCreatePlayer() {
     }
 
     const newPlayerObj = {
+      pkgId: 'players',
       id: playerId,
-      userId: this.rjs.user.id,
       name: playerName,
-      type: 'Player',
       aliases: [],
+      traitIds: [],
+      locationId: null,
+      userId: this.rjs.user.id,
       properties: [],
-      verbs: [],
-      createdAt: new Date(),
-      lastActivity: void 0,
-      isProgrammer: true,
     };
 
     db.insert(newPlayerObj);
-    World[newPlayerObj.id] = worldObjectProxy(newPlayerObj);
+    world.players[newPlayerObj.id] = worldObjectProxy(newPlayerObj);
     runHook(playerId, 'System', 'onPlayerCreated', playerId);
 
     this.emit('output', `Character created! To start the game now, type ${bm('play')}!`);
@@ -257,7 +261,7 @@ function loginPlayer(player) {
 }
 
 function onPlay() {
-  const players = db.findBy('userId', this.rjs.user.id);
+  const players = db.findBy('players', 'userId', this.rjs.user.id);
 
   if (players.length === 1) {
     loginPlayer.call(this, players[0]);
@@ -358,9 +362,9 @@ function onInput(input) {
 }
 
 function onSaveVerb(data, fn) {
-  const worldObject = World[data.objectId];
+  const worldObject = world[data.pkgId][data.objectId];
   const verb = data.verb;
-  const player = World[this.rjs.playerId];
+  const player = world.players[this.rjs.playerId];
 
   if (!player || !player.isProgrammer) {
     fn('Unauthorized');
@@ -379,10 +383,10 @@ function onSaveVerb(data, fn) {
 
 function onSaveFunction(data, fn) {
   const objectId = data.objectId;
-  const worldObject = World[objectId];
+  const worldObject = world[data.pkgId][objectId];
   const src = data.src;
   const name = data.name;
-  const player = World[this.rjs.playerId];
+  const player = world.players[this.rjs.playerId];
 
   if (!player || !player.isProgrammer) {
     fn('Unauthorized');
@@ -401,14 +405,14 @@ function onSaveFunction(data, fn) {
 
 function onTabKeyPress({ direction }) {
   if (this.rjs.playerId) {
-    const player = World[this.rjs.playerId];
+    const player = world.players[this.rjs.playerId];
     runHook(player.id, player.id, 'onTabKeyPress', direction);
   }
 }
 
 // TODO: this is incredibly innedfficient, but works for now
 function onSearch(query, fn) {
-  if (!query || !this.rjs.playerId || !World[this.rjs.playerId].isProgrammer) {
+  if (!query || !this.rjs.playerId || !world.players[this.rjs.playerId].isProgrammer) {
     fn([]);
   } else {
     const candidates = [];
@@ -431,7 +435,7 @@ function onSearch(query, fn) {
 }
 
 function onGetVerb({ objectId, name }, fn) {
-  if (!this.rjs.playerId || !World[this.rjs.playerId].isProgrammer) { fn(void 0); return; }
+  if (!this.rjs.playerId || !world.players[this.rjs.playerId].isProgrammer) { fn(void 0); return; }
   const worldObject = World[objectId];
   if (!worldObject) { fn(void 0); return; }
   const verb = worldObject[name];

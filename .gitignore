@@ -3,3 +3,4 @@ cron.bson
 world.bson
 users.bson
 .env
+db

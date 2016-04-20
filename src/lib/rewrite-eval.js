@@ -35,15 +35,31 @@ function makeAST(statements, playerId) {
         },
         arguments: [
           {
-            type: 'Identifier',
-            name: playerId,
+            type: 'MemberExpression',
+            computed: false,
+            object: {
+              type: 'Identifier',
+              name: 'players', // TODO: hardcoded players pkg
+            },
+            property: {
+              type: 'Identifier',
+              name: playerId,
+            },
           },
           {
             type: 'MemberExpression',
             computed: false,
             object: {
-              type: 'Identifier',
-              name: playerId,
+              type: 'MemberExpression',
+              computed: false,
+              object: {
+                type: 'Identifier',
+                name: 'players', // TODO: hardcoded players pkg
+              },
+              property: {
+                type: 'Identifier',
+                name: playerId,
+              },
             },
             property: {
               type: 'Identifier',

@@ -1,13 +1,15 @@
 import vm from 'vm';
 import chalk from 'chalk';
 
-import World from './world';
+// import World from './world';
 import parse from './parser';
 import util from './util';
 import { Cron } from './cron';
 import makeVerb from './make-verb';
 
-const sandbox = World;
+const world = require('./world');
+
+const sandbox = world;
 
 function real(object) {
   return object !== World.Nothing && object !== World.FailedMatch && object !== World.AmbigousMatch;

@@ -25,11 +25,13 @@ const prepArgs = [
 const jsVariableRegex = /^[$A-Z_][0-9A-Z_$]*$/i;
 
 const validateObject = schema({
+  core: jsVariableRegex,
   id: jsVariableRegex,
-  parentId: [null, jsVariableRegex],
+  traitIds: Array.of(jsVariableRegex),
+  userId: [null, String],
   locationId: [null, jsVariableRegex],
   name: String,
-  type: 'WorldObject',
+  type: ['WorldObject', 'Player'],
   aliases: Array.of(String),
   properties: Array.of({
     key: String,
@@ -43,12 +45,16 @@ const validateObject = schema({
     code: String,
   }),
   createdAt: Date,
+  lastActivity: [null, Date],
+  isProgrammer: [true, false],
 });
 
 function makeObject(object) {
   const defaults = {
+    pkg: 'Core',
     id: void 0,
-    parentId: void 0,
+    traitIds: [],
+    userId: null,
     locationId: void 0,
     name: void 0,
     type: 'WorldObject',
@@ -56,12 +62,18 @@ function makeObject(object) {
     properties: [],
     verbs: [],
     createdAt: new Date(),
+    lastActivity: null,
+    isProgrammer: false,
   };
   const newObject = {};
 
   // whitelist properties and fill in defaults
   for (const key in defaults) {
-    newObject[key] = object[key] || defaults[key];
+    if (key in object) {
+      newObject[key] = object[key];
+    } else {
+      newObject[key] = defaults[key];
+    }
   }
 
   // always set type and createdAt to default

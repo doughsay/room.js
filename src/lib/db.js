@@ -1,7 +1,7 @@
-import SimpleDB from './simple-db';
+import MooDB from './moo-db';
 import { serverLogger } from './logger';
 
-const db = new SimpleDB('world.bson');
+const db = new MooDB('new-db');
 
 function save() {
   const time = new Date();
