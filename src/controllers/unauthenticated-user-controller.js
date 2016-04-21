@@ -65,10 +65,10 @@ class UnauthenticatedUserController extends BaseChildController {
         this.userDb.insert(newUser);
         this.user = newUser;
 
-        this.logger.info({ user: user.id }, 'user created');
+        this.logger.info({ user: this.user.id }, 'user created');
 
         this.emit('output', [
-          `Welcome ${sanitizedUsername}!`,
+          `Welcome ${this.user.id}!`,
           `Type ${boldMagenta('help')} for a list of available commands.`,
         ].join('\n'));
       });
