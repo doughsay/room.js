@@ -1,13 +1,4 @@
 node_modules
-bower_components
-.DS_Store
-.cake_task_cache
-*.un~
-app/config/app.coffee
-app/config/logger.coffee
-db
-db.json
-log/*
-notes
-app/config/mongo.sample.coffee
-public
+/state
+.env
+bin
