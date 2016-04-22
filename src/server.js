@@ -14,7 +14,7 @@ const userDb = require('./state/user-db');
 const controllerMap = require('./state/controller-map');
 
 io.on('connection', socket => {
-  const controller = new SocketController(socket, world, db, userDb, controllerMap);
+  const controller = new SocketController(socket, world, db, userDb, controllerMap, logger);
   controller.onConnection();
 });
 

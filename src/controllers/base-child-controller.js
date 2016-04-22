@@ -12,8 +12,8 @@ class BaseChildController {
   get logger() { return this.parent.logger; }
   get user() { return this.parent.user; }
   set user(user) { this.parent.user = user; }
-  get player() { return this.parent.player; }
-  set player(player) { this.parent.player = player; }
+  get playerId() { return this.parent.playerId; }
+  set playerId(playerId) { this.parent.playerId = playerId; }
 }
 
 module.exports = BaseChildController;

@@ -4,7 +4,7 @@ const serialize = require('../lib/serialize');
 
 class ProgrammerController extends BaseChildController {
   get logger() {
-    return this.parent.logger.child({ user: this.user.id, player: this.player.id });
+    return this.parent.logger.child({ user: this.user.id, player: this.playerId });
   }
 
   // TODO: this is incredibly innefficient, but works for now

@@ -4,10 +4,9 @@ const UserController = require('./user-controller');
 const PlayerController = require('./player-controller');
 const ProgrammerController = require('./programmer-controller');
 const { boldMagenta, boldBlue, red } = require('../lib/colors');
-const logger = require('../config/logger');
 
 class SocketController {
-  constructor(socket, world, db, userDb, controllerMap) {
+  constructor(socket, world, db, userDb, controllerMap, logger) {
     this.socket = socket;
     this.world = world;
     this.db = db;
@@ -45,16 +44,16 @@ class SocketController {
 
   onDisconnect() {
     this.logger.debug('disconnected');
-    if (this.player) {
-      this.world.runHook('system', 'onPlayerDisconnected', this.player.id);
-      this.controllerMap.delete(this.player.id);
+    if (this.playerId) {
+      this.world.runHook('system', 'onPlayerDisconnected', this.playerId);
+      this.controllerMap.delete(this.playerId);
     }
-    delete this.player;
+    delete this.playerId;
   }
 
   onInput(input) {
-    if (this.player) {
-      this.logger.trace({ user: this.user.id, player: this.player.id, input }, 'input');
+    if (this.playerId) {
+      this.logger.trace({ user: this.user.id, player: this.playerId, input }, 'input');
       this.playerController.onInput(input);
     } else if (this.user) {
       this.logger.trace({ user: this.user.id, input }, 'input');
@@ -66,13 +65,21 @@ class SocketController {
   }
 
   onTabKeyPress(...args) {
-    if (this.player) {
+    if (this.playerId) {
       this.playerController.onTabKeyPress(...args);
     }
   }
 
+  authenticateProgrammer() {
+    if (this.playerId) {
+      const player = this.world.get(this.playerId);
+      return player.programmer;
+    }
+    return false;
+  }
+
   onSearch(query, done) {
-    if (this.player && this.player.programmer) {
+    if (this.authenticateProgrammer()) {
       this.programmerController.onSearch(query, done);
     } else {
       done([]);
@@ -80,7 +87,7 @@ class SocketController {
   }
 
   onGetVerb(data, done) {
-    if (this.player && this.player.programmer) {
+    if (this.authenticateProgrammer()) {
       this.programmerController.onGetVerb(data, done);
     } else {
       done(void 0);
@@ -88,7 +95,7 @@ class SocketController {
   }
 
   onGetFunction(data, done) {
-    if (this.player && this.player.programmer) {
+    if (this.authenticateProgrammer()) {
       this.programmerController.onGetFunction(data, done);
     } else {
       done(void 0);
@@ -96,7 +103,7 @@ class SocketController {
   }
 
   onSaveFunction(data, done) {
-    if (this.player && this.player.programmer) {
+    if (this.authenticateProgrammer()) {
       this.programmerController.onSaveFunction(data, done);
     } else {
       done('Unauthorized');
@@ -104,7 +111,7 @@ class SocketController {
   }
 
   onSaveVerb(data, done) {
-    if (this.player && this.player.programmer) {
+    if (this.authenticateProgrammer()) {
       this.programmerController.onSaveVerb(data, done);
     } else {
       done('Unauthorized');

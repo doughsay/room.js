@@ -1,7 +1,8 @@
 const onExit = require('../lib/on-exit');
 const MooDB = require('../lib/moo-db');
+const logger = require('../config/logger');
 
-const db = new MooDB('state/world');
+const db = new MooDB('state/world', logger);
 const save = () => db.saveSync();
 
 onExit(save);

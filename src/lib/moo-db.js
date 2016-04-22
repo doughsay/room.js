@@ -1,6 +1,9 @@
 const fs = require('fs');
 const mkdirp = require('mkdirp');
 const remove = require('remove');
+const chokidar = require('chokidar');
+const EventEmitter = require('events');
+const util = require('util');
 
 const VERB_DESCRIPTOR = /^\s*\/\/\s*verb\s*:\s*(.*?)\s*;\s*(.*?)\s*;\s*(.*?)\s*;\s*(.*?)\s*$/;
 
@@ -11,8 +14,11 @@ function* entries(obj) {
 }
 
 class MooDB {
-  constructor(directory) {
+  constructor(directory, logger) {
+    EventEmitter.call(this);
+
     this.directory = directory;
+    this.logger = logger.child({ directory });
     this._db = new Map();
     // this._locationIdIndex = new Map();
     // this._userIdIndex = new Map();
@@ -20,6 +26,22 @@ class MooDB {
     if (this.dbDirectoryExists()) {
       this.loadSync();
     }
+
+    this.setupWatcher();
+  }
+
+  setupWatcher() {
+    this.watcher = chokidar.watch(this.directory, {
+      ignored: /[\/\\]\./,
+      persistent: true,
+    });
+
+    this.watcher.on('ready', () => {
+      this.watcher
+        .on('add', this.onFileAddedOrChanged.bind(this))
+        .on('change', this.onFileAddedOrChanged.bind(this))
+        .on('unlink', this.onFileRemoved.bind(this));
+    });
   }
 
   dbDirectoryExists() {
@@ -81,9 +103,10 @@ class MooDB {
 
   loadSync() {
     if (!this.dbDirectoryExists()) {
-      // TODO: warn
+      this.logger.warn("tried loading db, but it wasn't there.");
       return;
     }
+    const start = new Date();
 
     this._db.clear();
     const ids = fs.readdirSync(this.directory);
@@ -91,14 +114,23 @@ class MooDB {
       if (id.startsWith('.')) { return; }
       this.loadObjectSync(id);
     });
+
+    this.logger.info({ loadTime: `${new Date() - start}ms` }, 'loaded database');
   }
 
   loadObjectSync(id) {
-    const fileContents = fs.readFileSync(this.filenameFor(id));
-    const object = JSON.parse(fileContents);
-    this.loadCallables(id, object.properties);
-    this._db.set(id, object);
-    // this.index(object);
+    try {
+      const fileContents = fs.readFileSync(this.filenameFor(id));
+      const object = JSON.parse(fileContents);
+      this.loadCallables(id, object.properties);
+      this._db.set(id, object);
+      // this.index(object);
+      this.logger.trace({ objectId: id }, 'loaded object');
+      return true;
+    } catch (err) {
+      this.logger.warn({ err, objectId: id }, 'tried loading object from files, but failed');
+      return false;
+    }
   }
 
   loadCallables(id, properties) {
@@ -125,25 +157,64 @@ class MooDB {
   }
 
   saveSync() {
+    const start = new Date();
     if (this.dbDirectoryExists()) { remove.removeSync(this.directory); }
 
     this._db.forEach(object => {
-      mkdirp.sync(this.dirnameFor(object.id));
-
-      fs.writeFileSync(this.filenameFor(object.id), this.serializeObject(object));
-
-      for (const [key, value] of entries(this.callableProperties(object))) {
-        const filename = `${this.dirnameFor(object.id)}/${key}.js`;
-        if ('function' in value) {
-          fs.writeFileSync(filename, value.function);
-        } else if ('verb' in value) {
-          const verbDef =
-            `// verb: ${value.pattern}; ${value.dobjarg}; ${value.preparg}; ${value.iobjarg}`;
-          const code = `${verbDef}\n${value.verb}`;
-          fs.writeFileSync(filename, code);
-        }
-      }
+      this.saveObjectSync(object);
     });
+
+    this.logger.info({ saveTime: `${new Date() - start}ms` }, 'saved database');
+  }
+
+  saveObjectSync(object) {
+    mkdirp.sync(this.dirnameFor(object.id));
+
+    fs.writeFileSync(this.filenameFor(object.id), this.serializeObject(object));
+
+    for (const [key, value] of entries(this.callableProperties(object))) {
+      const filename = `${this.dirnameFor(object.id)}/${key}.js`;
+      if ('function' in value) {
+        fs.writeFileSync(filename, value.function);
+      } else if ('verb' in value) {
+        const verbDef =
+          `// verb: ${value.pattern}; ${value.dobjarg}; ${value.preparg}; ${value.iobjarg}`;
+        const code = `${verbDef}\n${value.verb}`;
+        fs.writeFileSync(filename, code);
+      }
+    }
+    this.logger.trace({ objectId: object.id }, 'saved object');
+  }
+
+  idFromPath(path) {
+    return path.replace(`${this.directory}/`, '').split('/')[0];
+  }
+
+  pathIsSelf(path) {
+    const file = path.replace(`${this.directory}/`, '').split('/')[1];
+    const id = this.idFromPath(path);
+    return file === `${id}.json`;
+  }
+
+  onFileAddedOrChanged(path) {
+    this.logger.debug({ path }, 'file added or changed');
+    const objectId = this.idFromPath(path);
+    if (this.loadObjectSync(objectId)) {
+      this.emit('object-changed', this.findById(objectId));
+    }
+  }
+
+  onFileRemoved(path) {
+    this.logger.debug({ path }, 'file removed');
+    const objectId = this.idFromPath(path);
+    if (this.pathIsSelf(path)) {
+      this.removeById(objectId);
+      this.emit('object-removed', objectId);
+    } else {
+      if (this.loadObjectSync(objectId)) {
+        this.emit('object-changed', this.findById(objectId));
+      }
+    }
   }
 
   insert(object) {
@@ -185,5 +256,6 @@ class MooDB {
     return [...this._db.values()].filter(object => !!object.userId).map(o => o.id);
   }
 }
+util.inherits(MooDB, EventEmitter);
 
 module.exports = MooDB;

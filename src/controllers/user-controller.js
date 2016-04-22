@@ -111,7 +111,7 @@ class UserController extends BaseChildController {
       const msg = `You're playing as ${player.name} from another login session. Quitting...`;
       controller.emit('output', msg);
       controller.emit('set-prompt', controller.user.id);
-      controller.player = null;
+      controller.playerId = null;
       this.controllerMap.delete(player.id);
     }
   }
@@ -121,7 +121,7 @@ class UserController extends BaseChildController {
     this.logoutOtherInstance(player);
     this.emit('output', `Now playing as ${player.name}`);
     this.emit('set-prompt', player.name);
-    this.player = player;
+    this.playerId = playerId;
     this.controllerMap.set(player.id, this.parent);
     this.world.runHook('system', 'onPlayerConnected', player.id);
     this.logger.info({ player: player.name }, 'user playing as player');

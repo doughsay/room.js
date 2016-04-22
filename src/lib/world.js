@@ -29,6 +29,18 @@ class World {
     this.context.nextId = raw => this.nextId(raw);
 
     this.context.Verb = (...args) => this.newVerb(...args);
+
+    this.setupWatchers();
+  }
+
+  setupWatchers() {
+    this.db.on('object-changed', object => {
+      this.objects[object.id] = this.builder.build(object);
+    });
+
+    this.db.on('object-removed', id => {
+      delete this.objects[id];
+    });
   }
 
   get(id) {

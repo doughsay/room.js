@@ -8,43 +8,44 @@ const wrapString = require('../lib/wrap-string');
 
 class PlayerController extends BaseChildController {
   get logger() {
-    return this.parent.logger.child({ user: this.user.id, player: this.player.id });
+    return this.parent.logger.child({ user: this.user.id, player: this.playerId });
   }
 
   onTabKeyPress({ direction }) {
-    this.world.runHook(this.player.id, 'onTabKeyPress', direction);
+    this.world.runHook(this.playerId, 'onTabKeyPress', direction);
   }
 
   onInput(input) {
+    const player = this.world.get(this.playerId);
     const [hookRan, processedInput] = this.world.runHook(
-      'system', 'preprocessCommand', this.player.id, wrapString(input)
+      'system', 'preprocessCommand', player.id, wrapString(input)
     );
     const command = parse(hookRan ? processedInput : input);
 
-    if (command.verb === 'eval' && this.player.programmer) {
+    if (command.verb === 'eval' && player.programmer) {
       this.onEval(command.argstr);
     } else if (command.verb === 'quit') {
-      this.world.runHook('system', 'onPlayerDisconnected', this.player.id);
+      this.world.runHook('system', 'onPlayerDisconnected', player.id);
       this.emit('set-prompt', this.user.id);
       this.emit('output', 'Bye!');
-      this.controllerMap.delete(this.player.id);
-      this.player = null;
+      this.controllerMap.delete(player.id);
+      this.playerId = null;
     } else {
       try {
-        const matchedObjects = this.player.matchObjects(command);
-        const matchedVerb = this.player.matchVerb(command, matchedObjects);
+        const matchedObjects = player.matchObjects(command);
+        const matchedVerb = player.matchVerb(command, matchedObjects);
 
         if (matchedVerb) {
           this.onRunVerb(command, matchedObjects, matchedVerb);
-        } else if (this.player.location && this.player.location.verbMissing) {
-          const verbMissing = { verb: 'verbMissing', this: this.player.location };
+        } else if (player.location && player.location.verbMissing) {
+          const verbMissing = { verb: 'verbMissing', this: player.location };
           this.onRunVerb(command, matchedObjects, verbMissing);
         } else {
           this.emit('output', gray("I didn't understand that."));
         }
       } catch (err) {
         const output = bgRed(
-          this.player.programmer ? this.formatError(err) : 'An internal error occurred.'
+          player.programmer ? this.formatError(err) : 'An internal error occurred.'
         );
         this.emit('output', output);
         this.logger.warn({ err: bunyan.stdSerializers.err(err) }, 'error matching');
@@ -54,8 +55,8 @@ class PlayerController extends BaseChildController {
 
   onEval(input) {
     try {
-      const code = rewriteEval(input, this.player.id);
-      const filename = `Eval::${this.player.id}`;
+      const code = rewriteEval(input, this.playerId);
+      const filename = `Eval::${this.playerId}`;
 
       this.logger.debug({ code }, 'eval');
 
@@ -69,7 +70,8 @@ class PlayerController extends BaseChildController {
   }
 
   onRunVerb(command, matchedObjects, matchedVerb) {
-    const playerId = this.player.id;
+    const playerId = this.playerId;
+    const player = this.world.get(playerId);
     const dobjId = matchedObjects.dobj ? matchedObjects.dobj.id : 'void 0';
     const iobjId = matchedObjects.iobj ? matchedObjects.iobj.id : 'void 0';
     const verbstr = wrapString(command.verb);
@@ -89,7 +91,7 @@ class PlayerController extends BaseChildController {
       this.world.run(code, filename);
     } catch (err) {
       const output = bgRed(
-        this.player.programmer ? this.formatError(err) : 'An internal error occurred.'
+        player.programmer ? this.formatError(err) : 'An internal error occurred.'
       );
 
       this.emit('output', output);
