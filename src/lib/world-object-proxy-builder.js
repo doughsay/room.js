@@ -143,10 +143,19 @@ class Handler {
   }
 
   set(target, property, value) {
-    if (builtInProperty(property)) { return this._setBuiltInProperty(property, target, value); }
-    if (virtualProperty(property)) { return this._setVirtualProperty(property, target, value); }
+    const _s = fn => {
+      const retVal = fn();
+      this.db.markObjectDirty(target.id);
+      return retVal;
+    };
+    if (builtInProperty(property)) {
+      return _s(() => this._setBuiltInProperty(property, target, value));
+    }
+    if (virtualProperty(property)) {
+      return _s(() => this._setVirtualProperty(property, target, value));
+    }
     if (this.worldObjectProperty(property)) { return true; }
-    return Reflect.set(target.properties, property, serialize(value));
+    return _s(() => Reflect.set(target.properties, property, serialize(value)));
   }
 
   deleteProperty(target, property) {
