@@ -1,8 +1,6 @@
 const bunyan = require('bunyan');
 const BaseChildController = require('./base-child-controller');
 const parse = require('../lib/parse');
-const print = require('../lib/print');
-const rewriteEval = require('../lib/rewrite-eval');
 const { bgRed, gray } = require('../lib/colors');
 const wrapString = require('../lib/wrap-string');
 
@@ -23,49 +21,41 @@ class PlayerController extends BaseChildController {
     const command = parse(hookRan ? processedInput : input);
 
     if (command.verb === 'eval' && player.programmer) {
-      this.onEval(command.argstr);
+      this.parent.programmerController.onEval(command.argstr);
     } else if (command.verb === 'quit') {
-      this.world.runHook('system', 'onPlayerDisconnected', player.id);
-      this.emit('set-prompt', this.user.id);
-      this.emit('output', 'Bye!');
-      this.controllerMap.delete(player.id);
-      this.playerId = null;
+      this.onQuit(player);
     } else {
-      try {
-        const matchedObjects = player.matchObjects(command);
-        const matchedVerb = player.matchVerb(command, matchedObjects);
-
-        if (matchedVerb) {
-          this.onRunVerb(command, matchedObjects, matchedVerb);
-        } else if (player.location && player.location.verbMissing) {
-          const verbMissing = { verb: 'verbMissing', this: player.location };
-          this.onRunVerb(command, matchedObjects, verbMissing);
-        } else {
-          this.emit('output', gray("I didn't understand that."));
-        }
-      } catch (err) {
-        const output = bgRed(
-          player.programmer ? this.formatError(err) : 'An internal error occurred.'
-        );
-        this.emit('output', output);
-        this.logger.warn({ err: bunyan.stdSerializers.err(err) }, 'error matching');
-      }
+      this.runCommand(command, player);
     }
   }
 
-  onEval(input) {
+  onQuit(player) {
+    this.world.runHook('system', 'onPlayerDisconnected', player.id);
+    this.emit('set-prompt', this.user.id);
+    this.emit('output', 'Bye!');
+    this.controllerMap.delete(player.id);
+    this.playerId = null;
+  }
+
+  runCommand(command, player) {
     try {
-      const code = rewriteEval(input, this.playerId);
-      const filename = `Eval::${this.playerId}`;
+      const matchedObjects = player.matchObjects(command);
+      const matchedVerb = player.matchVerb(command, matchedObjects);
 
-      this.logger.debug({ code }, 'eval');
-
-      const retVal = this.world.run(code, filename);
-
-      this.emit('output', print(retVal, 1));
+      if (matchedVerb) {
+        this.onRunVerb(command, matchedObjects, matchedVerb);
+      } else if (player.location && player.location.verbMissing) {
+        const verbMissing = { verb: 'verbMissing', this: player.location };
+        this.onRunVerb(command, matchedObjects, verbMissing);
+      } else {
+        this.emit('output', gray("I didn't understand that."));
+      }
     } catch (err) {
-      this.emit('output', bgRed(this.formatError(err)));
-      this.logger.warn({ err: bunyan.stdSerializers.err(err) }, 'error running eval code');
+      const output = bgRed(
+        player.programmer ? this.formatError(err) : 'An internal error occurred.'
+      );
+      this.emit('output', output);
+      this.logger.warn({ err: bunyan.stdSerializers.err(err) }, 'error matching');
     }
   }
 

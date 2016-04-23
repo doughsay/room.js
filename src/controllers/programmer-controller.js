@@ -1,10 +1,30 @@
+const bunyan = require('bunyan');
 const { filter } = require('fuzzaldrin-plus');
 const BaseChildController = require('./base-child-controller');
 const serialize = require('../lib/serialize');
+const print = require('../lib/print');
+const rewriteEval = require('../lib/rewrite-eval');
+const { bgRed } = require('../lib/colors');
 
 class ProgrammerController extends BaseChildController {
   get logger() {
     return this.parent.logger.child({ user: this.user.id, player: this.playerId });
+  }
+
+  onEval(input) {
+    try {
+      const code = rewriteEval(input, this.playerId);
+      const filename = `Eval::${this.playerId}`;
+
+      this.logger.debug({ code }, 'eval');
+
+      const retVal = this.world.run(code, filename);
+
+      this.emit('output', print(retVal, 1));
+    } catch (err) {
+      this.emit('output', bgRed(this.formatError(err)));
+      this.logger.warn({ err: bunyan.stdSerializers.err(err) }, 'error running eval code');
+    }
   }
 
   // TODO: this is incredibly innefficient, but works for now

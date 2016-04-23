@@ -14,11 +14,18 @@ class SocketController {
     this.controllerMap = controllerMap;
     this.logger = logger.child({ socketId: this.socket.id });
 
+    this.setupChildControllers();
+    this.setupSocketListeners(socket);
+  }
+
+  setupChildControllers() {
     this.unauthenticatedUserController = new UnauthenticatedUserController(this);
     this.userController = new UserController(this);
     this.playerController = new PlayerController(this);
     this.programmerController = new ProgrammerController(this);
+  }
 
+  setupSocketListeners(socket) {
     socket.on('disconnect', this.onDisconnect.bind(this));
     socket.on('input', this.onInput.bind(this));
     socket.on('tab-key-press', this.onTabKeyPress.bind(this));
