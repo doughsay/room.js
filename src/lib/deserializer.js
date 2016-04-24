@@ -24,22 +24,23 @@ class Deserializer {
     if ('object' in object) { return this._deserializeObject(object.object); }
     if ('array' in object) { return object.array.map(this.deserialize.bind(this)); }
     if ('function' in object) {
-      const script = new vm.Script(`(${object.function})`);
+      const script = new vm.Script(`(${object.source})`);
       const world = this.world;
       const fn = function fn(...args) {
         return world.runScript(script, this, args);
       };
-      fn.source = object.function;
+      fn.function = true;
+      fn.source = object.source;
       return fn;
     }
     if ('verb' in object) {
-      const script = new vm.Script(`(${object.verb})`);
+      const script = new vm.Script(`(${object.source})`);
       const world = this.world;
       const verbFn = function verbFn(...args) {
         return world.runScript(script, this, args);
       };
       verbFn.verb = true;
-      verbFn.source = object.verb;
+      verbFn.source = object.source;
       verbFn.pattern = object.pattern;
       verbFn.dobjarg = object.dobjarg;
       verbFn.preparg = object.preparg;

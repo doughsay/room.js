@@ -60,33 +60,15 @@ class MooDB {
   loadCallables(id, properties) {
     for (const [key, value] of entries(properties)) {
       if (value.verb || value.function) {
-        properties[key] = this.loadCallable(id, value.file);
+        properties[key] = this.loadCallable(id, value);
       }
     }
   }
 
-  loadCallable(id, file) {
-    const source = this.fsdb.read(`${id}/${file}`);
-    return this.parseCallable(file, source);
-  }
-
-  parseCallable(file, source) {
-    try {
-      const lines = source.split('\n');
-      const firstLineMatch = (lines[0] || '').match(VERB_DESCRIPTOR);
-      if (firstLineMatch) {
-        const [pattern, dobjarg, preparg, iobjarg] = firstLineMatch.slice(1);
-        return {
-          verb: lines.slice(1).join('\n'),
-          pattern, dobjarg, preparg, iobjarg,
-          file,
-        };
-      }
-      return { function: source, file };
-    } catch (err) {
-      this.logger.warn({ err: bunyan.stdSerializers.err(err), file }, 'unable to parse callable');
-      return { function: "function invalid() { return 'invalid source'; }", file };
-    }
+  loadCallable(id, value) {
+    const source = this.fsdb.read(`${id}/${value.file}`);
+    value.source = source;
+    return value;
   }
 
   idFromFilepath(filepath) {
@@ -139,15 +121,17 @@ class MooDB {
   serializeAndSaveCallable(id, key, value) {
     const file = value.file || `${key}.js`;
     const filepath = `${id}/${file}`;
+    this.fsdb.write(filepath, value.source);
     if (value.function) {
-      this.fsdb.write(filepath, value.function);
       return { function: true, file };
     } else if (value.verb) {
-      const verbDef =
-        `// verb: ${value.pattern}; ${value.dobjarg}; ${value.preparg}; ${value.iobjarg}`;
-      const source = `${verbDef}\n${value.verb}`;
-      this.fsdb.write(filepath, source);
-      return { verb: true, file };
+      return {
+        verb: true, file,
+        pattern: value.pattern,
+        dobjarg: value.dobjarg,
+        preparg: value.preparg,
+        iobjarg: value.iobjarg,
+      };
     }
     throw new Error('invalid callable');
   }

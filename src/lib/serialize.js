@@ -32,14 +32,14 @@ function serializeFunction(fn) {
   const source = fn.source || fn.toString();
   if (fn.verb) {
     return {
-      verb: source,
+      verb: true, source,
       pattern: fn.pattern,
       dobjarg: fn.dobjarg,
       preparg: fn.preparg,
       iobjarg: fn.iobjarg,
     };
   }
-  return { function: source };
+  return { function: true, source };
 }
 
 function serialize(value) {
