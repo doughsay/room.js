@@ -1,7 +1,7 @@
 const http = require('http');
 const socketIo = require('socket.io');
 
-const { version, port } = require('./config/config');
+const { version, port, maintenance } = require('./config/config');
 const logger = require('./config/logger');
 const SocketController = require('./controllers/socket-controller');
 
@@ -14,8 +14,12 @@ const userDb = require('./state/user-db');
 const controllerMap = require('./state/controller-map');
 
 io.on('connection', socket => {
-  const controller = new SocketController(socket, world, db, userDb, controllerMap, logger);
-  controller.onConnection();
+  if (maintenance) {
+    socket.emit('output', 'Server in maintenance mode. Please check back later.');
+  } else {
+    const controller = new SocketController(socket, world, db, userDb, controllerMap, logger);
+    controller.onConnection();
+  }
 });
 
 server.listen(port, err => {
