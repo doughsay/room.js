@@ -34,8 +34,9 @@ class World {
   }
 
   setupWatchers() {
-    this.db.on('object-changed', object => {
-      this.objects[object.id] = this.builder.build(object);
+    this.db.on('object-added', id => {
+      const object = this.db.findById(id);
+      this.objects[id] = this.builder.build(object);
     });
 
     this.db.on('object-removed', id => {

@@ -1,9 +1,7 @@
-const fs = require('fs');
-const mkdirp = require('mkdirp');
-const remove = require('remove');
-const chokidar = require('chokidar');
 const EventEmitter = require('events');
 const util = require('util');
+const bunyan = require('bunyan');
+const FsDb = require('./fs-db');
 
 const VERB_DESCRIPTOR = /^\s*\/\/\s*verb\s*:\s*(.*?)\s*;\s*(.*?)\s*;\s*(.*?)\s*;\s*(.*?)\s*$/;
 
@@ -17,214 +15,207 @@ class MooDB {
   constructor(directory, logger) {
     EventEmitter.call(this);
 
-    this.directory = directory;
-    this.logger = logger.child({ directory });
-    this._db = new Map();
-    // this._locationIdIndex = new Map();
-    // this._userIdIndex = new Map();
-
-    if (this.dbDirectoryExists()) {
-      this.loadSync();
-    }
-
-    this.setupWatcher();
+    this.logger = logger;
+    this.fsdb = new FsDb(directory, logger);
+    this.db = new Map();
+    this.load();
+    this.setupListeners();
   }
 
-  setupWatcher() {
-    this.watcher = chokidar.watch(this.directory, {
-      ignored: /[\/\\]\./,
-      persistent: true,
+  setupListeners() {
+    this.fsdb.on('added', this.onFileAddedOrChanged.bind(this));
+    this.fsdb.on('changed', this.onFileAddedOrChanged.bind(this));
+    this.fsdb.on('removed', this.onFileRemoved.bind(this));
+  }
+
+  load() {
+    const ids = this.fsdb.lsDirs('');
+    ids.forEach(id => {
+      this.loadObject(id);
     });
-
-    this.watcher.on('ready', () => {
-      this.watcher
-        .on('add', this.onFileAddedOrChanged.bind(this))
-        .on('change', this.onFileAddedOrChanged.bind(this))
-        .on('unlink', this.onFileRemoved.bind(this));
-    });
-  }
-
-  dbDirectoryExists() {
-    return fs.existsSync(this.directory);
-  }
-
-  dirnameFor(id) {
-    return `${this.directory}/${id}`;
   }
 
   filenameFor(id) {
-    return `${this.dirnameFor(id)}/${id}.json`;
+    return `${id}/${id}.json`;
   }
 
-  callable(descriptor) {
-    return 'function' in descriptor || 'verb' in descriptor;
-  }
-
-  nonCallableProperties(object) {
-    const properties = {};
-    for (const [key, value] of entries(object.properties)) {
-      if (!this.callable(value)) { properties[key] = value; }
+  loadObject(id) {
+    try {
+      const fileContents = this.fsdb.read(this.filenameFor(id));
+      const object = JSON.parse(fileContents);
+      object.id = id;
+      this.loadCallables(id, object.properties);
+      this.db.set(id, object);
+      this.logger.trace({ objectId: id }, 'loaded object');
+      return true;
+    } catch (err) {
+      this.logger.warn(
+        { err: bunyan.stdSerializers.err(err), objectId: id },
+        'tried loading object from fsdb, but failed'
+      );
+      return false;
     }
-    return properties;
   }
 
-  callableProperties(object) {
+  loadCallables(id, properties) {
+    for (const [key, value] of entries(properties)) {
+      if (value.verb || value.function) {
+        properties[key] = this.loadCallable(id, value.file);
+      }
+    }
+  }
+
+  loadCallable(id, file) {
+    const source = this.fsdb.read(`${id}/${file}`);
+    return this.parseCallable(file, source);
+  }
+
+  parseCallable(file, source) {
+    try {
+      const lines = source.split('\n');
+      const firstLineMatch = (lines[0] || '').match(VERB_DESCRIPTOR);
+      if (firstLineMatch) {
+        const [pattern, dobjarg, preparg, iobjarg] = firstLineMatch.slice(1);
+        return {
+          verb: lines.slice(1).join('\n'),
+          pattern, dobjarg, preparg, iobjarg,
+          file,
+        };
+      }
+      return { function: source, file };
+    } catch (err) {
+      this.logger.warn({ err: bunyan.stdSerializers.err(err), file }, 'unable to parse callable');
+      return { function: "function invalid() { return 'invalid source'; }", file };
+    }
+  }
+
+  idFromFilepath(filepath) {
+    return filepath.split('/')[0];
+  }
+
+  onFileAddedOrChanged(file) {
+    const id = this.idFromFilepath(file);
+    if (file.endsWith('.json') || file.endsWith('.js')) {
+      this.addOrUpdateObject(id);
+    }
+  }
+
+  onFileRemoved(file) {
+    const id = this.idFromFilepath(file);
+    if (file.endsWith('.json')) {
+      this.removeById(id);
+      this.emit('object-removed', id);
+    } else if (file.endsWith('.js')) {
+      this.addOrUpdateObject(id);
+    }
+  }
+
+  addOrUpdateObject(id) {
+    try {
+      const object = this.findById(id);
+      const fileContents = this.fsdb.read(this.filenameFor(id));
+      const newObjectProperties = JSON.parse(fileContents);
+      if (object) {
+        object.name = newObjectProperties.name;
+        object.aliases = newObjectProperties.aliases;
+        object.traitIds = newObjectProperties.traitIds;
+        object.locationId = newObjectProperties.locationId;
+        object.userId = newObjectProperties.userId;
+        object.properties = newObjectProperties.properties;
+        this.loadCallables(id, object.properties);
+        this.logger.trace({ objectId: id }, 'reloaded object');
+      } else {
+        this.loadObject(id);
+        this.emit('object-added', id);
+      }
+    } catch (err) {
+      this.logger.warn(
+        { err: bunyan.stdSerializers.err(err), objectId: id },
+        'unable to add or update object'
+      );
+    }
+  }
+
+  serializeAndSaveCallable(id, key, value) {
+    const file = value.file || `${key}.js`;
+    const filepath = `${id}/${file}`;
+    if (value.function) {
+      this.fsdb.write(filepath, value.function);
+      return { function: true, file };
+    } else if (value.verb) {
+      const verbDef =
+        `// verb: ${value.pattern}; ${value.dobjarg}; ${value.preparg}; ${value.iobjarg}`;
+      const source = `${verbDef}\n${value.verb}`;
+      this.fsdb.write(filepath, source);
+      return { verb: true, file };
+    }
+    throw new Error('invalid callable');
+  }
+
+  savableProperties(object) {
     const properties = {};
     for (const [key, value] of entries(object.properties)) {
-      if (this.callable(value)) { properties[key] = value; }
+      if (value.verb || value.function) {
+        properties[key] = this.serializeAndSaveCallable(object.id, key, value);
+      } else {
+        properties[key] = value;
+      }
     }
     return properties;
   }
 
   serializeObject(object) {
     const obj = {
-      id: object.id,
       name: object.name,
       aliases: object.aliases,
       traitIds: object.traitIds,
       locationId: object.locationId,
       userId: object.userId,
-      properties: this.nonCallableProperties(object),
+      properties: this.savableProperties(object),
     };
     return `${JSON.stringify(obj, null, '  ')}\n`;
   }
 
-  // index(object) {
-  //   if (!this._locationIdIndex.get(object.locationId)) {
-  //     this._locationIdIndex.set(object.locationId, []);
-  //   }
-  //   this._locationIdIndex.get(object.locationId).push(object);
-  //
-  //   if (!this._userIdIndex.get(object.userId)) {
-  //     this._userIdIndex.set(object.userId, []);
-  //   }
-  //   this._userIdIndex.get(object.userId).push(object);
-  // }
-
-  loadSync() {
-    if (!this.dbDirectoryExists()) {
-      this.logger.warn("tried loading db, but it wasn't there.");
-      return;
-    }
-    const start = new Date();
-
-    this._db.clear();
-    const ids = fs.readdirSync(this.directory);
-    ids.forEach(id => {
-      if (id.startsWith('.')) { return; }
-      this.loadObjectSync(id);
-    });
-
-    this.logger.info({ loadTime: `${new Date() - start}ms` }, 'loaded database');
-  }
-
-  loadObjectSync(id) {
-    try {
-      const fileContents = fs.readFileSync(this.filenameFor(id));
-      const object = JSON.parse(fileContents);
-      this.loadCallables(id, object.properties);
-      this._db.set(id, object);
-      // this.index(object);
-      this.logger.trace({ objectId: id }, 'loaded object');
-      return true;
-    } catch (err) {
-      this.logger.warn({ err, objectId: id }, 'tried loading object from files, but failed');
-      return false;
-    }
-  }
-
-  loadCallables(id, properties) {
-    const files = fs.readdirSync(this.dirnameFor(id));
-    files.forEach(file => {
-      if (!file.endsWith('.js')) { return; }
-      const fileContents = fs.readFileSync(`${this.dirnameFor(id)}/${file}`).toString();
-      const [key] = file.split('.');
-      properties[key] = this.parseCallable(fileContents);
-    });
-  }
-
-  parseCallable(fileContents) {
-    const lines = fileContents.split('\n');
-    const firstLineMatch = (lines[0] || '').match(VERB_DESCRIPTOR);
-    if (firstLineMatch) {
-      const [pattern, dobjarg, preparg, iobjarg] = firstLineMatch.slice(1);
-      return {
-        verb: lines.slice(1).join('\n'),
-        pattern, dobjarg, preparg, iobjarg,
-      };
-    }
-    return { function: fileContents };
-  }
-
-  saveSync() {
-    const start = new Date();
-    if (this.dbDirectoryExists()) { remove.removeSync(this.directory); }
-
-    this._db.forEach(object => {
-      this.saveObjectSync(object);
-    });
-
-    this.logger.info({ saveTime: `${new Date() - start}ms` }, 'saved database');
-  }
-
-  saveObjectSync(object) {
-    mkdirp.sync(this.dirnameFor(object.id));
-
-    fs.writeFileSync(this.filenameFor(object.id), this.serializeObject(object));
-
-    for (const [key, value] of entries(this.callableProperties(object))) {
-      const filename = `${this.dirnameFor(object.id)}/${key}.js`;
-      if ('function' in value) {
-        fs.writeFileSync(filename, value.function);
-      } else if ('verb' in value) {
-        const verbDef =
-          `// verb: ${value.pattern}; ${value.dobjarg}; ${value.preparg}; ${value.iobjarg}`;
-        const code = `${verbDef}\n${value.verb}`;
-        fs.writeFileSync(filename, code);
-      }
-    }
+  saveObject(object) {
+    this.fsdb.write(`${object.id}/${object.id}.json`, this.serializeObject(object));
     this.logger.trace({ objectId: object.id }, 'saved object');
   }
 
-  idFromPath(path) {
-    return path.replace(`${this.directory}/`, '').split('/')[0];
-  }
-
-  pathIsSelf(path) {
-    const file = path.replace(`${this.directory}/`, '').split('/')[1];
-    const id = this.idFromPath(path);
-    return file === `${id}.json`;
-  }
-
-  onFileAddedOrChanged(path) {
-    this.logger.debug({ path }, 'file added or changed');
-    const objectId = this.idFromPath(path);
-    if (this.loadObjectSync(objectId)) {
-      this.emit('object-changed', this.findById(objectId));
-    }
-  }
-
-  onFileRemoved(path) {
-    this.logger.debug({ path }, 'file removed');
-    const objectId = this.idFromPath(path);
-    if (this.pathIsSelf(path)) {
-      this.removeById(objectId);
-      this.emit('object-removed', objectId);
-    } else {
-      if (this.loadObjectSync(objectId)) {
-        this.emit('object-changed', this.findById(objectId));
+  removeFilesFor(id) {
+    const object = this.findById(id);
+    for (const [key, value] of entries(object.properties)) {
+      if (value.function || value.verb) {
+        const file = value.file || `${key}.js`;
+        const filepath = `${id}/${file}`;
+        this.fsdb.rm(filepath);
       }
     }
+    this.fsdb.rm(`${id}/${id}.json`);
+    this.fsdb.rmDir(id); // cleanup; FsDb should do this for us, but it doesn't.
+  }
+
+  markObjectDirty(id) {
+    this.saveObject(this.findById(id));
+  }
+
+  removeProperty(id, key, value) {
+    if (value.function || value.verb) {
+      const file = value.file || `${key}.js`;
+      const filepath = `${id}/${file}`;
+      this.fsdb.rm(filepath);
+    }
+    this.saveObject(this.findById(id));
   }
 
   insert(object) {
     if (typeof object.id !== 'string') {
       throw new Error('Object must contain a string id property.');
     }
-    if (this._db.has(object.id)) {
+    if (this.db.has(object.id)) {
       throw new Error('An object with that id already exists.');
     }
-    this._db.set(object.id, object);
+    this.db.set(object.id, object);
+    this.saveObject(object);
     return object;
   }
 
@@ -233,27 +224,28 @@ class MooDB {
   }
 
   removeById(id) {
-    return this._db.delete(id);
+    this.removeFilesFor(id);
+    return this.db.delete(id);
   }
 
   findById(id) {
-    return this._db.get(id);
+    return this.db.get(id);
   }
 
   findBy(field, value) {
-    return [...this._db.values()].filter(object => object[field] === value);
+    return [...this.db.values()].filter(object => object[field] === value);
   }
 
   all() {
-    return this._db;
+    return this.db;
   }
 
   ids() {
-    return [...this._db.keys()];
+    return [...this.db.keys()];
   }
 
   playerIds() {
-    return [...this._db.values()].filter(object => !!object.userId).map(o => o.id);
+    return [...this.db.values()].filter(object => !!object.userId).map(o => o.id);
   }
 }
 util.inherits(MooDB, EventEmitter);

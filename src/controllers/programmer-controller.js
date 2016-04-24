@@ -88,6 +88,10 @@ class ProgrammerController extends BaseChildController {
 
     done('saved');
   }
+
+  formatError(err) {
+    return err.stack;
+  }
 }
 
 module.exports = ProgrammerController;

@@ -159,7 +159,10 @@ class Handler {
   }
 
   deleteProperty(target, property) {
-    return Reflect.deleteProperty(target.properties, property);
+    const originalValue = target.properties[property];
+    const retVal = Reflect.deleteProperty(target.properties, property);
+    this.db.removeProperty(target.id, property, originalValue);
+    return retVal;
   }
 
   ownKeys(target) {
