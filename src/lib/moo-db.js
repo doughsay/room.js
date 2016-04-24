@@ -3,8 +3,6 @@ const util = require('util');
 const bunyan = require('bunyan');
 const FsDb = require('./fs-db');
 
-const VERB_DESCRIPTOR = /^\s*\/\/\s*verb\s*:\s*(.*?)\s*;\s*(.*?)\s*;\s*(.*?)\s*;\s*(.*?)\s*$/;
-
 function* entries(obj) {
   for (const key of Object.keys(obj)) {
     yield [key, obj[key]];
@@ -15,11 +13,15 @@ class MooDB {
   constructor(directory, logger) {
     EventEmitter.call(this);
 
-    this.logger = logger;
+    this.logger = logger.child({ directory });
     this.fsdb = new FsDb(directory, logger);
     this.db = new Map();
+
+    const start = new Date();
     this.load();
     this.setupListeners();
+    const loadTime = new Date() - start;
+    this.logger.info({ loadTime }, 'moo-db loaded');
   }
 
   setupListeners() {
@@ -168,7 +170,7 @@ class MooDB {
   removeFilesFor(id) {
     const object = this.findById(id);
     for (const [key, value] of entries(object.properties)) {
-      if (value.function || value.verb) {
+      if (value && (value.function || value.verb)) {
         const file = value.file || `${key}.js`;
         const filepath = `${id}/${file}`;
         this.fsdb.rm(filepath);
@@ -183,7 +185,7 @@ class MooDB {
   }
 
   removeProperty(id, key, value) {
-    if (value.function || value.verb) {
+    if (value && (value.function || value.verb)) {
       const file = value.file || `${key}.js`;
       const filepath = `${id}/${file}`;
       this.fsdb.rm(filepath);

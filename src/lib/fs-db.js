@@ -13,6 +13,7 @@ class FsDb {
     this.directory = path.normalize(directory).replace(/\/$/, '');
     this.logger = logger.child({ directory });
     this.db = new Map();
+
     const start = new Date();
     this.load();
     this.setupWatcher();

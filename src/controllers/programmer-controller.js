@@ -56,9 +56,9 @@ class ProgrammerController extends BaseChildController {
     const verb = object[name];
     if (!verb || !verb.verb) { done(void 0); return; }
     const verbDescriptor = serialize(verb);
-    verbDescriptor.code = verbDescriptor.verb;
+    verbDescriptor.code = verbDescriptor.source;
     verbDescriptor.name = name;
-    delete verbDescriptor.verb;
+    delete verbDescriptor.source;
     done({ objectId, verb: verbDescriptor });
   }
 
@@ -74,17 +74,19 @@ class ProgrammerController extends BaseChildController {
     const dbObject = this.db.findById(objectId);
     if (!dbObject) { done('no such object'); return; }
 
-    const { name, pattern, dobjarg, preparg, iobjarg, code } = verb;
-    dbObject.properties[name] = { verb: code, pattern, dobjarg, preparg, iobjarg };
+    const { name, pattern, dobjarg, preparg, iobjarg, code: source } = verb;
+    dbObject.properties[name] = { verb: true, source, pattern, dobjarg, preparg, iobjarg };
+    this.db.markObjectDirty(objectId);
 
     done('saved');
   }
 
-  onSaveFunction({ objectId, src, name }, done) {
+  onSaveFunction({ objectId, src: source, name }, done) {
     const dbObject = this.db.findById(objectId);
     if (!dbObject) { done('no such object'); return; }
 
-    dbObject.properties[name] = { function: src };
+    dbObject.properties[name] = { function: true, source };
+    this.db.markObjectDirty(objectId);
 
     done('saved');
   }
