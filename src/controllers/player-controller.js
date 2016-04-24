@@ -70,9 +70,18 @@ class PlayerController extends BaseChildController {
     const prepstr = wrapString(command.prepstr);
     const iobjstr = wrapString(command.iobjstr);
 
-    const args = [playerId, dobjId, iobjId, verbstr, argstr, dobjstr, prepstr, iobjstr];
+    const argObject = [
+      `{ player: ${playerId},`,
+      `dobj: ${dobjId},`,
+      `iobj: ${iobjId},`,
+      `verbstr: ${verbstr},`,
+      `argstr: ${argstr},`,
+      `dobjstr: ${dobjstr},`,
+      `prepstr: ${prepstr},`,
+      `iobjstr: ${iobjstr} }`,
+    ].join(' ');
     const verbStatement = `${matchedVerb.this.id}[${wrapString(matchedVerb.verb)}]`;
-    const code = `${verbStatement}(${args.join(', ')})`;
+    const code = `${verbStatement}(${argObject})`;
     const filename = `Verb::${matchedVerb.this.id}.${matchedVerb.verb}`;
 
     this.logger.debug({ code }, 'run verb');
