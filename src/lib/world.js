@@ -76,8 +76,11 @@ class World {
 
   newVerb(pattern = '', dobjarg = 'none', preparg = 'none', iobjarg = 'none') {
     const name = pattern.split(' ')[0].replace(/[^a-z]/g, '') || 'anonymous';
-    const source =
-      `function ${name}(player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr) {\n  \n}\n`;
+    const source = [
+      `function ${name}`,
+      '({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr }) ',
+      '{\n  \n}\n',
+    ].join('');
     return this.deserializer.deserialize({
       verb: true, source,
       pattern, dobjarg, preparg, iobjarg,
