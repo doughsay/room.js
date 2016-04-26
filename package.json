@@ -6,9 +6,9 @@
   "private": true,
   "repository": "https://github.com/doughsay/room.js",
   "scripts": {
-    "start": "./bin/node --use_strict --harmony src | ./node_modules/.bin/bunyan",
-    "console": "./bin/node --use_strict --harmony src/console.js",
-    "test": "./bin/node --use_strict --harmony ./node_modules/.bin/tape 'test/**/*.js' | ./node_modules/.bin/faucet"
+    "start": "node --use_strict --harmony src | ./node_modules/.bin/bunyan",
+    "console": "node --use_strict --harmony src/console.js",
+    "test": "node --use_strict --harmony ./node_modules/.bin/tape 'test/**/*.js' | ./node_modules/.bin/faucet"
   },
   "main": "src/index.js",
   "license": "MIT",
