@@ -72,7 +72,7 @@ class UserController extends BaseChildController {
       this.world.insert(newPlayerObj);
       this.world.runHook('system', 'onPlayerCreated', playerId);
 
-      this.logger.info({ player: playerName }, 'player created');
+      this.logger.info({ player: playerId }, 'player created');
 
       this.emit('output', `Character created! To start the game now, type ${boldMagenta('play')}!`);
     });
@@ -133,7 +133,7 @@ class UserController extends BaseChildController {
     this.playerId = playerId;
     this.controllerMap.set(player.id, this.parent);
     this.world.runHook('system', 'onPlayerConnected', player.id);
-    this.logger.info({ player: player.name }, 'user playing as player');
+    this.logger.info({ player: playerId }, 'user playing as player');
   }
 }
 
