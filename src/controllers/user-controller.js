@@ -31,10 +31,10 @@ class UserController extends BaseChildController {
   }
 
   onLogout() {
-    this.user = null;
     this.emit('output', 'Bye!');
     this.emit('set-prompt', '');
     this.logger.info('user logged out');
+    this.user = null;
   }
 
   onCreatePlayer() {
