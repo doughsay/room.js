@@ -41,8 +41,8 @@ class PlayerController extends BaseChildController {
     this.emit('set-prompt', this.user.id);
     this.emit('output', 'Bye!');
     this.controllerMap.delete(player.id);
-    this.playerId = null;
     this.logger.info('player quit');
+    this.playerId = null;
   }
 
   runCommand(command, player) {
