@@ -8,17 +8,9 @@ class UserController extends BaseChildController {
 
   onInput(input) {
     if (input === 'help') {
-      this.emit('output', [
-        'Available commands:',
-        `• ${boldMagenta('logout')} - logout of your account`,
-        `• ${boldMagenta('create')} - create a new character`,
-        `• ${boldMagenta('play')}   - enter the game`,
-        `• ${boldMagenta('help')}   - show this message`,
-      ].join('\n'));
+      this.onHelp();
     } else if (input === 'logout') {
-      this.user = null;
-      this.emit('output', 'Bye!');
-      this.emit('set-prompt', '');
+      this.onLogout();
     } else if (input === 'create') {
       this.onCreatePlayer();
     } else if (input === 'play') {
@@ -26,6 +18,23 @@ class UserController extends BaseChildController {
     } else {
       this.emit('output', red('Invalid command.'));
     }
+  }
+
+  onHelp() {
+    this.emit('output', [
+      'Available commands:',
+      `• ${boldMagenta('logout')} - logout of your account`,
+      `• ${boldMagenta('create')} - create a new character`,
+      `• ${boldMagenta('play')}   - enter the game`,
+      `• ${boldMagenta('help')}   - show this message`,
+    ].join('\n'));
+  }
+
+  onLogout() {
+    this.user = null;
+    this.emit('output', 'Bye!');
+    this.emit('set-prompt', '');
+    this.logger.info('user logged out');
   }
 
   onCreatePlayer() {

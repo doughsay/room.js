@@ -52,10 +52,8 @@ class SocketController {
   onDisconnect() {
     this.logger.debug('disconnected');
     if (this.playerId) {
-      this.world.runHook('system', 'onPlayerDisconnected', this.playerId);
-      this.controllerMap.delete(this.playerId);
+      this.playerController.onDisconnect();
     }
-    delete this.playerId;
   }
 
   onInput(input) {

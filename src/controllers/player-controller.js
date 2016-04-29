@@ -29,12 +29,20 @@ class PlayerController extends BaseChildController {
     }
   }
 
+  onDisconnect() {
+    this.world.runHook('system', 'onPlayerDisconnected', this.playerId);
+    this.controllerMap.delete(this.playerId);
+    this.playerId = null;
+    this.logger.info('player disconnected');
+  }
+
   onQuit(player) {
     this.world.runHook('system', 'onPlayerDisconnected', player.id);
     this.emit('set-prompt', this.user.id);
     this.emit('output', 'Bye!');
     this.controllerMap.delete(player.id);
     this.playerId = null;
+    this.logger.info('player quit');
   }
 
   runCommand(command, player) {
