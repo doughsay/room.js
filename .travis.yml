@@ -1,0 +1,12 @@
+sudo: false
+language: node_js
+node_js:
+  - "6.0.0"
+cache:
+  directories:
+    - node_modules
+install:
+  - npm install
+  - ln -s .env.test .env
+
+script: "npm run lint && npm test && npm run cover && npm run coveralls"

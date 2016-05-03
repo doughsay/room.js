@@ -8,7 +8,10 @@
   "scripts": {
     "start": "node --use_strict --harmony src | ./node_modules/.bin/bunyan",
     "console": "node --use_strict --harmony src/console.js",
-    "test": "node --use_strict --harmony ./node_modules/.bin/tape 'test/**/*.js' | ./node_modules/.bin/faucet"
+    "lint": "eslint src",
+    "test": "node --use_strict --harmony ./node_modules/.bin/tape 'test/**/*.js' | ./node_modules/.bin/faucet",
+    "cover": "node --use_strict --harmony ./node_modules/.bin/istanbul cover ./node_modules/.bin/tape -- 'test/**/*.js' > /dev/null",
+    "coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
   },
   "main": "src/index.js",
   "license": "MIT",
@@ -28,9 +31,11 @@
     "socket.io": "^1.4.5"
   },
   "devDependencies": {
+    "coveralls": "^2.11.9",
     "eslint": "^2.8.0",
     "eslint-config-airbnb": "^7.0.0",
     "faucet": "0.0.1",
+    "istanbul": "^0.4.3",
     "tape": "^4.5.1"
   }
 }

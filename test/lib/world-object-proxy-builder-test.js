@@ -54,6 +54,10 @@ function mockedDbFactory() {
     all() {
       return [baseTarget, roomTarget, barTarget, bazTarget, fooTarget];
     },
+
+    on() {},
+
+    markObjectDirty() {},
   };
 }
 
@@ -61,7 +65,7 @@ function setup() {
   const db = mockedDbFactory();
   const world = new World(db, new Map());
   const WorldObject = (new WorldObjectClassBuilder(db, world, new Map())).buildClass();
-  const builder = new WorldObjectProxyBuilder(mockedDbFactory(), world, WorldObject);
+  const builder = new WorldObjectProxyBuilder(db, world, WorldObject);
   db.all().forEach(target => { world[target.id] = builder.build(target); });
   return [world, db];
 }

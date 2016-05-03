@@ -75,6 +75,9 @@ function verbMatchesCommand(verb, command, objects, self) {
       if (objects.dobj !== self) {
         return false;
       }
+      break;
+    default:
+      break;
   }
   switch (verb.iobjarg) {
     case 'none':
@@ -86,6 +89,9 @@ function verbMatchesCommand(verb, command, objects, self) {
       if (objects.iobj !== self) {
         return false;
       }
+      break;
+    default:
+      break;
   }
   switch (verb.preparg) {
     case 'none':

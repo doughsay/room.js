@@ -32,8 +32,8 @@ class PlayerController extends BaseChildController {
   onDisconnect() {
     this.world.runHook('system', 'onPlayerDisconnected', this.playerId);
     this.controllerMap.delete(this.playerId);
-    this.playerId = null;
     this.logger.info('player disconnected');
+    this.playerId = null;
   }
 
   onQuit(player) {
