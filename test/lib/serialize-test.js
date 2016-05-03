@@ -125,4 +125,64 @@ test('serialize a complex object', t => {
   t.end();
 });
 
-// TODO: serialize functions
+test('serialize a world object', t => {
+  const value = { __proxy__: true, id: 'foo' };
+  const expected = { ref: 'foo' };
+  const actual = serialize(value);
+
+  t.deepEqual(actual, expected);
+  t.end();
+});
+
+test('serialize an unsupported object', t => {
+  const value = new Map();
+  t.throws(() => { serialize(value); }, /Unable to serialize object/);
+  t.end();
+});
+
+test('serialize a function', t => {
+  const value = function foo() { return 'foo'; };
+  const expected = { function: true, source: "function foo() { return 'foo'; }" };
+  const actual = serialize(value);
+
+  t.deepEqual(actual, expected);
+  t.end();
+});
+
+test('serialize a function that has a source attribute', t => {
+  const value = function foo() { return 'foo'; };
+  value.source = "function bar() { return 'bar'; }";
+  const expected = { function: true, source: value.source };
+  const actual = serialize(value);
+
+  t.deepEqual(actual, expected);
+  t.end();
+});
+
+test('serialize a verb', t => {
+  const value = function foo() { return 'foo'; };
+  value.verb = true;
+  value.pattern = 'f*oo';
+  value.source = "function foo() { return 'foo'; }";
+  value.dobjarg = 'this';
+  value.preparg = 'none';
+  value.iobjarg = 'none';
+  const expected = {
+    verb: true,
+    pattern: value.pattern,
+    source: value.source,
+    dobjarg: value.dobjarg,
+    preparg: value.preparg,
+    iobjarg: value.iobjarg,
+  };
+  const actual = serialize(value);
+
+  t.deepEqual(actual, expected);
+  t.end();
+});
+
+test('serialize an unsupported object', t => {
+  const value = Symbol('foo');
+  t.throws(() => { serialize(value); }, /Unable to serialize value/);
+  t.end();
+});

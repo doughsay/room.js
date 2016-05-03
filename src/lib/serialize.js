@@ -18,7 +18,7 @@ function serializeObject(object) {
     return { array: object.map(serialize) }; // eslint-disable-line no-use-before-define
   } else if (object.__proxy__) {
     return { ref: object.id };
-  } else if (Object.prototype.toString.call({}) === '[object Object]') {
+  } else if (typeof object.toString === 'function' && object.toString() === '[object Object]') {
     const serializedObject = {};
     for (const key in object) { // eslint-disable-line guard-for-in
       serializedObject[key] = serialize(object[key]); // eslint-disable-line no-use-before-define
@@ -49,7 +49,7 @@ function serialize(value) {
   if (type === 'undefined') { return { undefined: true }; }
   if (type === 'object') { return serializeObject(value); }
   if (type === 'function') { return serializeFunction(value); }
-  throw new Error(`Unable to serialize value: ${value}`);
+  throw new Error('Unable to serialize value');
 }
 
 module.exports = serialize;
