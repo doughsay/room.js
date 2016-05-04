@@ -21,6 +21,11 @@ class FsDb {
     this.logger.info({ loadTime }, 'fsdb loaded');
   }
 
+  close() {
+    this.removeAllListeners();
+    this.watcher.close();
+  }
+
   load(dir = this.directory) {
     fs.readdirSync(dir).forEach(file => {
       const filepath = path.join(dir, file);
@@ -47,6 +52,7 @@ class FsDb {
         .on('add', this.onFileAdded.bind(this))
         .on('change', this.onFileChanged.bind(this))
         .on('unlink', this.onFileRemoved.bind(this));
+      this.emit('ready');
     });
   }
 

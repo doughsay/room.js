@@ -29,8 +29,6 @@
 // substrings (using word boundaries) must precede them.
 // e.g. 'on top of' comes before 'on', but 'onto' doesn't have to precede 'on'.
 
-// translated from coffeescript, so it might be a little weird.
-
 const prepositions = [
   'with', 'using',
   'at', 'to',
@@ -63,19 +61,13 @@ function chomp(s) {
 
 function parsePreposition(text) {
   const search = text.match(prepex);
-
-  if (search === null) {
-    return [false];
-  }
+  if (search === null) { return [false]; }
 
   const prepstr = search[0];
   const i = search.index;
   const dobjstr = i === 0 ? void 0 : text.slice(0, i - 1);
   let iobjstr = text.slice(i + prepstr.length + 1);
-
-  if (iobjstr === '') {
-    iobjstr = void 0;
-  }
+  if (iobjstr === '') { iobjstr = void 0; }
 
   return [true, [dobjstr, prepstr, iobjstr]];
 }

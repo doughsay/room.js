@@ -1,6 +1,5 @@
 const C3 = require('./c3');
 const serialize = require('./serialize');
-const Deserializer = require('./deserializer');
 
 function linearize(target, db, linearization = new C3(target)) {
   target.traitIds.forEach(traitId => {
@@ -29,7 +28,7 @@ class Handler {
   constructor(db, world, WorldObject) {
     this.db = db;
     this.world = world;
-    this.deserializer = new Deserializer(world);
+    this.deserializer = world.deserializer;
     this.worldObject = new WorldObject();
   }
 

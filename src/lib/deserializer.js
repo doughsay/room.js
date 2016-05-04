@@ -15,6 +15,9 @@ class Deserializer {
   }
 
   deserialize(object) {
+    if (typeof object !== 'object' || !object) {
+      throw new Error(`Unable to deserialize value: ${object}`);
+    }
     if ('value' in object) { return object.value; }
     if ('NaN' in object) { return NaN; }
     if ('undefined' in object) { return void 0; }

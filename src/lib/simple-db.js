@@ -50,6 +50,12 @@ class SimpleDB {
   all() {
     return Object.keys(this._db).map(id => this._db[id]);
   }
+
+  clear() {
+    this.all().forEach(obj => {
+      this.remove(obj);
+    });
+  }
 }
 
 module.exports = SimpleDB;

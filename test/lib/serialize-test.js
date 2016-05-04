@@ -1,7 +1,7 @@
 const test = require('tape');
 const serialize = require('../../src/lib/serialize');
 
-test('serialize a string', t => {
+test('serialize: a string', t => {
   const value = 'foo';
   const expected = { value: 'foo' };
   const actual = serialize(value);
@@ -10,7 +10,7 @@ test('serialize a string', t => {
   t.end();
 });
 
-test('serialize a number', t => {
+test('serialize: a number', t => {
   const value = 3.14159;
   const expected = { value: 3.14159 };
   const actual = serialize(value);
@@ -19,7 +19,7 @@ test('serialize a number', t => {
   t.end();
 });
 
-test('serialize not a number', t => {
+test('serialize: not a number', t => {
   const value = NaN;
   const expected = { NaN: true };
   const actual = serialize(value);
@@ -28,7 +28,7 @@ test('serialize not a number', t => {
   t.end();
 });
 
-test('serialize true', t => {
+test('serialize: true', t => {
   const value = true;
   const expected = { value: true };
   const actual = serialize(value);
@@ -37,7 +37,7 @@ test('serialize true', t => {
   t.end();
 });
 
-test('serialize false', t => {
+test('serialize: false', t => {
   const value = false;
   const expected = { value: false };
   const actual = serialize(value);
@@ -46,7 +46,7 @@ test('serialize false', t => {
   t.end();
 });
 
-test('serialize a date', t => {
+test('serialize: a date', t => {
   const value = new Date(Date.UTC(2016, 0));
   const expected = { date: '2016-01-01T00:00:00.000Z' };
   const actual = serialize(value);
@@ -55,7 +55,7 @@ test('serialize a date', t => {
   t.end();
 });
 
-test('serialize a regular expression', t => {
+test('serialize: a regular expression', t => {
   const value = /foo|bar/gi;
   const expected = { regexp: 'foo|bar', flags: 'gi' };
   const actual = serialize(value);
@@ -64,7 +64,7 @@ test('serialize a regular expression', t => {
   t.end();
 });
 
-test('serialize undefined', t => {
+test('serialize: undefined', t => {
   const value = void 0;
   const expected = { undefined: true };
   const actual = serialize(value);
@@ -73,7 +73,7 @@ test('serialize undefined', t => {
   t.end();
 });
 
-test('serialize null', t => {
+test('serialize: null', t => {
   const value = null;
   const expected = { object: null };
   const actual = serialize(value);
@@ -82,7 +82,7 @@ test('serialize null', t => {
   t.end();
 });
 
-test('serialize a simple object', t => {
+test('serialize: a simple object', t => {
   const value = { foo: 'bar' };
   const expected = { object: { foo: { value: 'bar' } } };
   const actual = serialize(value);
@@ -91,7 +91,7 @@ test('serialize a simple object', t => {
   t.end();
 });
 
-test('serialize a simple array', t => {
+test('serialize: a simple array', t => {
   const value = [1, 'two'];
   const expected = { array: [{ value: 1 }, { value: 'two' }] };
   const actual = serialize(value);
@@ -100,7 +100,7 @@ test('serialize a simple array', t => {
   t.end();
 });
 
-test('serialize a complex object', t => {
+test('serialize: a complex object', t => {
   const value = {
     s: 's', n: 2, r: /r/, nl: null, u: void 0, o: { x: 'y', z: null }, a: [1, 't', { r: /r/ }],
   };
@@ -125,7 +125,7 @@ test('serialize a complex object', t => {
   t.end();
 });
 
-test('serialize a world object', t => {
+test('serialize: a world object', t => {
   const value = { __proxy__: true, id: 'foo' };
   const expected = { ref: 'foo' };
   const actual = serialize(value);
@@ -134,13 +134,13 @@ test('serialize a world object', t => {
   t.end();
 });
 
-test('serialize an unsupported object', t => {
+test('serialize: an unsupported object', t => {
   const value = new Map();
   t.throws(() => { serialize(value); }, /Unable to serialize object/);
   t.end();
 });
 
-test('serialize a function', t => {
+test('serialize: a function', t => {
   const value = function foo() { return 'foo'; };
   const expected = { function: true, source: "function foo() { return 'foo'; }" };
   const actual = serialize(value);
@@ -149,7 +149,7 @@ test('serialize a function', t => {
   t.end();
 });
 
-test('serialize a function that has a source attribute', t => {
+test('serialize: a function that has a source attribute', t => {
   const value = function foo() { return 'foo'; };
   value.source = "function bar() { return 'bar'; }";
   const expected = { function: true, source: value.source };
@@ -159,7 +159,7 @@ test('serialize a function that has a source attribute', t => {
   t.end();
 });
 
-test('serialize a verb', t => {
+test('serialize: a verb', t => {
   const value = function foo() { return 'foo'; };
   value.verb = true;
   value.pattern = 'f*oo';
@@ -181,7 +181,7 @@ test('serialize a verb', t => {
   t.end();
 });
 
-test('serialize an unsupported object', t => {
+test('serialize: an unsupported object', t => {
   const value = Symbol('foo');
   t.throws(() => { serialize(value); }, /Unable to serialize value/);
   t.end();

@@ -3,32 +3,23 @@ const vm = require('vm');
 const WorldObjectClassBuilder = require('./world-object-class-builder');
 const WorldObjectProxyBuilder = require('./world-object-proxy-builder');
 const idify = require('./idify');
-const parse = require('./parse');
-const { color } = require('./colors');
-const logger = require('../config/logger');
 const Deserializer = require('./deserializer');
+const Context = require('./context');
 
 class World {
-  constructor(db, controllerMap) {
+  constructor(logger, db, controllerMap) {
+    this.logger = logger;
     this.db = db;
     this.objects = {};
+    this.deserializer = new Deserializer(this);
     const WorldObject = (new WorldObjectClassBuilder(db, this, controllerMap)).buildClass();
     this.builder = new WorldObjectProxyBuilder(db, this, WorldObject);
-    this.deserializer = new Deserializer(this);
 
     db.all().forEach(object => {
       this.objects[object.id] = this.builder.build(object);
     });
 
-    this.context = vm.createContext(this.objects);
-    this.context.parse = parse;
-    this.context.color = color;
-    this.context.all = () => this.all();
-    this.context.players = () => this.players();
-    this.context.$ = id => this.get(id);
-    this.context.nextId = raw => this.nextId(raw);
-
-    this.context.Verb = (...args) => this.newVerb(...args);
+    this.context = new Context(this);
 
     this.setupWatchers();
   }
@@ -115,7 +106,7 @@ class World {
         });
         return [true, retval];
       } catch (err) {
-        logger.warn({ err: bunyan.stdSerializers.err(err) }, 'error running hook');
+        this.logger.warn({ err: bunyan.stdSerializers.err(err) }, 'error running hook');
         return [false];
       }
     }

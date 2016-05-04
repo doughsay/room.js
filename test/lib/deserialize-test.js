@@ -1,8 +1,11 @@
 const test = require('tape');
 const Deserializer = require('../../src/lib/deserializer');
-const deserializer = new Deserializer({});
+const mockedWorld = {
+  get(id) { return { id }; },
+};
+const deserializer = new Deserializer(mockedWorld);
 
-test('deserialize a string', t => {
+test('Deserializer: deserializes a string', t => {
   const value = { value: 'foo' };
   const expected = 'foo';
   const actual = deserializer.deserialize(value);
@@ -11,7 +14,7 @@ test('deserialize a string', t => {
   t.end();
 });
 
-test('deserialize a number', t => {
+test('Deserializer: deserializes a number', t => {
   const value = { value: 3.14159 };
   const expected = 3.14159;
   const actual = deserializer.deserialize(value);
@@ -20,7 +23,7 @@ test('deserialize a number', t => {
   t.end();
 });
 
-test('deserialize not a number', t => {
+test('Deserializer: deserializes not a number', t => {
   const value = { NaN: true };
   const actual = deserializer.deserialize(value);
 
@@ -28,7 +31,7 @@ test('deserialize not a number', t => {
   t.end();
 });
 
-test('deserialize true', t => {
+test('Deserializer: deserializes true', t => {
   const value = { value: true };
   const expected = true;
   const actual = deserializer.deserialize(value);
@@ -37,7 +40,7 @@ test('deserialize true', t => {
   t.end();
 });
 
-test('deserialize false', t => {
+test('Deserializer: deserializes false', t => {
   const value = { value: false };
   const expected = false;
   const actual = deserializer.deserialize(value);
@@ -46,7 +49,7 @@ test('deserialize false', t => {
   t.end();
 });
 
-test('deserialize a date', t => {
+test('Deserializer: deserializes a date', t => {
   const value = { date: '2016-01-01T00:00:00.000Z' };
   const expected = new Date(Date.UTC(2016, 0));
   const actual = deserializer.deserialize(value);
@@ -55,7 +58,7 @@ test('deserialize a date', t => {
   t.end();
 });
 
-test('deserialize a regular expression', t => {
+test('Deserializer: deserializes a regular expression', t => {
   const value = { regexp: 'foo|bar', flags: 'gi' };
   const expected = /foo|bar/gi;
   const actual = deserializer.deserialize(value);
@@ -65,7 +68,7 @@ test('deserialize a regular expression', t => {
   t.end();
 });
 
-test('deserialize undefined', t => {
+test('Deserializer: deserializes undefined', t => {
   const value = { undefined: true };
   const expected = void 0;
   const actual = deserializer.deserialize(value);
@@ -74,7 +77,7 @@ test('deserialize undefined', t => {
   t.end();
 });
 
-test('deserialize null', t => {
+test('Deserializer: deserializes null', t => {
   const value = { object: null };
   const expected = null;
   const actual = deserializer.deserialize(value);
@@ -83,7 +86,7 @@ test('deserialize null', t => {
   t.end();
 });
 
-test('deserialize a simple object', t => {
+test('Deserializer: deserializes a simple object', t => {
   const value = { object: { foo: { value: 'bar' } } };
   const expected = { foo: 'bar' };
   const actual = deserializer.deserialize(value);
@@ -92,7 +95,7 @@ test('deserialize a simple object', t => {
   t.end();
 });
 
-test('deserialize a simple array', t => {
+test('Deserializer: deserializes a simple array', t => {
   const value = { array: [{ value: 1 }, { value: 'two' }] };
   const expected = [1, 'two'];
   const actual = deserializer.deserialize(value);
@@ -101,7 +104,7 @@ test('deserialize a simple array', t => {
   t.end();
 });
 
-test('deserialize a complex object', t => {
+test('Deserializer: deserializes a complex object', t => {
   const value = {
     object: {
       s: { value: 's' },
@@ -125,4 +128,63 @@ test('deserialize a complex object', t => {
   t.end();
 });
 
-// TODO: deserialize functions
+test('Deserializer: deserializes a world object reference', t => {
+  const value = { ref: 'foo' };
+  const expected = { id: 'foo' };
+  const actual = deserializer.deserialize(value);
+
+  t.deepEqual(actual, expected);
+  t.end();
+});
+
+test('Deserializer: deserializes a function', t => {
+  const value = { function: true, source: 'function foo() { return "foo"; }' };
+  const fn = deserializer.deserialize(value);
+
+  t.equal(typeof fn, 'function');
+  t.equal(fn.function, true);
+  t.equal(fn.source, 'function foo() { return "foo"; }');
+  t.end();
+});
+
+test('Deserializer: deserializes a verb', t => {
+  const value = {
+    verb: true,
+    pattern: 'f*oo',
+    source: "function foo() { return 'foo'; }",
+    dobjarg: 'this',
+    preparg: 'none',
+    iobjarg: 'none',
+  };
+  const fn = deserializer.deserialize(value);
+
+  t.equal(typeof fn, 'function');
+  t.equal(fn.verb, true);
+  t.equal(fn.pattern, value.pattern);
+  t.equal(fn.source, value.source);
+  t.equal(fn.dobjarg, value.dobjarg);
+  t.equal(fn.preparg, value.preparg);
+  t.equal(fn.iobjarg, value.iobjarg);
+  t.end();
+});
+
+test('Deserializer: deserializes invalid object', t => {
+  const value = { invalid: true };
+
+  t.throws(() => { deserializer.deserialize(value); }, /Unable to deserialize object/);
+  t.end();
+});
+
+test('Deserializer: deserializes null', t => {
+  const value = null;
+
+  t.throws(() => { deserializer.deserialize(value); }, /Unable to deserialize value/);
+  t.end();
+});
+
+test('Deserializer: deserializes invalid value', t => {
+  const value = 'foo';
+
+  t.throws(() => { deserializer.deserialize(value); }, /Unable to deserialize value/);
+  t.end();
+});

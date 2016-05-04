@@ -24,10 +24,16 @@ class MooDB {
     this.logger.info({ loadTime }, 'moo-db loaded');
   }
 
+  close() {
+    this.removeAllListeners();
+    this.fsdb.close();
+  }
+
   setupListeners() {
     this.fsdb.on('added', this.onFileAddedOrChanged.bind(this));
     this.fsdb.on('changed', this.onFileAddedOrChanged.bind(this));
     this.fsdb.on('removed', this.onFileRemoved.bind(this));
+    this.fsdb.on('ready', () => { this.emit('ready'); });
   }
 
   load() {
@@ -232,6 +238,12 @@ class MooDB {
 
   playerIds() {
     return [...this.db.values()].filter(object => !!object.userId).map(o => o.id);
+  }
+
+  clear() {
+    this.ids().forEach(id => {
+      this.removeById(id);
+    });
   }
 }
 util.inherits(MooDB, EventEmitter);

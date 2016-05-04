@@ -1,146 +1,91 @@
 const test = require('tape');
-const serialize = require('../../src/lib/serialize');
 const World = require('../../src/lib/world');
-const WorldObjectProxyBuilder = require('../../src/lib/world-object-proxy-builder');
-const WorldObjectClassBuilder = require('../../src/lib/world-object-class-builder');
+const mockDb = require('../helpers/mock-db');
 
-function targetFactory(id, traitIds, properties) {
-  const serializedProperties = {};
-  for (const key in properties) { // eslint-disable-line guard-for-in
-    serializedProperties[key] = serialize(properties[key]);
-  }
-
-  const locationId = id === 'room' ? null : 'room';
-
+function loggerFactory() {
   return {
-    id,
-    name: id,
-    aliases: [],
-    traitIds,
-    locationId,
-    userId: null,
-    properties: serializedProperties,
-  };
-}
-
-function mockedDbFactory() {
-  const baseTarget = targetFactory('base', [], { base: 'base' });
-  const roomTarget = targetFactory('room', ['base'], {});
-  const barTarget = targetFactory('bar', ['base'], { bar: 'bar', shared: 'from-bar' });
-  const bazTarget = targetFactory('baz', ['base'], { baz: 'baz', shared: 'from-baz' });
-  const fooTarget = targetFactory('foo', ['bar', 'baz'], { foo: 'foo' });
-
-  return {
-    findById(id) {
-      if (id === 'base') {
-        return baseTarget;
-      } else if (id === 'bar') {
-        return barTarget;
-      } else if (id === 'baz') {
-        return bazTarget;
-      } else if (id === 'foo') {
-        return fooTarget;
-      } else if (id === 'room') {
-        return roomTarget;
-      }
-      return void 0;
-    },
-
-    findBy(field, value) {
-      return [baseTarget, roomTarget, barTarget, bazTarget, fooTarget]
-        .filter(object => object[field] === value);
-    },
-
-    all() {
-      return [baseTarget, roomTarget, barTarget, bazTarget, fooTarget];
-    },
-
-    on() {},
-
-    markObjectDirty() {},
+    child() { return this; },
+    debug() {},
   };
 }
 
 function setup() {
-  const db = mockedDbFactory();
-  const world = new World(db, new Map());
-  const WorldObject = (new WorldObjectClassBuilder(db, world, new Map())).buildClass();
-  const builder = new WorldObjectProxyBuilder(db, world, WorldObject);
-  db.all().forEach(target => { world[target.id] = builder.build(target); });
-  return [world, db];
+  const db = mockDb();
+  const world = new World(loggerFactory(), db, new Map());
+  return [world.objects, db];
 }
 
-test('has property `foo`', t => {
+test('WorldObjectProxyBuilder: has property `foo`', t => {
   const [{ foo }] = setup();
 
   t.equal(foo.foo, 'foo');
   t.end();
 });
 
-test('has own property `foo`', t => {
+test('WorldObjectProxyBuilder: has own property `foo`', t => {
   const [{ foo }] = setup();
 
   t.true(foo.hasOwnProperty('foo'));
   t.end();
 });
 
-test('has property `bar`', t => {
+test('WorldObjectProxyBuilder: has property `bar`', t => {
   const [{ foo }] = setup();
 
   t.equal(foo.bar, 'bar');
   t.end();
 });
 
-test('does not have own property `bar`', t => {
+test('WorldObjectProxyBuilder: does not have own property `bar`', t => {
   const [{ foo }] = setup();
 
   t.false(foo.hasOwnProperty('bar'));
   t.end();
 });
 
-test('has property `baz`', t => {
+test('WorldObjectProxyBuilder: has property `baz`', t => {
   const [{ foo }] = setup();
 
   t.equal(foo.baz, 'baz');
   t.end();
 });
 
-test('does not have own property `baz`', t => {
+test('WorldObjectProxyBuilder: does not have own property `baz`', t => {
   const [{ foo }] = setup();
 
   t.false(foo.hasOwnProperty('bar'));
   t.end();
 });
 
-test('inherits property `shared` from bar', t => {
+test('WorldObjectProxyBuilder: inherits property `shared` from bar', t => {
   const [{ foo }] = setup();
 
   t.equal(foo.shared, 'from-bar');
   t.end();
 });
 
-test('does not have own property `shared`', t => {
+test('WorldObjectProxyBuilder: does not have own property `shared`', t => {
   const [{ foo }] = setup();
 
   t.false(foo.hasOwnProperty('shared'));
   t.end();
 });
 
-test('has property `base`', t => {
+test('WorldObjectProxyBuilder: has property `base`', t => {
   const [{ foo }] = setup();
 
   t.equal(foo.base, 'base');
   t.end();
 });
 
-test('does not have own property `base`', t => {
+test('WorldObjectProxyBuilder: does not have own property `base`', t => {
   const [{ foo }] = setup();
 
   t.false(foo.hasOwnProperty('base'));
   t.end();
 });
 
-test('set new property', t => {
+test('WorldObjectProxyBuilder: set new property', t => {
   const [{ foo }] = setup();
 
   foo.prop = 'new prop';
@@ -148,7 +93,16 @@ test('set new property', t => {
   t.end();
 });
 
-test('override inherited property', t => {
+test('WorldObjectProxyBuilder: delete property', t => {
+  const [{ foo }] = setup();
+
+  foo.prop = 'new prop';
+  delete foo.prop;
+  t.equal(foo.prop, void 0);
+  t.end();
+});
+
+test('WorldObjectProxyBuilder: override inherited property', t => {
   const [{ foo }] = setup();
 
   foo.base = 'overridden';
@@ -156,7 +110,7 @@ test('override inherited property', t => {
   t.end();
 });
 
-test('deserialize values from the properties hash on get', t => {
+test('WorldObjectProxyBuilder: deserialize values from the properties hash on get', t => {
   const [{ foo }, db] = setup();
 
   t.deepEqual(db.findById('foo').properties.foo, { value: 'foo' });
@@ -164,7 +118,7 @@ test('deserialize values from the properties hash on get', t => {
   t.end();
 });
 
-test('serialize values to the properties hash on set', t => {
+test('WorldObjectProxyBuilder: serialize values to the properties hash on set', t => {
   const [{ foo }, db] = setup();
 
   foo.prop = 'new-prop';
@@ -172,14 +126,14 @@ test('serialize values to the properties hash on set', t => {
   t.end();
 });
 
-test('get id', t => {
+test('WorldObjectProxyBuilder: get id', t => {
   const [{ foo }] = setup();
 
   t.equal(foo.id, 'foo');
   t.end();
 });
 
-test('set id', t => {
+test('WorldObjectProxyBuilder: set id', t => {
   const [{ foo }] = setup();
 
   foo.id = 'nope';
@@ -187,14 +141,14 @@ test('set id', t => {
   t.end();
 });
 
-test('get name', t => {
+test('WorldObjectProxyBuilder: get name', t => {
   const [{ foo }] = setup();
 
   t.equal(foo.name, 'foo');
   t.end();
 });
 
-test('set name', t => {
+test('WorldObjectProxyBuilder: set name', t => {
   const [{ foo }] = setup();
 
   foo.name = 'new name';
@@ -202,7 +156,7 @@ test('set name', t => {
   t.end();
 });
 
-test('set name coerces to string', t => {
+test('WorldObjectProxyBuilder: set name coerces to string', t => {
   const [{ foo }] = setup();
 
   foo.name = /new name/gi;
@@ -210,14 +164,14 @@ test('set name coerces to string', t => {
   t.end();
 });
 
-test('get aliases', t => {
+test('WorldObjectProxyBuilder: get aliases', t => {
   const [{ foo }] = setup();
 
   t.deepEqual(foo.aliases, []);
   t.end();
 });
 
-test('set aliases', t => {
+test('WorldObjectProxyBuilder: set aliases', t => {
   const [{ foo }] = setup();
 
   foo.aliases = ['some', 'thing'];
@@ -225,7 +179,7 @@ test('set aliases', t => {
   t.end();
 });
 
-test('set aliases coerces to array of strings', t => {
+test('WorldObjectProxyBuilder: set aliases coerces to array of strings', t => {
   const [{ foo }] = setup();
 
   foo.aliases = [1, 'two', /three/i, {}];
@@ -233,14 +187,22 @@ test('set aliases coerces to array of strings', t => {
   t.end();
 });
 
-test('get userId', t => {
+test('WorldObjectProxyBuilder: set aliases coerces single value to array', t => {
+  const [{ foo }] = setup();
+
+  foo.aliases = 'alias';
+  t.deepEqual(foo.aliases, ['alias']);
+  t.end();
+});
+
+test('WorldObjectProxyBuilder: get userId', t => {
   const [{ foo }] = setup();
 
   t.equal(foo.userId, null);
   t.end();
 });
 
-test('set userId', t => {
+test('WorldObjectProxyBuilder: set userId', t => {
   const [{ foo }] = setup();
 
   foo.userId = 'nope';
@@ -248,14 +210,14 @@ test('set userId', t => {
   t.end();
 });
 
-// test('get location', t => {
-//   const [{ foo, room }] = setup();
-//
-//   t.equal(foo.location, room);
-//   t.end();
-// });
+test('WorldObjectProxyBuilder: get location', t => {
+  const [{ foo }] = setup();
 
-test('set location to null', t => {
+  t.equal(foo.location.id, 'room');
+  t.end();
+});
+
+test('WorldObjectProxyBuilder: set location to null', t => {
   const [{ foo }] = setup();
 
   foo.location = null;
@@ -263,7 +225,7 @@ test('set location to null', t => {
   t.end();
 });
 
-test('set location to undefined', t => {
+test('WorldObjectProxyBuilder: set location to undefined', t => {
   const [{ foo }] = setup();
 
   foo.location = void 0;
@@ -271,22 +233,22 @@ test('set location to undefined', t => {
   t.end();
 });
 
-// test('set location to another object', t => {
-//   const [{ foo, bar }] = setup();
-//
-//   foo.location = bar;
-//   t.equal(foo.location, bar);
-//   t.end();
-// });
+test('WorldObjectProxyBuilder: set location to another object', t => {
+  const [{ foo, bar }] = setup();
 
-test('get traits', t => {
+  foo.location = bar;
+  t.equal(foo.location.id, 'bar');
+  t.end();
+});
+
+test('WorldObjectProxyBuilder: get traits', t => {
   const [{ foo, bar, baz }] = setup();
 
   t.deepEqual(foo.traits, [bar, baz]);
   t.end();
 });
 
-test('set traits to empty array', t => {
+test('WorldObjectProxyBuilder: set traits to empty array', t => {
   const [{ foo }] = setup();
 
   foo.traits = [];
@@ -294,10 +256,82 @@ test('set traits to empty array', t => {
   t.end();
 });
 
-test('set traits to new array of traits', t => {
+test('WorldObjectProxyBuilder: set traits to new array of traits', t => {
   const [{ foo, base }] = setup();
 
   foo.traits = [base];
   t.deepEqual(foo.traits, [base]);
+  t.end();
+});
+
+test('WorldObjectProxyBuilder: responds to "in" operator for own properties', t => {
+  const [{ foo }] = setup();
+
+  t.equal('foo' in foo, true);
+  t.end();
+});
+
+test('WorldObjectProxyBuilder: responds to "in" operator for inherited properties', t => {
+  const [{ foo }] = setup();
+
+  t.equal('bar' in foo, true);
+  t.end();
+});
+
+test('WorldObjectProxyBuilder: responds to "in" operator for non-existent properties', t => {
+  const [{ foo }] = setup();
+
+  t.equal('nope' in foo, false);
+  t.end();
+});
+
+test('WorldObjectProxyBuilder: responds to "in" operator for built-in properties', t => {
+  const [{ foo }] = setup();
+
+  t.equal('id' in foo, true);
+  t.end();
+});
+
+test('WorldObjectProxyBuilder: responds to "in" operator for virtual properties', t => {
+  const [{ foo }] = setup();
+
+  t.equal('contents' in foo, true);
+  t.end();
+});
+
+test('WorldObjectProxyBuilder: responds to "in" operator for world-object properties', t => {
+  const [{ foo }] = setup();
+
+  t.equal('new' in foo, true);
+  t.end();
+});
+
+test('WorldObjectProxyBuilder: get __proxy__', t => {
+  const [{ foo }] = setup();
+
+  t.equal(foo.__proxy__, true);
+  t.end();
+});
+
+test('WorldObjectProxyBuilder: set world-object property', t => {
+  const [{ foo }] = setup();
+
+  foo.new = 'nope';
+  t.equal(typeof foo.new, 'function');
+  t.end();
+});
+
+test('WorldObjectProxyBuilder: get contents', t => {
+  const [{ room }] = setup();
+  const ids = ['base', 'bar', 'baz', 'foo'];
+
+  t.deepEqual(room.contents.map(o => o.id), ids);
+  t.end();
+});
+
+test('WorldObjectProxyBuilder: get "player"', t => {
+  const [{ foo }] = setup();
+
+  t.equal(foo.player, false);
   t.end();
 });

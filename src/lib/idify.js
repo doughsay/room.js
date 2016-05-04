@@ -9,7 +9,9 @@ function classify(str) {
 }
 
 function idify(str) {
+  if (!str) { return ''; }
   const output = classify(str);
+  if (!output[0]) { return ''; }
   return output[0].toLowerCase() + output.slice(1);
 }
 

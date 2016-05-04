@@ -52,10 +52,6 @@ function print(x, maxdepth, depth = 0, prefix = '', parents = []) {
           return c.red(x.toString());
         }
 
-        if (x.constructor.name === 'JobProxy') {
-          return c.bold.yellow(x.toString());
-        }
-
         if (parents.indexOf(x) >= 0) {
           return c.black.bgYellow('[CircularReference]');
         }
@@ -103,7 +99,7 @@ function print(x, maxdepth, depth = 0, prefix = '', parents = []) {
         parents.pop(); return xs.map(y => y.join('')).join(',\n');
       }
       default: {
-        throw new Error('Unexpected case in print.');
+        throw new Error('print error: unsupported object');
       }
     }
   })();

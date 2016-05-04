@@ -11,3 +11,5 @@ module.exports.version = pkg.version;
 module.exports.port = loadIntegerFromEnv('PORT');
 module.exports.logLevel = loadFromEnv('LOG_LEVEL');
 module.exports.maintenance = loadBooleanFromEnv('MAINTENANCE_MODE');
+module.exports.userDbFile = loadFromEnv('USER_DB_FILE');
+module.exports.worldDirectory = loadFromEnv('WORLD_DIRECTORY');

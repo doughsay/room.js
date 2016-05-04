@@ -1,3 +1,5 @@
+// Adapted to ES6 class from https://github.com/silas/node-c3
+
 module.exports = class C3 {
   constructor(object) {
     this.object = object;
