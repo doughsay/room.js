@@ -7,4 +7,4 @@ Room.js
 Demo
 ====
 
-http://crazyjustin.com/room.js/
+http://roomjs.tk/
