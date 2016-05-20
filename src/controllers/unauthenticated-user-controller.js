@@ -64,7 +64,7 @@ class UnauthenticatedUserController extends BaseChildController {
 
         this.userDb.insert(newUser);
         this.user = newUser;
-        this.emit('logged-in', username);
+        this.emit('login', username);
 
         this.logger.info({ user: this.user.id }, 'user created');
 
@@ -109,7 +109,7 @@ class UnauthenticatedUserController extends BaseChildController {
           `Type ${boldMagenta('help')} for a list of available commands.`,
         ].join('\n'));
         this.emit('set-prompt', username);
-        this.emit('logged-in', username);
+        this.emit('login', username);
         this.user = user;
 
         this.logger.info({ user: user.id }, 'user logged in');
