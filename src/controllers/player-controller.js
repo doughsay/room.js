@@ -40,6 +40,7 @@ class PlayerController extends BaseChildController {
     this.world.runHook('system', 'onPlayerDisconnected', player.id);
     this.emit('set-prompt', this.user.id);
     this.emit('output', 'Bye!');
+    this.emit('quit');
     this.controllerMap.delete(player.id);
     this.logger.info('player quit');
     this.playerId = null;

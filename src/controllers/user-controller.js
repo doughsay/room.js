@@ -33,6 +33,7 @@ class UserController extends BaseChildController {
   onLogout() {
     this.emit('output', 'Bye!');
     this.emit('set-prompt', '');
+    this.emit('logout');
     this.logger.info('user logged out');
     this.user = null;
   }
@@ -130,6 +131,7 @@ class UserController extends BaseChildController {
     this.logoutOtherInstance(player);
     this.emit('output', `Now playing as ${player.name}`);
     this.emit('set-prompt', player.name);
+    this.emit('playing', player.name);
     this.playerId = playerId;
     this.controllerMap.set(player.id, this.parent);
     this.world.runHook('system', 'onPlayerConnected', player.id);

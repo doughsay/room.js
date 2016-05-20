@@ -1,7 +1,7 @@
 const dotenv = require('dotenv');
 
-const { loadFromEnv, loadIntegerFromEnv, loadBooleanFromEnv } = require('./environment-config');
-const pkg = require('../../package.json');
+const { loadFromEnv, loadIntegerFromEnv, loadBooleanFromEnv } = require('./lib/environment-config');
+const pkg = require('../package.json');
 
 dotenv.config();
 
