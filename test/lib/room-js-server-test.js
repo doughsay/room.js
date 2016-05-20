@@ -147,7 +147,8 @@ stest('RoomJSServer: login', (t, { server, socket, end }) => {
     cb({ username: 'test', password: 'test' });
 
     socket.once('output', (msg) => {
-      const expectedResponse = 'Hi test!'
+      const expectedResponse =
+        'Welcome back test!\nType \x1b[1m\x1b[35mhelp\x1b[39m\x1b[22m for a list of available commands.'
 
       t.equal(msg, expectedResponse);
       end();

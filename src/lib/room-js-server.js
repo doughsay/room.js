@@ -59,7 +59,7 @@ class RoomJSServer {
     this.server.listen(port, err => {
       if (err) { throw err; }
       this.world.runHook('system', 'onServerStarted');
-      this.logger.info({ version, port }, 'started');
+      this.logger.info({ version, port }, 'server started');
     });
   }
 
