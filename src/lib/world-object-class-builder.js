@@ -200,6 +200,10 @@ class WorldObjectClassBuilder {
       }
 
       new(id, props = {}) {
+        // Sanitize - trim and replace slashes
+        id = id.replace(/^\//, '').replace(/\/$/, '').replace(/\//g, '_');
+
+        
         if (id in world.context) {
           throw new TypeError(`Identifier '${id}' has already been declared`);
         }

@@ -12,7 +12,7 @@
     "exits": {
       "object": {
         "down": {
-          "ref": "lounge_room"
+          "ref": "rooms_lounge"
         }
       }
     }
