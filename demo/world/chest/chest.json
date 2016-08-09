@@ -5,7 +5,7 @@
     "item",
     "lib_closeable"
   ],
-  "locationId": "lounge_room",
+  "locationId": "rooms_lounge",
   "properties": {
     "locked": {
       "value": true

@@ -6,7 +6,7 @@
   "traitIds": [
     "item"
   ],
-  "locationId": "lounge_room",
+  "locationId": "rooms_lounge",
   "properties": {
     "keyId": {
       "value": "keypass"

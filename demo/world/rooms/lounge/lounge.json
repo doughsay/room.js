@@ -12,7 +12,7 @@
     "exits": {
       "object": {
         "up": {
-          "ref": "room_start"
+          "ref": "rooms_start"
         }
       }
     }

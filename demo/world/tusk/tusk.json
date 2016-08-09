@@ -4,17 +4,17 @@
   "traitIds": [
     "player"
   ],
-  "locationId": null,
+  "locationId": "rooms_start",
   "userId": "tusk",
   "properties": {
     "programmer": {
       "value": true
     },
     "previousLocation": {
-      "ref": "lounge_room"
+      "object": null
     },
     "mode": {
-      "ref": "playmode"
+      "ref": "evalmode"
     }
   }
 }

@@ -7,7 +7,7 @@
   "traitIds": [
     "liquidcontainer"
   ],
-  "locationId": "lounge_room",
+  "locationId": "rooms_lounge",
   "properties": {
     "containedLiquid": {
       "value": "beer"
