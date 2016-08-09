@@ -1,0 +1,28 @@
+{
+  "name": "liquidcontainer",
+  "aliases": [],
+  "traitIds": [
+    "food"
+  ],
+  "locationId": null,
+  "properties": {
+    "containerObject": {
+      "value": "bottle"
+    },
+    "containedLiquid": {
+      "value": "water"
+    },
+    "doUse": {
+      "function": true,
+      "file": "doUse.js"
+    },
+    "setLiquid": {
+      "function": true,
+      "file": "setLiquid.js"
+    },
+    "canUse": {
+      "function": true,
+      "file": "canUse.js"
+    }
+  }
+}

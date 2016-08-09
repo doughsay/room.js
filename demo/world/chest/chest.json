@@ -1,0 +1,20 @@
+{
+  "name": "chest",
+  "aliases": [],
+  "traitIds": [
+    "item",
+    "lib_closeable"
+  ],
+  "locationId": "lounge_room",
+  "properties": {
+    "locked": {
+      "value": true
+    },
+    "closed": {
+      "value": true
+    },
+    "keepFlag": {
+      "value": false
+    }
+  }
+}

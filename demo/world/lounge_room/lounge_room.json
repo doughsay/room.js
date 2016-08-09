@@ -1,0 +1,20 @@
+{
+  "name": "The Lounge",
+  "aliases": [],
+  "traitIds": [
+    "room"
+  ],
+  "locationId": null,
+  "properties": {
+    "description": {
+      "value": "A cosy place where to rest"
+    },
+    "exits": {
+      "object": {
+        "up": {
+          "ref": "room_start"
+        }
+      }
+    }
+  }
+}

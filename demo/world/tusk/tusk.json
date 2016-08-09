@@ -1,0 +1,20 @@
+{
+  "name": "Tusk",
+  "aliases": [],
+  "traitIds": [
+    "player"
+  ],
+  "locationId": null,
+  "userId": "tusk",
+  "properties": {
+    "programmer": {
+      "value": true
+    },
+    "previousLocation": {
+      "ref": "lounge_room"
+    },
+    "mode": {
+      "ref": "playmode"
+    }
+  }
+}

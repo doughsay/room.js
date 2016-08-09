@@ -1,0 +1,22 @@
+{
+  "name": "flask of beer",
+  "aliases": [
+    "flask",
+    "beer"
+  ],
+  "traitIds": [
+    "liquidcontainer"
+  ],
+  "locationId": "lounge_room",
+  "properties": {
+    "containedLiquid": {
+      "value": "beer"
+    },
+    "finished": {
+      "value": false
+    },
+    "containerObject": {
+      "value": "flask"
+    }
+  }
+}

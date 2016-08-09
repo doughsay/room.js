@@ -1,0 +1,20 @@
+{
+  "name": "The Heaven",
+  "aliases": [],
+  "traitIds": [
+    "room"
+  ],
+  "locationId": null,
+  "properties": {
+    "description": {
+      "value": "Starting Room"
+    },
+    "exits": {
+      "object": {
+        "down": {
+          "ref": "lounge_room"
+        }
+      }
+    }
+  }
+}
