@@ -1,0 +1,10 @@
+{
+  "name": "item",
+  "aliases": [],
+  "traitIds": [
+    "lib_describable",
+    "lib_gettable"
+  ],
+  "locationId": null,
+  "properties": {}
+}

@@ -1,0 +1,15 @@
+{
+  "name": "universal keypass",
+  "aliases": [
+    "keypass"
+  ],
+  "traitIds": [
+    "item"
+  ],
+  "locationId": "lounge_room",
+  "properties": {
+    "keyId": {
+      "value": "keypass"
+    }
+  }
+}

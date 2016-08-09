@@ -1,0 +1,13 @@
+{
+  "name": "Test",
+  "aliases": [],
+  "traitIds": [
+    "tusk"
+  ],
+  "locationId": null,
+  "properties": {
+    "description": {
+      "value": "Here a test"
+    }
+  }
+}
