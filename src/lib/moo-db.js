@@ -197,7 +197,7 @@ class MooDB {
         this.fsdb.rm(filepath);
       }
     }
-    this.fsdb.rm(this.filenameforObj(id));
+    this.fsdb.rm(this.filenameForObj(id));
     this.fsdb.rmDir(this.filepathToObj(id)); // cleanup; FsDb should do this for us, but it doesn't.
   }
 
