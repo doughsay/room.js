@@ -16,6 +16,7 @@ The term "mudlib" refers to the very basic set of objects and entities that are 
 
 ## Core objects (mandatory)
 The following objects shall always be present, as they are internally used by the game engine.
+
 | Object     | Comment |
 | ---------- | ------- |
 | system     | See further below |
@@ -33,6 +34,7 @@ The **system** object is where several customizable hooks are defined (besides a
 
 ## Useful objects (recommended)
 The following objects are not mandatory *per se* but are probably best keeping (and customizing if need really be)
+
 | Object     | Comment |
 | ---------- | ------- |
 | help       | The in-game help system: may be used as a basis for designing your own |
