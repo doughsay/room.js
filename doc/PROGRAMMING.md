@@ -16,7 +16,7 @@ You can then use any JavaScript (ES6) construct to start creating new rooms and 
   - Each object in the world has a unique identifier, which also corresponds to its name in the global scope.
     - You may reference an object by its identifier: `$('lib_room')`
     - Or rather, directy by its global variable:  `lib_room`
-    - Identifiers are internally mapped to a file path by the DB, with the underscore character corresponding to the path separator (e.g. "lib_room" will be mapped to "lib/room"). This allows  organizing the objects logically -- You can create objects at any level, but it is a **good practice** to enquire your game administrator regarding the recommended naming scheme. Please also refer to the [Builder guide](CUSTOMIZING.md)
+    - Identifiers are internally mapped to a file path by the DB, with the underscore character corresponding to the path separator (e.g. "lib_room" will be mapped to "lib/room"). This allows  organizing the objects logically -- You can create objects at any level, but it is a **good practice** to enquire your game administrator regarding the recommended naming scheme. Please also refer to the [Customization guide](CUSTOMIZING.md)
   - Objects can include, as usual, properties and functions, but they can also have verbs.
     - To add a new function: `obj.foo = function foo()` {} 
     - To add a new verb: `obj.bar = Verb("bar")`
@@ -113,7 +113,7 @@ light lamp
 extinguish lamp
 ```
 
-Yeah, there you go. Now, the description and short name should probably indicate whether our little lantern is lit or not. That's basic programming, so it's up to you!
+Yeah, there you go. Now, the description should probably indicate whether our little lantern is lit or not. That's basic programming, so it's up to you!
 
 ## Reference guide
 
@@ -211,7 +211,7 @@ Creates a new world object, deriving from its parent (i.e. having it in its trai
 
 Example:
 ```
-lib_chest.new("chest2", { opened: false, locked: false });
+lib_chest.new("items_chest2", { opened: false, locked: false });
 ```
 
 ##### destroy() ⇒ Boolean
