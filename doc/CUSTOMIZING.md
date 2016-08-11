@@ -1,9 +1,9 @@
 # Organizing and customizing your world objects
 
-This guide is intended for administrators and game builders, when setting up their initial instance for their own game based on the RoomJS MUD/MOO game engine.
+This guide is intended for administrators and game builders, when setting up the initial instance for their own game based on the RoomJS MUD/MOO engine.
 
 ## Introduction
-We will deal here with both the in-game object identifiers and the underlying on-disk file hierarchy, as there is a one-to-one mapping between them -- As detailed in the  [Programming guide](PROGRAMMING.md):
+We will deal here with both the object identifiers and the underlying on-disk file hierarchy, as there is a one-to-one mapping between them -- For details, refer to the  [Programming guide](PROGRAMMING.md):
 
 > Identifiers are internally mapped to a file path by the DB, with the underscore character
 > corresponding to the path separator (e.g. "lib_room" will be mapped to "lib/room"). This allows
@@ -58,11 +58,8 @@ The demo should not come with any (but well, that may not be true yet!), since y
 All other objects are demo-specific, so you may wholly remove them when creating your own world. As noted, you may follow any convention and logical naming scheme for your own world, but you will likely want to manage the objects in a maintenable way. 
 
 For instance, the demo adopts the following scheme:
-- All items are located in *items/* (and therefore have identifiers starting with "items_"),
-- Rooms are structured under *areas/* (and therefore have identifiers such as "area_something_roomname")
+- All useable items are located in *items/* (and therefore have identifiers starting with "items_"),
+- Rooms are structured under *areas/* (and therefore have identifiers such as "area_something_roomname").
 
- 
-
-
-
-
+Once you have created a room of your own, and changed the system.onPlayerConnected() hook
+to use that room as initial location, you may remove the aforementioned directories.
