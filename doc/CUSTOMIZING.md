@@ -1,4 +1,4 @@
-# Organizing and customizing your world objets
+# Organizing and customizing your world objects
 
 This guide is intended for administrators and game builders, when setting up their initial instance for their own game based on the RoomJS MUD/MOO game engine.
 
