@@ -39,7 +39,7 @@ class MooDB {
   load(dir = '') {
     const ids = this.fsdb.lsDirs(dir);
     ids.forEach(id => {
-      id = id.replace(/[/\\]/g, '_');
+      id = id.replace(/[\/\\]/g, '_');
       this.loadObject(id);
     });
   }
@@ -60,7 +60,7 @@ class MooDB {
   }
   
   idFromFilepath(filepath) {
-    let fpsplit = filepath.split('/');
+    let fpsplit = filepath.split(/[\/\\]/);
     fpsplit.pop();
     return fpsplit.join('_');
   }
@@ -197,7 +197,13 @@ class MooDB {
       }
     }
     this.fsdb.rm(this.filenameForObj(id));
-    this.fsdb.rmDir(this.filepathToObj(id)); // cleanup; FsDb should do this for us, but it doesn't.
+    try {
+        this.fsdb.rmDir(this.filepathToObj(id)); // cleanup; FsDb should do this for us, but it doesn't.
+    } catch (err) {
+        // DO NOTHING
+        // This is acceptable, since we allow objects to be organized in directories.
+        // HOWEVER, an empty directory might remain, if underlying objects are later destroyed.
+    }
   }
 
   markObjectDirty(id) {
