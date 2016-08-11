@@ -1,0 +1,26 @@
+{
+  "name": "South street",
+  "aliases": [],
+  "traitIds": [
+    "lib_room"
+  ],
+  "locationId": null,
+  "properties": {
+    "exits": {
+      "object": {
+        "north": {
+          "ref": "areas_city_greatmarket"
+        },
+        "south": {
+          "ref": "areas_city_southstreet1"
+        },
+        "southwest": {
+          "ref": "areas_city_alley2"
+        }
+      }
+    },
+    "description": {
+      "value": "The cobblestone road moves to the south and north here. A smaller alley leads to the southwest. The Great Market is to the north."
+    }
+  }
+}

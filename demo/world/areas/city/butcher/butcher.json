@@ -1,0 +1,20 @@
+{
+  "name": "Butcher",
+  "aliases": [],
+  "traitIds": [
+    "lib_room"
+  ],
+  "locationId": null,
+  "properties": {
+    "exits": {
+      "object": {
+        "east": {
+          "ref": "areas_city_lessermarket"
+        }
+      }
+    },
+    "description": {
+      "value": "The butcher's shop offers a great range of products for preparing meals. It has a generous assortment of fresh produce. According to the sign behind the counter, Today's Special is the lamb chop, at an exceptionally low price."
+    }
+  }
+}

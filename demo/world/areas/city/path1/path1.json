@@ -1,0 +1,23 @@
+{
+  "name": "Path",
+  "aliases": [],
+  "traitIds": [
+    "lib_room"
+  ],
+  "locationId": null,
+  "properties": {
+    "exits": {
+      "object": {
+        "northeast": {
+          "ref": "areas_city_alley"
+        },
+        "northwest": {
+          "ref": "areas_city_path"
+        }
+      }
+    },
+    "description": {
+      "value": "You near the city walls, and enter in their shadow. The ground here is made of dirt. A dark alley is to the northeast. An even darker path below the walls, goes to the northwest."
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "West gate",
+  "aliases": [],
+  "traitIds": [
+    "lib_room"
+  ],
+  "locationId": null,
+  "properties": {
+    "exits": {
+      "object": {
+        "east": {
+          "ref": "areas_city_weststreet1"
+        },
+        "northeast": {
+          "ref": "areas_city_alley3"
+        }
+      }
+    },
+    "description": {
+      "value": "Two strong stone towers surround a heavy wooden gate. The western gate, however, has been closed for ages. A cobblestone road leads to the east."
+    }
+  }
+}

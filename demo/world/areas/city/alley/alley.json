@@ -1,0 +1,23 @@
+{
+  "name": "Alley",
+  "aliases": [],
+  "traitIds": [
+    "lib_room"
+  ],
+  "locationId": null,
+  "properties": {
+    "exits": {
+      "object": {
+        "northeast": {
+          "ref": "areas_city_lessermarket"
+        },
+        "southwest": {
+          "ref": "areas_city_path1"
+        }
+      }
+    },
+    "description": {
+      "value": "The alley moves to the southwest and northeast here."
+    }
+  }
+}

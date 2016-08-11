@@ -1,0 +1,23 @@
+{
+  "name": "Main gate",
+  "aliases": [],
+  "traitIds": [
+    "lib_room"
+  ],
+  "locationId": null,
+  "properties": {
+    "exits": {
+      "object": {
+        "north": {
+          "ref": "areas_city_lessermarket"
+        },
+        "south": {
+          "ref": "areas_city_entranceplace"
+        }
+      }
+    },
+    "description": {
+      "value": "Two strong stone towers surround a heavy wooden gate. You can see the entrance place to the south, and the lesser market to the north."
+    }
+  }
+}

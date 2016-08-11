@@ -1,0 +1,26 @@
+{
+  "name": "South street",
+  "aliases": [],
+  "traitIds": [
+    "lib_room"
+  ],
+  "locationId": null,
+  "properties": {
+    "exits": {
+      "object": {
+        "north": {
+          "ref": "areas_city_southstreet"
+        },
+        "south": {
+          "ref": "areas_city_lessermarket"
+        },
+        "east": {
+          "ref": "areas_city_house"
+        }
+      }
+    },
+    "description": {
+      "value": "The cobblestone road moves to the south and north here. Many buildings can be seen all around here. An estate is to the east."
+    }
+  }
+}

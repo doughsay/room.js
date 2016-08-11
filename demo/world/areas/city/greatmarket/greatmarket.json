@@ -1,0 +1,29 @@
+{
+  "name": "Great market",
+  "aliases": [],
+  "traitIds": [
+    "lib_room"
+  ],
+  "locationId": null,
+  "properties": {
+    "exits": {
+      "object": {
+        "east": {
+          "ref": "areas_city_eaststreet"
+        },
+        "west": {
+          "ref": "areas_city_weststreet"
+        },
+        "south": {
+          "ref": "areas_city_southstreet"
+        },
+        "north": {
+          "ref": "areas_city_northstreet"
+        }
+      }
+    },
+    "description": {
+      "value": "You are standing at the open market square of the city, also known as the Great Market, where one may find the finest products and goods. It is a large place surrounded by arches, where city traders and merchants from the vast world come to do their business. The streets move in all four directions here."
+    }
+  }
+}

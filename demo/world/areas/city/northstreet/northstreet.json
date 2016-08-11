@@ -1,0 +1,26 @@
+{
+  "name": "North street",
+  "aliases": [],
+  "traitIds": [
+    "lib_room"
+  ],
+  "locationId": null,
+  "properties": {
+    "exits": {
+      "object": {
+        "south": {
+          "ref": "areas_city_greatmarket"
+        },
+        "north": {
+          "ref": "areas_city_northstreet1"
+        },
+        "west": {
+          "ref": "areas_city_inn"
+        }
+      }
+    },
+    "description": {
+      "value": "The cobblestone road moves to the south and north here. The Great Market is to the south. Many shops and buildings can be seen all around here. The main entrance to the tavern is to the west."
+    }
+  }
+}
