@@ -45,7 +45,12 @@ tests_lantern.description = "a portable lamp in a case, protected from the wind 
 ```
 tests_lantern.lighted = false; 
 ```
-- Now, let's declare the available command verbs.
+- This is a step-by-step example, but actually note that we could rather have added most of the properties directly at creation, specified as options:
+```
+lib_item.new('tests_lantern', { name: "lantern", lighted: false });
+```
+
+- Anyhow, let's now declare the available command verbs.
 ```
 tests_lantern.light = Verb("light", "this", "none", "none");
 tests_lantern.extinguish = Verb("extinguish", "this", "none", "none");
@@ -165,7 +170,7 @@ Verbs then have the following signature:
 function({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr })
 ```
 
-The **this** variable refers to the word object implementing the command, **player** is the player world object who triggered the command, and the remaining parameters correspond to the parsed fields (in world object form if found, and in string form -- see **parse()** below)
+The **this** variable refers to the world object implementing the command, **player** is the player world object who triggered the command, and the remaining parameters correspond to the parsed fields (in world object form if found, and in string form -- see **parse()** below)
 
 ##### parse( String ) ⇒ Command
 Invokes the command parser on a string. Explanation by example is easier:
@@ -211,7 +216,7 @@ Creates a new world object, deriving from its parent (i.e. having it in its trai
 
 Example:
 ```
-lib_chest.new("items_chest2", { opened: false, locked: false });
+lib_chest.new("items_chest2", { name: "large chest", opened: false, locked: false });
 ```
 
 ##### destroy() ⇒ Boolean
@@ -220,7 +225,8 @@ Removes an object from the world and its database. Currently returns true.
 ##### addAlias( ...String ) ⇒ Integer
 Add alias strings to the object and returns the number of aliases.
 
-Warning: it doesn't prevent from adding an existing alias. Maybe it should.
+> Warning: it doesn't prevent from adding an existing alias. Maybe it should, there's
+> no real point having the same alias declared more than once.
 
 ##### rmAlias( ...String ) ⇒ Integer
 Remove alias strings from the object (any duplicates will be removed), and returns the number of aliases.
@@ -228,10 +234,15 @@ Remove alias strings from the object (any duplicates will be removed), and retur
 ##### addTrait( ...WorldObject ) ⇒ Integer
 Add traits to the object and returns the number of traits. Traits are what makes the object inherit properties and methods.
 
-Warning: it doesn't prevent from adding an existing alias. Maybe it should.
+> Warning: it doesn't prevent from adding an already existing trait. Maybe it should, 
+> otherwise the object gets broken, with a 'duplicate parent'.
 
 ##### rmTrait( ...String ) ⇒ Integer
 Remove traits from the object and returns the number of traits.
+
+> Warning: removing an object used as trait in other objects leads to very bad things. 
+> Maybe a more graceful protection may be implemented, but anyhow it is probably a bad
+> idea to remove a trait object, as the child objects may likely be broken anyhow.
 
 #### Other methods
 They exist in the execution context, but are propably of lower interest.
@@ -266,26 +277,26 @@ Returns an array of a given object's own enumerable property values.
 
 Documentation not yet completed, work in progress...
 
-##### matchObjects( command ) ⇒ WordObject
+##### matchObjects( command ) ⇒ WorldObject
 TBD.
 May return world object **nothing**
 
-##### findObject( String ) ⇒ WordObject
+##### findObject( String ) ⇒ WorldObject
 TBD.
 String "me" (or "myself") returns the object itself (= this).
 String "here" returns the location (= this.location).
 Otherwise, call findNearby().
 May therefore return **fail** or **ambiguous**.
 
-##### findNearby( String ) ⇒ WordObject
+##### findNearby( String ) ⇒ WorldObject
 TBD. May return world objects **fail** or **ambiguous**.
 Looks in the object itself, in its location, in an extraMatchObjects 
 property (which may be an array or a function to call) in the location if any,
 
-##### findInside( String ) ⇒ WordObject
+##### findInside( String ) ⇒ WorldObject
 TBD. May return world objects **fail** or **ambiguous**.
 
-##### findMatch( -,- ) ⇒ WordObject
+##### findMatch( -,- ) ⇒ WorldObject
 TBD.
 
 ##### matchVerb( ... ) ⇒ ...
