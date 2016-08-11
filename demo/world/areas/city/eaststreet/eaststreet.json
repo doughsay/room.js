@@ -1,0 +1,29 @@
+{
+  "name": "East street",
+  "aliases": [],
+  "traitIds": [
+    "lib_room"
+  ],
+  "locationId": null,
+  "properties": {
+    "exits": {
+      "object": {
+        "east": {
+          "ref": "areas_city_eaststreet1"
+        },
+        "west": {
+          "ref": "areas_city_greatmarket"
+        },
+        "south": {
+          "ref": "areas_city_jewellery"
+        },
+        "north": {
+          "ref": "areas_city_armoury"
+        }
+      }
+    },
+    "description": {
+      "value": "The cobblestone road moves to the west and east here. The Great Market is to the west. Many shops and buildings can be seen all around here. To the south is a jewellery shop, and to the north, the armoury."
+    }
+  }
+}

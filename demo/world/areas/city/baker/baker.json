@@ -1,0 +1,20 @@
+{
+  "name": "Baker",
+  "aliases": [],
+  "traitIds": [
+    "lib_room"
+  ],
+  "locationId": null,
+  "properties": {
+    "exits": {
+      "object": {
+        "west": {
+          "ref": "areas_city_lessermarket"
+        }
+      }
+    },
+    "description": {
+      "value": "The room is small and encumbered, but what could be better than the sweet smell of warm bread and freshly baked bread rolls! There are also cakes, pastries and all kinds of cookies on the shelves."
+    }
+  }
+}

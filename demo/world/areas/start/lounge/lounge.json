@@ -13,6 +13,9 @@
       "object": {
         "up": {
           "ref": "areas_start_heaven"
+        },
+        "down": {
+          "ref": "areas_city_house"
         }
       }
     }

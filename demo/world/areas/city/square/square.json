@@ -1,0 +1,23 @@
+{
+  "name": "Square",
+  "aliases": [],
+  "traitIds": [
+    "lib_room"
+  ],
+  "locationId": null,
+  "properties": {
+    "exits": {
+      "object": {
+        "east": {
+          "ref": "areas_city_northstreet1"
+        },
+        "southwest": {
+          "ref": "areas_city_alley3"
+        }
+      }
+    },
+    "description": {
+      "value": "You stand in a deserted square. The trees try to reach the light, but the shadow of the city wall obscures everything. To the east, the square is connected to a paved street. There is an alley to the southwest."
+    }
+  }
+}

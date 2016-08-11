@@ -1,0 +1,13 @@
+{
+  "name": "check",
+  "aliases": [],
+  "traitIds": [
+    "lib_room"
+  ],
+  "locationId": null,
+  "properties": {
+    "exits": {
+      "object": {}
+    }
+  }
+}

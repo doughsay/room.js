@@ -1,0 +1,23 @@
+{
+  "name": "House",
+  "aliases": [],
+  "traitIds": [
+    "lib_room"
+  ],
+  "locationId": null,
+  "properties": {
+    "exits": {
+      "object": {
+        "west": {
+          "ref": "areas_city_southstreet1"
+        },
+        "up": {
+          "ref": "areas_start_lounge"
+        }
+      }
+    },
+    "description": {
+      "value": "You stand in a beautifully furnished room."
+    }
+  }
+}
