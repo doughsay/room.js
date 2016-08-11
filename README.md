@@ -8,3 +8,11 @@ Demo
 ====
 
 http://roomjs.tk/
+
+
+Documentation
+=============
+
+- [Building and programming your own RoomJS MUD/MMO](doc/PROGRAMMING.md)
+- [Organizing and customizing your world objets](doc/CUSTOMIZING.md)
+
