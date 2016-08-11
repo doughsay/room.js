@@ -31,10 +31,8 @@ class FsDb {
       const filepath = path.join(dir, file);
       const stats = fs.statSync(filepath);
       if (stats.isDirectory()) {
-        console.log("ENTERING " + filepath);
         this.load(filepath);
       } else if (stats.isFile()) {
-        console.log("LOADING " + filepath);
         this.loadFile(filepath);
       } else {
         const relpath = this.toRelpath(filepath);
