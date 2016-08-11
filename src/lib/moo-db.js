@@ -56,7 +56,7 @@ class MooDB {
   }
   
   filepathToObj(id) {
-     return id.split('_').pop();
+     return id.replace(/_/g, '/');
   }
   
   idFromFilepath(filepath) {
@@ -68,7 +68,6 @@ class MooDB {
   loadObject(id) {
     try {
       const fileContents = this.fsdb.read(this.filenameForObj(id));
-      //DEBUG console.log("DEBUG " + id + ", " + this.filenameForObj(id));
       const object = JSON.parse(fileContents);
       object.id = id;
       this.loadCallables(id, object.properties);
