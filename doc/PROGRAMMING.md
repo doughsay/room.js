@@ -24,7 +24,7 @@ You can then use any JavaScript (ES6) construct to start creating new rooms and 
 - Verbs: these are special functions invoked when a corresponding command from the player has succesfully been parsed.
 - Traits: the object-oriented programming in RoomJS relies on traits. Any world object can be used as a trait in other objects, and can have several traits. This is how an object can be used to extend the functionality of another object.
 
-For more details, see also the [Reference guide](#Reference-guide) further below.
+For more details, see also the [Reference guide](#reference-guide) further below.
 
 ## Example
 
