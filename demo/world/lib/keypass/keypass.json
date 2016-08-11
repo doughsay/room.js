@@ -1,0 +1,15 @@
+{
+  "name": "universal keypass",
+  "aliases": [
+    "keypass"
+  ],
+  "traitIds": [
+    "lib_item"
+  ],
+  "locationId": "areas_start_heaven",
+  "properties": {
+    "keyId": {
+      "value": "keypass"
+    }
+  }
+}

@@ -2,7 +2,7 @@
   "name": "views",
   "aliases": [],
   "traitIds": [
-    "root"
+    "lib_root"
   ],
   "locationId": null,
   "properties": {
@@ -10,7 +10,7 @@
       "function": true,
       "file": "chat.js"
     },
-    "noop": {
+    "noOp": {
       "function": true,
       "file": "noop.js"
     }

@@ -1,0 +1,20 @@
+{
+  "name": "Heaven",
+  "aliases": [],
+  "traitIds": [
+    "lib_room"
+  ],
+  "locationId": null,
+  "properties": {
+    "description": {
+      "value": "You stand in a beautifully furnished room. This is the Starting Room for newcomers in this World. There is a lounge downstairs."
+    },
+    "exits": {
+      "object": {
+        "down": {
+          "ref": "areas_start_lounge"
+        }
+      }
+    }
+  }
+}
