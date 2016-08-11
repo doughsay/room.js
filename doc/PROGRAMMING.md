@@ -31,26 +31,26 @@ For more details, see also the [Reference guide](#Reference-guide) further below
 But for now, let's create our first object: a (very) basic lantern!
 First, switch to EVAL mode, so that you do not have to prefix every JavaScript command.
 
-1. Create a new object. In the demo mudlib, **lib_item** is a gettable and describable object. So we will start from it (i.e. it will be the base trait for our object)
+- Create a new object. In the demo mudlib, **lib_item** is a gettable and describable object. So we will start from it (i.e. it will be the base trait for our object)
 ```
 lib_item.new('tests_lantern');
 ```
-2. By default, its short name is the same as its identifier, and it doesn't have a long description. It doesn't have aliases either. This is not very convenient, so let's add all these things:
+- By default, its short name is the same as its identifier, and it doesn't have a long description. It doesn't have aliases either. This is not very convenient, so let's add all these things:
 ```
 tests_lantern.name = "lantern";
 tests_lantern.addAlias("lamp");
 tests_lantern.description = "a portable lamp in a case, protected from the wind and rain";
 ```
-3. Since it is intended for being lit, let's add a boolean property to keep track of that state.
+- Since it is intended for being lit, let's add a boolean property to keep track of that state.
 ```
 tests_lantern.lighted = false; 
 ```
-4. Now, let's declare the available command verbs.
+- Now, let's declare the available command verbs.
 ```
 tests_lantern.light = Verb("light", "this", "none", "none");
 tests_lantern.extinguish = Verb("extinguish", "this", "none", "none");
 ```
-5. Hit Ctrl-p and look for our newly created "light" verb. In the editor, copy the following function body into the default template (i.e. keep the surrounding function definition!)
+- Hit Ctrl-p and look for our newly created "light" verb. In the editor, copy the following function body into the default template (i.e. keep the surrounding function definition!)
 ```
   if (!this.lighted) {
     this.doLight(player);
@@ -58,7 +58,7 @@ tests_lantern.extinguish = Verb("extinguish", "this", "none", "none");
     player.tell(`The ${this.name} is already lit.`);
   }
 ```
-6. Save with Ctrl-s, and then proceed similarly for the "extinguish" verb:
+- Save with Ctrl-s, and then proceed similarly for the "extinguish" verb:
 ```
   if (this.lighted) {
     this.doExtinguish(player);
@@ -66,12 +66,12 @@ tests_lantern.extinguish = Verb("extinguish", "this", "none", "none");
     player.tell(`The ${this.name} is not lit.`);
   }
 ```
-7. Close the editing tabs and return to the MUD tab. Here, for the sake of illustration, we decided to use two additional functions, that will be responsible for changing the state flag and announce something to other people in the room. So let's first create them:
+- Close the editing tabs and return to the MUD tab. Here, for the sake of illustration, we decided to use two additional functions, that will be responsible for changing the state flag and announce something to other people in the room. So let's first create them:
 ```
 tests_lantern.doLight = function(player) {};
 tests_lantern.doExtinguish = function(player) {};
 ```
-8. And again, hit Ctrl-p and look for these functions. Insert the following content in the body for the doLight method, and save with Ctrl-s.
+- And again, hit Ctrl-p and look for these functions. Insert the following content in the body for the doLight method, and save with Ctrl-s.
 ```
   function announce(sender, recipient, object) {
     if (sender === recipient) {
@@ -85,7 +85,7 @@ tests_lantern.doExtinguish = function(player) {};
   }
   this.lighted = true;
 ```
-9. And likewise for doExtinguish...
+- And likewise for doExtinguish...
 ```
   function announce(sender, recipient, object) {
     if (sender === recipient) {
@@ -99,12 +99,12 @@ tests_lantern.doExtinguish = function(player) {};
   }
   this.lighted = false;
 ```
-10. Go back to the MUD tab. We will want to test our new object, so let's bring it to our current room (and notice how the *this* object conveniently here points to you, the player/builder):
+- Go back to the MUD tab. We will want to test our new object, so let's bring it to our current room (and notice how the *this* object conveniently here points to you, the player/builder):
 ```
 tests_lantern.location = this.location
 ```
 
-11. Leave the EVAL mode, and play.
+- Leave the EVAL mode, and play.
 ```
 look lamp
 extinguish lamp
@@ -181,6 +181,7 @@ This may be used to check how a command will be split and passed to a Verb funct
 
 #### Base properties
 All world objects have at least the following properties:
+
 | Property  | Type                | Comment  |
 | --------- | ------------------- | ------------ |
 | player    | Boolean             | true if object is a player (read-only) |
@@ -218,7 +219,7 @@ Removes an object from the world and its database. Currently returns true.
 
 ##### addAlias( ...String ) ⇒ Integer
 Add alias strings to the object and returns the number of aliases.
-\
+
 Warning: it doesn't prevent from adding an existing alias. Maybe it should.
 
 ##### rmAlias( ...String ) ⇒ Integer
@@ -226,7 +227,7 @@ Remove alias strings from the object (any duplicates will be removed), and retur
 
 ##### addTrait( ...WorldObject ) ⇒ Integer
 Add traits to the object and returns the number of traits. Traits are what makes the object inherit properties and methods.
-\
+
 Warning: it doesn't prevent from adding an existing alias. Maybe it should.
 
 ##### rmTrait( ...String ) ⇒ Integer
@@ -237,11 +238,11 @@ They exist in the execution context, but are propably of lower interest.
 
 ##### send( String\|Object ) ⇒ Boolean
 Sends a message to the client.
-\
+
 This is normally not intended to be used directly (e.g. check **tell()** method, defined by the **lib_root** object inherited by allmost all objects in the demo mudlib).
-\
+
 Returns true upon success, false upon failure (no controller, e.g. not a player, or player not connected). 
-\
+
 Note: Sending an object also works, assuming it is transferable. 
 
 ##### linearize() ⇒ Array.<WorldObject>
@@ -249,8 +250,8 @@ Returns the trait inheritance hierarchy. Could be useful to check if an object h
 
 ##### setPrompt( String ) ⇒ Boolean
 Notifies the user to change his/her prompt. This is used by the mode system (see **modes** in the demo mudlib), when cycling between the modes (normal, say, chat, programming).
-\
-Returns true upon success, *false upon failure (no controller, e.g. not a player, or player not connected).
+
+Returns true upon success, false upon failure (no controller, e.g. not a player, or player not connected).
 
 ##### toString() ⇒ String
 Returns [object <identifier>]
@@ -272,17 +273,17 @@ May return world object **nothing**
 ##### findObject( String ) ⇒ WordObject
 TBD.
 String "me" (or "myself") returns the object itself (= this).
-String "here" returns the location (= this.location)
+String "here" returns the location (= this.location).
 Otherwise, call findNearby().
-May therefore
+May therefore return **fail** or **ambiguous**.
 
 ##### findNearby( String ) ⇒ WordObject
-TBD. May return world objects **fail** or **ambiguous**
+TBD. May return world objects **fail** or **ambiguous**.
 Looks in the object itself, in its location, in an extraMatchObjects 
 property (which may be an array or a function to call) in the location if any,
 
 ##### findInside( String ) ⇒ WordObject
-TBD. May return world objects **fail** or **ambiguous**
+TBD. May return world objects **fail** or **ambiguous**.
 
 ##### findMatch( -,- ) ⇒ WordObject
 TBD.
