@@ -16,7 +16,6 @@ class World {
     this.builder = new WorldObjectProxyBuilder(db, this, WorldObject);
 
     db.all().forEach(object => {
-      //DEBUG console.log("LOADING " + object.id);
       this.objects[object.id] = this.builder.build(object);
     });
 
@@ -59,7 +58,6 @@ class World {
 
   insert(object) {
     // TODO: protect against bad inserts
-    //DEBUG console.log("INSERTING " + object.id);
     this.objects[object.id] = this.builder.build(object);
   }
 

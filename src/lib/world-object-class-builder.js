@@ -1,4 +1,5 @@
 const C3 = require('./c3');
+const idify = require('./idify');
 
 // TODO: this file needs some refactoring
 
@@ -200,9 +201,8 @@ class WorldObjectClassBuilder {
       }
 
       new(id, props = {}) {
-        // Sanitize - trim and replace slashes
-        id = id.replace(/^\//, '').replace(/\/$/, '').replace(/\//g, '_');
-
+        // Sanitize the id, in case it wasn't previously checked with nextId()
+        id = idify(id);
         
         if (id in world.context) {
           throw new TypeError(`Identifier '${id}' has already been declared`);
