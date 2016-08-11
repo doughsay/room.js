@@ -119,13 +119,13 @@ Yeah, there you go. Now, the description and short name should probably indicate
 
 ### Toplevel global functions
 
-##### all() ⇒ Array.<WorldObject>
+##### all() ⇒ Array.WorldObject
 Returns a list of all existing world objects.
 
 ##### nextId( String ) ⇒ String
 Returns a new unique identifier from the text provided. Very useful when you create objects, and want an identifier following the same naming scheme, and as long as no one else takes that identifier in the meantime -- So usually, this is used directly in the object creation call.
 
-##### players() ⇒ Array.<WorldObject>
+##### players() ⇒ Array.WorldObject
 Returns a list of all existing player world objects (i.e. player characters).
 
 ##### color.*( String ) ⇒ String
@@ -188,10 +188,10 @@ All world objects have at least the following properties:
 | online    | Boolean             | true when connected player (read-only) |
 | id        | String              | unique identifier (read-only) |
 | name      | String              | name |
-| aliases   | Array.<String>      | List of aliases |
-| traits    | Array.<WorldObject> | All objects can therefore be containers |
+| aliases   | Array.String        | List of aliases |
+| traits    | Array.WorldObject   | All objects can therefore be containers |
 | location  | WorldObject\|null   | Location |
-| contents  | Array.<WorldObject> | Objects can therefore all be containers |
+| contents  | Array.WorldObject   | Objects can therefore all be containers |
 
 For the record:
 - The *player* property actually checks whether the object has an *userId* property (which can't be added manually),
@@ -245,7 +245,7 @@ Returns true upon success, false upon failure (no controller, e.g. not a player,
 
 Note: Sending an object also works, assuming it is transferable. 
 
-##### linearize() ⇒ Array.<WorldObject>
+##### linearize() ⇒ Array.WorldObject
 Returns the trait inheritance hierarchy. Could be useful to check if an object has a given trait via inheritance.
 
 ##### setPrompt( String ) ⇒ Boolean
@@ -254,12 +254,12 @@ Notifies the user to change his/her prompt. This is used by the mode system (see
 Returns true upon success, false upon failure (no controller, e.g. not a player, or player not connected).
 
 ##### toString() ⇒ String
-Returns [object <identifier>]
+Returns [object identifier]
 
-##### keys() ⇒ Array.<String>
+##### keys() ⇒ Array.String
 Returns an array of a given object's own enumerable properties.
 
-##### values() ⇒ Array.<Object>
+##### values() ⇒ Array.Object
 Returns an array of a given object's own enumerable property values.
 
 #### Other methods (WIP)
