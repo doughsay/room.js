@@ -2,7 +2,7 @@
   "name": "system",
   "aliases": [],
   "traitIds": [
-    "root"
+    "lib_root"
   ],
   "locationId": null,
   "properties": {

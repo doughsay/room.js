@@ -1,0 +1,20 @@
+{
+  "name": "The Lounge",
+  "aliases": [],
+  "traitIds": [
+    "lib_room"
+  ],
+  "locationId": null,
+  "properties": {
+    "description": {
+      "value": "This lounge room is a cozy place where to rest, handsomely decked with a fireplace. There is another room upstairs. Beware, other exits will take you out of the starting area."
+    },
+    "exits": {
+      "object": {
+        "up": {
+          "ref": "areas_start_heaven"
+        }
+      }
+    }
+  }
+}

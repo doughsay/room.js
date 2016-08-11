@@ -1,0 +1,32 @@
+{
+  "name": "wand of creation",
+  "aliases": [],
+  "traitIds": [
+    "lib_item"
+  ],
+  "locationId": "areas_start_heaven",
+  "properties": {
+    "clone": {
+      "verb": true,
+      "file": "clone.js",
+      "pattern": "clone",
+      "dobjarg": "any",
+      "preparg": "with/using",
+      "iobjarg": "this"
+    },
+    "zap": {
+      "verb": true,
+      "file": "zap.js",
+      "pattern": "zap",
+      "dobjarg": "any",
+      "preparg": "with/using",
+      "iobjarg": "this"
+    },
+    "alias": {
+      "value": "wand"
+    },
+    "keepFlag": {
+      "value": false
+    }
+  }
+}

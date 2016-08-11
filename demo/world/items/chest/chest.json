@@ -1,0 +1,20 @@
+{
+  "name": "chest",
+  "aliases": [],
+  "traitIds": [
+    "lib_item",
+    "lib_traits_closeable"
+  ],
+  "locationId": "areas_start_heaven",
+  "properties": {
+    "locked": {
+      "value": true
+    },
+    "closed": {
+      "value": true
+    },
+    "keepFlag": {
+      "value": false
+    }
+  }
+}

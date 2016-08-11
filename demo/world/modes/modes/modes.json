@@ -1,0 +1,26 @@
+{
+  "name": "modes",
+  "aliases": [],
+  "traitIds": [
+    "lib_root"
+  ],
+  "locationId": null,
+  "properties": {
+    "all": {
+      "array": [
+        {
+          "ref": "modes_playmode"
+        },
+        {
+          "ref": "modes_saymode"
+        },
+        {
+          "ref": "modes_chatmode"
+        },
+        {
+          "ref": "modes_evalmode"
+        }
+      ]
+    }
+  }
+}

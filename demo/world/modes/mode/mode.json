@@ -1,0 +1,21 @@
+{
+  "name": "mode",
+  "aliases": [],
+  "traitIds": [
+    "lib_root"
+  ],
+  "locationId": null,
+  "properties": {
+    "promptString": {
+      "object": null
+    },
+    "allowedFor": {
+      "function": true,
+      "file": "allowedFor.js"
+    },
+    "preprocessCommand": {
+      "function": true,
+      "file": "preprocessCommand.js"
+    }
+  }
+}

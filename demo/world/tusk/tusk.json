@@ -2,9 +2,9 @@
   "name": "Tusk",
   "aliases": [],
   "traitIds": [
-    "player"
+    "lib_player"
   ],
-  "locationId": "rooms_start",
+  "locationId": "areas_start_lounge",
   "userId": "tusk",
   "properties": {
     "programmer": {
@@ -14,7 +14,7 @@
       "object": null
     },
     "mode": {
-      "ref": "evalmode"
+      "ref": "modes_playmode"
     }
   }
 }

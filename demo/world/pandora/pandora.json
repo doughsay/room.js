@@ -2,19 +2,19 @@
   "name": "Pandora",
   "aliases": [],
   "traitIds": [
-    "player"
+    "lib_player"
   ],
-  "locationId": "rooms_start",
+  "locationId": null,
   "userId": "pandora",
   "properties": {
     "programmer": {
-      "value": true
+      "value": false
     },
     "previousLocation": {
-      "object": null
+      "ref": "areas_start_heaven"
     },
     "mode": {
-      "ref": "playmode"
+      "ref": "modes_playmode"
     }
   }
 }
