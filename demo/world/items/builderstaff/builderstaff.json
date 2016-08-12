@@ -40,6 +40,10 @@
     "buildAction": {
       "function": true,
       "file": "buildAction.js"
+    },
+    "nameAction": {
+      "function": true,
+      "file": "nameAction.js"
     }
   }
 }

@@ -9,6 +9,8 @@ function use({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr })
    * - use staff to zap|destroy <object>
    * - use staff to force <object> to <action>
    * - use staff to build <direction>
+   * - use staff to name <text>
+   * - use staff to desc|describe <text>
    */
   // Staff must be in hands
   if (this.location !== player) {
@@ -30,9 +32,10 @@ function use({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr })
     return;
   }
   
-  let cmdargstr = command.splice(1).join(' ');  
+  let cmdargstr = command.splice(1).join(' ');
+  command = command[0];
   
-  switch (command[0]) {
+  switch (command) {
     case "clone":
     case "create":    
       this.cloneAction(player, cmdargstr);
@@ -47,6 +50,13 @@ function use({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr })
     case "build":
       this.buildAction(player, cmdargstr);
       break;
+    case "name":
+        this.nameAction(player, cmdargstr, false);
+        break;
+    case "describe":
+    case "desc":
+        this.nameAction(player, cmdargstr, true);
+      break;      
     default:
       player.tell(`The ${this.name} cannot ${command[0]}.`);
       break;

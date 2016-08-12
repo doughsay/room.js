@@ -5,6 +5,7 @@ function buildAction(player, direction) {
   // Safeguard
   if (player.location === undefined) {
     player.tell("You cannot build in the Void.");
+    return;
   }
     
   // oppositeDirection returns undefined for non-canonical direction.
@@ -27,6 +28,9 @@ function buildAction(player, direction) {
   created.name = "Ordinary location";
   created.description = `The place is full of dust, with building materials left all over.
 That is the craft of ${player.name} the Builder, so maybe this is not unexpected.`;
+  
+  // Add a flag for keeping track of builder-created rooms
+  created.builtWithStaff = true;
   
   // Connect rooms
   player.location.addExit(dirFromHere, created);
