@@ -58,7 +58,7 @@ function use({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr })
         this.nameAction(player, cmdargstr, true);
       break;      
     default:
-      player.tell(`The ${this.name} cannot ${command[0]}.`);
+      player.tell(`The ${this.name} cannot ${command}.`);
       break;
   }
 }
