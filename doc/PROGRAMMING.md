@@ -4,12 +4,12 @@ This guide is intended for "builders", i.e. players with developer privileges in
 
 ## Introduction
 
-Once you have been given developer privileges (or by default, on the demo mudlib), you can use the **eval** command to prefix code instructions, or preferably cycle to the EVAL mode.
+Once you have been given developer privileges (or by default, on the demo), you can use the **eval** command to prefix code instructions, or preferably cycle to the EVAL mode.
 
 > For the reminder, you can cycle between different modes by hitting TAB. 
 > Modes effectively just prefix whatever you type with another word. 
  
-You can then use any JavaScript (ES6) construct to start creating new rooms and objects. You will need to learn but a few basic RoomJS-specific concepts only:
+You can then use any JavaScript (ES6) construct to start creating new rooms and objects. This document therefore assumes the reader has pre-existing JavaScript knowledge. You will need to learn but a few basic RoomJS-specific concepts only:
 
 - Toplevel functions: there are a few convenience global functions, such as **all()** and **nextId()**, etc. They are seldom used in actual code, but are provided as utilities for you to invoke on the command line.
 - World objects:
@@ -41,7 +41,7 @@ tests_lantern.name = "lantern";
 tests_lantern.addAlias("lamp");
 tests_lantern.description = "a portable lamp in a case, protected from the wind and rain";
 ```
-- Since it is intended for being lit, let's add a boolean property to keep track of that state.
+- Since it is intended for being lit, let's add a boolean property to keep track of that state:
 ```
 tests_lantern.lighted = false; 
 ```
@@ -50,7 +50,7 @@ tests_lantern.lighted = false;
 lib_item.new('tests_lantern', { name: "lantern", lighted: false });
 ```
 
-- Anyhow, let's now declare the available command verbs.
+- Anyhow, let's now declare the available command verbs:
 ```
 tests_lantern.light = Verb("light", "this", "none", "none");
 tests_lantern.extinguish = Verb("extinguish", "this", "none", "none");
@@ -76,7 +76,7 @@ tests_lantern.extinguish = Verb("extinguish", "this", "none", "none");
 tests_lantern.doLight = function(player) {};
 tests_lantern.doExtinguish = function(player) {};
 ```
-- And again, hit Ctrl-p and look for these functions. Insert the following content in the body for the doLight method, and save with Ctrl-s.
+- And again, hit Ctrl-p and look for these functions. Insert the following content in the body for the doLight method, and save with Ctrl-s:
 ```
   function announce(sender, recipient, object) {
     if (sender === recipient) {
@@ -109,7 +109,7 @@ tests_lantern.doExtinguish = function(player) {};
 tests_lantern.location = this.location
 ```
 
-- Leave the EVAL mode, and play.
+- Leave the EVAL mode, and play:
 ```
 look lamp
 extinguish lamp
@@ -134,7 +134,7 @@ Returns a new unique identifier from the text provided. Very useful when you cre
 Returns a list of all existing player world objects (i.e. player characters).
 
 ##### color.*( String ) ⇒ String
-Colorize a string.
+Colorizes a string.
 ```
 var boldBlueText = color.bold.blue("Some text");
 ```
@@ -152,17 +152,14 @@ Creates a command verb.
 | prep      | String?   | Preposition   |
 | iobj      | String?   | Indirect object |
 
-- The command can include several patterns separated by a space, that will be recognized alike. Each pattern can include a * sign for shortcuts. E.g., "l*ook ex*amine" will match "look", "l", "examine" and "ex".
-- Possible values for optional direct/indirect objects are 'this', 'any', 'none' (default).
+- The command can include several patterns separated by a space, that will be recognized alike. Each pattern can include a * sign for defining shortcuts. E.g., "l*ook ex*amine" will match "look", "l", "examine" and "ex".
+- Possible values for optional direct/indirect objects are "this", "any", "none" (default).
 - Several prepositions may be provided, separated with a /.
-- Recognized propositions: 'with', 'using',  'at', 'to',  'in front of',  'in', 'inside', 'into',
-  'on top of', 'on', 'onto', 'upon',  'out of', 'from inside', 'from',  'over',  'through',
-  'under', 'underneath', 'beneath',  'behind', 'beside', 'for', 'about', 'is', 'as',
-  'off of', 'off'.
+- Recognized propositions: "with", "using", "at", "to", "in front of", "in", "inside", "into", "on top of", "on", "onto", "upon", "out of", "from inside", "from", "over", "through", "under", "underneath", "beneath", "behind", "beside", "for", "about", "is", "as", "off of", "off".
 
 Example:
 ```
-Verb("put", "any", "in/into", "any");
+Verb("put", "any", "in/into", "this");
 ```
 
 Verbs then have the following signature:
@@ -170,7 +167,11 @@ Verbs then have the following signature:
 function({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr })
 ```
 
-The **this** variable refers to the world object implementing the command, **player** is the player world object who triggered the command, and the remaining parameters correspond to the parsed fields (in world object form if found, and in string form -- see **parse()** below)
+When the function is invoked:
+- The *this* variable refers to the world object implementing the command,
+- *player* is the player world object who triggered the command,
+- *dobj* and *iobj* are the direct and indirect object of the command, that is either a world object (if found) or one of the core objects **fail**, **nothing** and **ambiguous**.
+- *verbstr, argstr, dobjstr, prepstr, iobjstr* are the parsed strings, see **parse()** just below.
 
 ##### parse( String ) ⇒ Command
 Invokes the command parser on a string. Explanation by example is easier:
@@ -193,15 +194,23 @@ All world objects have at least the following properties:
 | online    | Boolean             | true when connected player (read-only) |
 | id        | String              | unique identifier (read-only) |
 | name      | String              | name |
-| aliases   | Array.String        | List of aliases |
-| traits    | Array.WorldObject   | All objects can therefore be containers |
-| location  | WorldObject\|null   | Location |
+| aliases   | Array.String        | list of aliases |
+| traits    | Array.WorldObject   | list of applicable traits |
+| location  | WorldObject\|null   | location |
 | contents  | Array.WorldObject   | Objects can therefore all be containers |
 
 For the record:
 - The *player* property actually checks whether the object has an *userId* property (which can't be added manually),
 - The *online* is a getter querying the connection controller,
 - The *id* property is internally mapped to a file path by the DB. 
+
+Moreover, for there are a few optional properties used by the game engine:
+
+| Property  | Type                | Comment  |
+| --------- | ------------------- | ------------ |
+| userId    | String              | (On a player.) User login name |
+| extraMatchObjects | Array.WorldObject\|Function | (On a location.) See look-up functions below. For advanced usage |
+| verbMissing | Verb              | (On a location.) For advanced usage |
 
 #### Base methods
 As a programmer, these are the methods you will most likely use very often.
@@ -211,13 +220,15 @@ Creates a new world object, deriving from its parent (i.e. having it in its trai
 
 | Parameter  | Type                | Comment  |
 | ---------- | ------------------- | ------------ |
-| id         | String              | See below    |
+| id         | String              | unique identifier |
 | props      | Object              | Optional properties to be copied into the object |
 
 Example:
 ```
 lib_chest.new("items_chest2", { name: "large chest", opened: false, locked: false });
 ```
+
+Note: The identifier is 'sanitized', i.e. non-authorized characters are removed or replaced.
 
 ##### destroy() ⇒ Boolean
 Removes an object from the world and its database. Currently returns true.
@@ -244,23 +255,67 @@ Remove traits from the object and returns the number of traits.
 > Maybe a more graceful protection may be implemented, but anyhow it is probably a bad
 > idea to remove a trait object, as the child objects may likely be broken anyhow.
 
+#### Look-up methods
+These are methods you may need when implementing complex verbs, where you may want to
+check if an item can be found in a container, a location, etc.
+
+##### findNearby( String ) ⇒ WorldObject
+Looks if a string can be matched to an object in the environment, that is:
+- the object's contents,
+- its location's contents,
+- the location's extraMatchObjects, if defined.
+
+Returns:
+- the core object **fail** when there is no match,
+- the core object **ambiguous** if there are more than one match,
+- otherwise, the matched object.
+
+##### findObject( String ) ⇒ WorldObject
+Looks if a string can be matched to an object in the environment. This is a convenience function over findNearby(), accepting the strings "me", "myself" and "here" to be matched.
+
+Returns: 
+- the object itself (= *this*) if the string is "me" or "myself",
+- the location (= *this.location*) if the string is "here",
+- otherwise, **fail**, **ambiguous** or a matched object.
+  
+##### findInside( String ) ⇒ WorldObject
+Looks inside the object's contents if a string can be matched to an object.
+
+Returns:
+- the core object **fail** when there is no match,
+- the core object **ambiguous** if there are more than one match,
+- otherwise, the matched object.
+
+#### Verb related methods
+For advanced usage. 
+
+##### matchObjects( String ) ⇒ Object
+##### matchVerb( String, Object ) ⇒ Object
+
+Check the **items_builderstaff** item in the demo for a possible use case. 
+
 #### Other methods
 They exist in the execution context, but are propably of lower interest.
 
 ##### send( String\|Object ) ⇒ Boolean
 Sends a message to the client.
 
-This is normally not intended to be used directly (e.g. check **tell()** method, defined by the **lib_root** object inherited by allmost all objects in the demo mudlib).
+This is normally not intended to be used directly (e.g. check the **tell()** method, defined by the **lib_root** object inherited by allmost all objects in the demo mudlib).
 
 Returns true upon success, false upon failure (no controller, e.g. not a player, or player not connected). 
 
 Note: Sending an object also works, assuming it is transferable. 
 
 ##### linearize() ⇒ Array.WorldObject
-Returns the trait inheritance hierarchy. Could be useful to check if an object has a given trait via inheritance.
+Returns the trait inheritance hierarchy. It could be useful to check if an object has a given trait via inheritance, see instanceOf() below for that purpose.
+
+##### instanceOf( WorldObject ) ⇒ Boolean
+Checks if the object is an instance of another object, i.e. if the former has the latter in its trait inheritance hierarchy.
+
+Basically, it just linearizes the object, and checks whether the other object is in the returned list of traits. (Obviously, since the object-oriented programming in RoomJS is trait-based, the usual JavaScript `instanceof` operator, which operates on object's prototypes, would not work as intended.)
 
 ##### setPrompt( String ) ⇒ Boolean
-Notifies the user to change his/her prompt. This is used by the mode system (see **modes** in the demo mudlib), when cycling between the modes (normal, say, chat, programming).
+Notifies the user to change his/her prompt. This is used by the mode system, when cycling between the modes (normal, say, chat, programming).
 
 Returns true upon success, false upon failure (no controller, e.g. not a player, or player not connected).
 
@@ -273,34 +328,11 @@ Returns an array of a given object's own enumerable properties.
 ##### values() ⇒ Array.Object
 Returns an array of a given object's own enumerable property values.
 
-#### Other methods (WIP)
+#### Other methods (internal/undocumented)
 
-Documentation not yet completed, work in progress...
+This section is provided for reference only. You are normally not supposed to need these methods -- but these are therefore reserved property names.
 
-##### matchObjects( command ) ⇒ WorldObject
-TBD.
-May return world object **nothing**
+##### matches( String ) ⇒ 0..2
+##### findMatch( Array, Array ) ⇒ WorldObject
+##### findVerb( Object, Object, WorldObject ) ⇒ Verb
 
-##### findObject( String ) ⇒ WorldObject
-TBD.
-String "me" (or "myself") returns the object itself (= this).
-String "here" returns the location (= this.location).
-Otherwise, call findNearby().
-May therefore return **fail** or **ambiguous**.
-
-##### findNearby( String ) ⇒ WorldObject
-TBD. May return world objects **fail** or **ambiguous**.
-Looks in the object itself, in its location, in an extraMatchObjects 
-property (which may be an array or a function to call) in the location if any,
-
-##### findInside( String ) ⇒ WorldObject
-TBD. May return world objects **fail** or **ambiguous**.
-
-##### findMatch( -,- ) ⇒ WorldObject
-TBD.
-
-##### matchVerb( ... ) ⇒ ...
-TBD.
-
-##### findVerb( ... ) ⇒ ...
-TBD.
