@@ -6,8 +6,8 @@ function zapAction(player, argstr) {
   }
   
   // Check the destroyable flag to only allow destroying player-created objects
-  if (!target.destroyable) {
-    player.tell("The gods of creation do not let you zap ${argstr}.");
+  if (!target.createdWithStaff) {
+    player.tell(`The gods of creation do not let you zap ${argstr}.`);
     return;
   }
 
@@ -19,7 +19,7 @@ function zapAction(player, argstr) {
           return `You zap the ${object.name} into oblivion.`;
         }
         return `${sender.name} zaps a ${object.name} into oblivion.`;
-      }, player, dobj);
+      }, player, target);
   }
   
   // Now, we can proceed to DESTRUCTION

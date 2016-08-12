@@ -22,7 +22,7 @@ function cloneAction(player, argstr) {
   let created = target.new(id);
   
   // Special flag to track objects created with the staff.
-  created.destroyable = true; 
+  created.createdWithStaff = true; 
   
   // Copy name, description and aliases, and move object in player inventory
   created.name = target.name;
