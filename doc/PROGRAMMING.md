@@ -152,7 +152,7 @@ Creates a command verb.
 | prep      | String?   | Preposition   |
 | iobj      | String?   | Indirect object |
 
-- The command can include several patterns separated by a space, that will be recognized alike. Each pattern can include a * sign for defining shortcuts. E.g., "l*ook ex*amine" will match "look", "l", "examine" and "ex".
+- The command can include several patterns separated by a space, that will be recognized alike. Each pattern can include a \* sign for defining shortcuts. E.g., "l\*ook ex\*amine" will match "look", "l", "examine" and "ex".
 - Possible values for optional direct/indirect objects are "this", "any", "none" (default).
 - Several prepositions may be provided, separated with a /.
 - Recognized propositions: "with", "using", "at", "to", "in front of", "in", "inside", "into", "on top of", "on", "onto", "upon", "out of", "from inside", "from", "over", "through", "under", "underneath", "beneath", "behind", "beside", "for", "about", "is", "as", "off of", "off".
