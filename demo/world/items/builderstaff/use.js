@@ -11,6 +11,7 @@ function use({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr })
    * - use staff to build <direction>
    * - use staff to name <text>
    * - use staff to desc|describe <text>
+   * - use staff to id|identify <object>|here|me
    */
   // Staff must be in hands
   if (this.location !== player) {
@@ -51,12 +52,16 @@ function use({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr })
       this.buildAction(player, cmdargstr);
       break;
     case "name":
-        this.nameAction(player, cmdargstr, false);
-        break;
+      this.nameAction(player, cmdargstr, false);
+      break;
     case "describe":
     case "desc":
-        this.nameAction(player, cmdargstr, true);
+      this.nameAction(player, cmdargstr, true);
       break;      
+    case "id":
+    case "identify":
+      this.identifyAction(player, cmdargstr);
+      break; 
     default:
       player.tell(`The ${this.name} cannot ${command}.`);
       break;

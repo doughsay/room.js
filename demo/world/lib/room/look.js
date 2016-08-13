@@ -3,7 +3,9 @@ function look({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr }
   const otherThingsHere = this.contents.filter(obj => !!obj.describe);
   const msg = [color.bold.yellow(this.name), this.describe()];
   
-  msg.push(color.bold.magenta('Exits: ') + Object.keys(this.exits).join(', '));
+  const exits = [];
+  Object.keys(this.exits).forEach(exit => { exits.push(`#cmd[${exit}]`) });
+  msg.push(color.bold.magenta('Exits: ') + exits.join(', '));
   
   otherThingsHere.forEach(obj => {
     const description = obj.describe();
