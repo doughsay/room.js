@@ -63,7 +63,7 @@
       "dobjarg": "none",
       "preparg": "none",
       "iobjarg": "none"
-    },    
+    },
     "goDirection": {
       "verb": true,
       "file": "goDirection.js",

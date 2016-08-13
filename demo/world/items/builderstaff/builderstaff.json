@@ -4,7 +4,7 @@
   "traitIds": [
     "lib_item"
   ],
-  "locationId": null,
+  "locationId": "tusk",
   "properties": {
     "description": {
       "value": "the magical staff of creation, for 'use' by builders"
@@ -14,7 +14,7 @@
       "file": "use.js",
       "pattern": "use",
       "dobjarg": "this",
-      "preparg": "to",
+      "preparg": "at/to",
       "iobjarg": "any"
     },
     "fetchTarget": {
@@ -44,6 +44,10 @@
     "nameAction": {
       "function": true,
       "file": "nameAction.js"
+    },
+    "identifyAction": {
+      "function": true,
+      "file": "identifyAction.js"
     }
   }
 }
