@@ -1,6 +1,6 @@
 # Description of the demo mudlib
 
-This memorandum describes the demo mudlib (i.e. *lib_xxx* objects), which may be used as
+This memorandum describes the demo mudlib (i.e. *lib\_xxx* objects), which may be used as
 a sample for designing you own world.
 
 THIS IS A WORK IN PROGRESS
@@ -11,10 +11,10 @@ Lorem ipsum dolor sic amet...
 
 ### Pure traits
 
-These objects are purely 'abstract' (i.e. they don't inherit from **lib_root**), and are
+These objects are purely 'abstract' (i.e. they don't inherit from **lib\_root**), and are
 intended to be added to objects deriving from it, to extend their functionality).
 
-##### lib_traits_describable
+##### lib\_traits\_describable
 
 A trait for items than can be described
 
@@ -40,7 +40,7 @@ Properties:
 
 Triggers: none
 
-##### lib_traits_gettable
+##### lib\_traits\_gettable
 
 A trait for items that can be taken or dropped.
 
@@ -74,7 +74,7 @@ Triggers: none, but that's probably missing (e.g. onDropItem/onTakeItem)
 **TODO** : canTake, canDrop ?
 **FIX** : any/ambiguous/fail are poorly handled
 
-##### lib_traits_closeable
+##### lib\_traits\_closeable
 
 A trait for items that can be opened/closed/locked/unlocked.
 
@@ -106,7 +106,7 @@ Properties:
 | --------------------------- | ------------- |
 | locked   : Boolean          | True if item is locked. Defaults to true |
 | closed   : Boolean          | True if item is closed. Defaults to true |
-| keySet   : Array.String     | Key identifiers (see **lib_key** below) for locking/unlocking the object. Default to [ "masterkey" ] |
+| keySet   : Array.String     | Key identifiers (see **lib\_key** below) for locking/unlocking the object. Default to [ "masterkey" ] |
 | autolocking : Boolean       | Optional flag. If true, the object will lock itself when being closed |
 
 - If you don't want the object to be lockable/unlockable, set the keySet to an empty array,
@@ -121,7 +121,7 @@ Triggers:
 | onLock                      | Fired after object is locked |
 | onUnlock                    | Fired after object is unlocked |
 
-##### lib_traits_container
+##### lib\_traits\_container
 
 A trait for items that can serve as containers.
 
@@ -141,14 +141,14 @@ Functions:
 | --------------------------- | ------------- |
 | announcePutItemContainer    | Defines the message displayed in the room when an object is put into the container |
 | announceTakeItemContainer   | Defines the message displayed in the room when the object is dropped |
-| canAccept                   | Checks the container interior can be accessed. Currently only checks whether the container is closed, in case it also inherits from *lib_traits_closeable* |
+| canAccept                   | Checks the container interior can be accessed. Currently only checks whether the container is closed, in case it also inherits from *lib\_traits\_closeable* |
 | describeContents            | Returns the contents of the container |
 
 Properties: none
 
-Triggers: none, but that's probably missing (or we should use onDropItem/onTakeItem if the instances has *lib_traits_gettable*)
+Triggers: none, but that's probably missing (or we should use onDropItem/onTakeItem if the instances has *lib\_traits\_gettable*)
 
-##### lib_traits_edible
+##### lib\_traits\_edible
 
 A trait for items that can be eaten or drunk.
 
@@ -176,7 +176,7 @@ Properties:
 | destroyOnUse : Boolean      | True if the object should be destroyed after use. Defaults to false |
 
 - To keep this as simple as possible, edibled object are either single use (when destroyOnUse is true) or inexhaustible (when false).
-- Basically, the idea is that meal is usually for single use, and drink is inexhaustible, but the **lib_liquidcontainer** is probably what you'll rather use for single use drinks.
+- Basically, the idea is that meal is usually for single use, and drink is inexhaustible, but the **lib\_liquidcontainer** is probably what you'll rather use for single use drinks.
 
 Triggers:
 
@@ -184,7 +184,7 @@ Triggers:
 | --------------------------- | ------------- |
 | onUse                       | Fired after object is eaten or drunk |
 
-##### lib_traits_commandable
+##### lib\_traits\_commandable
 
 A trait for locations (as opposed to the previous ones), using the special "verbMissing" on locations, invoked by the game engine when no matching verb has been found according to the usual rules. It the tries to delegate the command to the first item in the location that possibly accepts the command.
 
@@ -214,7 +214,7 @@ Triggers: none
 
 ### Root object
 
-##### lib_root
+##### lib\_root
 
 A base parent trait for all other objects.
 
@@ -233,11 +233,11 @@ Triggers: none
 
 ### Rooms and doors
 
-##### lib_room
+##### lib\_room
 
 The base structure for rooms.
 
-Traits: **lib_root**
+Traits: **lib\_root**
 
 Verbs:
 
@@ -275,11 +275,11 @@ Triggers:
 | onEnter                     | Fired after the room is entered |
 | onLeave                     | Fired when the room is being left |
 
-##### lib_door
+##### lib\_door
 
 A door is a two-way traversable entity.
 
-Traits: **lib_root**, **lib_describable**, **lib_closeable**
+Traits: **lib\_root**, **lib\_describable**, **lib\_closeable**
 
 Verbs: none
 
@@ -319,11 +319,11 @@ function onTraversal(player) {
 
 ### Items
 
-##### lib_item
+##### lib\_item
 
 The base structure for items.
 
-Traits: **lib_root**, **lib_describable**, **lib_gettable**
+Traits: **lib\_root**, **lib\_describable**, **lib\_gettable**
 
 Verbs: none
 
@@ -337,11 +337,11 @@ Properties:
 
 Triggers: none
 
-##### lib_key
+##### lib\_key
 
 A base object for designing key-like items, allowing to lock/unlock closeable objects.
 
-Traits: **lib_item**
+Traits: **lib\_item**
 
 Verbs: none
 
@@ -354,15 +354,15 @@ Properties:
 | description : String        | Default textual description ("An undescript key.") |
 | keyId : String              | Default key identifier for matching closeable objects ("masterkey") |
 
-- The key identifier is set to "masterkey", which is also the initial setting for **lib_closeable**, so any derived object will by default be an all-purpose master key. It is up to you to change it, following you own identification pattern.
+- The key identifier is set to "masterkey", which is also the initial setting for **lib\_closeable**, so any derived object will by default be an all-purpose master key. It is up to you to change it, following you own identification pattern.
 
 Triggers: none
     
-##### lib_ediblecontainer
+##### lib\_ediblecontainer
 
 A base object for designing single use items containing edible things, such as a cup of tea, a plate of potatoes, etc. When used, they'd become an empty cup, an empty plate, etc.
 
-Traits: **lib_item**, **lib_traits_edible**
+Traits: **lib\_item**, **lib\_traits\_edible**
 
 Verbs: none
 
@@ -388,11 +388,11 @@ Triggers: none
 
 ### Living things
 
-##### lib_player
+##### lib\_player
 
 The base structure for players.
 
-Traits: **lib_root**
+Traits: **lib\_root**
 
 Verbs:
 
@@ -422,13 +422,13 @@ Properties:
 
 Triggers: none
 
-##### lib_npc
+##### lib\_npc
 
 The base structure for non-player characters. This is just a demo, so we don't
 really know what NPCs are - but we'd probably like them to have extra features in the
 future.
 
-Traits: **lib_root**
+Traits: **lib\_root**
 
 Verbs: none
 
@@ -438,11 +438,11 @@ Properties: none
 
 Triggers: none
 
-##### lib_npc_seller
+##### lib\_npc\_seller
 
 The base structure for a simple seller NPC characters. The goods available for sale are in the object's contents. The 'list' command allows getting the list of goods, and the 'order' command to obtain one.
 
-Traits: **lib_npc**
+Traits: **lib\_npc**
 
 Verbs:
 
