@@ -69,9 +69,8 @@ Properties:
 | --------------------------- | ------------- |
 | keepFlag : Boolean          | Optional flag marking the object as kept, when true. |
 
-Triggers: none
+Triggers: none, but that's probably missing (e.g. onDropItem/onTakeItem)
 
-**TODO** : Add onDropItem, onTakeItem events ?
 **TODO** : canTake, canDrop ?
 **FIX** : any/ambiguous/fail are poorly handled
 
@@ -122,6 +121,33 @@ Triggers:
 | onLock                      | Fired after object is locked |
 | onUnlock                    | Fired after object is unlocked |
 
+##### lib_traits_container
+
+A trait for items that can serve as containers.
+
+Traits: none
+
+Verbs:
+
+| Verb                        | 
+| --------------------------- | 
+| get/take any out of/from/inside/from this | 
+| put any in/inside/into this | 
+| l\*ook in/inside/into this  |
+
+Functions:
+
+| Function                    | Description   |
+| --------------------------- | ------------- |
+| announcePutItemContainer    | Defines the message displayed in the room when an object is put into the container |
+| announceTakeItemContainer   | Defines the message displayed in the room when the object is dropped |
+| canAccept                   | Checks the container interior can be accessed. Currently only checks whether the container is closed, in case it also inherits from *lib_traits_closeable* |
+| describeContents            | Returns the contents of the container |
+
+Properties: none
+
+Triggers: none, but that's probably missing (or we should use onDropItem/onTakeItem if the instances has *lib_traits_gettable*)
+
 ##### lib_traits_edible
 
 A trait for items that can be eaten or drunk.
@@ -158,6 +184,34 @@ Triggers:
 | --------------------------- | ------------- |
 | onUse                       | Fired after object is eaten or drunk |
 
+##### lib_traits_commandable
+
+A trait for locations (as opposed to the previous ones), using the special "verbMissing" on locations, invoked by the game engine when no matching verb has been found according to the usual rules. It the tries to delegate the command to the first item in the location that possibly accepts the command.
+
+The idea here is that the location does know which command exits, but some item would.
+Typically, it is used for shops, where there might be a trader in the room to accept the command.
+
+Traits: none
+
+Verbs: none
+
+Functions:
+
+| Function                    | Description   |
+| --------------------------- | ------------- |
+| verbMisssing                | Special property on locations, invoked when the game engine failed at find an appropriate verb |
+| delegateCommand             | Browse the location's constant for an item that would accept the command |
+
+Properties:
+
+| Property                    | Description   |
+| --------------------------- | ------------- |
+| allowedCommands : Array.String  | Commands that be delegate (["list", "sell", "buy", "order"]) |
+
+- It comes with a set of predefined commands suitable for shops.
+
+Triggers: none
+
 ### Root object
 
 ##### lib_root
@@ -170,11 +224,10 @@ Verbs: none
 
 Functions:
 
-| Function                  | Description
-| ------------------------- | -------------
-| tell( msg : String )      | If the object is a player, sends a message to him/her
-
-**TODO** add clone
+| Function                  | Description   |
+| ------------------------- | ------------- |
+| tell( msg : String )      | If the object is a player, sends a message to him/her |
+| clone( id : String )      | Convenience function to create an object but also copy its name description and aliases from its parent. | 
 
 Triggers: none
 
@@ -369,3 +422,41 @@ Properties:
 
 Triggers: none
 
+##### lib_npc
+
+The base structure for non-player characters. This is just a demo, so we don't
+really know what NPCs are - but we'd probably like them to have extra features in the
+future.
+
+Traits: **lib_root**
+
+Verbs: none
+
+Functions: none
+
+Properties: none
+
+Triggers: none
+
+##### lib_npc_seller
+
+The base structure for a simple seller NPC characters. The goods available for sale are in the object's contents. The 'list' command allows getting the list of goods, and the 'order' command to obtain one.
+
+Traits: **lib_npc**
+
+Verbs:
+
+| Verb                         | 
+| ---------------------------- |
+| list                         | 
+| order/buy any                | 
+
+Functions:
+
+| Function                    | Description   |
+| --------------------------- | ------------- |
+| annonceSale                 | Defines the message displayed in the room when the sale is concluded |
+
+Properties: none
+
+Triggers: none
