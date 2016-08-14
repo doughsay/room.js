@@ -7,6 +7,10 @@
     "tell": {
       "function": true,
       "file": "tell.js"
+    },
+    "clone": {
+      "function": true,
+      "file": "clone.js"
     }
   }
 }

@@ -2,7 +2,8 @@
   "name": "Inn",
   "aliases": [],
   "traitIds": [
-    "lib_room"
+    "lib_room",
+    "lib_traits_commandable"
   ],
   "locationId": null,
   "properties": {
