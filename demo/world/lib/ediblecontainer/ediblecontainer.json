@@ -1,0 +1,36 @@
+{
+  "name": "lib_ediblecontainer",
+  "aliases": [],
+  "traitIds": [
+    "lib_item",
+    "lib_traits_edible"
+  ],
+  "locationId": null,
+  "properties": {
+    "containerObject": {
+      "value": "bottle"
+    },
+    "containedEdible": {
+      "value": "water"
+    },
+    "doUse": {
+      "function": true,
+      "file": "doUse.js"
+    },
+    "setEdible": {
+      "function": true,
+      "file": "setEdible.js"
+    },
+    "canUse": {
+      "function": true,
+      "file": "canUse.js"
+    },
+    "describe": {
+      "function": true,
+      "file": "describe.js"
+    },
+    "exhausted": {
+      "value": false
+    }
+  }
+}

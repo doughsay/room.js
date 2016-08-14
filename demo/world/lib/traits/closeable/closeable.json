@@ -45,7 +45,7 @@
     "keySet": {
       "array": [
         {
-          "value": "keypass"
+          "value": "masterkey"
         }
       ]
     },
@@ -80,6 +80,14 @@
     "onUnlock": {
       "function": true,
       "file": "onUnlock.js"
+    },
+    "addKeyId": {
+      "function": true,
+      "file": "addKeyId.js"
+    },
+    "rmKeyId": {
+      "function": true,
+      "file": "rmKeyId.js"
     }
   }
 }
