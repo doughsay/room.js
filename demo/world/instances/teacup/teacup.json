@@ -1,0 +1,17 @@
+{
+  "name": "cup of tea",
+  "aliases": [
+    "tea",
+    "cup",
+    "teacup"
+  ],
+  "traitIds": [
+    "items_teacup"
+  ],
+  "locationId": "areas_start_heaven",
+  "properties": {
+    "exhausted": {
+      "value": false
+    }
+  }
+}

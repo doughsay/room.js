@@ -1,9 +1,9 @@
 {
-  "name": "cup of tea",
+  "name": "glass of wine",
   "aliases": [
-    "cup",
-    "tea",
-    "teacup"
+    "glass",
+    "goblet",
+    "wine"
   ],
   "traitIds": [
     "lib_ediblecontainer"
@@ -11,19 +11,19 @@
   "locationId": "items_waitress",
   "properties": {
     "containedEdible": {
-      "value": "tea"
+      "value": "wine"
     },
     "edibleDescription": {
-      "value": "Like a fine dessert liqueur, this intoxicating black tea blend is smooth and delicate."
+      "value": "The wine is rich, with bold aromas and a balanced flavor of blackberry."
     },
     "exhausted": {
       "value": false
     },
     "description": {
-      "value": "A hand painted porcelain teacup."
+      "value": "A fine crystal goblet."
     },
     "containerObject": {
-      "value": "cup"
+      "value": "glass"
     }
   }
 }
