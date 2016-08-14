@@ -1,15 +1,13 @@
 {
   "name": "lib_traits_describable",
   "aliases": [],
-  "traitIds": [
-    "lib_root"
-  ],
+  "traitIds": [],
   "locationId": null,
   "properties": {
     "examine": {
       "verb": true,
       "file": "examine.js",
-      "pattern": "ex*amine look",
+      "pattern": "ex*amine l*ook",
       "dobjarg": "this",
       "preparg": "none",
       "iobjarg": "none"

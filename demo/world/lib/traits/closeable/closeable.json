@@ -1,9 +1,7 @@
 {
   "name": "lib_traits_closeable",
   "aliases": [],
-  "traitIds": [
-    "lib_root"
-  ],
+  "traitIds": [],
   "locationId": null,
   "properties": {
     "open": {

@@ -2,6 +2,7 @@
   "name": "lib_door",
   "aliases": [],
   "traitIds": [
+    "lib_root",
     "lib_traits_closeable",
     "lib_traits_describable"
   ],

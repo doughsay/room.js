@@ -3,7 +3,8 @@
   "aliases": [],
   "traitIds": [
     "lib_traits_describable",
-    "lib_traits_gettable"
+    "lib_traits_gettable",
+    "lib_root"
   ],
   "locationId": null,
   "properties": {}
