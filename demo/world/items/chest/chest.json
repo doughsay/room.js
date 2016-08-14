@@ -3,9 +3,10 @@
   "aliases": [],
   "traitIds": [
     "lib_item",
-    "lib_traits_closeable"
+    "lib_traits_closeable",
+    "lib_traits_container"
   ],
-  "locationId": "areas_start_heaven",
+  "locationId": null,
   "properties": {
     "locked": {
       "value": true
@@ -13,8 +14,8 @@
     "closed": {
       "value": true
     },
-    "keepFlag": {
-      "value": false
+    "description": {
+      "value": "A small chest with an antique style lock."
     }
   }
 }
