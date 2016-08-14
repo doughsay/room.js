@@ -7,5 +7,9 @@
     "lib_root"
   ],
   "locationId": null,
-  "properties": {}
+  "properties": {
+    "description": {
+      "value": "An undescript item."
+    }
+  }
 }

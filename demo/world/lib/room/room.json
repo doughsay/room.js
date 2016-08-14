@@ -7,7 +7,7 @@
   "locationId": null,
   "properties": {
     "description": {
-      "value": "default room"
+      "value": "An undescript room."
     },
     "exits": {
       "object": {}

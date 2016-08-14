@@ -1,0 +1,16 @@
+{
+  "name": "key",
+  "aliases": [],
+  "traitIds": [
+    "lib_item"
+  ],
+  "locationId": null,
+  "properties": {
+    "keyId": {
+      "value": "masterkey"
+    },
+    "description": {
+      "value": "An undescript key."
+    }
+  }
+}
