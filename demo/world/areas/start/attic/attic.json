@@ -1,5 +1,5 @@
 {
-  "name": "Heaven",
+  "name": "Loke's Attic",
   "aliases": [],
   "traitIds": [
     "lib_room"
@@ -7,14 +7,11 @@
   "locationId": null,
   "properties": {
     "description": {
-      "value": "You stand in a beautifully furnished room. This is the Starting Room for newcomers in this World. There is a lounge downstairs."
+      "value": "You hardly stand in this awkardly shaped room, just under a slanted roof. There are difficult-to-reach corners, and everything stored here is gathering dust. Anyhow, there seems to be something sacred in this place, or maybe that's just an illusion."
     },
     "exits": {
       "object": {
         "down": {
-          "ref": "areas_start_lounge"
-        },
-        "up": {
           "ref": "areas_start_door"
         }
       }
