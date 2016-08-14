@@ -1,9 +1,7 @@
 {
   "name": "lib_traits_gettable",
   "aliases": [],
-  "traitIds": [
-    "lib_root"
-  ],
+  "traitIds": [],
   "locationId": null,
   "properties": {
     "drop": {
