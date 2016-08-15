@@ -18,7 +18,14 @@
       }
     },
     "description": {
-      "value": "There is nothing better than having a yarn with the locals or other travellers over a beer at the local tavern. This is an high standing place, with many tables made of polished quality wood. There are also comfortable sofas near the chimney in the corner of the room."
+      "value": "There is nothing better than having a yarn with the locals or other travellers over a beer at the local tavern. This is an high standing place, with many tables made of polished quality wood. There are also comfortable sofas near the chimney in the corner of the room.\nThere is a sign on the wall, you should maybe take a look."
+    },
+    "extraMatchObjects": {
+      "array": [
+        {
+          "ref": "items_sellersign"
+        }
+      ]
     }
   }
 }
