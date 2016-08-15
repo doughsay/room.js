@@ -25,6 +25,10 @@
     "announceSale": {
       "function": true,
       "file": "announceSale.js"
+    },
+    "announceOffer": {
+      "function": true,
+      "file": "announceOffer.js"
     }
   }
 }

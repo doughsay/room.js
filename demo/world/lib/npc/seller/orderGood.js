@@ -13,10 +13,18 @@ function order({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr 
   } else {
     player.tell(`${this.name} says: "You are welcome!"`);
     
-    // Clone the good and give it to player
+    // Clone the good
     let created = target.clone("instances_" + target.id.split("_").pop());
-    created.location = player;
-    player.location.announce(this.announceSale.bind(this), player, created);
+    
+    if (this !== player) {
+      // Give to player
+      created.location = player;
+      player.location.announce(this.announceSale.bind(this), player, created);
+    } else {
+      // Handle the fun case where the player/programmer would have added the trait to himself...
+      created.location = this.location;
+      player.location.announce(this.announceOffer.bind(this), player, created);
+    }
 
   } 
 }

@@ -4,19 +4,19 @@ This guide is intended for "builders", i.e. players with developer privileges in
 
 ## Introduction
 
-Once you have been given developer privileges (or by default, on the demo), you can use the **eval** command to prefix code instructions, or preferably cycle to the EVAL mode.
+Once you have been given developer privileges (or by default, on the demonstration), you can use the **eval** command to prefix code instructions, or preferably cycle to the EVAL mode.
 
 > For the reminder, you can cycle between different modes by hitting TAB. 
 > Modes effectively just prefix whatever you type with another word. 
  
 You can then use any JavaScript (ES6) construct to start creating new rooms and objects. This document therefore assumes the reader has pre-existing JavaScript knowledge. You will need to learn but a few basic RoomJS-specific concepts only:
 
-- Toplevel functions: there are a few convenience global functions, such as **all()** and **nextId()**, etc. They are seldom used in actual code, but are provided as utilities for you to invoke on the command line.
+- Toplevel functions: there are a few global functions, such as **all()**. Some are seldom used in actual code, but are provided as utilities for you to invoke on the command line. Others, such as **nextId()**, will be of frequent use.
 - World objects:
   - Each object in the world has a unique identifier, which also corresponds to its name in the global scope.
-    - You may reference an object by its identifier: `$('lib_room')`
-    - Or rather, directy by its global variable:  `lib_room`
-    - Identifiers are internally mapped to a file path by the DB, with the underscore character corresponding to the path separator (e.g. "lib_room" will be mapped to "lib/room"). This allows  organizing the objects logically -- You can create objects at any level, but it is a **good practice** to enquire your game administrator regarding the recommended naming scheme. Please also refer to the [Customization guide](CUSTOMIZING.md)
+    - You may reference an object by its identifier: `$('lib\_room')`
+    - Or rather, directy by its global variable:  `lib\_room`
+    - Identifiers are internally mapped to a file path by the DB, with the underscore character corresponding to the path separator (e.g. "lib\_room" will be mapped to "lib/room"). This allows  organizing the objects logically -- You can create objects at any level, but it is a **good practice** to enquire your game administrator regarding the recommended naming scheme. Please also refer to the [Customization guide](CUSTOMIZING.md)
   - Objects can include, as usual, properties and functions, but they can also have verbs.
     - To add a new function: `obj.foo = function foo()` {} 
     - To add a new verb: `obj.bar = Verb("bar")`
@@ -31,7 +31,7 @@ For more details, see also the [Reference guide](#reference-guide) further below
 But for now, let's create our first object: a (very) basic lantern!
 First, switch to EVAL mode, so that you do not have to prefix every JavaScript command.
 
-- Create a new object. In the demo mudlib, **lib_item** is a gettable and describable object. So we will start from it (i.e. it will be the base trait for our object)
+- Create a new object. In the demonstration mudlib, **lib\_item** is a gettable and describable object. So we will start from it (i.e. it will be the base trait for our object)
 ```
 lib_item.new('tests_lantern');
 ```
@@ -118,7 +118,7 @@ light lamp
 extinguish lamp
 ```
 
-Yeah, there you go. Now, the description should probably indicate whether our little lantern is lit or not. That's basic programming, so it's up to you!
+There you go! Well, the description should probably indicate whether our little lantern is lit or not. That's basic programming, so it's up to you now.
 
 ## Reference guide
 
@@ -132,12 +132,6 @@ Returns a new unique identifier from the text provided. Very useful when you cre
 
 ##### players() ⇒ Array.WorldObject
 Returns a list of all existing player world objects (i.e. player characters).
-
-##### color.*( String ) ⇒ String
-Colorizes a string.
-```
-var boldBlueText = color.bold.blue("Some text");
-```
 
 ##### $( String ) ⇒ WorldObject|undefined
 Returns a world object by its identifier, if it exits.
@@ -182,6 +176,14 @@ parse("put trash in can");
 ```
 
 This may be used to check how a command will be split and passed to a Verb function.
+
+##### color.*( String ) ⇒ String
+Colorizes a string.
+```
+var boldBlueText = color.bold.blue("Some text");
+```
+
+The available features are those provided by [Chalk](https://github.com/chalk/chalk).
 
 ### World objects
 
@@ -292,7 +294,7 @@ For advanced usage.
 ##### matchObjects( String ) ⇒ Object
 ##### matchVerb( String, Object ) ⇒ Object
 
-Check the **items_builderstaff** item in the demo for a possible use case. 
+Check the **items\_builderstaff** item or the **lib\_traits\_commandable** trait in the demonstration for possible use cases. 
 
 #### Other methods
 They exist in the execution context, but are propably of lower interest.
@@ -300,11 +302,11 @@ They exist in the execution context, but are propably of lower interest.
 ##### send( String\|Object ) ⇒ Boolean
 Sends a message to the client.
 
-This is normally not intended to be used directly (e.g. check the **tell()** method, defined by the **lib_root** object inherited by allmost all objects in the demo mudlib).
+This is normally not intended to be used directly (e.g. check the **tell()** method, defined by the **lib\_root** object inherited by allmost all objects in the demo mudlib).
 
 Returns true upon success, false upon failure (no controller, e.g. not a player, or player not connected). 
 
-Note: Sending an object also works, assuming it is transferable. 
+Note: Sending a JavaScript object also works, assuming it is [transferable](https://www.w3.org/TR/html5/infrastructure.html#transferable-objects) (and that the client side knows what to do with it, obviously).
 
 ##### linearize() ⇒ Array.WorldObject
 Returns the trait inheritance hierarchy. It could be useful to check if an object has a given trait via inheritance, see instanceOf() below for that purpose.
