@@ -244,15 +244,15 @@ Verbs:
 | Verb                         | 
 | ---------------------------- | 
 | l\*ook                       |
-| g\*o <any>                   |   
+| g\*o any                     |   
 | n\*orth e\*ast s\*outh w\*est u\*p d\*own ne se nw sw northeast northwest southeast southwest |
 
 Functions:
 
 | Function                    | Description   |
 | --------------------------- | ------------- |
-| doEnter                     |               |
-| doLeave                     |               |
+| doEnter                     | Entering logic |
+| doLeave                     | Leaving logic  |
 | canEnter                    | Checks if the room may be entered. Returns true, so intended to be overloaded by derived objects |
 | canLeave                    | Checks if the room may be left. Returns true, so intended to be overloaded by derived objects |
 | announceEnterRoom           | Defines the message displayed in the room upon entering |
@@ -281,7 +281,7 @@ A door is a two-way traversable entity.
 
 For the reminder, once you have connected rooms via a door, you will very likely want to add the door to the extraMatchObjects property of each room, so that players can operate upon the door (since it is not an item in the room's content).
 
-Traits: **lib\_root**, **lib\_describable**, **lib\_closeable**
+Traits: **lib\_root**, **lib\_traits\_describable**, **lib\_traits\_closeable**
 
 Verbs: none
 
@@ -325,7 +325,7 @@ function onTraversal(player) {
 
 The base structure for items.
 
-Traits: **lib\_root**, **lib\_describable**, **lib\_gettable**
+Traits: **lib\_root**, **lib\_traits\_describable**, **lib\_traits\_gettable**
 
 Verbs: none
 
@@ -354,7 +354,7 @@ Properties:
 | description : String        | Default textual description ("An undescript key.") |
 | keyId : String              | Default key identifier for matching closeable objects ("masterkey") |
 
-- The key identifier is set to "masterkey", which is also the initial setting for **lib\_closeable**, so any derived object will by default be an all-purpose master key. It is up to you to change it, following you own identification pattern.
+- The key identifier is set to "masterkey", which is also the initial setting for **lib\_traits\_closeable**, so any derived object will by default be an all-purpose master key. It is up to you to change it, following you own identification pattern.
  
 #### lib\_ediblecontainer
 
@@ -398,23 +398,24 @@ Verbs:
 | say any                      |
 | ch\*at any                   |   
 | who                          |
-| help                         |
+| help any                     |
 
 Functions:
 
 | Function                    | Description   |
 | --------------------------- | ------------- |
 | announceSay                 | Defines the message displayed in the room when the "say" command is used |
-| setMode                     |               |
-| nextMode                    |               |
-| onTabKeyPress               |               |
-| renderPrompt                |               |
+| setMode                     | Sets the mode |
+| nextMode                    | Gets the next mode according to a direction (i.e. whether TAB was initially shifter or not) |
+| renderPrompt                | Builds the appropriate prompt for the current mode, and invokes setPrompt() |
+| onTabKeyPress               | Hook invoked by the game engine when the TAB key event is recieved. Just calls the above mode-changing methods |
+
 
 Properties:
 
 | Property                    | Description   |
 | --------------------------- | ------------- |
-| mode : WorldObject          | Current player mode |
+| mode : WorldObject          | Current mode (play, say, chat, eval) |
 
 #### lib\_npc
 
@@ -434,7 +435,7 @@ Properties: none
 
 The base structure for (very simple) NPC sellers. The 'list' command allows getting the list of goods, and the 'order' command to obtain one of the listed goods.
 
-The goods available for sale are those in the object's contents (so logically you would want to have different types of items there). Upon order, the required object is cloned and that newly created instance is given to the player (i.e. placed in the player's contents).
+The goods available for sale are those in the object's contents (so logically you would want to have different types of items there). Upon order, the required object is cloned and the newly created instance is given to the player (i.e. placed in the player's contents).
 
 For this to work, the NPC must be in a room that has the **lib\_traits\_commandable** trait, for the player commands to be delegated to the NPC.
 
