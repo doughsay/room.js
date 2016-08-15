@@ -21,6 +21,10 @@
     "oppositeDirection": {
       "function": true,
       "file": "oppositeDirection.js"
+    },
+    "prettyPrintVerb": {
+      "function": true,
+      "file": "prettyPrintVerb.js"
     }
   }
 }

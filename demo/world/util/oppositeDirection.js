@@ -6,6 +6,10 @@ function oppositeDirection(direction) {
     west: 'east',
     up: 'down',
     down: 'up',
+    northeast: 'southwest',
+    northwest: 'southeast',
+    southeast: 'northwest',
+    southwest: 'northeast'
   };
 
   return directionsMap[direction];

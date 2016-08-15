@@ -1,4 +1,6 @@
 function normalizeDirection(str) {
+  if (str === '') { return };
+                   
   if (str === 'ne') { return 'northeast'; }
   if (str === 'se') { return 'southeast'; }
   if (str === 'nw') { return 'northwest'; }
