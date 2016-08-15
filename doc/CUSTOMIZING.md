@@ -10,9 +10,9 @@ We will deal here with both the object identifiers and the underlying on-disk fi
 > organizing the objects logically -- You can create objects at any level, but it is a **good practice**
 >to enquire your game administrator regarding the recommended naming scheme.
 
-World objects can be created at any logical level. In this document, the demo world is used as a sample -- your own world may end up with a different structure.
+World objects can be created at any logical level. In this document, the demonstration world is used as a sample -- your own world may end up with a different structure.
 
-The term "mudlib" refers to the very basic set of objects and entities that are initally required to make the first real objects in your game, i.e. the base structure for rooms, containers, behaviors, etc.). The demo comes with its own mudlib, which you can modify/extend, but it is wholly replaceable -- By nature, the demo mudlib has been kept small (no character classes or combat system, for instance -- You'll have to design your owns).
+The term "mudlib" hereafter refers to the very basic set of objects and entities that are initally required to make the first real objects in your game, i.e. the base structure for rooms, containers, behaviors, etc.). The demonstration comes with its own mudlib, which you can modify/extend, but it is wholly replaceable -- By nature, the demonstration mudlib has been kept small (no character classes or combat system, for instance -- You'll have to design your owns).
 
 ## Core objects (mandatory)
 The following objects shall always be present, as they are internally used by the game engine.
@@ -44,22 +44,25 @@ The following objects are not mandatory *per se* but are probably best keeping (
 
 ## Mudlib objects (replaceable)
 
-In the demo, all mudlib objects are located under the *lib/* directory (and henceforth, their identifiers all start with "lib_".
+In the demonstration, all mudlib objects are located under the *lib/* directory (and henceforth, their identifiers all start with "lib_".
 
-The mudlib defines an initial class hierarchy for designing more complex objects. You may replace it by your own.
+The mudlib defines an initial class hierarchy for designing more complex objects, for details see the [Demonstration mudlib](DEMO_MUDLIB.md) memorandum.
+
+You may replace it by your own.
 
 ## Player objects (removable, if any)
 
 For now, player objects (characters) also reside at the world toplevel.
-The demo should not come with any (but well, that may not be true yet!), since you'll just create them when playing :)
+The demonstration should not come with any (but well, that may not be true yet!), since you will just create them when playing :)
 
 ## All other objects (removable)
 
-All other objects are demo-specific, so you may wholly remove them when creating your own world. As noted, you may follow any convention and logical naming scheme for your own world, but you will likely want to manage the objects in a maintenable way. 
+All other objects are demonstration-specific, so you may wholly remove them when creating your own world. As noted, you may follow any convention and logical naming scheme for your own world, but you will likely want to manage the objects in a maintenable way. 
 
-For instance, the demo adopts the following scheme:
+For instance, the demonstration adopts the following scheme:
 - All useable items are located in *items/* (and therefore have identifiers starting with "items_"),
 - Rooms are structured under *areas/* (and therefore have identifiers such as "area_something_roomname").
+- Cloned objects (i.e. copies of useable items, such as made by the seller NPCs) are located in *instances/*).
 
 Once you have created a room of your own, and changed the system.onPlayerConnected() hook
 to use that room as initial location, you may remove the aforementioned directories.

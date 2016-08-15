@@ -1,6 +1,6 @@
 function look({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr }) {
   const playersHere = this.contents.filter(obj => obj.player);
-  const otherThingsHere = this.contents.filter(obj => !!obj.describe);
+  const otherThingsHere = this.contents.filter(obj => !!obj.describe && !obj.player);
   const msg = [color.bold.yellow(this.name), this.describe()];
   
   const exits = [];

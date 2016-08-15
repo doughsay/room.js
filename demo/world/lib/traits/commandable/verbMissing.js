@@ -6,11 +6,13 @@ function ({player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr}) {
     // See if any item in the location can accept the command
     let command = {verb, argstr, dobjstr, prepstr, iobjstr};
     found = this.contents.some(item => {
-      if (item.player) {
+      // It could be good to ignore players here - Since this means having the 
+      // player will be forced to perform an action
+      /* if (item.player) {
         return false;
-      } else {  
+      } else { */
         return this.delegateCommand(player, item, command);
-      }
+      /* } */
     });
   }
   

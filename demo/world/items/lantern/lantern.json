@@ -4,8 +4,7 @@
     "lamp"
   ],
   "traitIds": [
-    "lib_item",
-    "lib_traits_describable"
+    "lib_item"
   ],
   "locationId": "items_chest",
   "properties": {

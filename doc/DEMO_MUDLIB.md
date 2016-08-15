@@ -1,22 +1,30 @@
-# Description of the demo mudlib
+# A brief description of the demonstration mudlib
 
-This memorandum describes the demo mudlib (i.e. *lib\_xxx* objects), which may be used as
-a sample for designing you own world.
+The RoomJS game engine does not make many assumptions about the gaming logic. It can be regarded as a generic "driver" responsible for handling connections and player accounts,  dispatching commands and providing a persisent world -- But basically, everything else is entirely up to the game developers.
 
-THIS IS A WORK IN PROGRESS
+As noted in the [Customization guide](CUSTOMIZING.md), which the reader is assumed to have first read at this point:
+
+> The term "mudlib" refers to the very basic set of objects and entities that are initally required to make the first real objects in your game, i.e. the base structure for rooms, containers, behaviors, etc.). The demonstration comes with its own mudlib, which you can modify/extend, but it is wholly replaceable -- By nature, the demonstration mudlib has been kept small (no character classes or combat system, for instance -- You'll have to design your owns).
+
+This memorandum describes the demonstration mudlib (i.e. *lib\_xxx* objects), which may be used as a sample for designing and implementing you own game logic.
 
 ## Introduction
 
-Lorem ipsum dolor sic amet...
+For each objects, this memorandum provides:
+- The directly inherited traits,
+- Verbs defined by the object,
+- Functions defined by the object,
+- Properties defined by the object,
+- If any, triggers provided by this object: these are callback functions that do nothing by default, but are intended for being overloaded by derived classes.
 
 ### Pure traits
 
 These objects are purely 'abstract' (i.e. they don't inherit from **lib\_root**), and are
 intended to be added to objects deriving from it, to extend their functionality).
 
-##### lib\_traits\_describable
+#### lib\_traits\_describable
 
-A trait for items than can be described
+A trait for items than can be described.
 
 Traits: none
 
@@ -38,9 +46,7 @@ Properties:
 | --------------------------- | ------------- |
 | description : String        | Optional textual description for the object |
 
-Triggers: none
-
-##### lib\_traits\_gettable
+#### lib\_traits\_gettable
 
 A trait for items that can be taken or dropped.
 
@@ -71,7 +77,7 @@ Properties:
 
 Triggers: none, but that's probably missing (e.g. onDropItem/onTakeItem)
 
-##### lib\_traits\_closeable
+#### lib\_traits\_closeable
 
 A trait for items that can be opened/closed/locked/unlocked.
 
@@ -90,12 +96,12 @@ Functions:
 
 | Function                    | Description   |
 | --------------------------- | ------------- |
-| doOpen                      |               |
-| doClose                     |               |
-| doLock                      |               |
-| doUnlock                    |               |
-| addKeyId                    |               |
-| rmKeyId                     |               |
+| doOpen                      | Opening logic |
+| doClose                     | Closing logic |
+| doLock                      | Locking logic |
+| doUnlock                    | Unlocking logic |
+| addKeyId                    | Convenience function for adding a key identifier to the object |
+| rmKeyId                     | Convenience function for removing a key identifier to the object |
 
 Properties:
 
@@ -118,7 +124,7 @@ Triggers:
 | onLock                      | Fired after object is locked |
 | onUnlock                    | Fired after object is unlocked |
 
-##### lib\_traits\_container
+#### lib\_traits\_container
 
 A trait for items that can serve as containers.
 
@@ -145,7 +151,7 @@ Properties: none
 
 Triggers: none, but that's probably missing (or we should use onDropItem/onTakeItem if the instances has *lib\_traits\_gettable*)
 
-##### lib\_traits\_edible
+#### lib\_traits\_edible
 
 A trait for items that can be eaten or drunk.
 
@@ -161,8 +167,8 @@ Functions:
 
 | Function                    | Description   |
 | --------------------------- | ------------- |
-| doUse                       |               |
-| canUse                      |               |
+| doUse                       | Drinking/eating logic     |
+| canUse                      | Check if eating/drinking is possible. Returns true, but intended to be overloaded by derived objects, e.g. see **lib\_ediblecontainer** |
 
 Properties:
 
@@ -181,12 +187,13 @@ Triggers:
 | --------------------------- | ------------- |
 | onUse                       | Fired after object is eaten or drunk |
 
-##### lib\_traits\_commandable
+#### lib\_traits\_commandable
 
-A trait for locations (as opposed to the previous ones), using the special "verbMissing" on locations, invoked by the game engine when no matching verb has been found according to the usual rules. It the tries to delegate the command to the first item in the location that possibly accepts the command.
+A trait for locations (as opposed to the previous ones), using the special "verbMissing" property on locations, invoked by the game engine when a matching verb cannot be found according to the usual command processing rules. 
 
-The idea here is that the location does know which command exits, but some item would.
-Typically, it is used for shops, where there might be a trader in the room to accept the command.
+Rooms with this trait will try to delegate the unrecognized command to the first item in their contents that can possibly accepts the command.
+
+The idea here is that the location does know which commands exit, but some item in it would perhaps. Typically, it may be used for shops, where there might be a seller/trader in the room to accept the command.
 
 Traits: none
 
@@ -196,22 +203,20 @@ Functions:
 
 | Function                    | Description   |
 | --------------------------- | ------------- |
-| verbMisssing                | Special property on locations, invoked when the game engine failed at find an appropriate verb |
+| verbMisssing                | Special property on locations, invoked when the game engine failed at finding an appropriate verb |
 | delegateCommand             | Browse the location's constant for an item that would accept the command |
 
 Properties:
 
 | Property                    | Description   |
 | --------------------------- | ------------- |
-| allowedCommands : Array.String  | Commands that be delegate (["list", "sell", "buy", "order"]) |
+| allowedCommands : Array.String | Commands that be delegate (["list", "sell", "buy", "order"]) |
 
 - It comes with a set of predefined commands suitable for shops.
 
-Triggers: none
-
 ### Root object
 
-##### lib\_root
+#### lib\_root
 
 A base parent trait for all other objects.
 
@@ -223,14 +228,12 @@ Functions:
 
 | Function                  | Description   |
 | ------------------------- | ------------- |
-| tell( msg : String )      | If the object is a player, sends a message to him/her |
-| clone( id : String )      | Convenience function to create an object but also copy its name description and aliases from its parent. | 
-
-Triggers: none
+| tell(msg : String)        | If the object is a player, sends a message to him/her |
+| clone(id : String)        | Convenience function to create a new object, also copying the name, description and aliases from its parent (i.e. all things that the regular **new()** doesn't do). | 
 
 ### Rooms and doors
 
-##### lib\_room
+#### lib\_room
 
 The base structure for rooms.
 
@@ -250,13 +253,13 @@ Functions:
 | --------------------------- | ------------- |
 | doEnter                     |               |
 | doLeave                     |               |
-| canEnter                    |               |
-| canLeave                    |               |
-| announceEnterRoom           |               |
-| announceLeaveRoom           |               |
-| describe                    |               |
-| announce                    |               |
-| addExit                     |               |
+| canEnter                    | Checks if the room may be entered. Returns true, so intended to be overloaded by derived objects |
+| canLeave                    | Checks if the room may be left. Returns true, so intended to be overloaded by derived objects |
+| announceEnterRoom           | Defines the message displayed in the room upon entering |
+| announceLeaveRoom           | Defines the message displayed in the room upon leaving  |
+| describe                    | Returns the room description |
+| announce                    | Announcement broadcasting logic, to all players in the room |
+| addExit(String, WorldObject) | Convenience function for adding an exit in the given direction |
 
 Properties:
 
@@ -272,9 +275,11 @@ Triggers:
 | onEnter                     | Fired after the room is entered |
 | onLeave                     | Fired when the room is being left |
 
-##### lib\_door
+#### lib\_door
 
 A door is a two-way traversable entity.
+
+For the reminder, once you have connected rooms via a door, you will very likely want to add the door to the extraMatchObjects property of each room, so that players can operate upon the door (since it is not an item in the room's content).
 
 Traits: **lib\_root**, **lib\_describable**, **lib\_closeable**
 
@@ -284,11 +289,11 @@ Functions:
 
 | Function                    | Description   |
 | --------------------------- | ------------- |
-| doEnter                     |               |
-| canEnter                    |               |
-| describe                    |               |
-| announce                    |               |
-| addExit                     |               |
+| doEnter                     | Entering logic, i.e. immediate traversal from one side to the other |
+| canEnter                    | Checks if the door may be traversed, e.g. it's not closed and the two sides are defined |
+| describe                    | Overloads the default description |
+| announce                    | Announcement broadcasting logic, to operate on both sides |
+| addExit(WorldObject)        | Convenience function for adding a side, unless there are already two |
 
 Properties:
 
@@ -316,7 +321,7 @@ function onTraversal(player) {
 
 ### Items
 
-##### lib\_item
+#### lib\_item
 
 The base structure for items.
 
@@ -332,9 +337,7 @@ Properties:
 | --------------------------- | ------------- |
 | description : String        | Default textual description ("An undescript item.") |
 
-Triggers: none
-
-##### lib\_key
+#### lib\_key
 
 A base object for designing key-like items, allowing to lock/unlock closeable objects.
 
@@ -352,10 +355,8 @@ Properties:
 | keyId : String              | Default key identifier for matching closeable objects ("masterkey") |
 
 - The key identifier is set to "masterkey", which is also the initial setting for **lib\_closeable**, so any derived object will by default be an all-purpose master key. It is up to you to change it, following you own identification pattern.
-
-Triggers: none
-    
-##### lib\_ediblecontainer
+ 
+#### lib\_ediblecontainer
 
 A base object for designing single use items containing edible things, such as a cup of tea, a plate of potatoes, etc. When used, they'd become an empty cup, an empty plate, etc.
 
@@ -381,11 +382,9 @@ Properties:
 | containedEdible : String    | Default content name ("water") |
 | edibleDescription : String  | Optional description for the content |
 
-Triggers: none
-
 ### Living things
 
-##### lib\_player
+#### lib\_player
 
 The base structure for players.
 
@@ -405,7 +404,7 @@ Functions:
 
 | Function                    | Description   |
 | --------------------------- | ------------- |
-| announceSay                 |               |
+| announceSay                 | Defines the message displayed in the room when the "say" command is used |
 | setMode                     |               |
 | nextMode                    |               |
 | onTabKeyPress               |               |
@@ -417,9 +416,7 @@ Properties:
 | --------------------------- | ------------- |
 | mode : WorldObject          | Current player mode |
 
-Triggers: none
-
-##### lib\_npc
+#### lib\_npc
 
 The base structure for non-player characters. This is just a demo, so we don't
 really know what NPCs are - but we'd probably like them to have extra features in the
@@ -433,11 +430,13 @@ Functions: none
 
 Properties: none
 
-Triggers: none
+#### lib\_npc\_seller
 
-##### lib\_npc\_seller
+The base structure for (very simple) NPC sellers. The 'list' command allows getting the list of goods, and the 'order' command to obtain one of the listed goods.
 
-The base structure for a simple seller NPC characters. The goods available for sale are in the object's contents. The 'list' command allows getting the list of goods, and the 'order' command to obtain one.
+The goods available for sale are those in the object's contents (so logically you would want to have different types of items there). Upon order, the required object is cloned and that newly created instance is given to the player (i.e. placed in the player's contents).
+
+For this to work, the NPC must be in a room that has the **lib\_traits\_commandable** trait, for the player commands to be delegated to the NPC.
 
 Traits: **lib\_npc**
 
@@ -452,8 +451,10 @@ Functions:
 
 | Function                    | Description   |
 | --------------------------- | ------------- |
-| annonceSale                 | Defines the message displayed in the room when the sale is concluded |
+| announceSale                | Defines the message displayed in the room when the sale is concluded with a player |
+| announceOffer               | Defines the message displayed in the room when the seller acts on himself (e.g. is a player, see below) |
+
+- For more advanced trader NPCs, one idea would be to use another location that the object's contents, such as a dedicated room (logically not accessible to regular players).
+- For the record, if a player is being given this trait, the cloned good is dropped in the location, rather than placed in the player's contents. The commands will work for the player himself in any location, and will work for other players when in a commandable room. This might sound a bit weird to add this trait to a player, but during demo-building, I found this little trick useful to clone objects from my inventory here and there without having to do any programming.
 
 Properties: none
-
-Triggers: none
