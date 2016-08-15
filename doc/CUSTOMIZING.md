@@ -6,7 +6,7 @@ This guide is intended for administrators and game builders, when setting up the
 We will deal here with both the object identifiers and the underlying on-disk file hierarchy, as there is a one-to-one mapping between them -- For details, refer to the  [Programming guide](PROGRAMMING.md):
 
 > Identifiers are internally mapped to a file path by the DB, with the underscore character
-> corresponding to the path separator (e.g. "lib_room" will be mapped to "lib/room"). This allows
+> corresponding to the path separator (e.g. "lib\_room" will be mapped to "lib/room"). This allows
 > organizing the objects logically -- You can create objects at any level, but it is a **good practice**
 >to enquire your game administrator regarding the recommended naming scheme.
 
@@ -28,9 +28,12 @@ The **system** object is where several customizable hooks are defined (besides a
 
 | Customizable hook    | comment |
 | -------------------- | ------- |
-| onPlayerCreated | Invoked when a new player character is created: this is where you can define his/her initial location and the appropriate trait(s) for the player object (it comes with none by default, so you have do define it -- The demo uses **lib_player** from its mudlib) |
-| onPlayerConnected | Invoked when a player character enters the world: this is where you can restore is previous location, and possibly announce his/her arrival to other players (at least in the room, if not to all) -- The demo relies on the doEnter() method, from the mudlib **lib_room** object, and obviously refers to a demo-specific initial location. |
+| onServerStarted | Invoked when the server just started -- The demonstration does nothing here, but that's where you can implement any (re)initialization logic |
+| onPlayerCreated | Invoked when a new player character is created: this is where you can define his/her initial location and the appropriate trait(s) for the player object (it comes with none by default, so you have do define it -- The demonstration uses **lib\_player** from its mudlib) |
+| onPlayerConnected | Invoked when a player character enters the world: this is where you can restore is previous location, and possibly announce his/her arrival to other players (at least in the room, if not to all) -- The demonstration relies on the doEnter() method, from the mudlib **lib\_room** object, and obviously refers to a demonstration-specific initial location. |
 | onPlayerDisconnected | Invoked when a player character quits the world: this is where you can reset his/her location, and possibly announce his/her leaving to other players (at least in the room, if not to all) |
+
+For the record here, as far as customizable hooks are concerned, the game engine also invokes onTabKeyPress() on the player object when the TAB key event is received. In the demonstration, this is used to cycle through the different modes (a.k.a. PLAY, CHAT, SAY, EVAL), and implemented in the **lib\_player** object.
 
 ## Useful objects (recommended)
 The following objects are not mandatory *per se* but are probably best keeping (and customizing if need really be)
@@ -44,7 +47,7 @@ The following objects are not mandatory *per se* but are probably best keeping (
 
 ## Mudlib objects (replaceable)
 
-In the demonstration, all mudlib objects are located under the *lib/* directory (and henceforth, their identifiers all start with "lib_".
+In the demonstration, all mudlib objects are located under the *lib/* directory (and henceforth, their identifiers all start with "lib\_").
 
 The mudlib defines an initial class hierarchy for designing more complex objects, for details see the [Demonstration mudlib](DEMO_MUDLIB.md) memorandum.
 
@@ -60,8 +63,8 @@ The demonstration should not come with any (but well, that may not be true yet!)
 All other objects are demonstration-specific, so you may wholly remove them when creating your own world. As noted, you may follow any convention and logical naming scheme for your own world, but you will likely want to manage the objects in a maintenable way. 
 
 For instance, the demonstration adopts the following scheme:
-- All useable items are located in *items/* (and therefore have identifiers starting with "items_"),
-- Rooms are structured under *areas/* (and therefore have identifiers such as "area_something_roomname").
+- All useable items are located in *items/* (and therefore have identifiers starting with "items\_"),
+- Rooms are structured under *areas/* (and therefore have identifiers such as "area\_something\_roomname").
 - Cloned objects (i.e. copies of useable items, such as made by the seller NPCs) are located in *instances/*).
 
 Once you have created a room of your own, and changed the system.onPlayerConnected() hook
