@@ -1,5 +1,5 @@
 {
-  "name": "Paul Butcher, behind his counter.",
+  "name": "Paul Butcher",
   "aliases": [
     "butcher"
   ],
@@ -7,5 +7,9 @@
     "lib_npc_seller"
   ],
   "locationId": "areas_city_butcher",
-  "properties": {}
+  "properties": {
+    "description": {
+      "value": "Paul Butcher, behind his counter."
+    }
+  }
 }
