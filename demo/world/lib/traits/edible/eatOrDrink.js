@@ -12,8 +12,8 @@ function eatOrDrink({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iob
       
   function announce(sender, recipient, object) {
       return sender === recipient
-      ? `You ${verbstr} ${object.name}`
-      : `${sender.name} ${verbstr}s ${object.name}`;
+      ? `You ${verbstr} the ${object.name}.`
+      : `${sender.name} a ${verbstr}s ${object.name}.`;
     
   }
   
@@ -22,7 +22,9 @@ function eatOrDrink({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iob
       player.location.announce(announce, player, this);
     }
   
-    this.doUse(player);
+    if (this.doUse) {
+      this.doUse(player);
+    }
     this.onUse(player);
     
     if (this.destroyOnUse) {

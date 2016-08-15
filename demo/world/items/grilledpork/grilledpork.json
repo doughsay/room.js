@@ -1,0 +1,24 @@
+{
+  "name": "grilled pork tenderloin",
+  "aliases": [
+    "pork",
+    "tenderloin",
+    "meat"
+  ],
+  "traitIds": [
+    "lib_item",
+    "lib_traits_edible"
+  ],
+  "locationId": "items_butcher",
+  "properties": {
+    "description": {
+      "value": "A juicy grilled pork tenderloin."
+    },
+    "foodType": {
+      "value": 2
+    },
+    "destroyOnUse": {
+      "value": true
+    }
+  }
+}
