@@ -9,10 +9,10 @@
   "locationId": null,
   "properties": {
     "locked": {
-      "value": false
+      "value": true
     },
     "closed": {
-      "value": false
+      "value": true
     },
     "sides": {
       "array": [
