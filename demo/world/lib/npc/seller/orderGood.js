@@ -14,7 +14,7 @@ function order({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr 
     player.tell(`${this.name} says: "You are welcome!"`);
     
     // Clone the good and give it to player
-    let created = target.clone("instances_clone");
+    let created = target.clone("instances_" + target.id.split("_").pop());
     created.location = player;
     player.location.announce(this.announceSale.bind(this), player, created);
 
