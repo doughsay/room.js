@@ -6,7 +6,7 @@
     "lib_traits_closeable",
     "lib_traits_container"
   ],
-  "locationId": null,
+  "locationId": "areas_start_heaven",
   "properties": {
     "locked": {
       "value": true
