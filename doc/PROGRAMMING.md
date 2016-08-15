@@ -14,8 +14,8 @@ You can then use any JavaScript (ES6) construct to start creating new rooms and 
 - Toplevel functions: there are a few global functions, such as **all()**. Some are seldom used in actual code, but are provided as utilities for you to invoke on the command line. Others, such as **nextId()**, will be of frequent use.
 - World objects:
   - Each object in the world has a unique identifier, which also corresponds to its name in the global scope.
-    - You may reference an object by its identifier: `$('lib\_room')`
-    - Or rather, directy by its global variable:  `lib\_room`
+    - You may reference an object by its identifier: `$('lib_room')`
+    - Or rather, directy by its global variable:  `lib_room`
     - Identifiers are internally mapped to a file path by the DB, with the underscore character corresponding to the path separator (e.g. "lib\_room" will be mapped to "lib/room"). This allows  organizing the objects logically -- You can create objects at any level, but it is a **good practice** to enquire your game administrator regarding the recommended naming scheme. Please also refer to the [Customization guide](CUSTOMIZING.md)
   - Objects can include, as usual, properties and functions, but they can also have verbs.
     - To add a new function: `obj.foo = function foo()` {} 
