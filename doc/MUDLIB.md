@@ -71,9 +71,6 @@ Properties:
 
 Triggers: none, but that's probably missing (e.g. onDropItem/onTakeItem)
 
-**TODO** : canTake, canDrop ?
-**FIX** : any/ambiguous/fail are poorly handled
-
 ##### lib\_traits\_closeable
 
 A trait for items that can be opened/closed/locked/unlocked.

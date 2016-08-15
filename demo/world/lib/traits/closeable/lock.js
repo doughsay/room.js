@@ -5,8 +5,10 @@ function lock({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr }
     if (!this.closed) {
       this.doClose(player);
     }
-    if (iobj === undefined) {
-      player.tell("You don't have that.");
+    if (iobj === fail) {
+      player.tell(`I see no ${iobjstr} here.`);
+    } else if (iobj === ambiguous) {
+      player.tell(`I can't tell which ${dobjstr} you meant.`);
     } else if (this.keySet && (this.keySet.length) && this.keySet.includes(iobj.keyId)) {
       this.doLock(player);
     } else {
