@@ -197,13 +197,7 @@ class MooDB {
       }
     }
     this.fsdb.rm(this.filenameForObj(id));
-    try {
-        this.fsdb.rmDir(this.filepathToObj(id)); // cleanup; FsDb should do this for us, but it doesn't.
-    } catch (err) {
-        // DO NOTHING
-        // This is acceptable, since we allow objects to be organized in directories.
-        // HOWEVER, an empty directory might remain, if underlying objects are later destroyed.
-    }
+    this.fsdb.rmDir(this.filepathToObj(id)); // cleanup; FsDb should do this for us, but it doesn't.
   }
 
   markObjectDirty(id) {
