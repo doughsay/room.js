@@ -2,10 +2,16 @@ const C3 = require('./c3');
 const serialize = require('./serialize');
 
 function linearize(target, db, linearization = new C3(target)) {
-  target.traitIds.forEach(traitId => {
+  target.traitIds.forEach((traitId, index) => {
     const trait = db.findById(traitId);
-    linearization.add(target, trait);
-    linearize(trait, db, linearization);
+    if (trait !== void 0) {
+      linearization.add(target, trait);
+      linearize(trait, db, linearization);
+    } else {
+      // Attempt at gracefully handle a broken trait chain
+      // e.g. the parent object was destroyed
+      target.traitIds.splice(index, 1);
+    }
   });
   return linearization.run();
 }

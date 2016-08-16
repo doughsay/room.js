@@ -8,9 +8,14 @@ const EXACT_MATCH = 1;
 const PARTIAL_MATCH = 2;
 
 function linearize(object, linearization = new C3(object)) {
-  object.traits.forEach(trait => {
-    linearization.add(object, trait);
-    linearize(trait, linearization);
+  object.traits.forEach((trait, index) => {
+    if (trait !== void 0) {
+      linearization.add(object, trait);
+      linearize(trait, linearization);
+    } else {
+      // Attempt at gracefully handle a broken trait chain
+      object.traits.splice(index, 1);
+    }
   });
   return linearization.run();
 }
