@@ -14,6 +14,7 @@ function linearize(object, linearization = new C3(object)) {
       linearize(trait, linearization);
     } else {
       // Attempt at gracefully handle a broken trait chain
+      // e.g. the parent object was destroyed
       object.traits.splice(index, 1);
     }
   });
