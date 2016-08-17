@@ -1,7 +1,10 @@
 function take({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr }) {
-  let target = player.location.findInside(dobjstr);
+  // If triggered by a item already in player inventory, check in room.
+  let target = (dobj.location === player)
+    ? player.location.findInside(dobjstr)
+    : dobj;
   if (target === fail) {
-    player.tell(`I see no ${dobjstr} to take.`);
+    player.tell(`I can't see any ${dobjstr} to take.`);
   } else if (target === ambiguous) {
     player.tell(`I can't tell which ${dobjstr} you meant.`);
   } else {
