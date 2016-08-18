@@ -41,6 +41,10 @@
     "preprocessCommand": {
       "function": true,
       "file": "preprocessCommand.js"
+    },
+    "onPlayerCommandFailed": {
+      "function": true,
+      "file": "onPlayerCommandFailed.js"
     }
   }
 }

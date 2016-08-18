@@ -1,6 +1,6 @@
 const vm = require('vm');
 
-const parse = require('./parse');
+const parse = require('./parse').parseSentence;
 const { color } = require('./colors');
 
 function Context(world) {

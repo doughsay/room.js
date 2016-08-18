@@ -206,13 +206,14 @@ For the record:
 - The *online* is a getter querying the connection controller,
 - The *id* property is internally mapped to a file path by the DB. 
 
-Moreover, for there are a few optional properties used by the game engine:
+Moreover, there are a few optional properties used by the game engine:
 
-| Property  | Type                | Comment  |
-| --------- | ------------------- | ------------ |
-| userId    | String              | (On a player.) User login name |
-| extraMatchObjects | Array.WorldObject\|Function | (On a location.) See look-up functions below. For advanced usage |
-| verbMissing | Verb              | (On a location.) For advanced usage |
+| Property   | Type                | Comment  |
+| ---------- | ------------------- | ------------ |
+| userId     | String              | (On a player.) User login name. |
+| programmer | Boolean             | (On a player.) True if the player has programmer privileges. |
+| extraMatchObjects | Array.WorldObject\|Function | (On a location.) See look-up functions below. For a somewhat advanced usage. |
+| verbMissing | Verb               | (On a location.) For advanced usage. |
 
 #### Base methods
 As a programmer, these are the methods you will most likely use very often.
@@ -222,7 +223,7 @@ Creates a new world object, deriving from its parent (i.e. having it in its trai
 
 | Parameter  | Type                | Comment  |
 | ---------- | ------------------- | ------------ |
-| id         | String              | unique identifier |
+| id         | String              | Unique identifier |
 | props      | Object              | Optional properties to be copied into the object |
 
 Example:
@@ -253,9 +254,8 @@ Add traits to the object and returns the number of traits. Traits are what makes
 ##### rmTrait( ...String ) ⇒ Integer
 Remove traits from the object and returns the number of traits.
 
-> Warning: removing an object used as trait in other objects leads to very bad things. 
-> Maybe a more graceful protection may be implemented, but anyhow it is probably a bad
-> idea to remove a trait object, as the child objects may likely be broken anyhow.
+> Warning: removing an object used as trait in other objects may lead to bad things. 
+> Anyhow, it is probably a bad idea to remove a parent trait object, as the inheriting objects may likely be broken afterwards.
 
 #### Look-up methods
 These are methods you may need when implementing complex verbs, where you may want to
@@ -265,7 +265,7 @@ check if an item can be found in a container, a location, etc.
 Looks if a string can be matched to an object in the environment, that is:
 - the object's contents,
 - its location's contents,
-- the location's extraMatchObjects, if defined.
+- the location's extraMatchObjects, if defined. This allows specifying additional objects that may also be matched (e.g. a door, a sign, etc.) despite not appearing in the location's contents.
 
 Returns:
 - the core object **fail** when there is no match,
@@ -273,7 +273,7 @@ Returns:
 - otherwise, the matched object.
 
 ##### findObject( String ) ⇒ WorldObject
-Looks if a string can be matched to an object in the environment. This is a convenience function over findNearby(), accepting the strings "me", "myself" and "here" to be matched.
+Looks if a string can be matched to an object in the environment. This is a convenience function over findNearby(), also accepting the strings "me", "myself" and "here" to be matched.
 
 Returns: 
 - the object itself (= *this*) if the string is "me" or "myself",
@@ -291,10 +291,13 @@ Returns:
 #### Verb related methods
 For advanced usage. 
 
-##### matchObjects( String ) ⇒ Object
-##### matchVerb( String, Object ) ⇒ Object
-
 Check the **items\_builderstaff** item or the **lib\_traits\_commandable** trait in the demonstration for possible use cases. 
+
+##### matchObjects( command : String ) ⇒ Object
+Given a command, returns { dobj : WorldObject, iobj : WorldObject }, containing the matched objects in the environment.
+
+##### matchVerb( command : String, Object ) ⇒ Object|null
+Given a command and the result from matchObjects(), returns an object { verb: Function, this: WorldObject }, corresponding to the first matched verb and the target object, or null in case there is no match.
 
 #### Other methods
 They exist in the execution context, but are propably of lower interest.
@@ -335,6 +338,21 @@ Returns an array of a given object's own enumerable property values.
 This section is provided for reference only. You are normally not supposed to need these methods -- but these are therefore reserved property names.
 
 ##### matches( String ) ⇒ 0..2
-##### findMatch( Array, Array ) ⇒ WorldObject
-##### findVerb( Object, Object, WorldObject ) ⇒ Verb
+Checks if an object matches a given string, comparing it against its name and its aliases.
 
+Returns:
+- 0 when not matching,
+- 1 for exact match,
+- 2 for partial match.
+
+##### findMatch( Array, Array, String ) ⇒ WorldObject
+Given an exact-match array of WorldObject's, a partial-match array of WorldObject's and a determiner, returns:
+- the core object **fail** when there is no match,
+- the core object **ambiguous** if there are more than one match,
+- otherwise, the matched object.
+
+The determiner is one of 'all' (for the whole collection), 'any' (for any indefinite random item in a collection),
+undefined (for definiteness), or a string containing an ordinal index (i.e. rank in a collection). Internally used by the abovementioned look-up methods.
+
+##### findVerb( Object, Object, WorldObject ) ⇒ String|undefined
+Given a command and a set of matched objects, returns an applicable verb property name (or undefined, if none matches). Internally used by matchVerb(), which applies it to the object first, then to its location, and finally the command direct and indirect objects.
