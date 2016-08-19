@@ -44,9 +44,16 @@ class UserController extends BaseChildController {
     ];
 
     this.emit('request-input', inputs, ({ playerName }) => {
-      const playerId = this.world.nextId(playerName); // should produce a new unique ID
-
-      if (playerId === '') {
+      const PLAYERS_HIERARCHY = "players_";
+      
+      // Create unique ID:
+      // We want to place player id under the 'players_' logical hierarchy.
+      // Use playerName as base, but remove underscores to disallow additional logical levels.
+      // Call nextId() to obtain a unique sanitized ID. 
+      let playerId = this.world.nextId(PLAYERS_HIERARCHY + playerName.replace(/_/g, ''));
+      // However, if the playerName is reduced to '' by the sanitizing, the final undescore may get 
+      // trimmed.
+      if (playerId === '' || playerId.indexOf('_') === -1) {
         // if the name produces an invalid ID, let's just call the name invalid.
         this.emit('output', red('Sorry, that name is invalid.'));
         return;
