@@ -13,7 +13,7 @@ function onPlayerCommandFailed({ player, dobj, iobj, verbstr, argstr, dobjstr, p
   } else if (dobj === nothing) {
     msg = `What? Some ${iobj.name} is around, sure...`;
   } else if (iobj === nothing) {
-    msg = `What? Some ${dobj.name} is around, sure...'`;
+    msg = `What? Some ${dobj.name} is around, sure...`;
   } else {
     msg = `I didn't understand that.`;
   }
