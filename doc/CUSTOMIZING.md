@@ -3,7 +3,7 @@
 This guide is intended for administrators and game builders, when setting up the initial instance for their own game based on the RoomJS MUD/MOO engine.
 
 ## Introduction
-We will deal here with both the object identifiers and the underlying on-disk file hierarchy, as there is a one-to-one mapping between them -- For details, refer to the  [Programming guide](PROGRAMMING.md):
+We will deal here with both the object identifiers and the underlying on-disk file hierarchy, as there is a one-to-one mapping between them -- For details, refer to the [Programming guide](PROGRAMMING.md):
 
 > Identifiers are internally mapped to a file path by the DB, with the underscore character
 > corresponding to the path separator (e.g. "lib\_room" will be mapped to "lib/room"). This allows
@@ -56,8 +56,10 @@ You may replace it by your own.
 
 ## Player objects (removable, if any)
 
-For now, player objects (characters) also reside at the world toplevel.
-The demonstration should not come with any (but well, that may not be true yet!), since you will just create them when playing :)
+Player objects (i.e. characters) are normally all located under the *players/* directory.
+The demonstration should not come with any, since you will just create them when playing :)
+
+For the record, player accounts (i.e. login credentials etc.) are stored in another DB.
 
 ## All other objects (removable)
 
