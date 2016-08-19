@@ -14,7 +14,7 @@ function basics() {
     '',
     'Experiment with various other verbs to see what works. Good luck!',
     '',
-    'The [noun] can have an additional  determiner such as "any" (picked at random),',
+    'The [noun] can have an additional determiner such as "any" (picked at random),',
     'or be followed by a number defining its rank (in a collection).',
     'Examples:',
     '  #cmd[look chest 1]',
