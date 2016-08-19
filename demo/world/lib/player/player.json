@@ -2,7 +2,8 @@
   "name": "player",
   "aliases": [],
   "traitIds": [
-    "lib_root"
+    "lib_root",
+    "lib_traits_describable"
   ],
   "locationId": null,
   "properties": {
@@ -68,6 +69,10 @@
       "dobjarg": "any",
       "preparg": "none",
       "iobjarg": "none"
+    },
+    "describe": {
+      "function": true,
+      "file": "describe.js"
     }
   }
 }
