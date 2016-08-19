@@ -13,7 +13,7 @@ http://roomjs.tk/
 Documentation
 =============
 
-- [Building and programming your own RoomJS MUD/MMO](doc/PROGRAMMING.md)
+- [Building and programming your own RoomJS MUD/MOO](doc/PROGRAMMING.md)
 - [Organizing and customizing your world objects](doc/CUSTOMIZING.md)
 - [A brief description of the demonstration mudlib](doc/DEMO_MUDLIB.md)
 
