@@ -58,9 +58,6 @@ Verbs:
 | --------------------------- | 
 | get/take this               | 
 | drop this                   | 
-| keep this                   |
-
-- Items marked for keeping cannot be dropped inadvertently.
 
 Functions:
 
@@ -69,11 +66,7 @@ Functions:
 | announceTakeItem            | Defines the message displayed in the room when the object is taken |
 | announceDropItem            | Defines the message displayed in the room when the object is dropped |
 
-Properties:
-
-| Property                    | Description   |
-| --------------------------- | ------------- |
-| keepFlag : Boolean          | Optional flag marking the object as kept, when true. |
+Properties: none
 
 Triggers: none, but that's probably missing (e.g. onDropItem/onTakeItem)
 
@@ -179,7 +172,7 @@ Properties:
 | destroyOnUse : Boolean      | True if the object should be destroyed after use. Defaults to false |
 
 - To keep this as simple as possible, edibled object are either single use (when destroyOnUse is true) or inexhaustible (when false).
-- Basically, the idea is that meal is usually for single use, and drink is inexhaustible, but the **lib\_liquidcontainer** is probably what you'll rather use for single use drinks.
+- See also **lib\_ediblecontainer** below, which is not destroyed when used, but handles its own exhaustion state.
 
 Triggers:
 
@@ -388,7 +381,7 @@ Properties:
 
 The base structure for players.
 
-Traits: **lib\_root**
+Traits: **lib\_root**, **lib\_traits\_describable**
 
 Verbs:
 
@@ -423,7 +416,7 @@ The base structure for non-player characters. This is just a demo, so we don't
 really know what NPCs are - but we'd probably like them to have extra features in the
 future.
 
-Traits: **lib\_root**
+Traits: **lib\_root**, **lib\_traits\_describable**
 
 Verbs: none
 

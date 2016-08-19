@@ -4,11 +4,6 @@ function drop({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr }
     return;
   }
   
-  if (this.keepFlag) {
-    player.tell(`You have marked ${this.name} for keeping.`)
-    return;
-  }
-  
   if (player.location) {
     player.location.announce(this.announceDropItem, player, this);
     this.location = player.location;

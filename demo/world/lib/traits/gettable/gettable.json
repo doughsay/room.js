@@ -12,14 +12,6 @@
       "preparg": "none",
       "iobjarg": "none"
     },
-    "keep": {
-      "verb": true,
-      "file": "keep.js",
-      "pattern": "keep",
-      "dobjarg": "this",
-      "preparg": "none",
-      "iobjarg": "none"
-    },
     "take": {
       "verb": true,
       "file": "take.js",
