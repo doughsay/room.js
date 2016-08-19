@@ -32,31 +32,31 @@ But for now, let's create our first object: a (very) basic lantern!
 First, switch to EVAL mode, so that you do not have to prefix every JavaScript command.
 
 - Create a new object. In the demonstration mudlib, **lib\_item** is a gettable and describable object. So we will start from it (i.e. it will be the base trait for our object)
-```
+```javascript
 lib_item.new('tests_lantern');
 ```
 - By default, its short name is the same as its identifier, and it doesn't have a long description. It doesn't have aliases either. This is not very convenient, so let's add all these things:
-```
+```javascript
 tests_lantern.name = "lantern";
 tests_lantern.addAlias("lamp");
 tests_lantern.description = "a portable lamp in a case, protected from the wind and rain";
 ```
 - Since it is intended for being lit, let's add a boolean property to keep track of that state:
-```
+```javascript
 tests_lantern.lighted = false; 
 ```
 - This is a step-by-step example, but actually note that we could rather have added most of the properties directly at creation, specified as options:
-```
+```javascript
 lib_item.new('tests_lantern', { name: "lantern", lighted: false });
 ```
 
 - Anyhow, let's now declare the available command verbs:
-```
+```javascript
 tests_lantern.light = Verb("light", "this", "none", "none");
 tests_lantern.extinguish = Verb("extinguish", "this", "none", "none");
 ```
 - Hit Ctrl-p and look for our newly created "light" verb. In the editor, copy the following function body into the default template (i.e. keep the surrounding function definition!)
-```
+```javascript
   if (!this.lighted) {
     this.doLight(player);
   } else {
@@ -64,7 +64,7 @@ tests_lantern.extinguish = Verb("extinguish", "this", "none", "none");
   }
 ```
 - Save with Ctrl-s, and then proceed similarly for the "extinguish" verb:
-```
+```javascript
   if (this.lighted) {
     this.doExtinguish(player);
   } else {
@@ -72,12 +72,12 @@ tests_lantern.extinguish = Verb("extinguish", "this", "none", "none");
   }
 ```
 - Close the editing tabs and return to the MUD tab. Here, for the sake of illustration, we decided to use two additional functions, that will be responsible for changing the state flag and announce something to other people in the room. So let's first create them:
-```
+```javascript
 tests_lantern.doLight = function(player) {};
 tests_lantern.doExtinguish = function(player) {};
 ```
-- And again, hit Ctrl-p and look for these functions. Insert the following content in the body for the doLight method, and save with Ctrl-s:
-```
+- And again, hit Ctrl-p and look for these functions. Insert the following content inside the body for the doLight method, and save with Ctrl-s:
+```javascript
   function announce(sender, recipient, object) {
     if (sender === recipient) {
       return `You light the ${object.name}.`;
@@ -91,7 +91,7 @@ tests_lantern.doExtinguish = function(player) {};
   this.lighted = true;
 ```
 - And likewise for doExtinguish...
-```
+```javascript
   function announce(sender, recipient, object) {
     if (sender === recipient) {
       return `You extinguish the ${object.name}.`;
@@ -105,7 +105,7 @@ tests_lantern.doExtinguish = function(player) {};
   this.lighted = false;
 ```
 - Go back to the MUD tab. We will want to test our new object, so let's bring it to our current room (and notice how the *this* object conveniently here points to you, the player/builder):
-```
+```javascript
 tests_lantern.location = this.location
 ```
 
@@ -152,12 +152,12 @@ Creates a command verb.
 - Recognized propositions: "with", "using", "at", "to", "in front of", "in", "inside", "into", "on top of", "on", "onto", "upon", "out of", "from inside", "from", "over", "through", "under", "underneath", "beneath", "behind", "beside", "for", "about", "is", "as", "off of", "off".
 
 Example:
-```
+```javascript
 Verb("put", "any", "in/into", "this");
 ```
 
 Verbs then have the following signature:
-```
+```javascript
 function({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr })
 ```
 
@@ -169,7 +169,7 @@ When the function is invoked:
 
 ##### parse( String ) ⇒ Command
 Invokes the command parser on a string. Explanation by example is easier:
-```
+```javascript
 parse("put trash in can");
 ⇒ { verb: 'put', dobjstr: 'trash', prepstr: 'in', iobjstr: 'can', argstr: 'trash in can' }
 }
@@ -179,7 +179,7 @@ This may be used to check how a command will be split and passed to a Verb funct
 
 ##### color.*( String ) ⇒ String
 Colorizes a string.
-```
+```javascript
 var boldBlueText = color.bold.blue("Some text");
 ```
 
@@ -227,7 +227,7 @@ Creates a new world object, deriving from its parent (i.e. having it in its trai
 | props      | Object              | Optional properties to be copied into the object |
 
 Example:
-```
+```javascript
 lib_chest.new("items_chest2", { name: "large chest", opened: false, locked: false });
 ```
 
@@ -333,7 +333,7 @@ Returns an array of a given object's own enumerable properties.
 ##### values() ⇒ Array.Object
 Returns an array of a given object's own enumerable property values.
 
-#### Other methods (internal/undocumented)
+#### Other methods (somehow internal)
 
 This section is provided for reference only. You are normally not supposed to need these methods -- but these are therefore reserved property names.
 

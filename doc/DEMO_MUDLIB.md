@@ -4,7 +4,7 @@ The RoomJS game engine does not make many assumptions about the gaming logic. It
 
 As noted in the [Customization guide](CUSTOMIZING.md), which the reader is assumed to have first read at this point:
 
-> The term "mudlib" refers to the very basic set of objects and entities that are initally required to make the first real objects in your game, i.e. the base structure for rooms, containers, behaviors, etc.). The demonstration comes with its own mudlib, which you can modify/extend, but it is wholly replaceable -- By nature, the demonstration mudlib has been kept small (no character classes or combat system, for instance -- You'll have to design your owns).
+> The term "mudlib" refers to the very basic set of objects and entities that are initally required to make the first real objects in your game (i.e. the base structure for rooms, containers, behaviors, etc.). The demonstration comes with its own mudlib, which you can modify/extend, but it is wholly replaceable -- By nature, the demonstration mudlib has been kept small (no character classes or combat system, for instance -- You'll have to design your owns).
 
 This memorandum describes the demonstration mudlib (i.e. *lib\_xxx* objects), which may be used as a sample for designing and implementing you own game logic.
 
@@ -20,7 +20,7 @@ For each objects, this memorandum provides:
 ### Pure traits
 
 These objects are purely 'abstract' (i.e. they don't inherit from **lib\_root**), and are
-intended to be added to objects deriving from it, to extend their functionality).
+intended to be added to objects, to extend their functionality.
 
 #### lib\_traits\_describable
 
@@ -44,7 +44,7 @@ Properties:
 
 | Property                    | Description   |
 | --------------------------- | ------------- |
-| description : String        | Optional textual description for the object |
+| description : String        | Optional textual description for the object. |
 
 #### lib\_traits\_gettable
 
@@ -63,8 +63,8 @@ Functions:
 
 | Function                    | Description   |
 | --------------------------- | ------------- |
-| announceTakeItem            | Defines the message displayed in the room when the object is taken |
-| announceDropItem            | Defines the message displayed in the room when the object is dropped |
+| announceTakeItem            | Defines the message displayed in the room when the object is taken. |
+| announceDropItem            | Defines the message displayed in the room when the object is dropped. |
 
 Properties: none
 
@@ -89,21 +89,21 @@ Functions:
 
 | Function                    | Description   |
 | --------------------------- | ------------- |
-| doOpen                      | Opening logic |
-| doClose                     | Closing logic |
-| doLock                      | Locking logic |
-| doUnlock                    | Unlocking logic |
-| addKeyId                    | Convenience function for adding a key identifier to the object |
-| rmKeyId                     | Convenience function for removing a key identifier to the object |
+| doOpen                      | Opening logic. |
+| doClose                     | Closing logic. |
+| doLock                      | Locking logic. |
+| doUnlock                    | Unlocking logic. |
+| addKeyId                    | Convenience function for adding a key identifier to the object. |
+| rmKeyId                     | Convenience function for removing a key identifier to the object. |
 
 Properties:
 
 | Property                    | Description   |
 | --------------------------- | ------------- |
-| locked   : Boolean          | True if item is locked. Defaults to true |
-| closed   : Boolean          | True if item is closed. Defaults to true |
-| keySet   : Array.String     | Key identifiers (see **lib\_key** below) for locking/unlocking the object. Default to [ "masterkey" ] |
-| autolocking : Boolean       | Optional flag. If true, the object will lock itself when being closed |
+| locked   : Boolean          | True if item is locked. Defaults to true. |
+| closed   : Boolean          | True if item is closed. Defaults to true. |
+| keySet   : Array.String     | Key identifiers (see **lib\_key** below) for locking/unlocking the object. Defaults to [ "masterkey" ]. |
+| autolocking : Boolean       | Optional flag. If true, the object will lock itself when being closed. |
 
 - If you don't want the object to be lockable/unlockable, set the keySet to an empty array,
 - The "masterkey" identifier stands for an all-purpose master key, so you may either remove it or rather just add specific key identifiers.
@@ -112,10 +112,10 @@ Triggers:
 
 | Trigger                     | Description   |
 | --------------------------- | ------------- |
-| onOpen                      | Fired after object is opened |
-| onClose                     | Fired after object is closed |
-| onLock                      | Fired after object is locked |
-| onUnlock                    | Fired after object is unlocked |
+| onOpen                      | Fired after object is opened. |
+| onClose                     | Fired after object is closed. |
+| onLock                      | Fired after object is locked. |
+| onUnlock                    | Fired after object is unlocked. |
 
 #### lib\_traits\_container
 
@@ -135,10 +135,10 @@ Functions:
 
 | Function                    | Description   |
 | --------------------------- | ------------- |
-| announcePutItemContainer    | Defines the message displayed in the room when an object is put into the container |
-| announceTakeItemContainer   | Defines the message displayed in the room when the object is dropped |
-| canAccept                   | Checks the container interior can be accessed. Currently only checks whether the container is closed, in case it also inherits from *lib\_traits\_closeable* |
-| describeContents            | Returns the contents of the container |
+| announcePutItemContainer    | Defines the message displayed in the room when an object is put into the container. |
+| announceTakeItemContainer   | Defines the message displayed in the room when the object is taken from the container. |
+| canAccept                   | Checks the container interior can be accessed. Currently only checks whether the container is closed, in case it also inherits from *lib\_traits\_closeable*. |
+| describeContents            | Returns the contents of the container. |
 
 Properties: none
 
@@ -160,16 +160,16 @@ Functions:
 
 | Function                    | Description   |
 | --------------------------- | ------------- |
-| doUse                       | Drinking/eating logic     |
-| canUse                      | Check if eating/drinking is possible. Returns true, but intended to be overloaded by derived objects, e.g. see **lib\_ediblecontainer** |
+| doUse                       | Drinking/eating logic.  |
+| canUse                      | Check if eating/drinking is possible. Returns true, but intended to be overloaded by derived objects, e.g. see **lib\_ediblecontainer**. |
 
 Properties:
 
 | Property                    | Description   |
 | --------------------------- | ------------- |
 | DRINK = 1, MEAL = 2         | Bit mask constants for type of food |
-| foodType : Integer          | Current type (1) |
-| destroyOnUse : Boolean      | True if the object should be destroyed after use. Defaults to false |
+| foodType : Integer          | Current type. Defaults to DRINK (1) |
+| destroyOnUse : Boolean      | True if the object should be destroyed after use. Defaults to false. |
 
 - To keep this as simple as possible, edibled object are either single use (when destroyOnUse is true) or inexhaustible (when false).
 - See also **lib\_ediblecontainer** below, which is not destroyed when used, but handles its own exhaustion state.
@@ -178,7 +178,7 @@ Triggers:
 
 | Trigger                     | Description   |
 | --------------------------- | ------------- |
-| onUse                       | Fired after object is eaten or drunk |
+| onUse                       | Fired after object is eaten or drunk. |
 
 #### lib\_traits\_commandable
 
@@ -186,7 +186,7 @@ A trait for locations (as opposed to the previous ones), using the special "verb
 
 Rooms with this trait will try to delegate the unrecognized command to the first item in their contents that can possibly accepts the command.
 
-The idea here is that the location does know which commands exit, but some item in it would perhaps. Typically, it may be used for shops, where there might be a seller/trader in the room to accept the command.
+The idea here is that the location does know which commands exist, but some item in it would perhaps. Typically, it may be used for shops, where there might be a seller/trader in the room to accept the command.
 
 Traits: none
 
@@ -196,14 +196,14 @@ Functions:
 
 | Function                    | Description   |
 | --------------------------- | ------------- |
-| verbMisssing                | Special property on locations, invoked when the game engine failed at finding an appropriate verb |
-| delegateCommand             | Browse the location's constant for an item that would accept the command |
+| verbMisssing                | Special property on locations, invoked when the game engine failed at finding an appropriate verb. |
+| delegateCommand             | Browse the location's contents for an item that would accept the command. |
 
 Properties:
 
 | Property                    | Description   |
 | --------------------------- | ------------- |
-| allowedCommands : Array.String | Commands that be delegate (["list", "sell", "buy", "order"]) |
+| allowedCommands : Array.String | Commands that can be delegated (["list", "sell", "buy", "order"]) |
 
 - It comes with a set of predefined commands suitable for shops.
 
@@ -221,7 +221,7 @@ Functions:
 
 | Function                  | Description   |
 | ------------------------- | ------------- |
-| tell(msg : String)        | If the object is a player, sends a message to him/her |
+| tell(msg : String)        | If the object is a player, sends a message to him/her. |
 | clone(id : String)        | Convenience function to create a new object, also copying the name, description and aliases from its parent (i.e. all things that the regular **new()** doesn't do). | 
 
 ### Rooms and doors
@@ -244,35 +244,35 @@ Functions:
 
 | Function                    | Description   |
 | --------------------------- | ------------- |
-| doEnter                     | Entering logic |
-| doLeave                     | Leaving logic  |
-| canEnter                    | Checks if the room may be entered. Returns true, so intended to be overloaded by derived objects |
-| canLeave                    | Checks if the room may be left. Returns true, so intended to be overloaded by derived objects |
-| announceEnterRoom           | Defines the message displayed in the room upon entering |
-| announceLeaveRoom           | Defines the message displayed in the room upon leaving  |
-| describe                    | Returns the room description |
-| announce                    | Announcement broadcasting logic, to all players in the room |
-| addExit(String, WorldObject) | Convenience function for adding an exit in the given direction |
+| doEnter                     | Entering logic. |
+| doLeave                     | Leaving logic.  |
+| canEnter                    | Checks if the room may be entered. Returns true, so intended to be overloaded by derived objects. |
+| canLeave                    | Checks if the room may be left. Returns true, so intended to be overloaded by derived objects. |
+| announceEnterRoom           | Defines the message displayed in the room upon entering. |
+| announceLeaveRoom           | Defines the message displayed in the room upon leaving.  |
+| describe                    | Returns the room description. |
+| announce                    | Announcement broadcasting logic, to all players in the room. |
+| addExit(String, WorldObject) | Convenience function for adding an exit in the given direction. |
 
 Properties:
 
 | Property                    | Description   |
 | --------------------------- | ------------- |
-| exits : Object              | Object whose keys are the directions, and values are the target location |
+| exits : Object              | Object whose keys are the directions, and values are the target location. |
 | description : String        | Textual long description for the room ("An undescript room.") |
 
 Triggers:
 
 | Triggers                    | Description   |
 | --------------------------- | ------------- |
-| onEnter                     | Fired after the room is entered |
-| onLeave                     | Fired when the room is being left |
+| onEnter                     | Fired after the room is entered. |
+| onLeave                     | Fired when the room is left. |
 
 #### lib\_door
 
 A door is a two-way traversable entity.
 
-For the reminder, once you have connected rooms via a door, you will very likely want to add the door to the extraMatchObjects property of each room, so that players can operate upon the door (since it is not an item in the room's content).
+For the reminder, once you have connected rooms via a door, you will very likely want to add the door to the extraMatchObjects property of each room, so that players can operate upon the door (since it is not an item in the room's contents).
 
 Traits: **lib\_root**, **lib\_traits\_describable**, **lib\_traits\_closeable**
 
@@ -282,17 +282,17 @@ Functions:
 
 | Function                    | Description   |
 | --------------------------- | ------------- |
-| doEnter                     | Entering logic, i.e. immediate traversal from one side to the other |
-| canEnter                    | Checks if the door may be traversed, e.g. it's not closed and the two sides are defined |
-| describe                    | Overloads the default description |
-| announce                    | Announcement broadcasting logic, to operate on both sides |
-| addExit(WorldObject)        | Convenience function for adding a side, unless there are already two |
+| doEnter                     | Entering logic, i.e. immediate traversal from one side to the other. |
+| canEnter                    | Checks if the door may be traversed, e.g. it's not closed and the two sides are defined. |
+| describe                    | Overloads the default description. |
+| announce                    | Announcement broadcasting logic, to operate on both sides. |
+| addExit(WorldObject)        | Convenience function for adding a side, unless there are already two. |
 
 Properties:
 
 | Property                    | Description   |
 | --------------------------- | ------------- |
-| sides : Array[2]            | Up to two connected rooms |
+| sides : Array[2]            | Up to two connected rooms. |
 | description : String        | Textual long description for the door ("A standard door.") |
 
 Triggers:
@@ -304,7 +304,7 @@ Triggers:
 - Technically, the player is still in the initial room when the trigger is fired.
 - Example use: announce something to both sides of the door, when it is traversed
 
-```
+```javascript
 function onTraversal(player) {
   this.announce((sender, recipient) => {
     return "You hear a distant bell ring.";
@@ -351,7 +351,7 @@ Properties:
  
 #### lib\_ediblecontainer
 
-A base object for designing single use items containing edible things, such as a cup of tea, a plate of potatoes, etc. When used, they'd become an empty cup, an empty plate, etc.
+A base object for designing single use items containing edible things, such as a cup of tea, a plate of potatoes, etc. When used, they become an empty cup, an empty plate, etc.
 
 Traits: **lib\_item**, **lib\_traits\_edible**
 
@@ -361,19 +361,19 @@ Functions:
 
 | Property                    | Description   |
 | --------------------------- | ------------- |
-| doUse                       | Set the exhausted flag, and resets aliases accordingly |
-| canUse                      | Returns false if exhausted, true otherwise          |
-| describe                    | Constructs a description from the object's own description, whether it's empty or not, and in the latter case the description of the content |
-| setEdible                   | Convenience function for setting the name and description of the content, and resets all flags and aliases accordingly, i.e. refills the item |
+| doUse                       | Set the exhausted flag, and resets aliases accordingly. |
+| canUse                      | Returns false if exhausted, true otherwise.          |
+| describe                    | Constructs a description from the object's own description, whether it's empty or not, and in the latter case the description of the content. |
+| setEdible                   | Convenience function for setting the name and description of the content, and resets all flags and aliases accordingly, i.e. refills the item. |
 
 Properties:
 
 | Property                    | Description   |
 | --------------------------- | ------------- |
-| exhausted : String          | True when empty |
+| exhausted : String          | True when empty. |
 | containerObject : String    | Default container name ("bottle.") |
 | containedEdible : String    | Default content name ("water") |
-| edibleDescription : String  | Optional description for the content |
+| edibleDescription : String  | Optional description for the content. |
 
 ### Living things
 
@@ -397,24 +397,25 @@ Functions:
 
 | Function                    | Description   |
 | --------------------------- | ------------- |
-| announceSay                 | Defines the message displayed in the room when the "say" command is used |
-| setMode                     | Sets the mode |
-| nextMode                    | Gets the next mode according to a direction (i.e. whether TAB was initially shifter or not) |
-| renderPrompt                | Builds the appropriate prompt for the current mode, and invokes setPrompt() |
-| onTabKeyPress               | Hook invoked by the game engine when the TAB key event is recieved. Just calls the above mode-changing methods |
+| announceSay                 | Defines the message displayed in the room when the "say" command is used. |
+| describe                    | Constructs a description. |
+| setMode                     | Sets the mode. |
+| nextMode                    | Gets the next mode according to a direction (i.e. whether TAB was initially shifter or not). |
+| renderPrompt                | Builds the appropriate prompt for the current mode, and invokes setPrompt(). |
+| onTabKeyPress               | Hook invoked by the game engine when the TAB key event is recieved. Just calls the above mode-changing methods. |
 
 
 Properties:
 
 | Property                    | Description   |
 | --------------------------- | ------------- |
-| mode : WorldObject          | Current mode (play, say, chat, eval) |
+| mode : WorldObject          | Current mode (play, say, chat, eval). |
 
 #### lib\_npc
 
-The base structure for non-player characters. This is just a demo, so we don't
-really know what NPCs are - but we'd probably like them to have extra features in the
-future.
+The base structure for non-player characters. This is just a demonstration, so we do not
+really know what NPCs are - but we will eventually want them to have extra features in the
+future, so this object is kind of a place holder for now.
 
 Traits: **lib\_root**, **lib\_traits\_describable**
 
@@ -445,8 +446,8 @@ Functions:
 
 | Function                    | Description   |
 | --------------------------- | ------------- |
-| announceSale                | Defines the message displayed in the room when the sale is concluded with a player |
-| announceOffer               | Defines the message displayed in the room when the seller acts on himself (e.g. is a player, see below) |
+| announceSale                | Defines the message displayed in the room when the sale is concluded with a player. |
+| announceOffer               | Defines the message displayed in the room when the seller acts on himself (e.g. is a player, see below). |
 
 - For more advanced trader NPCs, one idea would be to use another location that the object's contents, such as a dedicated room (logically not accessible to regular players).
 - For the record, if a player is being given this trait, the cloned good is dropped in the location, rather than placed in the player's contents. The commands will work for the player himself in any location, and will work for other players when in a commandable room. This might sound a bit weird to add this trait to a player, but during demo-building, I found this little trick useful to clone objects from my inventory here and there without having to do any programming.
