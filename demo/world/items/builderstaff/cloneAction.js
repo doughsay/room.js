@@ -4,6 +4,11 @@ function cloneAction(player, argstr) {
   if (target === fail) {
     return;
   }
+  
+  if (target.createdWithStaff) {
+    player.tell("The Gods of Creation forbid cloning a clone!");
+    return;
+  }
 
   // Announcement in the room 
   if (player.location) {
@@ -18,17 +23,11 @@ function cloneAction(player, argstr) {
 
   // Now, we can proceed to CREATION
   let idScheme = "instances_" + target.id.split("_").pop();
-  let id = nextId(idScheme);
-  let created = target.new(id);
+  let created = target.clone(idScheme);
   
   // Special flag to track objects created with the staff.
   created.createdWithStaff = true; 
   
-  // Copy name, description and aliases, and move object in player inventory
-  created.name = target.name;
-  created.description = target.description;
-  target.aliases.forEach(alias => {
-    created.addAlias(alias);
-  });
+  // Move object in player inventory
   created.location = player;
 }

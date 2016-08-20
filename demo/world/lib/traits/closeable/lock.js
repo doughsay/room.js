@@ -12,7 +12,7 @@ function lock({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr }
     } else if (this.keySet && (this.keySet.length) && this.keySet.includes(iobj.keyId)) {
       this.doLock(player);
     } else {
-      player.tell(`Cannot lock ${dobj.name} with ${iobj.name}.`);
+      player.tell(`You cannot lock the ${dobj.name} with ${iobj.name}.`);
     }
   }
 }

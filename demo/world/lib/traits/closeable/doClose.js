@@ -4,7 +4,7 @@ function doClose(agent) {
     if (sender === recipient) {
       return `You close the ${object.name}.`;
     }
-    return `${sender.name} closes a ${object.name}.`;
+    return `${sender.name} closes some ${object.name}.`;
   }
   
   if (agent !== undefined && agent.location) {

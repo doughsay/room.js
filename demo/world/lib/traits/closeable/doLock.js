@@ -4,7 +4,7 @@ function doLock(agent) {
     if (sender === recipient) {
       return `You lock the ${object.name}.`;
     }
-    return `${sender.name} locks a ${object.name}.`;
+    return `${sender.name} locks some ${object.name}.`;
   }
   
   if (agent !== undefined && agent.location) {

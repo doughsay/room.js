@@ -3,7 +3,7 @@ function (player) {
     if (sender === recipient) {
       return `You light the ${object.name}.`;
     }
-    return `${sender.name} lights a ${object.name}.`;
+    return `${sender.name} lights some ${object.name}.`;
   }
   
   if (player.location) {
