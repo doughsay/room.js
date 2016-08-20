@@ -46,6 +46,12 @@ Properties:
 | --------------------------- | ------------- |
 | description : String        | Optional textual description for the object. |
 
+Triggers:
+
+| Trigger                     | Description   |
+| --------------------------- | ------------- |
+| onExamine                   | Fired after object is looked at. |
+
 #### lib\_traits\_gettable
 
 A trait for items that can be taken or dropped.

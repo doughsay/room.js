@@ -15,4 +15,5 @@ function examine({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjst
     player.location.announce(announce, player, this);
   }
   player.tell(util.capitalize(this.describe()));
+  this.onExamine(player);
 }

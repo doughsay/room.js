@@ -15,6 +15,10 @@
     "describe": {
       "function": true,
       "file": "describe.js"
+    },
+    "onExamine": {
+      "function": true,
+      "file": "onExamine.js"
     }
   }
 }
