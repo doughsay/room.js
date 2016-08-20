@@ -4,7 +4,7 @@ function doOpen(agent) {
     if (sender === recipient) {
       return `You open the ${object.name}.`;
     }
-    return `${sender.name} opens a ${object.name}.`;
+    return `${sender.name} opens some ${object.name}.`;
   }
   
   if (agent !== undefined && agent.location) {

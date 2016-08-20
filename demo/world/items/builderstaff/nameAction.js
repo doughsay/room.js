@@ -1,13 +1,13 @@
 function nameAction(player, text, describe) {
   // Safeguard
   if (player.location === undefined) {
-    player.tell("You cannot build in the Void.");
+    player.tell("You cannot name the Void.");
     return;
   }
   
   // Only allowed on rooms created with the builder staff
   if (!player.location.builtWithStaff) {
-    player.tell("The gods of creation do not allow this.");
+    player.tell("The Gods of Creation do not allow this.");
     return;    
   }
   

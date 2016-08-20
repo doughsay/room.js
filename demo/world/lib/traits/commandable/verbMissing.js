@@ -18,7 +18,7 @@ function ({player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr}) {
     });
     
     if (!found) {
-      player.tell(color.gray("There's no one to hear you, at the moment"));
+      player.tell(color.gray("There's no one to hear you, at the moment."));
     }
   } else {
     system.onPlayerCommandFailed({player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr});

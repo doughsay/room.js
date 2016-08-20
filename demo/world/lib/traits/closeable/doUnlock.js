@@ -4,7 +4,7 @@ function doUnlock(agent) {
     if (sender === recipient) {
       return `You unlock the ${object.name}.`;
     }
-    return `${sender.name} unlocks a ${object.name}.`;
+    return `${sender.name} unlocks some ${object.name}.`;
   }
   
   if (agent !== undefined && agent.location) {

@@ -1,3 +1,3 @@
 function canEnter(player) {
-        return true;
-    }
+  return true;
+}

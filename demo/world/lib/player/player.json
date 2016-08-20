@@ -45,7 +45,7 @@
     "say": {
       "verb": true,
       "file": "say.js",
-      "pattern": "say",
+      "pattern": "say \"",
       "dobjarg": "any",
       "preparg": "any",
       "iobjarg": "any"

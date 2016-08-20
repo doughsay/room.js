@@ -3,7 +3,7 @@ function (player) {
     if (sender === recipient) {
       return `You extinguish the ${object.name}.`;
     }
-    return `${sender.name} extinguishes a ${object.name}.`;
+    return `${sender.name} extinguishes some ${object.name}.`;
   }
   
   if (player.location) {

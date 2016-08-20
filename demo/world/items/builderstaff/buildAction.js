@@ -8,7 +8,7 @@ function buildAction(player, direction) {
     return;
   }
     
-  // oppositeDirection returns undefined for non-canonical direction.
+  // Small trick: oppositeDirection returns undefined for non-canonical direction.
   if (dirToHere === undefined) {
     player.tell("You can only build known directions.");
     return;

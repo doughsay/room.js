@@ -1,6 +1,6 @@
 function announceOffer(sender, recipient, obj) {
   if (sender === recipient) { 
-     return `You offer a ${obj.name}.`; 
+     return `You offer some ${obj.name} for free.`; 
   }
-  return `${this.name} offers a free ${obj.name}.`;
+  return `${this.name} offers some free ${obj.name}.`;
 }

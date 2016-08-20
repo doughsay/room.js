@@ -9,7 +9,7 @@ function unlock({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr
     } else if (this.keySet && (this.keySet.length) && this.keySet.includes(iobj.keyId)) {
       this.doUnlock(player);
     } else {
-      player.tell(`Cannot unlock ${dobj.name} with ${iobj.name}.`);
+      player.tell(`You cannot unlock the ${dobj.name} with ${iobj.name}.`);
     }
   }
 }

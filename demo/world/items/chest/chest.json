@@ -2,7 +2,8 @@
   "name": "chest",
   "aliases": [],
   "traitIds": [
-    "lib_item",
+    "lib_root",
+    "lib_traits_describable",
     "lib_traits_closeable",
     "lib_traits_container"
   ],

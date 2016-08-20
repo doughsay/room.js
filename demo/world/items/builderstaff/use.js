@@ -64,6 +64,15 @@ function use({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr })
       break; 
     default:
       player.tell(`The ${this.name} cannot ${command}.`);
+      player.tell(color.gray(`Available powers:
+  - use staff to create <object> (clones an object)
+  - use staff to destroy <object> (destroys a cloned object)
+  - use staff to force <object> to <action> (makes someone perform an action)
+  - use staff to build <direction> (builds a room in the given direction)
+  - use staff to name <text> (names a room built with the staff)
+  - use staff to desc|describe <text> (describes a room built with the staff)
+  - use staff to id|identify <object>|here|me (obtains the internal ID)
+`));
       break;
   }
 }
