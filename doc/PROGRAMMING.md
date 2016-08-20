@@ -168,7 +168,7 @@ When the function is invoked:
 - *verbstr, argstr, dobjstr, prepstr, iobjstr* are the parsed strings, see **parse()** just below.
 
 ##### parse( String ) ⇒ Command
-Invokes the command parser on a string. Explanation by example is easier:
+Invokes the sentence parser on a string. Explanation by example is easier:
 ```javascript
 parse("put trash in can");
 ⇒ { verb: 'put', dobjstr: 'trash', prepstr: 'in', iobjstr: 'can', argstr: 'trash in can' }
@@ -176,6 +176,15 @@ parse("put trash in can");
 ```
 
 This may be used to check how a command will be split and passed to a Verb function.
+
+##### noun( String ) ⇒ [String, String]
+Invokes the noun parser on a string, separating the determiner (if any) and the noun. This may have some use when formatting messages.
+Examples:
+```javascript
+noun("any lantern"); ⇒ ['any', 'lantern']
+noun("lantern"); ⇒ [undefined, 'lantern']
+noun("lantern.1"); ⇒ ['1', 'lantern']
+```
 
 ##### color.*( String ) ⇒ String
 Colorizes a string.
