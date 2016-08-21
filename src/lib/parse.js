@@ -139,7 +139,7 @@ function parseNoun(text) {
   
   nounstr = i === 0 ? text.slice(detstr.length + 1) : text.slice(0, i);
   if (nounstr === '') { nounstr = void 0; }
-  detstr = determiners[detstr] ? determiners[detstr] : detstr; 
+  detstr = determiners.hasOwnProperty(detstr) ? determiners[detstr] : detstr; 
   
   return [detstr, nounstr];
 }
