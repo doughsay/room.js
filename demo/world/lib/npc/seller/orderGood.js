@@ -7,7 +7,7 @@ function order({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr 
   const target = this.findInside(dobjstr);
 
   if (target === fail) {
-    player.tell(`${this.name} says: "I am sorry, we don't have any ${dobjstr}."`);
+    player.tell(`${this.name} says: "I am sorry, we don't have any ${noun(dobjstr)[1]}."`);
   } else if (target === ambiguous) {
     player.tell(`${this.name} says: "I can't tell which ${dobjstr} you meant."`);
   } else {
