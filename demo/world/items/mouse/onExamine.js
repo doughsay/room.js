@@ -3,6 +3,10 @@ function onExamine(player) {
   if (this.location) {
     // Pick a random exit
     let exitDirs = Object.keys(this.location.exits);
+    if (exitDirs.length === 0) {
+      // Safeguard
+      return;
+    }
     let pickedExit = exitDirs[Math.floor(Math.random()*exitDirs.length)];
 
     // Some name cheating...
