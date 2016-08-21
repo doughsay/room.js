@@ -4,9 +4,9 @@ function describe() {
     description = this.description;
   }
   if (this.exhausted) {
-    description += ` The ${this.containerObject} is empty.`;
+    description += ` (Empty)`;
   } else {
-    description += ` The ${this.containerObject} is full of ${this.containedEdible}.`;
+    description += ` (Full of ${this.containedEdible})`;
     if (this.edibleDescription) {
       description += " " + this.edibleDescription;
     }
