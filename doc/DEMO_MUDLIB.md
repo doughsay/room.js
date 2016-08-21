@@ -1,6 +1,6 @@
 # A brief description of the demonstration mudlib
 
-The RoomJS game engine does not make many assumptions about the gaming logic. It can be regarded as a generic "driver" responsible for handling connections and player accounts,  dispatching commands and providing a persisent world -- But basically, everything else is entirely up to the game developers.
+The RoomJS game engine does not make many assumptions about the gaming logic. It can be regarded as a generic "driver" responsible for handling connections and player accounts, dispatching commands and providing a persisent world -- But basically, everything else is entirely up to the game developers.
 
 As noted in the [Customization guide](CUSTOMIZING.md), which the reader is assumed to have first read at this point:
 
@@ -133,7 +133,7 @@ Verbs:
 
 | Verb                        | 
 | --------------------------- | 
-| get/take any out of/from/inside/from this | 
+| get/take any out of/from inside/from this | 
 | put any in/inside/into this | 
 | l\*ook in/inside/into this  |
 
@@ -149,6 +149,41 @@ Functions:
 Properties: none
 
 Triggers: none, but that's probably missing (or we should use onDropItem/onTakeItem if the instances has *lib\_traits\_gettable*)
+
+#### lib\_traits\_surface
+
+A trait for items that can serve as surfaces (e.g. a table).
+
+Traits: none (but overloads some methods from **lib\_traits\_describable**).
+
+Verbs:
+
+| Verb                        | 
+| --------------------------- | 
+| get/take any out of/from inside/from this | 
+| put any on top of/on/unto/upon this | 
+| l\*ook on top of/on/unto/upon this  |
+
+Functions:
+
+| Function                    | Description   |
+| --------------------------- | ------------- |
+| announcePutItemSurface      | Defines the message displayed in the room when an object is put on the surface. |
+| announceTakeItemSurface     | Defines the message displayed in the room when the object is taken from the surface. |
+| canAccept                   | Checks the container interior can be accessed. Currently checks if maxItems is reached. |
+| describe                    | Returns the description (including the contents). |
+| describeContents            | Returns the contents of the container. |
+
+Properties:
+
+| Property                    | Description   |
+| --------------------------- | ------------- |
+| description                 | Optional description |
+| maxItems                    | Maximum items that can be stored on the surface. Defaults to 10. |
+| destroyOnUse : Boolean      | True if the object should be destroyed after use. Defaults to false. |
+
+Triggers: none, but that's probably missing (or we should use onDropItem/onTakeItem if the instances has *lib\_traits\_gettable*)
+
 
 #### lib\_traits\_edible
 
