@@ -1,0 +1,18 @@
+{
+  "name": "table",
+  "aliases": [],
+  "traitIds": [
+    "lib_traits_surface",
+    "lib_root",
+    "lib_traits_describable"
+  ],
+  "locationId": "areas_city_inn",
+  "properties": {
+    "maxItems": {
+      "value": 10
+    },
+    "description": {
+      "value": "An elegant elm table with shaped ends."
+    }
+  }
+}
