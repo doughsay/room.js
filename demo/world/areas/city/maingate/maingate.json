@@ -11,13 +11,13 @@
         "north": {
           "ref": "areas_city_lessermarket"
         },
-        "south": {
-          "ref": "areas_city_entranceplace"
+        "east": {
+          "ref": "areas_city_guardtower"
         }
       }
     },
     "description": {
-      "value": "Two strong stone towers surround a heavy wooden gate. You can see the entrance place to the south, and the lesser market to the north."
+      "value": "This is the main entrance place of the city. Two strong stone towers surround a heavy wooden gate. You can see the lesser market to the north. A defense tower stands in the east."
     }
   }
 }

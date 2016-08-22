@@ -1,5 +1,5 @@
 {
-  "name": "House",
+  "name": "Town house",
   "aliases": [],
   "traitIds": [
     "lib_room"
@@ -12,12 +12,12 @@
           "ref": "areas_city_southstreet1"
         },
         "up": {
-          "ref": "areas_start_lounge"
+          "ref": "areas_start_heaven"
         }
       }
     },
     "description": {
-      "value": "You stand in a beautifully furnished room."
+      "value": "This is an elegant house interior. A fully visible staircase paved with wooden planks leads to the first floor."
     }
   }
 }

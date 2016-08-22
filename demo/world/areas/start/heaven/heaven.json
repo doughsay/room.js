@@ -1,5 +1,5 @@
 {
-  "name": "Heaven",
+  "name": "First floor",
   "aliases": [],
   "traitIds": [
     "lib_room"
@@ -7,12 +7,12 @@
   "locationId": null,
   "properties": {
     "description": {
-      "value": "You stand in a beautifully furnished room. This is the Starting Room for newcomers in this World. There is a lounge downstairs."
+      "value": "You stand in a beautifully furnished room. It is a cozy place where to rest, handsomely decked with a fireplace. There is another room downstairs. A trap door, with a foldable ladder, is also visible on the ceiling."
     },
     "exits": {
       "object": {
         "down": {
-          "ref": "areas_start_lounge"
+          "ref": "areas_city_house"
         },
         "up": {
           "ref": "areas_start_door"

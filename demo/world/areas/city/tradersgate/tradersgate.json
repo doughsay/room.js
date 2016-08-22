@@ -9,7 +9,7 @@
     "exits": {
       "object": {
         "west": {
-          "ref": "areas_city_eaststreet1"
+          "ref": "areas_city_eaststreet"
         }
       }
     },
