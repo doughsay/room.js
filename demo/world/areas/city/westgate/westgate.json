@@ -9,7 +9,7 @@
     "exits": {
       "object": {
         "east": {
-          "ref": "areas_city_weststreet1"
+          "ref": "areas_city_weststreet"
         },
         "northeast": {
           "ref": "areas_city_alley3"

@@ -9,21 +9,18 @@
     "exits": {
       "object": {
         "east": {
-          "ref": "areas_city_eaststreet1"
+          "ref": "areas_city_tradersgate"
         },
         "west": {
           "ref": "areas_city_greatmarket"
         },
         "south": {
-          "ref": "areas_city_jewellery"
-        },
-        "north": {
-          "ref": "areas_city_armoury"
+          "ref": "areas_city_cityhall"
         }
       }
     },
     "description": {
-      "value": "The cobblestone road moves to the west and east here. The Great Market is to the west. Many shops and buildings can be seen all around here. To the south is a jewellery shop, and to the north, the armoury."
+      "value": "The cobblestone road moves to the west and east here. The Great Market is to the west. Many shops and buildings can be seen all around here. The city hall is to the south."
     }
   }
 }
