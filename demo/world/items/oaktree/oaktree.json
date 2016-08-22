@@ -1,0 +1,28 @@
+{
+  "name": "oak tree",
+  "aliases": [
+    "tree"
+  ],
+  "traitIds": [
+    "lib_root",
+    "lib_traits_describable"
+  ],
+  "locationId": "areas_city_square",
+  "properties": {
+    "description": {
+      "value": "An old moss-covered oak tree, high and massive."
+    },
+    "climb": {
+      "verb": true,
+      "file": "climb.js",
+      "pattern": "climb",
+      "dobjarg": "this",
+      "preparg": "none",
+      "iobjarg": "none"
+    },
+    "tell": {
+      "function": true,
+      "file": "tell.js"
+    }
+  }
+}
