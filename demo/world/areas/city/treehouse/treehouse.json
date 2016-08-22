@@ -1,0 +1,28 @@
+{
+  "name": "Small tree house",
+  "aliases": [],
+  "traitIds": [
+    "lib_room"
+  ],
+  "locationId": null,
+  "properties": {
+    "exits": {
+      "object": {
+        "down": {
+          "ref": "areas_city_square"
+        }
+      }
+    },
+    "canEnter": {
+      "function": true,
+      "file": "canEnter.js"
+    },
+    "description": {
+      "value": "A pretty small hut made with planks, probably built by children. One may probably stand here, but not more."
+    },
+    "announce": {
+      "function": true,
+      "file": "announce.js"
+    }
+  }
+}
