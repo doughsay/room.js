@@ -6,7 +6,7 @@ As noted in the [Customization guide](CUSTOMIZING.md), which the reader is assum
 
 > The term "mudlib" refers to the very basic set of objects and entities that are initally required to make the first real objects in your game (i.e. the base structure for rooms, containers, behaviors, etc.). The demonstration comes with its own mudlib, which you can modify/extend, but it is wholly replaceable -- By nature, the demonstration mudlib has been kept small (no character classes or combat system, for instance -- You'll have to design your owns).
 
-This memorandum describes the demonstration mudlib (i.e. *lib\_xxx* objects), which may be used as a sample for designing and implementing you own game logic.
+This memorandum describes the demonstration mudlib (i.e. *lib\_xxx* objects), which may be used as a sample for designing and implementing you own game logic. It is indeed a very small library (with only 10 base structures for items/rooms/NPCs, and 7 traits for behaviors).
 
 ## Introduction
 
@@ -16,6 +16,8 @@ For each objects, this memorandum provides:
 - Functions defined by the object,
 - Properties defined by the object,
 - If any, triggers provided by this object: these are callback functions that do nothing by default, but are intended for being overloaded by derived classes.
+
+## Description
 
 ### Pure traits
 
@@ -178,7 +180,7 @@ Properties:
 
 | Property                    | Description   |
 | --------------------------- | ------------- |
-| description                 | Optional description |
+| description                 | Optional description. |
 | maxItems                    | Maximum items that can be stored on the surface. Defaults to 10. |
 | destroyOnUse : Boolean      | True if the object should be destroyed after use. Defaults to false. |
 
@@ -208,8 +210,8 @@ Properties:
 
 | Property                    | Description   |
 | --------------------------- | ------------- |
-| DRINK = 1, MEAL = 2         | Bit mask constants for type of food |
-| foodType : Integer          | Current type. Defaults to DRINK (1) |
+| DRINK = 1, MEAL = 2         | Bit mask constants for type of food. |
+| foodType : Integer          | Current type. Defaults to DRINK (1). |
 | destroyOnUse : Boolean      | True if the object should be destroyed after use. Defaults to false. |
 
 - To keep this as simple as possible, edibled object are either single use (when destroyOnUse is true) or inexhaustible (when false).
@@ -405,15 +407,15 @@ Functions:
 | doUse                       | Set the exhausted flag, and resets aliases accordingly. |
 | canUse                      | Returns false if exhausted, true otherwise.          |
 | describe                    | Constructs a description from the object's own description, whether it's empty or not, and in the latter case the description of the content. |
-| setEdible                   | Convenience function for setting the name and description of the content, and resets all flags and aliases accordingly, i.e. refills the item. |
+| setEdible                   | Convenience function for setting the name and description of the content, and resetting all flags and aliases accordingly, e.g. to refill the item. |
 
 Properties:
 
 | Property                    | Description   |
 | --------------------------- | ------------- |
 | exhausted : String          | True when empty. |
-| containerObject : String    | Default container name ("bottle.") |
-| containedEdible : String    | Default content name ("water") |
+| containerObject : String    | Default container name ("bottle"). |
+| containedEdible : String    | Default content name ("water"). |
 | edibleDescription : String  | Optional description for the content. |
 
 ### Living things
@@ -494,3 +496,9 @@ Functions:
 - For the record, if a player is being given this trait, the cloned good is dropped in the location, rather than placed in the player's contents. The commands will work for the player himself in any location, and will work for other players when in a commandable room. This might sound a bit weird to add this trait to a player, but during demo-building, I found this little trick useful to clone objects from my inventory here and there without having to do any programming.
 
 Properties: none
+
+
+
+
+
+

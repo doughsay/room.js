@@ -37,12 +37,12 @@ The **system** object is where several customizable hooks are defined (besides a
 For the record here, as far as customizable hooks are concerned, the game engine also invokes onTabKeyPress() on the player object when the TAB key event is received. In the demonstration, this is used to cycle through the different modes (a.k.a. PLAY, CHAT, SAY, EVAL), and implemented in the **lib\_player** object.
 
 ## Useful objects (recommended)
-The following objects are not mandatory *per se* but are probably best keeping (and customized if need really be)
+The following objects are not mandatory *per se* but are probably best keeping (and customized, if need really be).
 
 | Object     | Comment |
 | ---------- | ------- |
 | help       | The in-game help system: may be used as a basis for designing your own. |
-| modes      | (Along with several mode object located in sub-directories.) The mode system (a.k.a. PLAY, CHAT, SAY, EVAL): may be modified according to your needs. |
+| modes      | (Along with several mode objects located in sub-directories.) The mode system (a.k.a. PLAY, CHAT, SAY, EVAL): may be modified according to your needs. |
 | util       | Several useful functions (e.g. for normalizing directions, capitalizing strings, etc.): may be extended, obviously. |
 | views      | Some other useful methods. |
 
@@ -67,7 +67,7 @@ All other objects are demonstration-specific, so you may wholly remove them when
 
 For instance, the demonstration adopts the following scheme:
 - All useable items are located in *items/* (and therefore have identifiers starting with "items\_"),
-- Rooms are structured under *areas/* (and therefore have identifiers such as "area\_something\_roomname").
+- Rooms are structured under *areas/* (and therefore have identifiers such as "areas\_something\_roomname").
 - Cloned objects (i.e. copies of useable items, such as made by the seller NPCs) are located in *instances/*.
 
 Once you have created a room of your own, and changed the system.onPlayerConnected() hook

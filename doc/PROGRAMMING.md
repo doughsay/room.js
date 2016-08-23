@@ -1,6 +1,6 @@
 # Building and programming your own RoomJS MUD/MOO world
 
-This guide is intended for "builders", i.e. players with developer privileges in the game.
+This guide is intended for players with developer privileges in the game.
 
 ## Introduction
 
@@ -11,7 +11,7 @@ Once you have been given developer privileges (or by default, on the demonstrati
  
 You can then use any JavaScript (ES6) construct to start creating new rooms and objects. This document therefore assumes the reader has pre-existing JavaScript knowledge. You will need to learn but a few basic RoomJS-specific concepts only:
 
-- Toplevel functions: there are a few global functions, such as **all()**. Some are seldom used in actual code, but are provided as utilities for you to invoke on the command line. Others, such as **nextId()**, will be of frequent use.
+- Toplevel functions: there are a few global functions, such as **all()**. Some are seldom used in actual code, but are provided as utilities for you to invoke on the command line. Others, such as **nextId()**, will be of more frequent use.
 - World objects:
   - Each object in the world has a unique identifier, which also corresponds to its name in the global scope.
     - You may reference an object by its identifier: `$('lib_room')`
@@ -134,22 +134,22 @@ Returns a new unique identifier from the text provided. Very useful when you cre
 Returns a list of all existing player world objects (i.e. player characters).
 
 ##### $( String ) ⇒ WorldObject|undefined
-Returns a world object by its identifier, if it exits.
+Returns a world object by its identifier, if it exists.
 
-##### Verb( command, dobj?, prep?, iobj? ) ⇒ Command
+##### Verb( pattern, dobjarg?, preparg?, iobjarg? ) ⇒ Command
 Creates a command verb.
 
 | Parameter | Type      | Comment  | 
 | --------- | --------- | ------------ |
-| command   | String    | Command name(s) |
-| dobj      | String?   | Direct object |
-| prep      | String?   | Preposition   |
-| iobj      | String?   | Indirect object |
+| pattern   | String    | Verb pattern(s) |
+| dobjarg   | String?   | Direct object |
+| preparg   | String?   | Preposition   |
+| iobjarg   | String?   | Indirect object |
 
-- The command can include several patterns separated by a space, that will be recognized alike. Each pattern can include a \* sign for defining shortcuts. E.g., "l\*ook ex\*amine" will match "look", "l", "examine" and "ex".
+- The verb pattern can consists in several patterns separated by a space, that will be recognized alike. Each pattern can include a \* sign for defining shortcuts. E.g., "l\*ook ex\*amine" will match "look", "l", "examine" and "ex".
 - Possible values for optional direct/indirect objects are "this", "any", "none" (default).
 - Several prepositions may be provided, separated with a /.
-- Recognized propositions: "with", "using", "at", "to", "in front of", "in", "inside", "into", "on top of", "on", "onto", "upon", "out of", "from inside", "from", "over", "through", "under", "underneath", "beneath", "behind", "beside", "for", "about", "is", "as", "off of", "off".
+- Recognized prepositions: "with", "using", "at", "to", "in front of", "in", "inside", "into", "on top of", "on", "onto", "upon", "out of", "from inside", "from", "over", "through", "under", "underneath", "beneath", "behind", "beside", "for", "about", "is", "as", "off of", "off".
 
 Example:
 ```javascript
@@ -164,8 +164,8 @@ function({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr })
 When the function is invoked:
 - The *this* variable refers to the world object implementing the command,
 - *player* is the player world object who triggered the command,
-- *dobj* and *iobj* are the direct and indirect object of the command, that is either a world object (if found) or one of the core objects **fail**, **nothing** and **ambiguous**.
-- *verbstr, argstr, dobjstr, prepstr, iobjstr* are the parsed strings, see **parse()** just below.
+- *dobj* and *iobj* are the direct and indirect object of the command, that is either a world object (if found) or one of the core objects **fail**, **nothing** and **ambiguous**,
+- *verbstr, argstr, dobjstr, prepstr, iobjstr* are the parsed raw strings, see **parse()** just below.
 
 ##### parse( String ) ⇒ Command
 Invokes the sentence parser on a string. Explanation by example is easier:
@@ -186,6 +186,9 @@ noun("lantern"); ⇒ [undefined, 'lantern']
 noun("lantern.1"); ⇒ ['1', 'lantern']
 ```
 
+Recognized determiners are 'all' (for a collection), 'a', 'an', 'any' (all mapped to 'any', for any indefinite random item in a collection),
+'the' or undefined (both mapped to undefined, assuming definiteness by default), or a string containing an ordinal index (i.e. rank in a collection), either prefixed ("2.lantern") or suffixed ("lantern.2" or "lantern 2"). 
+
 ##### color.*( String ) ⇒ String
 Colorizes a string.
 ```javascript
@@ -201,18 +204,18 @@ All world objects have at least the following properties:
 
 | Property  | Type                | Comment  |
 | --------- | ------------------- | ------------ |
-| player    | Boolean             | true if object is a player (read-only) |
-| online    | Boolean             | true when connected player (read-only) |
-| id        | String              | unique identifier (read-only) |
-| name      | String              | name |
-| aliases   | Array.String        | list of aliases |
-| traits    | Array.WorldObject   | list of applicable traits |
-| location  | WorldObject\|null   | location |
-| contents  | Array.WorldObject   | Objects can therefore all be containers |
+| player    | Boolean             | True if object is a player (read-only) |
+| online    | Boolean             | True for a connected player (read-only) |
+| id        | String              | Unique identifier (read-only) |
+| name      | String              | Name |
+| aliases   | Array.String        | List of aliases |
+| traits    | Array.WorldObject   | List of traits |
+| location  | WorldObject\|null   | Location |
+| contents  | Array.WorldObject   | List of objects -- All objects can therefore all be containers. |
 
 For the record:
 - The *player* property actually checks whether the object has an *userId* property (which can't be added manually),
-- The *online* is a getter querying the connection controller,
+- The *online* property is actually a getter, querying the connection controller,
 - The *id* property is internally mapped to a file path by the DB. 
 
 Moreover, there are a few optional properties used by the game engine:
@@ -246,22 +249,22 @@ Note: The identifier is 'sanitized', i.e. non-authorized characters are removed 
 Removes an object from the world and its database. Currently returns true.
 
 ##### addAlias( ...String ) ⇒ Integer
-Add alias strings to the object and returns the number of aliases.
+Adds alias strings to the object and returns the number of aliases.
 
 > Warning: it doesn't prevent from adding an existing alias. Maybe it should, there's
 > no real point having the same alias declared more than once.
 
 ##### rmAlias( ...String ) ⇒ Integer
-Remove alias strings from the object (any duplicates will be removed), and returns the number of aliases.
+Removes alias strings from the object (any duplicates will be removed), and returns the number of aliases.
 
 ##### addTrait( ...WorldObject ) ⇒ Integer
-Add traits to the object and returns the number of traits. Traits are what makes the object inherit properties and methods.
+Adds traits to the object and returns the number of traits. Traits are what makes the object inherit properties and methods.
 
 > Warning: it doesn't prevent from adding an already existing trait. Maybe it should, 
 > otherwise the object gets broken, with a 'duplicate parent'.
 
 ##### rmTrait( ...String ) ⇒ Integer
-Remove traits from the object and returns the number of traits.
+Removes traits from the object and returns the number of traits.
 
 > Warning: removing an object used as trait in other objects may lead to bad things. 
 > Anyhow, it is probably a bad idea to remove a parent trait object, as the inheriting objects may likely be broken afterwards.
@@ -274,7 +277,7 @@ check if an item can be found in a container, a location, etc.
 Looks if a string can be matched to an object in the environment, that is:
 - the object's contents,
 - its location's contents,
-- the location's extraMatchObjects, if defined. This allows specifying additional objects that may also be matched (e.g. a door, a sign, etc.) despite not appearing in the location's contents.
+- the location's extraMatchObjects, if defined. This allows specifying additional objects that may also be matched (e.g. a door, a sign, etc.) despite not appearing in the location's contents. This may either be an array or a function (for returning a dynamical list of objects).
 
 Returns:
 - the core object **fail** when there is no match,
@@ -309,7 +312,7 @@ Given a command, returns { dobj : WorldObject, iobj : WorldObject }, containing 
 Given a command and the result from matchObjects(), returns an object { verb: Function, this: WorldObject }, corresponding to the first matched verb and the target object, or null in case there is no match.
 
 #### Other methods
-They exist in the execution context, but are propably of lower interest.
+They exist in the execution context, but are probably of lower interest.
 
 ##### send( String\|Object ) ⇒ Boolean
 Sends a message to the client.
@@ -344,7 +347,7 @@ Returns an array of a given object's own enumerable property values.
 
 #### Other methods (somehow internal)
 
-This section is provided for reference only. You are normally not supposed to need these methods -- but these are therefore reserved property names.
+This section is provided for reference only. You are normally not supposed to need these methods (internally used by the abovementioned look-up methods) -- but these are therefore reserved property/function names.
 
 ##### matches( String ) ⇒ 0..2
 Checks if an object matches a given string, comparing it against its name and its aliases.
@@ -361,7 +364,7 @@ Given an exact-match array of WorldObject's, a partial-match array of WorldObjec
 - otherwise, the matched object.
 
 The determiner is one of 'all' (for the whole collection), 'any' (for any indefinite random item in a collection),
-undefined (for definiteness), or a string containing an ordinal index (i.e. rank in a collection). Internally used by the abovementioned look-up methods.
+undefined (for definiteness), or a string containing an ordinal index (i.e. rank in a collection).
 
 ##### findVerb( Object, Object, WorldObject ) ⇒ String|undefined
-Given a command and a set of matched objects, returns an applicable verb property name (or undefined, if none matches). Internally used by matchVerb(), which applies it to the object first, then to its location, and finally the command direct and indirect objects.
+Given a command and a set of matched objects, returns an applicable verb property name (or undefined, if none matches). Internally used by matchVerb(), which applies it to the object first, then to its location, and finally to the command direct and indirect objects.
