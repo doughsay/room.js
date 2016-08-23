@@ -13,7 +13,7 @@ function eatOrDrink({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iob
   function announce(sender, recipient, object) {
       return sender === recipient
       ? `You ${verbstr} the ${object.name}.`
-      : `${sender.name} a ${verbstr}s ${object.name}.`;
+      : `${sender.name} ${verbstr}s some ${object.name}.`;
     
   }
   
