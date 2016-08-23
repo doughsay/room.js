@@ -143,7 +143,7 @@ Creates a command verb.
 | --------- | --------- | ------------ |
 | pattern   | String    | Verb pattern(s) |
 | dobjarg   | String?   | Direct object |
-| preparg   | String?   | Preposition   |
+| preparg   | String?   | Preposition(s) |
 | iobjarg   | String?   | Indirect object |
 
 - The verb pattern can consists in several patterns separated by a space, that will be recognized alike. Each pattern can include a \* sign for defining shortcuts. E.g., "l\*ook ex\*amine" will match "look", "l", "examine" and "ex".
