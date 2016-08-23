@@ -15,6 +15,7 @@ The RoomJS server requires **Node.js 6.0** or upper.
 Clone the repository or download a ZIP archive. 
 
 Installation steps are straightforward:
+
 1. `npm install`
 2. Edit the `.env` file to customize the server listening port and the debug level (if need be), and just source it. (Also edit the path to the User DB and the path to world directory, if not using the lightweight demonstration world bundled with the project.)
 3. `npm start`
@@ -42,7 +43,7 @@ These are but a few of all the things that you get just out-of-the-box:
   - Out-of-the box "Say" channel for the chatty ones, "Chat" channel and "Eval" mode for the developers.
   - Extensible and easily customizable mode system.
 
-- Powerfull **Debugging**
+- Powerfull **Debugging**:
   - The game relies on [Bunyan](https://github.com/trentm/node-bunyan), a simple and fast JSON logging library, with a nice CLI for viewing and analyzing logs.
 
 - Lightweight **Demonstration**:
