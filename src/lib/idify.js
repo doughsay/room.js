@@ -2,7 +2,7 @@
  * Module for sanitizing object identifier to ensure they are acceptable.
  * - Replace any non-character, spaces, dashes etc., switching to Camel case
  * - Keep the underscores internally (representing a logical hierarchy, and
- *   mapped to a directory in the filesystem DB), but remove duplicates and 
+ *   mapped to a directory in the filesystem DB), but remove duplicates and
  *   trim them.
  */
 

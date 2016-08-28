@@ -47,8 +47,9 @@ class PlayerController extends BaseChildController {
   }
 
   runCommand(command, player) {
-    let matchedObjects, matchedVerb;
-    
+    let matchedObjects;
+    let matchedVerb;
+
     try {
       matchedObjects = player.matchObjects(command);
       matchedVerb = player.matchVerb(command, matchedObjects);
@@ -87,7 +88,6 @@ class PlayerController extends BaseChildController {
 
   onRunVerb(command, matchedObjects, matchedVerb) {
     const playerId = this.playerId;
-    const player = this.world.get(playerId);
     const dobjId = matchedObjects.dobj ? matchedObjects.dobj.id : 'void 0';
     const iobjId = matchedObjects.iobj ? matchedObjects.iobj.id : 'void 0';
     const verbstr = wrapString(command.verb);
@@ -104,7 +104,7 @@ class PlayerController extends BaseChildController {
       `argstr: ${argstr},`,
       `dobjstr: ${dobjstr},`,
       `prepstr: ${prepstr},`,
-      `iobjstr: ${iobjstr} }`
+      `iobjstr: ${iobjstr} }`,
     ].join(' ');
     const verbStatement = `${matchedVerb.this.id}[${wrapString(matchedVerb.verb)}]`;
     const code = `${verbStatement}(${argObject})`;
