@@ -13,14 +13,11 @@
         },
         "south": {
           "ref": "areas_city_southstreet1"
-        },
-        "southwest": {
-          "ref": "areas_city_alley2"
         }
       }
     },
     "description": {
-      "value": "The cobblestone road moves to the south and north here. A smaller alley leads to the southwest. The Great Market is to the north."
+      "value": "The cobblestone road moves to the south and north here. The Great Market is to the north."
     }
   }
 }
