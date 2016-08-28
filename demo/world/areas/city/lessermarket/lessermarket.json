@@ -14,9 +14,6 @@
         "southeast": {
           "ref": "areas_city_alley1"
         },
-        "southwest": {
-          "ref": "areas_city_alley"
-        },
         "west": {
           "ref": "areas_city_butcher"
         },
@@ -29,7 +26,7 @@
       }
     },
     "description": {
-      "value": "The Lesser Market is an open square surrounded by shops and small estates. A bakery is to the east, and a butcher's shop to the west. The main street moves to the north. A dark alley leads to the southwest, and another to the southeast. The main gate of the city is to the south."
+      "value": "The Lesser Market is an open square surrounded by shops and small estates. A bakery is to the east, and a butcher's shop to the west. The main street moves to the north. A dark alley leads to the southeast. The main gate of the city is to the south."
     }
   }
 }
