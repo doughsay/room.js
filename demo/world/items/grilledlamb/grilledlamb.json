@@ -1,0 +1,24 @@
+{
+  "name": "grilled lamb chop",
+  "aliases": [
+    "lamb",
+    "chop",
+    "meat"
+  ],
+  "traitIds": [
+    "lib_item",
+    "lib_traits_edible"
+  ],
+  "locationId": "items_butcher",
+  "properties": {
+    "description": {
+      "value": "A set of perfectly grilled lamb chops, marinated with thyme and garlic."
+    },
+    "foodType": {
+      "value": 2
+    },
+    "destroyOnUse": {
+      "value": true
+    }
+  }
+}

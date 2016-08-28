@@ -1,0 +1,20 @@
+{
+  "name": "City Hall",
+  "aliases": [],
+  "traitIds": [
+    "lib_room"
+  ],
+  "locationId": null,
+  "properties": {
+    "exits": {
+      "object": {
+        "north": {
+          "ref": "areas_city_eaststreet"
+        }
+      }
+    },
+    "description": {
+      "value": "You are in a small, beautifully furnished room. The warm light emanating from the small oil lamps on the walls is reflected in the hard, polished surface of the big desk that stands in the centre of the room."
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "Guard tower",
+  "aliases": [],
+  "traitIds": [
+    "lib_room"
+  ],
+  "locationId": null,
+  "properties": {
+    "exits": {
+      "object": {
+        "north": {
+          "ref": "areas_city_alley1"
+        },
+        "west": {
+          "ref": "areas_city_maingate"
+        }
+      }
+    },
+    "description": {
+      "value": "This fortified tower stands next to the main gate of the city, under the ramparts. There's a winding stone straircase leading to the wall walk. The city is at peace now, but according to the old saying, 'each wall shall have a tower and each tower a guard'. The entrance place of the city is to the west. You also notice a small exit leading to an alley in the north."
+    }
+  }
+}

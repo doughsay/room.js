@@ -1,0 +1,27 @@
+{
+  "name": "Attic",
+  "aliases": [],
+  "traitIds": [
+    "lib_room"
+  ],
+  "locationId": null,
+  "properties": {
+    "description": {
+      "value": "You hardly stand in this awkardly shaped room, just under a slanted roof. There are difficult-to-reach corners, and everything stored here is gathering dust."
+    },
+    "exits": {
+      "object": {
+        "down": {
+          "ref": "areas_start_door"
+        }
+      }
+    },
+    "extraMatchObjects": {
+      "array": [
+        {
+          "ref": "areas_start_door"
+        }
+      ]
+    }
+  }
+}

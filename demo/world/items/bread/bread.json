@@ -1,0 +1,23 @@
+{
+  "name": "stick of bread",
+  "aliases": [
+    "stick",
+    "bread"
+  ],
+  "traitIds": [
+    "lib_item",
+    "lib_traits_edible"
+  ],
+  "locationId": "items_baker",
+  "properties": {
+    "description": {
+      "value": "A freshly baked stick of bread."
+    },
+    "foodType": {
+      "value": 2
+    },
+    "destroyOnUse": {
+      "value": true
+    }
+  }
+}

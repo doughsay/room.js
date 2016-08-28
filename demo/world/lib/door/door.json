@@ -1,0 +1,42 @@
+{
+  "name": "lib_door",
+  "aliases": [],
+  "traitIds": [
+    "lib_root",
+    "lib_traits_closeable",
+    "lib_traits_describable"
+  ],
+  "locationId": null,
+  "properties": {
+    "description": {
+      "value": "A standard door."
+    },
+    "sides": {
+      "array": []
+    },
+    "describe": {
+      "function": true,
+      "file": "describe.js"
+    },
+    "announce": {
+      "function": true,
+      "file": "announce.js"
+    },
+    "addExit": {
+      "function": true,
+      "file": "addExit.js"
+    },
+    "doEnter": {
+      "function": true,
+      "file": "doEnter.js"
+    },
+    "canEnter": {
+      "function": true,
+      "file": "canEnter.js"
+    },
+    "onTraversal": {
+      "function": true,
+      "file": "onTraversal.js"
+    }
+  }
+}

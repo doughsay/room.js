@@ -1,0 +1,9 @@
+{
+  "name": "playmode",
+  "aliases": [],
+  "traitIds": [
+    "modes_mode"
+  ],
+  "locationId": null,
+  "properties": {}
+}

@@ -1,6 +1,6 @@
 const bunyan = require('bunyan');
 const BaseChildController = require('./base-child-controller');
-const parse = require('../lib/parse');
+const parse = require('../lib/parse').parseSentence;
 const { bgRed, gray } = require('../lib/colors');
 const wrapString = require('../lib/wrap-string');
 
@@ -47,18 +47,12 @@ class PlayerController extends BaseChildController {
   }
 
   runCommand(command, player) {
-    try {
-      const matchedObjects = player.matchObjects(command);
-      const matchedVerb = player.matchVerb(command, matchedObjects);
+    let matchedObjects;
+    let matchedVerb;
 
-      if (matchedVerb) {
-        this.onRunVerb(command, matchedObjects, matchedVerb);
-      } else if (player.location && player.location.verbMissing) {
-        const verbMissing = { verb: 'verbMissing', this: player.location };
-        this.onRunVerb(command, matchedObjects, verbMissing);
-      } else {
-        this.emit('output', gray("I didn't understand that."));
-      }
+    try {
+      matchedObjects = player.matchObjects(command);
+      matchedVerb = player.matchVerb(command, matchedObjects);
     } catch (err) {
       const output = bgRed(
         player.programmer ? this.formatError(err) : 'An internal error occurred.'
@@ -66,11 +60,34 @@ class PlayerController extends BaseChildController {
       this.emit('output', output);
       this.logger.warn({ err: bunyan.stdSerializers.err(err) }, 'error matching');
     }
+
+    try {
+      if (matchedVerb) {
+        this.onRunVerb(command, matchedObjects, matchedVerb);
+      } else if (player.location && player.location.verbMissing) {
+        const verbMissing = { verb: 'verbMissing', this: player.location };
+        this.onRunVerb(command, matchedObjects, verbMissing);
+      } else {
+        const verbFailure = { verb: 'onPlayerCommandFailed', this: this.world.get('system') };
+        try {
+          this.onRunVerb(command, matchedObjects, verbFailure);
+        } catch (err) {
+          this.logger.warn({ err: bunyan.stdSerializers.err(err) }, 'error running hook');
+          this.emit('output', gray("I didn't understand that."));
+        }
+      }
+    } catch (err) {
+      const output = bgRed(
+        player.programmer ? this.formatError(err) : 'An internal error occurred.'
+      );
+
+      this.emit('output', output);
+      this.logger.warn({ err: bunyan.stdSerializers.err(err) }, 'error running verb');
+    }
   }
 
   onRunVerb(command, matchedObjects, matchedVerb) {
     const playerId = this.playerId;
-    const player = this.world.get(playerId);
     const dobjId = matchedObjects.dobj ? matchedObjects.dobj.id : 'void 0';
     const iobjId = matchedObjects.iobj ? matchedObjects.iobj.id : 'void 0';
     const verbstr = wrapString(command.verb);
@@ -94,17 +111,7 @@ class PlayerController extends BaseChildController {
     const filename = `Verb::${matchedVerb.this.id}.${matchedVerb.verb}`;
 
     this.logger.debug({ code }, 'run verb');
-
-    try {
-      this.world.run(code, filename);
-    } catch (err) {
-      const output = bgRed(
-        player.programmer ? this.formatError(err) : 'An internal error occurred.'
-      );
-
-      this.emit('output', output);
-      this.logger.warn({ err: bunyan.stdSerializers.err(err) }, 'error running verb');
-    }
+    this.world.run(code, filename);
   }
 
   formatError(err) {

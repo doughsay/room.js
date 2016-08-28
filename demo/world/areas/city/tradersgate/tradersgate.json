@@ -1,0 +1,20 @@
+{
+  "name": "Traders gate",
+  "aliases": [],
+  "traitIds": [
+    "lib_room"
+  ],
+  "locationId": null,
+  "properties": {
+    "exits": {
+      "object": {
+        "west": {
+          "ref": "areas_city_eaststreet"
+        }
+      }
+    },
+    "description": {
+      "value": "Two strong stone towers surround a heavy wooden gate. This is known as the Trader's Gate, where foreign merchants coming to the city declare their goods. A cobblestone road leads to the west."
+    }
+  }
+}

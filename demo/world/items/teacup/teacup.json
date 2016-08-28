@@ -1,0 +1,29 @@
+{
+  "name": "cup of tea",
+  "aliases": [
+    "cup",
+    "tea",
+    "teacup"
+  ],
+  "traitIds": [
+    "lib_ediblecontainer"
+  ],
+  "locationId": "items_waitress",
+  "properties": {
+    "containedEdible": {
+      "value": "tea"
+    },
+    "edibleDescription": {
+      "value": "Like a fine dessert liqueur, this intoxicating black tea blend is smooth and delicate."
+    },
+    "exhausted": {
+      "value": false
+    },
+    "description": {
+      "value": "A hand painted porcelain teacup."
+    },
+    "containerObject": {
+      "value": "cup"
+    }
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "name": "lib_traits_surface",
+  "aliases": [],
+  "traitIds": [],
+  "locationId": null,
+  "properties": {
+    "announcePutItemSurface": {
+      "function": true,
+      "file": "announcePutItemSurface.js"
+    },
+    "announceTakeItemSurface": {
+      "function": true,
+      "file": "announceTakeItemSurface.js"
+    },
+    "canAccept": {
+      "function": true,
+      "file": "canAccept.js"
+    },
+    "describeContents": {
+      "function": true,
+      "file": "describeContents.js"
+    },
+    "putItemSurface": {
+      "verb": true,
+      "file": "putItemSurface.js",
+      "pattern": "put",
+      "dobjarg": "any",
+      "preparg": "on top of/on/onto/upon",
+      "iobjarg": "this"
+    },
+    "takeItemSurface": {
+      "verb": true,
+      "file": "takeItemSurface.js",
+      "pattern": "take get",
+      "dobjarg": "any",
+      "preparg": "out of/from inside/from",
+      "iobjarg": "this"
+    },
+    "lookOn": {
+      "verb": true,
+      "file": "lookOn.js",
+      "pattern": "l*ook",
+      "dobjarg": "none",
+      "preparg": "on top of/on/onto/upon",
+      "iobjarg": "this"
+    },
+    "matchableObjects": {
+      "function": true,
+      "file": "matchableObjects.js"
+    },
+    "describe": {
+      "function": true,
+      "file": "describe.js"
+    }
+  }
+}

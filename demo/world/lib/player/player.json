@@ -1,0 +1,78 @@
+{
+  "name": "player",
+  "aliases": [],
+  "traitIds": [
+    "lib_root",
+    "lib_traits_describable"
+  ],
+  "locationId": null,
+  "properties": {
+    "mode": {
+      "ref": "modes_playmode"
+    },
+    "announceSay": {
+      "function": true,
+      "file": "announceSay.js"
+    },
+    "chat": {
+      "verb": true,
+      "file": "chat.js",
+      "pattern": "ch*at",
+      "dobjarg": "any",
+      "preparg": "any",
+      "iobjarg": "any"
+    },
+    "inventory": {
+      "verb": true,
+      "file": "inventory.js",
+      "pattern": "i*nventory",
+      "dobjarg": "none",
+      "preparg": "none",
+      "iobjarg": "none"
+    },
+    "nextMode": {
+      "function": true,
+      "file": "nextMode.js"
+    },
+    "onTabKeyPress": {
+      "function": true,
+      "file": "onTabKeyPress.js"
+    },
+    "renderPrompt": {
+      "function": true,
+      "file": "renderPrompt.js"
+    },
+    "say": {
+      "verb": true,
+      "file": "say.js",
+      "pattern": "say \"",
+      "dobjarg": "any",
+      "preparg": "any",
+      "iobjarg": "any"
+    },
+    "setMode": {
+      "function": true,
+      "file": "setMode.js"
+    },
+    "who": {
+      "verb": true,
+      "file": "who.js",
+      "pattern": "who",
+      "dobjarg": "none",
+      "preparg": "none",
+      "iobjarg": "none"
+    },
+    "readHelp": {
+      "verb": true,
+      "file": "readHelp.js",
+      "pattern": "h*elp ?",
+      "dobjarg": "any",
+      "preparg": "none",
+      "iobjarg": "none"
+    },
+    "describe": {
+      "function": true,
+      "file": "describe.js"
+    }
+  }
+}

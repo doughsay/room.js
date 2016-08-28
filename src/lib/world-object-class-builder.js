@@ -1,4 +1,6 @@
 const C3 = require('./c3');
+const idify = require('./idify');
+const parseNoun = require('./parse').parseNoun;
 
 // TODO: this file needs some refactoring
 
@@ -7,16 +9,26 @@ const EXACT_MATCH = 1;
 const PARTIAL_MATCH = 2;
 
 function linearize(object, linearization = new C3(object)) {
-  object.traits.forEach(trait => {
-    linearization.add(object, trait);
-    linearize(trait, linearization);
+  object.traits.forEach((trait, index) => {
+    if (trait !== void 0) {
+      linearization.add(object, trait);
+      linearize(trait, linearization);
+    } else {
+      // Attempt at gracefully handle a broken trait chain
+      // e.g. the parent object was destroyed
+      object.traits.splice(index, 1);
+    }
   });
   return linearization.run();
 }
 
-function match(x, y) {
-  const xl = x.toLowerCase();
-  const yl = y.toLowerCase();
+function match(name, search) {
+  if (search === void 0) {
+    return EXACT_MATCH;
+  }
+
+  const xl = name.toLowerCase();
+  const yl = search.toLowerCase();
   if (xl === yl) {
     return EXACT_MATCH;
   }
@@ -24,6 +36,26 @@ function match(x, y) {
     return PARTIAL_MATCH;
   }
   return NO_MATCH;
+}
+
+function getMatchesWithDeterminer(foundMatches, determiner, ambiguous, fail) {
+  const length = foundMatches.length;
+  if (determiner === void 0) { // one, definite
+    if (length === 1) {
+      return foundMatches[0][1];
+    }
+    return ambiguous;
+  } else if (determiner === 'any') { // one, indefinite => random
+    return foundMatches[Math.floor(Math.random() * length)][1];
+  } else if (determiner === 'all') { // all
+    return foundMatches.map(object => object[1]);
+  }
+  // one, by ordinal rank
+  const n = Number(determiner) - 1;
+  if (!isNaN(n) && n < length) {
+    return foundMatches[n][1];
+  }
+  return fail;
 }
 
 function matchPattern(pattern, str) {
@@ -199,7 +231,10 @@ class WorldObjectClassBuilder {
         return this.keys().map(k => this[k]);
       }
 
-      new(id, props = {}) {
+      new(idraw, props = {}) {
+        // Sanitize the id, in case it wasn't previously checked with nextId()
+        const id = idify(idraw);
+
         if (id in world.context) {
           throw new TypeError(`Identifier '${id}' has already been declared`);
         }
@@ -286,34 +321,41 @@ class WorldObjectClassBuilder {
 
         searchItems = searchItems.filter(object => object !== this);
 
-        const potentialMatches = searchItems.map(object => [object.matches(search), object]);
+        const [determiner, noun] = parseNoun(search);
+
+        const potentialMatches = searchItems.map(object => [object.matches(noun), object]);
         const exactMatches = potentialMatches.filter(m => m[0] === EXACT_MATCH);
         const partialMatches = potentialMatches.filter(m => m[0] === PARTIAL_MATCH);
 
-        return this.findMatch(exactMatches, partialMatches);
+        return this.findMatch(exactMatches, partialMatches, determiner);
       }
 
       findInside(search) {
         if (search === '') {
           return world.get('fail');
         }
-        const potentialMatches = this.contents.map(object => [object.matches(search), object]);
+
+        const [determiner, noun] = parseNoun(search);
+
+        const potentialMatches = this.contents.map(object => [object.matches(noun), object]);
         const exactMatches = potentialMatches.filter(m => m[0] === EXACT_MATCH);
         const partialMatches = potentialMatches.filter(m => m[0] === PARTIAL_MATCH);
-        return this.findMatch(exactMatches, partialMatches);
+        return this.findMatch(exactMatches, partialMatches, determiner);
       }
 
-      findMatch(partialMatches, exactMatches) {
-        if (exactMatches.length === 1) {
-          return exactMatches[0][1];
-        } else if (exactMatches.length > 1) {
-          return world.get('ambiguous');
+      findMatch(partialMatches, exactMatches, determiner) {
+        if (exactMatches.length > 0) {
+          const result = getMatchesWithDeterminer(exactMatches, determiner,
+            world.get('ambiguous'), world.get('fail'));
+          // For now, treat collections as ambiguous
+          return Array.isArray(result) ? world.get('ambiguous') : result;
         }
 
-        if (partialMatches.length === 1) {
-          return partialMatches[0][1];
-        } else if (partialMatches.length > 1) {
-          return world.get('ambiguous');
+        if (partialMatches.length > 0) {
+          const result = getMatchesWithDeterminer(partialMatches, determiner,
+            world.get('ambiguous'), world.get('fail'));
+          // For now, treat collections as ambiguous
+          return Array.isArray(result) ? world.get('ambiguous') : result;
         }
 
         return world.get('fail');
@@ -346,14 +388,14 @@ class WorldObjectClassBuilder {
           }
         }
 
-        if (objects.dobj) {
+        if ((objects.dobj) && !Array.isArray(objects.dobj)) {
           verb = objects.dobj.findVerb(command, objects);
           if (verb) {
             return { verb, this: objects.dobj };
           }
         }
 
-        if (objects.iobj) {
+        if ((objects.iobj) && !Array.isArray(objects.iobj)) {
           verb = objects.iobj.findVerb(command, objects);
           if (verb) {
             return { verb, this: objects.iobj };

@@ -1,0 +1,15 @@
+{
+  "name": "Adam Baker",
+  "aliases": [
+    "baker"
+  ],
+  "traitIds": [
+    "lib_npc_seller"
+  ],
+  "locationId": "areas_city_baker",
+  "properties": {
+    "description": {
+      "value": "Adam Baker, behind his counter."
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "chatmode",
+  "aliases": [],
+  "traitIds": [
+    "modes_mode"
+  ],
+  "locationId": null,
+  "properties": {
+    "promptString": {
+      "value": "\u001b[1m\u001b[34mCHAT\u001b[39m\u001b[22m"
+    },
+    "preprocessCommand": {
+      "function": true,
+      "file": "preprocessCommand.js"
+    }
+  }
+}

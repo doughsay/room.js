@@ -1,0 +1,32 @@
+{
+  "name": "lib_traits_gettable",
+  "aliases": [],
+  "traitIds": [],
+  "locationId": null,
+  "properties": {
+    "drop": {
+      "verb": true,
+      "file": "drop.js",
+      "pattern": "drop",
+      "dobjarg": "this",
+      "preparg": "none",
+      "iobjarg": "none"
+    },
+    "take": {
+      "verb": true,
+      "file": "take.js",
+      "pattern": "take get",
+      "dobjarg": "this",
+      "preparg": "none",
+      "iobjarg": "none"
+    },
+    "announceDropItem": {
+      "function": true,
+      "file": "announceDropItem.js"
+    },
+    "announceTakeItem": {
+      "function": true,
+      "file": "announceTakeItem.js"
+    }
+  }
+}

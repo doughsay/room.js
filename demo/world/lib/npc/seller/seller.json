@@ -1,0 +1,34 @@
+{
+  "name": "lib_npc_seller",
+  "aliases": [],
+  "traitIds": [
+    "lib_npc"
+  ],
+  "locationId": null,
+  "properties": {
+    "listGoods": {
+      "verb": true,
+      "file": "listGoods.js",
+      "pattern": "list",
+      "dobjarg": "none",
+      "preparg": "none",
+      "iobjarg": "none"
+    },
+    "orderGood": {
+      "verb": true,
+      "file": "orderGood.js",
+      "pattern": "order buy",
+      "dobjarg": "any",
+      "preparg": "none",
+      "iobjarg": "none"
+    },
+    "announceSale": {
+      "function": true,
+      "file": "announceSale.js"
+    },
+    "announceOffer": {
+      "function": true,
+      "file": "announceOffer.js"
+    }
+  }
+}

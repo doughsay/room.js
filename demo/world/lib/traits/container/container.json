@@ -1,0 +1,48 @@
+{
+  "name": "lib_traits_container",
+  "aliases": [],
+  "traitIds": [],
+  "locationId": null,
+  "properties": {
+    "announcePutItemContainer": {
+      "function": true,
+      "file": "announcePutItemContainer.js"
+    },
+    "announceTakeItemContainer": {
+      "function": true,
+      "file": "announceTakeItemContainer.js"
+    },
+    "canAccept": {
+      "function": true,
+      "file": "canAccept.js"
+    },
+    "describeContents": {
+      "function": true,
+      "file": "describeContents.js"
+    },
+    "putItemContainer": {
+      "verb": true,
+      "file": "putItemContainer.js",
+      "pattern": "put",
+      "dobjarg": "any",
+      "preparg": "in/inside/into",
+      "iobjarg": "this"
+    },
+    "takeItemContainer": {
+      "verb": true,
+      "file": "takeItemContainer.js",
+      "pattern": "take get",
+      "dobjarg": "any",
+      "preparg": "out of/from inside/from",
+      "iobjarg": "this"
+    },
+    "lookInside": {
+      "verb": true,
+      "file": "lookInside.js",
+      "pattern": "l*ook",
+      "dobjarg": "none",
+      "preparg": "in/inside/into",
+      "iobjarg": "this"
+    }
+  }
+}

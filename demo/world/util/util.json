@@ -1,0 +1,30 @@
+{
+  "name": "util",
+  "aliases": [],
+  "traitIds": [
+    "lib_root"
+  ],
+  "locationId": null,
+  "properties": {
+    "andJoin": {
+      "function": true,
+      "file": "andJoin.js"
+    },
+    "capitalize": {
+      "function": true,
+      "file": "capitalize.js"
+    },
+    "normalizeDirection": {
+      "function": true,
+      "file": "normalizeDirection.js"
+    },
+    "oppositeDirection": {
+      "function": true,
+      "file": "oppositeDirection.js"
+    },
+    "prettyPrintVerb": {
+      "function": true,
+      "file": "prettyPrintVerb.js"
+    }
+  }
+}

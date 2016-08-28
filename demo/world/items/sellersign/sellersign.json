@@ -1,0 +1,14 @@
+{
+  "name": "sign",
+  "aliases": [],
+  "traitIds": [
+    "lib_root",
+    "lib_traits_describable"
+  ],
+  "locationId": null,
+  "properties": {
+    "description": {
+      "value": "The sign reads: \"During our office hours, see the available goods with '#cmd[list]' and then 'order' something.\nNote: The house does not make credit.\""
+    }
+  }
+}

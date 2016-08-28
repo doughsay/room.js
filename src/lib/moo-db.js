@@ -36,20 +36,37 @@ class MooDB {
     this.fsdb.on('ready', () => { this.emit('ready'); });
   }
 
-  load() {
-    const ids = this.fsdb.lsDirs('');
+  load(dir = '') {
+    const ids = this.fsdb.lsDirs(dir);
     ids.forEach(id => {
-      this.loadObject(id);
+      this.loadObject(id.replace(/[\/\\]/g, '_'));
     });
   }
 
-  filenameFor(id) {
-    return `${id}/${id}.json`;
+  filenameForObj(id, ext = 'json') {
+    const filename = id.split('_').pop();
+    const filepath = id.replace(/_/g, '/');
+    return `${filepath}/${filename}.${ext}`;
+  }
+
+  filenameForSrc(id, file) {
+    const filepath = id.replace(/_/g, '/');
+    return `${filepath}/${file}`;
+  }
+
+  filepathToObj(id) {
+    return id.replace(/_/g, '/');
+  }
+
+  idFromFilepath(filepath) {
+    const fpsplit = filepath.split(/[\/\\]/);
+    fpsplit.pop();
+    return fpsplit.join('_');
   }
 
   loadObject(id) {
     try {
-      const fileContents = this.fsdb.read(this.filenameFor(id));
+      const fileContents = this.fsdb.read(this.filenameForObj(id));
       const object = JSON.parse(fileContents);
       object.id = id;
       this.loadCallables(id, object.properties);
@@ -74,13 +91,9 @@ class MooDB {
   }
 
   loadCallable(id, value) {
-    const source = this.fsdb.read(`${id}/${value.file}`);
+    const source = this.fsdb.read(this.filenameForSrc(id, value.file));
     value.source = source;
     return value;
-  }
-
-  idFromFilepath(filepath) {
-    return filepath.split('/')[0];
   }
 
   onFileAddedOrChanged(file) {
@@ -103,7 +116,7 @@ class MooDB {
   addOrUpdateObject(id) {
     try {
       const object = this.findById(id);
-      const fileContents = this.fsdb.read(this.filenameFor(id));
+      const fileContents = this.fsdb.read(this.filenameForObj(id));
       const newObjectProperties = JSON.parse(fileContents);
       if (object) {
         object.name = newObjectProperties.name;
@@ -128,7 +141,7 @@ class MooDB {
 
   serializeAndSaveCallable(id, key, value) {
     const file = value.file || `${key}.js`;
-    const filepath = `${id}/${file}`;
+    const filepath = this.filenameForSrc(id, file);
     this.fsdb.write(filepath, value.source);
     if (value.function) {
       return { function: true, file };
@@ -169,7 +182,7 @@ class MooDB {
   }
 
   saveObject(object) {
-    this.fsdb.write(`${object.id}/${object.id}.json`, this.serializeObject(object));
+    this.fsdb.write(this.filenameForObj(object.id), this.serializeObject(object));
     this.logger.trace({ objectId: object.id }, 'saved object');
   }
 
@@ -178,12 +191,12 @@ class MooDB {
     for (const [key, value] of entries(object.properties)) {
       if (value && (value.function || value.verb)) {
         const file = value.file || `${key}.js`;
-        const filepath = `${id}/${file}`;
+        const filepath = this.filenameForSrc(id, file);
         this.fsdb.rm(filepath);
       }
     }
-    this.fsdb.rm(`${id}/${id}.json`);
-    this.fsdb.rmDir(id); // cleanup; FsDb should do this for us, but it doesn't.
+    this.fsdb.rm(this.filenameForObj(id));
+    this.fsdb.rmDir(this.filepathToObj(id)); // cleanup; FsDb should do this for us, but it doesn't.
   }
 
   markObjectDirty(id) {
@@ -193,7 +206,7 @@ class MooDB {
   removeProperty(id, key, value) {
     if (value && (value.function || value.verb)) {
       const file = value.file || `${key}.js`;
-      const filepath = `${id}/${file}`;
+      const filepath = this.filenameForSrc(id, file);
       this.fsdb.rm(filepath);
     }
     this.saveObject(this.findById(id));

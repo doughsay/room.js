@@ -1,0 +1,36 @@
+{
+  "name": "lib_traits_edible",
+  "aliases": [],
+  "traitIds": [],
+  "locationId": null,
+  "properties": {
+    "DRINK": {
+      "value": 1
+    },
+    "MEAL": {
+      "value": 2
+    },
+    "eatOrDrink": {
+      "verb": true,
+      "file": "eatOrDrink.js",
+      "pattern": "eat drink",
+      "dobjarg": "this",
+      "preparg": "none",
+      "iobjarg": "none"
+    },
+    "foodType": {
+      "value": 1
+    },
+    "canUse": {
+      "function": true,
+      "file": "canUse.js"
+    },
+    "onUse": {
+      "function": true,
+      "file": "onUse.js"
+    },
+    "destroyOnUse": {
+      "value": false
+    }
+  }
+}

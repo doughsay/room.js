@@ -1,0 +1,16 @@
+{
+  "name": "lib_root",
+  "aliases": [],
+  "traitIds": [],
+  "locationId": null,
+  "properties": {
+    "tell": {
+      "function": true,
+      "file": "tell.js"
+    },
+    "clone": {
+      "function": true,
+      "file": "clone.js"
+    }
+  }
+}

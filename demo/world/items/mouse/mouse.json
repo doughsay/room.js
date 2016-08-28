@@ -1,0 +1,19 @@
+{
+  "name": "mouse",
+  "aliases": [
+    "rodent"
+  ],
+  "traitIds": [
+    "lib_npc"
+  ],
+  "locationId": "areas_city_baker",
+  "properties": {
+    "description": {
+      "value": "A small rodent with a pointed snout, and small rounded ears."
+    },
+    "onExamine": {
+      "function": true,
+      "file": "onExamine.js"
+    }
+  }
+}

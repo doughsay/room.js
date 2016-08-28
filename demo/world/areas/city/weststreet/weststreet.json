@@ -1,0 +1,26 @@
+{
+  "name": "West street",
+  "aliases": [],
+  "traitIds": [
+    "lib_room"
+  ],
+  "locationId": null,
+  "properties": {
+    "exits": {
+      "object": {
+        "east": {
+          "ref": "areas_city_greatmarket"
+        },
+        "west": {
+          "ref": "areas_city_westgate"
+        },
+        "north": {
+          "ref": "areas_city_inn"
+        }
+      }
+    },
+    "description": {
+      "value": "The cobblestone road moves to the west and east here. The Great Market is to the east. Many shops and buildings can be seen all around here. The side entrance to the tavern is to the north."
+    }
+  }
+}

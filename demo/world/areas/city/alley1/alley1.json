@@ -1,0 +1,26 @@
+{
+  "name": "Alley",
+  "aliases": [],
+  "traitIds": [
+    "lib_room"
+  ],
+  "locationId": null,
+  "properties": {
+    "exits": {
+      "object": {
+        "northwest": {
+          "ref": "areas_city_lessermarket"
+        },
+        "east": {
+          "ref": "areas_city_house1"
+        },
+        "south": {
+          "ref": "areas_city_guardtower"
+        }
+      }
+    },
+    "description": {
+      "value": "The alley moves to the northwest here. There is a modest house to the east. To the south is a guard tower."
+    }
+  }
+}

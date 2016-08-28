@@ -1,0 +1,20 @@
+{
+  "name": "online help",
+  "aliases": [],
+  "traitIds": [],
+  "locationId": null,
+  "properties": {
+    "basics": {
+      "function": true,
+      "file": "basics.js"
+    },
+    "modes": {
+      "function": true,
+      "file": "modes.js"
+    },
+    "programming": {
+      "function": true,
+      "file": "programming.js"
+    }
+  }
+}
