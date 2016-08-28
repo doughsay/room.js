@@ -26,7 +26,7 @@ function match(name, search) {
   if (search === void 0) {
     return EXACT_MATCH;
   }
-  
+
   const xl = name.toLowerCase();
   const yl = search.toLowerCase();
   if (xl === yl) {
@@ -42,22 +42,22 @@ function getMatchesWithDeterminer(foundMatches, determiner, ambiguous, fail) {
   const length = foundMatches.length;
   if (determiner === void 0) { // one, definite
     if (length === 1) {
-        return foundMatches[0][1];
-    } 
-    return ambiguous;
-  } else if (determiner === "any") { // one, indefinite => random
-    return foundMatches[Math.floor(Math.random()*length)][1];
-  } else if (determiner === "all") { // all
-    return foundMatches.map(object => object[1]);
-  } else { // one, by ordinal rank
-    const n = Number(determiner) - 1;
-    if (!isNaN(n) && n < length) {
-       return foundMatches[n][1];
+      return foundMatches[0][1];
     }
-    return fail;
+    return ambiguous;
+  } else if (determiner === 'any') { // one, indefinite => random
+    return foundMatches[Math.floor(Math.random() * length)][1];
+  } else if (determiner === 'all') { // all
+    return foundMatches.map(object => object[1]);
   }
+  // one, by ordinal rank
+  const n = Number(determiner) - 1;
+  if (!isNaN(n) && n < length) {
+    return foundMatches[n][1];
+  }
+  return fail;
 }
-            
+
 function matchPattern(pattern, str) {
   let patternParts;
   let rest;
@@ -231,10 +231,10 @@ class WorldObjectClassBuilder {
         return this.keys().map(k => this[k]);
       }
 
-      new(id, props = {}) {
+      new(idraw, props = {}) {
         // Sanitize the id, in case it wasn't previously checked with nextId()
-        id = idify(id);
-        
+        const id = idify(idraw);
+
         if (id in world.context) {
           throw new TypeError(`Identifier '${id}' has already been declared`);
         }
@@ -320,7 +320,7 @@ class WorldObjectClassBuilder {
         }
 
         searchItems = searchItems.filter(object => object !== this);
-      
+
         const [determiner, noun] = parseNoun(search);
 
         const potentialMatches = searchItems.map(object => [object.matches(noun), object]);
@@ -336,31 +336,31 @@ class WorldObjectClassBuilder {
         }
 
         const [determiner, noun] = parseNoun(search);
-        
+
         const potentialMatches = this.contents.map(object => [object.matches(noun), object]);
         const exactMatches = potentialMatches.filter(m => m[0] === EXACT_MATCH);
         const partialMatches = potentialMatches.filter(m => m[0] === PARTIAL_MATCH);
         return this.findMatch(exactMatches, partialMatches, determiner);
       }
-      
+
       findMatch(partialMatches, exactMatches, determiner) {
         if (exactMatches.length > 0) {
-          let result = getMatchesWithDeterminer(exactMatches, determiner, 
-            world.get('ambiguous'), world.get('fail'));            
-            // For now, treat collections as ambiguous
-            return Array.isArray(result) ? world.get('ambiguous') : result;
+          const result = getMatchesWithDeterminer(exactMatches, determiner,
+            world.get('ambiguous'), world.get('fail'));
+          // For now, treat collections as ambiguous
+          return Array.isArray(result) ? world.get('ambiguous') : result;
         }
 
         if (partialMatches.length > 0) {
-          let result = getMatchesWithDeterminer(partialMatches, determiner, 
+          const result = getMatchesWithDeterminer(partialMatches, determiner,
             world.get('ambiguous'), world.get('fail'));
-            // For now, treat collections as ambiguous
-            return Array.isArray(result) ? world.get('ambiguous') : result;
+          // For now, treat collections as ambiguous
+          return Array.isArray(result) ? world.get('ambiguous') : result;
         }
 
         return world.get('fail');
       }
-      
+
       matches(search) {
         const matches = this.aliases.concat([this.name]).map(name => match(name, search));
 

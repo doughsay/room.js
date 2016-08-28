@@ -30,11 +30,11 @@
 //   iobj: 'cuckoo clock'
 //
 // 2. The noun parser understands basic nominal groups with optional determiners,
-// of the form 
+// of the form
 //      '[determiner] [noun]' or '[ordinal].[noun]' or '[noun].[ordinal]' or '[noun] [ordinal]'
-// With either a determiner is matched against a pre-defined list and categorized, or an ordinal number 
-// value is provided (= rank in a collection).
-// 
+// With either a determiner is matched against a pre-defined list and categorized,
+// or an ordinal number value is provided (= rank in a collection).
+//
 // Examples:
 // "yellow bird.2" = "yellow bird 2" = "2.yellow bird" ->
 //   det = '2'
@@ -75,12 +75,14 @@ const determiners = {
   all: 'all',
   the: void 0, // assume definite is same as no determiner
   any: 'any',
-  a:   'any',
-  an:  'any'
-}
+  a: 'any',
+  an: 'any',
+};
 
 const prepex = new RegExp(`\\b(${prepositions.join('|')})\\b`);
-const qualex = new RegExp(`\^(${Object.keys(determiners).join('|')})\\b|^([1-9][0-9]{0,1})\\.|[\\s\\.]([1-9][0-9]{0,1})$`);
+const qualex = new RegExp(
+  `\^(${Object.keys(determiners).join('|')})\\b|^([1-9][0-9]{0,1})\\.|[\\s\\.]([1-9][0-9]{0,1})$`
+);
 
 function sanitize(text) {
   return text.trim().replace(/\s+/g, ' ');
@@ -129,23 +131,23 @@ function parseNoun(text) {
     return [void 0, void 0];
   }
   const search = text.match(qualex);
-  let nounstr; 
+  let nounstr;
   if (search === null) {
     return [void 0, text];
   }
-  
+
   let detstr = search[1] || search[2] || search[3];
   const i = search.index;
-  
+
   nounstr = i === 0 ? text.slice(detstr.length + 1) : text.slice(0, i);
   if (nounstr === '') { nounstr = void 0; }
-  detstr = determiners.hasOwnProperty(detstr) ? determiners[detstr] : detstr; 
-  
+  detstr = determiners.hasOwnProperty(detstr) ? determiners[detstr] : detstr;
+
   return [detstr, nounstr];
 }
 
 module.exports = {
-  parseSentence: parseSentence,
-  parseNoun: parseNoun
+  parseSentence,
+  parseNoun,
 };
 

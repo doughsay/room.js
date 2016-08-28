@@ -52,8 +52,10 @@ class FsDb {
         .on('add', this.onFileAdded.bind(this))
         .on('change', this.onFileChanged.bind(this))
         .on('unlink', this.onFileRemoved.bind(this))
-        .on('error', (error) => { 
-          // On Windows notabbly, when a file is deleted from an extern process, an EPERM status may occur here, due to a temporary system file lock. Attempt at gracefully ignore the error, to avoid an uncaught exception.
+        .on('error', error => {
+          // On Windows notabbly, when a file is deleted from an extern process, an EPERM status
+          // may occur here, due to a temporary system file lock.
+          // Attempt at gracefully ignore the error, to avoid an uncaught exception.
           this.logger.warn({ error }, 'file watcher error caught');
         });
       this.emit('ready');

@@ -39,28 +39,27 @@ class MooDB {
   load(dir = '') {
     const ids = this.fsdb.lsDirs(dir);
     ids.forEach(id => {
-      id = id.replace(/[\/\\]/g, '_');
-      this.loadObject(id);
+      this.loadObject(id.replace(/[\/\\]/g, '_'));
     });
   }
 
   filenameForObj(id, ext = 'json') {
-    let filename = id.split('_').pop();
-    let filepath = id.replace(/_/g, '/');
+    const filename = id.split('_').pop();
+    const filepath = id.replace(/_/g, '/');
     return `${filepath}/${filename}.${ext}`;
   }
-  
+
   filenameForSrc(id, file) {
-    let filepath = id.replace(/_/g, '/');
+    const filepath = id.replace(/_/g, '/');
     return `${filepath}/${file}`;
   }
-  
+
   filepathToObj(id) {
-     return id.replace(/_/g, '/');
+    return id.replace(/_/g, '/');
   }
-  
+
   idFromFilepath(filepath) {
-    let fpsplit = filepath.split(/[\/\\]/);
+    const fpsplit = filepath.split(/[\/\\]/);
     fpsplit.pop();
     return fpsplit.join('_');
   }
@@ -92,7 +91,7 @@ class MooDB {
   }
 
   loadCallable(id, value) {
-    const source = this.fsdb.read(this.filenameForSrc(id,value.file));
+    const source = this.fsdb.read(this.filenameForSrc(id, value.file));
     value.source = source;
     return value;
   }
@@ -142,7 +141,7 @@ class MooDB {
 
   serializeAndSaveCallable(id, key, value) {
     const file = value.file || `${key}.js`;
-    const filepath = this.filenameForSrc(id,file);
+    const filepath = this.filenameForSrc(id, file);
     this.fsdb.write(filepath, value.source);
     if (value.function) {
       return { function: true, file };
