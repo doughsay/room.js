@@ -44,7 +44,7 @@ These are but a few of all the things that you get just out-of-the-box:
   - Extensible and easily customizable "mode" system.
 
 - Powerfull **Debugging**:
-  - The game relies on [Bunyan](https://github.com/trentm/node-bunyan), a simple and fast JSON logging library, with a nice CLI for viewing and analyzing logs.
+  - The game engine relies on [Bunyan](https://github.com/trentm/node-bunyan), a simple and fast JSON logging library, with a nice CLI for viewing and analyzing logs.
 
 - Lightweight **Demonstration**:
   - The server is bundled with but a small demonstration, to illustrate a few possible ways of coding your own world. *No huge codebase with so many specific combat or leveling rules, or complex skill systems, that one would immediately get lost.*
