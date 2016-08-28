@@ -1,33 +1,33 @@
 function forceAction(player, argstr) {
   // Here the input text should be "force object to action".
   // First invoke the parser to split that
-  let command = parse(argstr);
-  
+  const command = parse(argstr);
+
   // Check the output
-  if ((command.verb !== "force") || (command.prepstr !== "to")) {
-    player.tell("Syntax expected: force <object> to <action>");
+  if ((command.verb !== 'force') || (command.prepstr !== 'to')) {
+    player.tell('Syntax expected: force <object> to <action>');
     return;
   }
   if (command.dobjstr === undefined) {
-    player.tell("Force whom?");
+    player.tell('Force whom?');
     return;
   }
-  
+
   if (command.iobjstr === undefined) {
     player.tell(`Force ${command.dobjstr} to what?`);
     return;
   }
-  
+
   // Look around for the target object, and handle failure
-  let target = this.fetchTarget(player, command.dobjstr); 
+  const target = this.fetchTarget(player, command.dobjstr);
   if (target === fail) {
     return;
   }
-  
+
   // So know we have the target and an action to delegate.
   // It may fail if the command is improper in the target's context.
-  let status = this.delegateCommand(target, command.iobjstr);
-  
+  const status = this.delegateCommand(target, command.iobjstr);
+
   if (status) {
     // Announcement in the room
     if (player.location) {

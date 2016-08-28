@@ -3,5 +3,5 @@ function close({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr 
     this.doClose(player);
   } else {
     player.tell(`The ${this.name} is already closed.`);
-  } 
+  }
 }

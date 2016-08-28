@@ -18,50 +18,50 @@ function use({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr })
     player.tell(`You must have the ${this.name} in hands.`);
     return;
   }
-  
+
   // Ensure indirect object is defined
   if (iobjstr === undefined) {
     player.tell(`Use ${this.name} to what?`);
     return;
   }
-  
-  let command = iobjstr.split(" ");
-  
+
+  let command = iobjstr.split(' ');
+
   // Ensure there are enough arguments
   if (command.length < 2) {
     player.tell(`Use ${this.name} to ${command} what?`);
     return;
   }
-  
-  let cmdargstr = command.splice(1).join(' ');
+
+  const cmdargstr = command.splice(1).join(' ');
   command = command[0];
-  
+
   switch (command) {
-    case "clone":
-    case "create":    
+    case 'clone':
+    case 'create':
       this.cloneAction(player, cmdargstr);
       break;
-    case "zap":
-    case "destroy":    
+    case 'zap':
+    case 'destroy':
       this.zapAction(player, cmdargstr);
       break;
-    case "force":
+    case 'force':
       this.forceAction(player, iobjstr);
       break;
-    case "build":
+    case 'build':
       this.buildAction(player, cmdargstr);
       break;
-    case "name":
+    case 'name':
       this.nameAction(player, cmdargstr, false);
       break;
-    case "describe":
-    case "desc":
+    case 'describe':
+    case 'desc':
       this.nameAction(player, cmdargstr, true);
-      break;      
-    case "id":
-    case "identify":
+      break;
+    case 'id':
+    case 'identify':
       this.identifyAction(player, cmdargstr);
-      break; 
+      break;
     default:
       player.tell(`The ${this.name} cannot ${command}.`);
       player.tell(color.gray(`Available powers:

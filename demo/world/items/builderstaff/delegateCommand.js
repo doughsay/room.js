@@ -9,8 +9,8 @@ function delegateCommand(target, input) {
    *
    * This is mostly what's the game engine itself does.
    */
-  
-  function onRunVerb (command, matchedObjects, matchedVerb) {
+
+  function onRunVerb(command, matchedObjects, matchedVerb) {
     const player = target;
     const dobj = matchedObjects.dobj;
     const iobj = matchedObjects.iobj;
@@ -23,7 +23,7 @@ function delegateCommand(target, input) {
     matchedVerb.this[matchedVerb.verb]({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr });
     return true;
   }
-  
+
   const command = parse(input);
   const matchedObjects = target.matchObjects(command);
   const matchedVerb = target.matchVerb(command, matchedObjects);
@@ -33,7 +33,6 @@ function delegateCommand(target, input) {
   } else if (target.location && target.location.verbMissing) {
     const verbMissing = { verb: 'verbMissing', this: target.location };
     return onRunVerb(command, matchedObjects, verbMissing);
-  } else {
-    return false;
   }
+  return false;
 }

@@ -6,7 +6,7 @@ function inventory({ player }) {
 
     this.contents.forEach(obj => {
       // For robustness, ensure objects have a description method
-      if (typeof obj.describe === "function") {
+      if (typeof obj.describe === 'function') {
         output.push(util.capitalize(obj.describe()));
       }
     });

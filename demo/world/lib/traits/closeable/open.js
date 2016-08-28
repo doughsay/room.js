@@ -1,4 +1,4 @@
-function open({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr }) { 
+function open({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr }) {
   if (this.locked) {
     player.tell(`The ${this.name} is locked.`);
     return;

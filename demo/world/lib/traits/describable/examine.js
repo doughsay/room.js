@@ -10,10 +10,11 @@ function examine({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjst
       return `${sender.name} looks at some ${object.name}.`;
     }
   }
-  
+
   if (player.location) {
     player.location.announce(announce, player, this);
   }
   player.tell(util.capitalize(this.describe()));
   this.onExamine(player);
 }
+

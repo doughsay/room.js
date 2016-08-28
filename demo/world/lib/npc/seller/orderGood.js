@@ -3,7 +3,7 @@ function order({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr 
     player.tell(`${this.name} says: "What?"`);
     return;
   }
-  
+
   const target = this.findInside(dobjstr);
 
   if (target === fail) {
@@ -12,10 +12,10 @@ function order({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr 
     player.tell(`${this.name} says: "I can't tell which ${dobjstr} you meant."`);
   } else {
     player.tell(`${this.name} says: "You are welcome!"`);
-    
+
     // Clone the good
-    let created = target.clone("instances_" + target.id.split("_").pop());
-    
+    const created = target.clone('instances_' + target.id.split('_').pop());
+
     if (this !== player) {
       // Give to player
       created.location = player;
@@ -25,6 +25,5 @@ function order({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr 
       created.location = this.location;
       player.location.announce(this.announceOffer.bind(this), player, created);
     }
-
-  } 
+  }
 }
