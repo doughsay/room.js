@@ -18,8 +18,8 @@ function programming() {
     'To add a new verb (i.e. special functions for command processing):',
     '   obj.bar = Verb("bar")',
     '',
-    'Then you can hit Ctrl-p (or Cmd-p) to open the fuzzy-search and look for a function or a verb by',
-    'name. There you can start editing the function/verb and insert your own code.',
+    'Then you can hit Ctrl-p (or Cmd-p) to open the fuzzy-search and look for a function or verb',
+    'by name. There you can start editing the function/verb and insert your own code.',
     '',
     'For more details, please refer to the online Programming guide.',
   ];

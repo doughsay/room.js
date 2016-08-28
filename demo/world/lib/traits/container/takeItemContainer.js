@@ -1,8 +1,8 @@
 function take({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr }) {
   if (!dobjstr) {
-      player.tell(`What?`);
+    player.tell('What?');
   }
-  
+
   if (this.canAccept(player, nothing)) {
     const target = this.findInside(dobjstr);
 

@@ -1,6 +1,6 @@
 function fetchTarget(player, argstr) {
   // Look for the target object, and handle failure
-  let target = player.findNearby(argstr);
+  const target = player.findNearby(argstr);
   if (target === fail) {
     player.tell(`There doesn't seem to be any ${argstr} here.`);
     return fail;
@@ -9,6 +9,6 @@ function fetchTarget(player, argstr) {
     player.tell(`There are more than one ${argstr}.`);
     return fail;
   }
-  
+
   return target;
 }

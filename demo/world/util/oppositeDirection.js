@@ -9,7 +9,7 @@ function oppositeDirection(direction) {
     northeast: 'southwest',
     northwest: 'southeast',
     southeast: 'northwest',
-    southwest: 'northeast'
+    southwest: 'northeast',
   };
 
   return directionsMap[direction];

@@ -4,52 +4,52 @@ function prettyPrintVerb(v, objstr) {
    * a formatted text command. -- Used by the help system for instance.
    */
   let canRun = true;
-  let output = [];
-  let verbstr = v.pattern.split(" ")[0].replace(/\*/g, ''); /* first possible */
+  const output = [];
+  const verbstr = v.pattern.split(' ')[0].replace(/\*/g, ''); /* first possible */
 
-  if (util.oppositeDirection(verbstr)) {  
+  if (util.oppositeDirection(verbstr)) {
     // Quick hacky test:
     // oppositeDirection returns undefined for non-canonical directions.
-    output.push("<directions>");
+    output.push('<directions>');
     canRun = false;
   } else {
     output.push(verbstr);
   }
 
-  if (v.dobjarg !== "none") {
-    if (v.dobjarg === "this") {
+  if (v.dobjarg !== 'none') {
+    if (v.dobjarg === 'this') {
       output.push(objstr);
     } else {
-      output.push("<any>");
+      output.push('<any>');
       canRun = false;
     }
   }
 
-  if (v.preparg !== "none") {
-    if (v.preparg !== "any") {
-      output.push(v.preparg.split("/")[0]); /* first possible */
+  if (v.preparg !== 'none') {
+    if (v.preparg !== 'any') {
+      output.push(v.preparg.split('/')[0]); /* first possible */
 
-      if (v.iobjarg !== "none") {
-        if (v.iobjarg === "this") {
+      if (v.iobjarg !== 'none') {
+        if (v.iobjarg === 'this') {
           output.push(objstr);
         } else {
-          output.push("<any>");
+          output.push('<any>');
           canRun = false;
-        }        
+        }
       }
     } else {
       canRun = false;
-      if (v.iobjarg === "any") {
-        if (v.dobjarg !== "any") {
+      if (v.iobjarg === 'any') {
+        if (v.dobjarg !== 'any') {
           output.push('<any>');
         }
-      } else if (v.iobjarg !== "none") {
+      } else if (v.iobjarg !== 'none') {
         output.push('<prep>');
-        output.push((v.iobjarg === "this") ? objstr : "<any>");
+        output.push((v.iobjarg === 'this') ? objstr : '<any>');
       }
     }
   }
 
-  let result = output.join(" ");
+  const result = output.join(' ');
   return canRun ? `#cmd[${result}]` : color.gray(result);
 }

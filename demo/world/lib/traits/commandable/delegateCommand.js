@@ -1,7 +1,7 @@
 function delegateCommand(player, target, command) {
   /**
    * Attempts having the target process the command
-   */ 
+   */
   const matchedObjects = target.matchObjects(command);
   const matchedVerb = target.matchVerb(command, matchedObjects);
 
@@ -16,7 +16,6 @@ function delegateCommand(player, target, command) {
 
     matchedVerb.this[matchedVerb.verb]({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr });
     return true;
-  } else {
-    return false;
   }
+  return false;
 }

@@ -3,7 +3,7 @@ function announce(viewFn = views.noOp, sender, msg) {
     // Safeguard
     return;
   }
-  
+
   // Announce in the room itself...
   this.contents.forEach(recipient => {
     recipient.tell(viewFn(sender, recipient, msg));
@@ -11,7 +11,7 @@ function announce(viewFn = views.noOp, sender, msg) {
   // ... and propagate down.
   this.exits.down.announce((senderx, recipient, message) => {
     if (recipient !== items_oaktree) {
-      return color.gray("(From the tree) ") + viewFn(senderx, recipient, message);
+      return color.gray('(From the tree) ') + viewFn(senderx, recipient, message);
     }
     return null;
   }, sender, msg);

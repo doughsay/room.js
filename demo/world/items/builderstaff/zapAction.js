@@ -1,17 +1,17 @@
 function zapAction(player, argstr) {
   // Look for the target object, and handle failure
-  let target = this.fetchTarget(player, argstr); 
+  const target = this.fetchTarget(player, argstr);
   if (target === fail) {
     return;
   }
-  
+
   // Check the destroyable flag to only allow destroying player-created objects
   if (!target.createdWithStaff) {
     player.tell(`The Gods of Creation do not let you zap the ${target.name}.`);
     return;
   }
 
-  // Announcement in the room 
+  // Announcement in the room
   if (player.location) {
     player.location.announce(
       (sender, recipient, object) => {
@@ -21,7 +21,7 @@ function zapAction(player, argstr) {
         return `${sender.name} zaps some ${object.name} into oblivion.`;
       }, player, target);
   }
-  
+
   // Now, we can proceed to DESTRUCTION
   target.destroy();
 }

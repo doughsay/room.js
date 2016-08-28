@@ -1,15 +1,15 @@
 function describe() {
-  let description = "";
+  let description = '';
   if (this.description) {
     description = this.description;
   }
   if (this.exhausted) {
-    description += ` (Empty)`;
+    description += ' (Empty)';
   } else {
     description += ` (Full of ${this.containedEdible})`;
     if (this.edibleDescription) {
-      description += " " + this.edibleDescription;
+      description += ' ' + this.edibleDescription;
     }
   }
-  return description; 
+  return description;
 }
