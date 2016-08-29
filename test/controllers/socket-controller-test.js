@@ -1,6 +1,11 @@
 const test = require('tape');
 const SocketController = require('../../src/controllers/socket-controller');
 
+// From 'chalk':
+// use bright blue on Windows as the normal blue color is illegible
+// i.e. escape 94m instead of 34m.
+var isSimpleWindowsTerm = process.platform === 'win32' && !/^xterm/i.test(process.env.TERM);
+
 function loggerFactory() {
   return {
     child() { return this; },
@@ -33,7 +38,9 @@ test('SocketController: emits a welcome message when a socket connects', t => {
 
   const expected = [
     'output',
-    'Welcome to \x1b[1m\x1b[34mroom.js\x1b[39m\x1b[22m!\nType \x1b[1m\x1b[35mhelp\x1b[39m\x1b[22m for a list of available commands.'
+    isSimpleWindowsTerm 
+      ? 'Welcome to \x1b[1m\x1b[94mroom.js\x1b[39m\x1b[22m!\nType \x1b[1m\x1b[35mhelp\x1b[39m\x1b[22m for a list of available commands.'
+      : 'Welcome to \x1b[1m\x1b[34mroom.js\x1b[39m\x1b[22m!\nType \x1b[1m\x1b[35mhelp\x1b[39m\x1b[22m for a list of available commands.'
   ]
 
   t.deepEqual(socket.lastEvent(), expected);
