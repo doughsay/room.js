@@ -1,6 +1,11 @@
 const test = require('tape');
 const print = require('../../src/lib/print');
 
+// From 'chalk':
+// use bright blue on Windows as the normal blue color is illegible
+// i.e. escape 94m instead of 34m.
+var isSimpleWindowsTerm = process.platform === 'win32' && !/^xterm/i.test(process.env.TERM);
+
 test('print: prints numbers in yellow', t => {
   const value = 2;
   const expected = '\x1b[0m\x1b[33m2\x1b[39m\x1b[0m';
@@ -21,7 +26,9 @@ test('print: prints strings in green', t => {
 
 test('print: truncates long strings when in object', t => {
   const value = { x: 'this is a long-ish string that will be truncated' };
-  const expected = '{ \x1b[0m\x1b[34mx\x1b[39m\x1b[0m: \'\x1b[0m\x1b[32mthis is a long-ish string ...\x1b[39m\x1b[0m\' }';
+  const expected = isSimpleWindowsTerm
+    ? '{ \x1b[0m\x1b[94mx\x1b[39m\x1b[0m: \'\x1b[0m\x1b[32mthis is a long-ish string ...\x1b[39m\x1b[0m\' }'
+    : '{ \x1b[0m\x1b[34mx\x1b[39m\x1b[0m: \'\x1b[0m\x1b[32mthis is a long-ish string ...\x1b[39m\x1b[0m\' }';
   const actual = print(value);
 
   t.equal(actual, expected);
@@ -30,7 +37,9 @@ test('print: truncates long strings when in object', t => {
 
 test('print: does not truncate short strings when in object', t => {
   const value = { x: 'foo' };
-  const expected = '{ \x1b[0m\x1b[34mx\x1b[39m\x1b[0m: \'\x1b[0m\x1b[32mfoo\x1b[39m\x1b[0m\' }';
+  const expected = isSimpleWindowsTerm
+    ? '{ \x1b[0m\x1b[94mx\x1b[39m\x1b[0m: \'\x1b[0m\x1b[32mfoo\x1b[39m\x1b[0m\' }'
+    : '{ \x1b[0m\x1b[34mx\x1b[39m\x1b[0m: \'\x1b[0m\x1b[32mfoo\x1b[39m\x1b[0m\' }';
   const actual = print(value);
 
   t.equal(actual, expected);
@@ -110,7 +119,9 @@ test('print: prints regular expressions in red', t => {
 test('print: prints objects with circular references in black with yellow background', t => {
   const value = {};
   value.x = value;
-  const expected = '{ \x1b[0m\x1b[34mx\x1b[39m\x1b[0m: \x1b[0m\x1b[30m\x1b[43m[CircularReference]\x1b[49m\x1b[39m\x1b[0m }';
+  const expected = isSimpleWindowsTerm
+    ? '{ \x1b[0m\x1b[94mx\x1b[39m\x1b[0m: \x1b[0m\x1b[30m\x1b[43m[CircularReference]\x1b[49m\x1b[39m\x1b[0m }'
+    : '{ \x1b[0m\x1b[34mx\x1b[39m\x1b[0m: \x1b[0m\x1b[30m\x1b[43m[CircularReference]\x1b[49m\x1b[39m\x1b[0m }';
   const actual = print(value);
 
   t.equal(actual, expected);
@@ -137,7 +148,9 @@ test('print: prints empty arrays', t => {
 
 test('print: prints objects as strings when max depth is reached', t => {
   const value = { x: {} };
-  const expected = '\x1b[0m\x1b[34m[object Object]\x1b[39m\x1b[0m';
+  const expected = isSimpleWindowsTerm
+    ? '\x1b[0m\x1b[94m[object Object]\x1b[39m\x1b[0m'
+    : '\x1b[0m\x1b[34m[object Object]\x1b[39m\x1b[0m';
   const actual = print(value, 0);
 
   t.equal(actual, expected);
@@ -152,7 +165,9 @@ test('print: throws when given an unsupported object', t => {
 
 test('print: indents nested objects', t => {
   const value = { x: { y: 'foo' } };
-  const expected = '{ \x1b[0m\x1b[34mx\x1b[39m\x1b[0m: \n  { \x1b[0m\x1b[34my\x1b[39m\x1b[0m: \'\x1b[0m\x1b[32mfoo\x1b[39m\x1b[0m\' } }';
+  const expected = isSimpleWindowsTerm
+    ? '{ \x1b[0m\x1b[94mx\x1b[39m\x1b[0m: \n  { \x1b[0m\x1b[94my\x1b[39m\x1b[0m: \'\x1b[0m\x1b[32mfoo\x1b[39m\x1b[0m\' } }'
+    : '{ \x1b[0m\x1b[34mx\x1b[39m\x1b[0m: \n  { \x1b[0m\x1b[34my\x1b[39m\x1b[0m: \'\x1b[0m\x1b[32mfoo\x1b[39m\x1b[0m\' } }';
   const actual = print(value, 2);
 
   t.equal(actual, expected);
@@ -170,7 +185,9 @@ test('print: prints array values in their respective colors', t => {
 
 test('print: handles proper indentation with nested objects and arrays', t => {
   const value = { a: [{ b: [] }] };
-  const expected = '{ \x1b[0m\x1b[34ma\x1b[39m\x1b[0m: \n  [ { \x1b[0m\x1b[34mb\x1b[39m\x1b[0m: [] } ] }';
+  const expected = isSimpleWindowsTerm
+    ? '{ \x1b[0m\x1b[94ma\x1b[39m\x1b[0m: \n  [ { \x1b[0m\x1b[94mb\x1b[39m\x1b[0m: [] } ] }'
+    : '{ \x1b[0m\x1b[34ma\x1b[39m\x1b[0m: \n  [ { \x1b[0m\x1b[34mb\x1b[39m\x1b[0m: [] } ] }';
   const actual = print(value, 3);
 
   t.equal(actual, expected);
@@ -179,7 +196,9 @@ test('print: handles proper indentation with nested objects and arrays', t => {
 
 test('print: prints arrays as strings when max depth is reached', t => {
   const value = { x: [1, 2, 3] };
-  const expected = '{ \x1b[0m\x1b[34mx\x1b[39m\x1b[0m: \x1b[0m\x1b[34m[Array(3)]\x1b[39m\x1b[0m }';
+  const expected = isSimpleWindowsTerm
+    ? '{ \x1b[0m\x1b[94mx\x1b[39m\x1b[0m: \x1b[0m\x1b[94m[Array(3)]\x1b[39m\x1b[0m }'
+    : '{ \x1b[0m\x1b[34mx\x1b[39m\x1b[0m: \x1b[0m\x1b[34m[Array(3)]\x1b[39m\x1b[0m }';
   const actual = print(value);
 
   t.equal(actual, expected);

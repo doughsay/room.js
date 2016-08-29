@@ -1,5 +1,6 @@
 const test = require('tape');
-const parse = require('../../src/lib/parse');
+const parse = require('../../src/lib/parse').parseSentence;
+const parseNoun = require('../../src/lib/parse').parseNoun;
 
 test('parse: "look"', t => {
   const value = 'look';
@@ -56,6 +57,96 @@ test('parse: "look at"', t => {
     argstr: 'at',
   };
   const actual = parse(value);
+
+  t.deepEqual(actual, expected);
+  t.end();
+});
+
+test('parseNoun: "any book"', t => {
+  const value = 'any book';
+  const expected = ['any', 'book'];
+
+  const actual = parseNoun(value);
+
+  t.deepEqual(actual, expected);
+  t.end();
+});
+
+test('parseNoun: "a book"', t => {
+  const value = 'a book';
+  const expected = ['any', 'book'];
+
+  const actual = parseNoun(value);
+
+  t.deepEqual(actual, expected);
+  t.end();
+});
+
+test('parseNoun: "an apple"', t => {
+  const value = 'an apple';
+  const expected = ['any', 'apple'];
+
+  const actual = parseNoun(value);
+
+  t.deepEqual(actual, expected);
+  t.end();
+});
+
+test('parseNoun: "book"', t => {
+  const value = 'book';
+  const expected = [void 0, 'book'];
+
+  const actual = parseNoun(value);
+
+  t.deepEqual(actual, expected);
+  t.end();
+});
+
+test('parseNoun: "the book"', t => {
+  const value = 'the book';
+  const expected = [void 0, 'book'];
+
+  const actual = parseNoun(value);
+
+  t.deepEqual(actual, expected);
+  t.end();
+});
+
+test('parseNoun: "1.book"', t => {
+  const value = '1.book';
+  const expected = ['1', 'book'];
+
+  const actual = parseNoun(value);
+
+  t.deepEqual(actual, expected);
+  t.end();
+});
+
+test('parseNoun: "book.1"', t => {
+  const value = 'book.1';
+  const expected = ['1', 'book'];
+
+  const actual = parseNoun(value);
+
+  t.deepEqual(actual, expected);
+  t.end();
+});
+
+test('parseNoun: "book 1"', t => {
+  const value = 'book 1';
+  const expected = ['1', 'book'];
+
+  const actual = parseNoun(value);
+
+  t.deepEqual(actual, expected);
+  t.end();
+});
+
+test('parseNoun: "all book"', t => {
+  const value = 'all book';
+  const expected = ['all', 'book'];
+
+  const actual = parseNoun(value);
 
   t.deepEqual(actual, expected);
   t.end();
