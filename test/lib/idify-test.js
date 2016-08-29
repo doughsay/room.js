@@ -28,8 +28,8 @@ test('idify: "This is a sentence!"', t => {
   t.end();
 });
 
-test('idify: "!@#$%^&*()_+"', t => {
-  const value = '!@#$%^&*()_+';
+test('idify: "!@#$%^&*()+"', t => {
+  const value = '!@#$%^&*()+';
   const expected = '';
   const actual = idify(value);
 
@@ -37,8 +37,8 @@ test('idify: "!@#$%^&*()_+"', t => {
   t.end();
 });
 
-test('idify: "hello !@#$%^&*()_+" world', t => {
-  const value = 'hello !@#$%^&*()_+ world';
+test('idify: "hello !@#$%^&*()+" world', t => {
+  const value = 'hello !@#$%^&*()+ world';
   const expected = 'helloWorld';
   const actual = idify(value);
 
@@ -58,6 +58,15 @@ test('idify: ""', t => {
 test('idify: `undefined`', t => {
   const value = void 0;
   const expected = '';
+  const actual = idify(value);
+
+  t.equal(actual, expected);
+  t.end();
+});
+
+test('idify: "_hello_to_the__world_', t => {
+  const value = '_hello_to_the__world_';
+  const expected = 'hello_to_the_world';
   const actual = idify(value);
 
   t.equal(actual, expected);
