@@ -82,9 +82,9 @@ test('parseNoun: "a book"', t => {
   t.end();
 });
 
-test('parseNoun: "any book"', t => {
-  const value = 'any book';
-  const expected = ['any', 'book'];
+test('parseNoun: "an apple"', t => {
+  const value = 'an apple';
+  const expected = ['any', 'apple'];
 
   const actual = parseNoun(value);
 
