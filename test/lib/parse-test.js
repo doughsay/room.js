@@ -151,3 +151,13 @@ test('parseNoun: "all book"', t => {
   t.deepEqual(actual, expected);
   t.end();
 });
+
+test('parseNoun: undefined', t => {
+  const value = void 0;
+  const expected = [void 0, void 0];
+
+  const actual = parseNoun(value);
+
+  t.deepEqual(actual, expected);
+  t.end();
+});
