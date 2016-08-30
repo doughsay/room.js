@@ -105,7 +105,7 @@ stest('RoomJSServer: create a user account', (t, { socket, end }) => {
 
     socket.once('output', (msg) => {
       const expectedResponse =
-        'Welcome test!\nType \x1b[1m\x1b[35mhelp\x1b[39m\x1b[22m for a list of available commands.'
+        'Welcome test!\nType \x1b[1m\x1b[35mhelp\x1b[39m\x1b[22m for a list of available commands.';
 
       t.equal(msg, expectedResponse);
       end();
@@ -123,7 +123,23 @@ stest('RoomJSServer: attempt to create a user account that already exists', (t, 
 
     socket.once('output', (msg) => {
       const expectedResponse =
-        '\x1b[31mSorry, that username is taken.\x1b[39m'
+        '\x1b[31mSorry, that username is taken.\x1b[39m';
+
+      t.equal(msg, expectedResponse);
+      end();
+    });
+  });
+});
+
+stest('RoomJSServer: attempt to create a user, mismatching passwords', (t, { server, socket, end }) => {
+  socket.emit('input', 'create');
+
+  socket.once('request-input', (inputs, cb) => {
+    cb({ username: 'testbadpass', password: 'pass1', password2: 'pass2' });
+
+    socket.once('output', (msg) => {
+      const expectedResponse =
+        '\x1b[31mPasswords did not match.\x1b[39m';
 
       t.equal(msg, expectedResponse);
       end();
@@ -148,7 +164,25 @@ stest('RoomJSServer: login', (t, { server, socket, end }) => {
 
     socket.once('output', (msg) => {
       const expectedResponse =
-        'Welcome back test!\nType \x1b[1m\x1b[35mhelp\x1b[39m\x1b[22m for a list of available commands.'
+        'Welcome back test!\nType \x1b[1m\x1b[35mhelp\x1b[39m\x1b[22m for a list of available commands.';
+
+      t.equal(msg, expectedResponse);
+      end();
+    });
+  });
+});
+
+stest('RoomJSServer: login attempt, incorrect password', (t, { server, socket, end }) => {
+  insertTestUser(server);
+
+  socket.emit('input', 'login');
+
+  socket.once('request-input', (_, cb) => {
+    cb({ username: 'test', password: 'badpass' });
+
+    socket.once('output', (msg) => {
+      const expectedResponse =
+        '\x1b[31mInvalid username or password.\x1b[39m';
 
       t.equal(msg, expectedResponse);
       end();
@@ -176,11 +210,55 @@ stest('RoomJSServer: create player', (t, { server, socket, end }) => {
 
         socket.once('output', (msg) => {
           const expectedResponse =
-            'Character created! To start the game now, type \x1b[1m\x1b[35mplay\x1b[39m\x1b[22m!'
+            'Character created! To start the game now, type \x1b[1m\x1b[35mplay\x1b[39m\x1b[22m!';
 
           t.equal(msg, expectedResponse);
           end();
         });
+      });
+    });
+  });
+});
+
+stest('RoomJSServer: (user-authenticated) help', (t, { server, socket, end }) => {
+  insertTestUser(server);
+
+  socket.emit('input', 'login');
+
+  socket.once('request-input', (_, cb) => {
+    cb({ username: 'test', password: 'test' });
+
+    socket.once('output', () => {
+      socket.emit('input', 'help');
+
+      socket.once('output', (msg) => {
+        const expectedResponse =
+          'Available commands:\n• \x1b[1m\x1b[35mlogout\x1b[39m\x1b[22m - logout of your account\n• \x1b[1m\x1b[35mcreate\x1b[39m\x1b[22m - create a new character\n• \x1b[1m\x1b[35mplay\x1b[39m\x1b[22m   - enter the game\n• \x1b[1m\x1b[35mhelp\x1b[39m\x1b[22m   - show this message';
+
+        t.equal(msg, expectedResponse);
+        end();
+      });
+    });
+  });
+});
+
+stest('RoomJSServer: (user-authenticated) invalid command', (t, { server, socket, end }) => {
+  insertTestUser(server);
+
+  socket.emit('input', 'login');
+
+  socket.once('request-input', (_, cb) => {
+    cb({ username: 'test', password: 'test' });
+
+    socket.once('output', () => {
+      socket.emit('input', 'invalidcommand');
+
+      socket.once('output', (msg) => {
+        const expectedResponse =
+          '\x1b[31mInvalid command.\x1b[39m';
+
+        t.equal(msg, expectedResponse);
+        end();
       });
     });
   });
@@ -199,7 +277,29 @@ stest('RoomJSServer: play', (t, { server, socket, end }) => {
       socket.emit('input', 'play');
 
       socket.once('output', (msg) => {
-        const expectedResponse = 'Now playing as test'
+        const expectedResponse = 'Now playing as test';
+
+        t.equal(msg, expectedResponse);
+        end();
+      });
+    });
+  });
+});
+
+stest('RoomJSServer: logout', (t, { server, socket, end }) => {
+  insertTestUser(server);
+  insertTestPlayer(server);
+
+  socket.emit('input', 'login');
+
+  socket.once('request-input', (_, cb) => {
+    cb({ username: 'test', password: 'test' });
+
+    socket.once('output', () => {
+      socket.emit('input', 'logout');
+
+      socket.once('output', (msg) => {
+        const expectedResponse = 'Bye!';
 
         t.equal(msg, expectedResponse);
         end();
@@ -224,7 +324,7 @@ stest('RoomJSServer: eval code', (t, { server, socket, end }) => {
         socket.emit('input', 'eval 2 + 2');
 
         socket.once('output', (msg) => {
-          const expectedResponse = '\x1b[0m\x1b[33m4\x1b[39m\x1b[0m'
+          const expectedResponse = '\x1b[0m\x1b[33m4\x1b[39m\x1b[0m';
 
           t.equal(msg, expectedResponse);
           end();
