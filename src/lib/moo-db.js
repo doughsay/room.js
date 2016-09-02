@@ -1,5 +1,6 @@
 const EventEmitter = require('events');
 const util = require('util');
+const path = require('path');
 const bunyan = require('bunyan');
 const FsDb = require('./fs-db');
 
@@ -39,7 +40,16 @@ class MooDB {
   load(dir = '') {
     const ids = this.fsdb.lsDirs(dir);
     ids.forEach(id => {
-      this.loadObject(id.replace(/[\/\\]/g, '_'));
+      const filepath = path.posix.join(dir, id);
+      // Recurse
+      this.load(filepath);
+
+      // Load object contents
+      // Not the most efficient way to check that the directory
+      // has content to load, but we only do that at start-up.
+      if (this.fsdb.lsFiles(filepath).length) {
+        this.loadObject(this.idFromFilepath(filepath));
+      }
     });
   }
 
@@ -58,10 +68,14 @@ class MooDB {
     return id.replace(/_/g, '/');
   }
 
-  idFromFilepath(filepath) {
-    const fpsplit = filepath.split(/[\/\\]/);
+  idFromFilename(filename) {
+    const fpsplit = filename.split(/\//);
     fpsplit.pop();
     return fpsplit.join('_');
+  }
+
+  idFromFilepath(filepath) {
+    return filepath.replace(/\//g, '_');
   }
 
   loadObject(id) {
@@ -97,14 +111,14 @@ class MooDB {
   }
 
   onFileAddedOrChanged(file) {
-    const id = this.idFromFilepath(file);
+    const id = this.idFromFilename(file);
     if (file.endsWith('.json') || file.endsWith('.js')) {
       this.addOrUpdateObject(id);
     }
   }
 
   onFileRemoved(file) {
-    const id = this.idFromFilepath(file);
+    const id = this.idFromFilename(file);
     if (file.endsWith('.json')) {
       this.removeById(id);
       this.emit('object-removed', id);

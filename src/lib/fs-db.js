@@ -6,6 +6,13 @@ const chokidar = require('chokidar');
 const EventEmitter = require('events');
 const util = require('util');
 
+// Design note:
+//   "The default operation of the path module varies based on the operating system
+//   on which a Node.js application is running. Specifically, when running on a Windows
+//   operating system, the path module will assume that Windows-style paths are being used."
+// Therefore, to avoid inconsistent behaviors, we enforce working with POSIX paths at our
+// level.
+
 class FsDb {
   constructor(directory, logger) {
     EventEmitter.call(this);
@@ -28,7 +35,7 @@ class FsDb {
 
   load(dir = this.directory) {
     fs.readdirSync(dir).forEach(file => {
-      const filepath = path.join(dir, file);
+      const filepath = path.posix.join(dir, file);
       const stats = fs.statSync(filepath);
       if (stats.isDirectory()) {
         this.load(filepath);
@@ -67,7 +74,7 @@ class FsDb {
   }
 
   toFilepath(relpath) {
-    return path.join(this.directory, relpath);
+    return path.posix.join(this.directory, relpath);
   }
 
   createOrGetMap(map, key) {
@@ -90,7 +97,7 @@ class FsDb {
 
   mapFor(filepath, create = true) {
     const getCallback = create ? this.createOrGetMap.bind(this) : this.getMap.bind(this);
-    const keys = this.toRelpath(path.dirname(filepath)).split('/').filter(x => x);
+    const keys = this.toRelpath(path.posix.dirname(filepath)).split('/').filter(x => x);
     return keys.reduce((map, key) => getCallback(map, key), this.db);
   }
 
@@ -114,27 +121,27 @@ class FsDb {
   unloadDir(dirname) {
     const relpath = this.toRelpath(dirname);
     const map = this.mapFor(dirname);
-    const dir = path.basename(dirname);
+    const dir = path.posix.basename(dirname);
     map.delete(dir);
     this.logger.trace({ relpath }, 'unloaded directory');
-    if (this.unloadable(map)) { this.unloadDir(path.dirname(dirname)); }
+    if (this.unloadable(map)) { this.unloadDir(path.posix.dirname(dirname)); }
   }
 
   unloadFile(filepath, emit = true) {
     const relpath = this.toRelpath(filepath);
-    const file = path.basename(filepath);
+    const file = path.posix.basename(filepath);
     const originalExisted = typeof this.read(relpath) !== 'undefined';
     if (originalExisted) {
       const map = this.mapFor(filepath);
       map.delete(file);
       this.logger.trace({ relpath }, 'unloaded file');
-      if (this.unloadable(map)) { this.unloadDir(path.dirname(filepath)); }
+      if (this.unloadable(map)) { this.unloadDir(path.posix.dirname(filepath)); }
       if (emit) { this.emit('removed', relpath); }
     }
   }
 
   onFileAdded(filepath) {
-    const relpath = this.toRelpath(filepath);
+    const relpath = this.toRelpath(filepath.replace(/[\\]/g, '/'));
     this.logger.trace({ relpath }, 'added to filesystem');
     this.loadFile(filepath);
   }
@@ -142,18 +149,18 @@ class FsDb {
   onFileChanged(filepath) {
     const relpath = this.toRelpath(filepath);
     this.logger.trace({ relpath }, 'changed in filesystem');
-    this.loadFile(filepath);
+    this.loadFile(filepath.replace(/[\\]/g, '/'));
   }
 
   onFileRemoved(filepath) {
     const relpath = this.toRelpath(filepath);
     this.logger.trace({ relpath }, 'removed from filesystem');
-    this.unloadFile(filepath);
+    this.unloadFile(filepath.replace(/[\\]/g, '/'));
   }
 
   set(relpath, contents) {
     const filepath = this.toFilepath(relpath);
-    const file = path.basename(filepath);
+    const file = path.posix.basename(filepath);
     const map = this.mapFor(filepath);
     map.set(file, contents);
     return true;
@@ -161,7 +168,7 @@ class FsDb {
 
   read(relpath) {
     const filepath = this.toFilepath(relpath);
-    const file = path.basename(filepath);
+    const file = path.posix.basename(filepath);
     const map = this.mapFor(filepath, false);
     if (!map) { return void 0; }
     return map.get(file);
@@ -173,7 +180,7 @@ class FsDb {
     const originalDidntExist = typeof originalContents === 'undefined';
     this.set(relpath, contents);
     if (originalDidntExist || contents !== originalContents) {
-      if (originalDidntExist) { mkdirp.sync(path.dirname(filepath)); }
+      if (originalDidntExist) { mkdirp.sync(path.posix.dirname(filepath)); }
       fs.writeFileSync(filepath, contents);
       this.logger.trace({ relpath }, 'wrote file to disk');
     }
