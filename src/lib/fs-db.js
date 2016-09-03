@@ -11,7 +11,7 @@ class FsDb {
     EventEmitter.call(this);
 
     this.directory = path.normalize(directory).replace(/\/$/, '');
-    this.logger = logger.child({ directory });
+    this.logger = logger.child({ component: 'fs-db', directory });
     this.db = new Map();
 
     const start = new Date();

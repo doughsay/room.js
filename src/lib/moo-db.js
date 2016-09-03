@@ -13,7 +13,7 @@ class MooDB {
   constructor(directory, logger) {
     EventEmitter.call(this);
 
-    this.logger = logger.child({ directory });
+    this.logger = logger.child({ component: 'moo-db', directory });
     this.fsdb = new FsDb(directory, logger);
     this.db = new Map();
 

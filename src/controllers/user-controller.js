@@ -1,9 +1,9 @@
 const BaseChildController = require('./base-child-controller');
-const { boldMagenta, boldBlue, red } = require('../lib/colors');
+const { boldMagenta, red } = require('../lib/colors');
 
 class UserController extends BaseChildController {
   get logger() {
-    return this.parent.logger.child({ user: this.user.id });
+    return this.parent.logger.child({ component: 'user-controller', user: this.user.id });
   }
 
   onInput(input) {
@@ -89,7 +89,7 @@ class UserController extends BaseChildController {
       const inputs = [{ type: 'text', label: 'character', name: 'selection' }];
 
       players.forEach((p, i) => {
-        msg.push(`${i + 1}. ${boldBlue(p.name)}`);
+        msg.push(`${i + 1}. #cmd[${p.name}]`);
       });
 
       this.emit('output', msg.join('\n'));

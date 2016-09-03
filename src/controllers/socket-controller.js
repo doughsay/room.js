@@ -12,7 +12,7 @@ class SocketController {
     this.db = db;
     this.userDb = userDb;
     this.controllerMap = controllerMap;
-    this.logger = logger.child({ socketId: this.socket.id });
+    this.logger = logger.child({ component: 'socket-controller', socketId: this.socket.id });
 
     this.setupChildControllers();
     this.setupSocketListeners(socket);

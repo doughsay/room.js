@@ -1,10 +1,18 @@
 const repl = require('repl');
-const world = require('./state/world');
+const bunyan = require('bunyan');
+
+const config = require('./config');
+const RoomJSServer = require('./lib/room-js-server');
+
+const { appName, logLevel } = config;
+const logger = bunyan.createLogger({ name: appName, level: logLevel });
+
+const server = new RoomJSServer(logger, config);
 
 const local = repl.start('room.js > ');
 
-for (const id in world.context) { // eslint-disable-line guard-for-in
-  local.context[id] = world.context[id];
+for (const id in server.world.context) { // eslint-disable-line guard-for-in
+  local.context[id] = server.world.context[id];
 }
 
 local.on('exit', () => {

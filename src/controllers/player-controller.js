@@ -6,7 +6,11 @@ const wrapString = require('../lib/wrap-string');
 
 class PlayerController extends BaseChildController {
   get logger() {
-    return this.parent.logger.child({ user: this.user.id, player: this.playerId });
+    return this.parent.logger.child({
+      component: 'player-controller',
+      user: this.user.id,
+      player: this.playerId,
+    });
   }
 
   onTabKeyPress({ direction }) {
