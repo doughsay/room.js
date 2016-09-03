@@ -43,11 +43,8 @@ class MooDB {
       const filepath = path.posix.join(dir, id);
       // Recurse
       this.load(filepath);
-
       // Load object contents
-      // Not the most efficient way to check that the directory
-      // has content to load, but we only do that at start-up.
-      if (this.fsdb.lsFiles(filepath).length) {
+      if (this.fsdb.hasContents(filepath, '.json')) {
         this.loadObject(this.idFromFilepath(filepath));
       }
     });
