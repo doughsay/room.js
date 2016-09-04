@@ -1,0 +1,23 @@
+{
+  "name": "Town house",
+  "aliases": [],
+  "traitIds": [
+    "lib_room"
+  ],
+  "locationId": null,
+  "properties": {
+    "exits": {
+      "object": {
+        "west": {
+          "ref": "areas_city_southstreet1"
+        },
+        "up": {
+          "ref": "areas_start_heaven"
+        }
+      }
+    },
+    "description": {
+      "value": "This is an elegant house interior. A fully visible staircase paved with wooden planks leads to the first floor."
+    }
+  }
+}

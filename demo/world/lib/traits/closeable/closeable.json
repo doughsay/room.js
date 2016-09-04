@@ -1,0 +1,93 @@
+{
+  "name": "lib_traits_closeable",
+  "aliases": [],
+  "traitIds": [],
+  "locationId": null,
+  "properties": {
+    "open": {
+      "verb": true,
+      "file": "open.js",
+      "pattern": "open",
+      "dobjarg": "this",
+      "preparg": "none",
+      "iobjarg": "none"
+    },
+    "close": {
+      "verb": true,
+      "file": "close.js",
+      "pattern": "close",
+      "dobjarg": "this",
+      "preparg": "none",
+      "iobjarg": "none"
+    },
+    "closed": {
+      "value": true
+    },
+    "unlock": {
+      "verb": true,
+      "file": "unlock.js",
+      "pattern": "unlock open",
+      "dobjarg": "this",
+      "preparg": "with/using",
+      "iobjarg": "any"
+    },
+    "locked": {
+      "value": true
+    },
+    "lock": {
+      "verb": true,
+      "file": "lock.js",
+      "pattern": "lock close",
+      "dobjarg": "this",
+      "preparg": "with/using",
+      "iobjarg": "any"
+    },
+    "keySet": {
+      "array": [
+        {
+          "value": "masterkey"
+        }
+      ]
+    },
+    "doOpen": {
+      "function": true,
+      "file": "doOpen.js"
+    },
+    "doClose": {
+      "function": true,
+      "file": "doClose.js"
+    },
+    "doLock": {
+      "function": true,
+      "file": "doLock.js"
+    },
+    "doUnlock": {
+      "function": true,
+      "file": "doUnlock.js"
+    },
+    "onOpen": {
+      "function": true,
+      "file": "onOpen.js"
+    },
+    "onClose": {
+      "function": true,
+      "file": "onClose.js"
+    },
+    "onLock": {
+      "function": true,
+      "file": "onLock.js"
+    },
+    "onUnlock": {
+      "function": true,
+      "file": "onUnlock.js"
+    },
+    "addKeyId": {
+      "function": true,
+      "file": "addKeyId.js"
+    },
+    "rmKeyId": {
+      "function": true,
+      "file": "rmKeyId.js"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "lib_npc",
+  "aliases": [],
+  "traitIds": [
+    "lib_root",
+    "lib_traits_describable"
+  ],
+  "locationId": null,
+  "properties": {}
+}

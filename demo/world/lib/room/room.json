@@ -1,0 +1,84 @@
+{
+  "name": "lib_room",
+  "aliases": [],
+  "traitIds": [
+    "lib_root"
+  ],
+  "locationId": null,
+  "properties": {
+    "description": {
+      "value": "An undescript room."
+    },
+    "exits": {
+      "object": {}
+    },
+    "announceEnterRoom": {
+      "function": true,
+      "file": "announceEnterRoom.js"
+    },
+    "announceLeaveRoom": {
+      "function": true,
+      "file": "announceLeaveRoom.js"
+    },
+    "describe": {
+      "function": true,
+      "file": "describe.js"
+    },
+    "announce": {
+      "function": true,
+      "file": "announce.js"
+    },
+    "addExit": {
+      "function": true,
+      "file": "addExit.js"
+    },
+    "doEnter": {
+      "function": true,
+      "file": "doEnter.js"
+    },
+    "doLeave": {
+      "function": true,
+      "file": "doLeave.js"
+    },
+    "canEnter": {
+      "function": true,
+      "file": "canEnter.js"
+    },
+    "canLeave": {
+      "function": true,
+      "file": "canLeave.js"
+    },
+    "onEnter": {
+      "function": true,
+      "file": "onEnter.js"
+    },
+    "onLeave": {
+      "function": true,
+      "file": "onLeave.js"
+    },
+    "look": {
+      "verb": true,
+      "file": "look.js",
+      "pattern": "l*ook",
+      "dobjarg": "none",
+      "preparg": "none",
+      "iobjarg": "none"
+    },
+    "goDirection": {
+      "verb": true,
+      "file": "goDirection.js",
+      "pattern": "g*o",
+      "dobjarg": "any",
+      "preparg": "none",
+      "iobjarg": "none"
+    },
+    "go": {
+      "verb": true,
+      "file": "go.js",
+      "pattern": "n*orth e*ast s*outh w*est u*p d*own ne se nw sw northeast northwest southeast southwest",
+      "dobjarg": "none",
+      "preparg": "none",
+      "iobjarg": "none"
+    }
+  }
+}

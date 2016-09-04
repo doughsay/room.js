@@ -1,0 +1,15 @@
+{
+  "name": "antique key",
+  "aliases": [
+    "key"
+  ],
+  "traitIds": [
+    "lib_key"
+  ],
+  "locationId": "areas_start_heaven",
+  "properties": {
+    "description": {
+      "value": "An old antique wrought iron key, with jagged edges."
+    }
+  }
+}

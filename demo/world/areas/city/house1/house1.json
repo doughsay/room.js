@@ -1,0 +1,20 @@
+{
+  "name": "Simple house",
+  "aliases": [],
+  "traitIds": [
+    "lib_room"
+  ],
+  "locationId": null,
+  "properties": {
+    "exits": {
+      "object": {
+        "west": {
+          "ref": "areas_city_alley1"
+        }
+      }
+    },
+    "description": {
+      "value": "You are in a dark and small, poorly furnished room. The only natural light comes from a small barred window."
+    }
+  }
+}

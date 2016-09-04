@@ -1,0 +1,42 @@
+{
+  "name": "lantern",
+  "aliases": [
+    "lamp"
+  ],
+  "traitIds": [
+    "lib_item"
+  ],
+  "locationId": "items_chest",
+  "properties": {
+    "description": {
+      "value": "A portable lamp in a case, protected from the wind and rain"
+    },
+    "lighted": {
+      "value": false
+    },
+    "light": {
+      "verb": true,
+      "file": "light.js",
+      "pattern": "light",
+      "dobjarg": "this",
+      "preparg": "none",
+      "iobjarg": "none"
+    },
+    "extinguish": {
+      "verb": true,
+      "file": "extinguish.js",
+      "pattern": "extinguish",
+      "dobjarg": "this",
+      "preparg": "none",
+      "iobjarg": "none"
+    },
+    "doLight": {
+      "function": true,
+      "file": "doLight.js"
+    },
+    "doExtinguish": {
+      "function": true,
+      "file": "doExtinguish.js"
+    }
+  }
+}

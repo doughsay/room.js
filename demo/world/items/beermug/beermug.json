@@ -1,0 +1,29 @@
+{
+  "name": "mug of ale",
+  "aliases": [
+    "mug",
+    "glass",
+    "ale"
+  ],
+  "traitIds": [
+    "lib_ediblecontainer"
+  ],
+  "locationId": "items_waitress",
+  "properties": {
+    "containedEdible": {
+      "value": "ale"
+    },
+    "edibleDescription": {
+      "value": "This is a strong ale, with a reddish copper color."
+    },
+    "exhausted": {
+      "value": false
+    },
+    "description": {
+      "value": "A thick beer mug with a handle."
+    },
+    "containerObject": {
+      "value": "mug"
+    }
+  }
+}

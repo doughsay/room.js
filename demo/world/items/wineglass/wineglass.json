@@ -1,0 +1,29 @@
+{
+  "name": "glass of wine",
+  "aliases": [
+    "glass",
+    "goblet",
+    "wine"
+  ],
+  "traitIds": [
+    "lib_ediblecontainer"
+  ],
+  "locationId": "items_waitress",
+  "properties": {
+    "containedEdible": {
+      "value": "wine"
+    },
+    "edibleDescription": {
+      "value": "The wine is rich, with bold aromas and a balanced flavor of blackberry."
+    },
+    "exhausted": {
+      "value": false
+    },
+    "description": {
+      "value": "A fine crystal goblet."
+    },
+    "containerObject": {
+      "value": "glass"
+    }
+  }
+}

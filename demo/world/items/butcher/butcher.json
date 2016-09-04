@@ -1,0 +1,15 @@
+{
+  "name": "Paul Butcher",
+  "aliases": [
+    "butcher"
+  ],
+  "traitIds": [
+    "lib_npc_seller"
+  ],
+  "locationId": "areas_city_butcher",
+  "properties": {
+    "description": {
+      "value": "Paul Butcher, behind his counter."
+    }
+  }
+}

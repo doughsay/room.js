@@ -1,0 +1,15 @@
+{
+  "name": "Sarah",
+  "aliases": [
+    "waitress"
+  ],
+  "traitIds": [
+    "lib_npc_seller"
+  ],
+  "locationId": "areas_city_inn",
+  "properties": {
+    "description": {
+      "value": "Sarah, the waitress."
+    }
+  }
+}

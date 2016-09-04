@@ -1,5 +1,11 @@
 const fs = require('fs');
-const path = require('path');
+const path = require('path').posix;
+// Design note:
+//   "The default operation of the path module varies based on the operating system
+//   on which a Node.js application is running. Specifically, when running on a Windows
+//   operating system, the path module will assume that Windows-style paths are being used."
+// Therefore, to avoid inconsistent behaviors, we enforce working with POSIX paths at our
+// level.
 const mkdirp = require('mkdirp');
 const remove = require('remove');
 const chokidar = require('chokidar');
@@ -49,9 +55,15 @@ class FsDb {
 
     this.watcher.on('ready', () => {
       this.watcher
-        .on('add', this.onFileAdded.bind(this))
-        .on('change', this.onFileChanged.bind(this))
-        .on('unlink', this.onFileRemoved.bind(this));
+        .on('add', file => this.onFileAdded(file.replace(/[\\]/g, '/')))
+        .on('change', file => this.onFileChanged(file.replace(/[\\]/g, '/')))
+        .on('unlink', file => this.onFileRemoved(file.replace(/[\\]/g, '/')))
+        .on('error', error => {
+          // On Windows notabbly, when a file is deleted from an extern process, an EPERM status
+          // may occur here, due to a temporary system file lock.
+          // Attempt at gracefully ignore the error, to avoid an uncaught exception.
+          this.logger.warn({ error }, 'file watcher error caught');
+        });
       this.emit('ready');
     });
   }
@@ -187,7 +199,14 @@ class FsDb {
 
   rmDir(relpath) {
     const filepath = this.toFilepath(relpath);
-    fs.rmdirSync(filepath);
+    try {
+      fs.rmdirSync(filepath);
+    } catch (error) {
+       // At least two observed cases here:
+      // - ENOTEMPTY
+      // - ENOENT
+      this.logger.warn({ relpath, error }, 'file directory deletion failed');
+    }
   }
 
   // input expected to be a path to a directory only
@@ -216,6 +235,11 @@ class FsDb {
 
   lsFiles(relpath) {
     return this.lsBy(relpath, x => x.file);
+  }
+
+  hasContents(relpath, ext) {
+    const entries = this.lsBy(relpath, x => x.file && x.file.endsWith(ext));
+    return entries.length !== 0;
   }
 
   _inspectTree(map = this.db, prefix = '', lines = []) {

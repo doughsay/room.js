@@ -1,0 +1,21 @@
+{
+  "name": "evalmode",
+  "aliases": [],
+  "traitIds": [
+    "modes_mode"
+  ],
+  "locationId": null,
+  "properties": {
+    "promptString": {
+      "value": "\u001b[31mEVAL\u001b[39m"
+    },
+    "preprocessCommand": {
+      "function": true,
+      "file": "preprocessCommand.js"
+    },
+    "allowedFor": {
+      "function": true,
+      "file": "allowedFor.js"
+    }
+  }
+}

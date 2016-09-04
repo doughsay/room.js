@@ -1,0 +1,50 @@
+{
+  "name": "system",
+  "aliases": [],
+  "traitIds": [
+    "lib_root"
+  ],
+  "locationId": null,
+  "properties": {
+    "broadcast": {
+      "function": true,
+      "file": "broadcast.js"
+    },
+    "changeId": {
+      "function": true,
+      "file": "changeId.js"
+    },
+    "colorTest": {
+      "function": true,
+      "file": "colorTest.js"
+    },
+    "onlinePlayers": {
+      "function": true,
+      "file": "onlinePlayers.js"
+    },
+    "onPlayerConnected": {
+      "function": true,
+      "file": "onPlayerConnected.js"
+    },
+    "onPlayerCreated": {
+      "function": true,
+      "file": "onPlayerCreated.js"
+    },
+    "onPlayerDisconnected": {
+      "function": true,
+      "file": "onPlayerDisconnected.js"
+    },
+    "onServerStarted": {
+      "function": true,
+      "file": "onServerStarted.js"
+    },
+    "preprocessCommand": {
+      "function": true,
+      "file": "preprocessCommand.js"
+    },
+    "onPlayerCommandFailed": {
+      "function": true,
+      "file": "onPlayerCommandFailed.js"
+    }
+  }
+}

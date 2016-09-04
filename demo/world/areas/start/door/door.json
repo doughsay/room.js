@@ -1,0 +1,45 @@
+{
+  "name": "trap",
+  "aliases": [
+    "trap"
+  ],
+  "traitIds": [
+    "lib_door"
+  ],
+  "locationId": null,
+  "properties": {
+    "locked": {
+      "value": true
+    },
+    "closed": {
+      "value": true
+    },
+    "sides": {
+      "array": [
+        {
+          "ref": "areas_start_attic"
+        },
+        {
+          "ref": "areas_start_heaven"
+        }
+      ]
+    },
+    "description": {
+      "value": "A trap in the ceiling."
+    },
+    "onTraversal": {
+      "function": true,
+      "file": "onTraversal.js"
+    },
+    "keySet": {
+      "array": [
+        {
+          "value": "masterkey"
+        },
+        {
+          "value": "key_areas_start_attic"
+        }
+      ]
+    }
+  }
+}

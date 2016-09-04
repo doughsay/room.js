@@ -1,0 +1,24 @@
+{
+  "name": "lib_traits_describable",
+  "aliases": [],
+  "traitIds": [],
+  "locationId": null,
+  "properties": {
+    "examine": {
+      "verb": true,
+      "file": "examine.js",
+      "pattern": "ex*amine l*ook",
+      "dobjarg": "this",
+      "preparg": "none",
+      "iobjarg": "none"
+    },
+    "describe": {
+      "function": true,
+      "file": "describe.js"
+    },
+    "onExamine": {
+      "function": true,
+      "file": "onExamine.js"
+    }
+  }
+}

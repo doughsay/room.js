@@ -1,0 +1,53 @@
+{
+  "name": "staff of creation",
+  "aliases": [],
+  "traitIds": [
+    "lib_item"
+  ],
+  "locationId": "areas_start_attic",
+  "properties": {
+    "description": {
+      "value": "the magical staff of creation, for 'use' by builders"
+    },
+    "use": {
+      "verb": true,
+      "file": "use.js",
+      "pattern": "use",
+      "dobjarg": "this",
+      "preparg": "at/to",
+      "iobjarg": "any"
+    },
+    "fetchTarget": {
+      "function": true,
+      "file": "fetchTarget.js"
+    },
+    "cloneAction": {
+      "function": true,
+      "file": "cloneAction.js"
+    },
+    "zapAction": {
+      "function": true,
+      "file": "zapAction.js"
+    },
+    "forceAction": {
+      "function": true,
+      "file": "forceAction.js"
+    },
+    "delegateCommand": {
+      "function": true,
+      "file": "delegateCommand.js"
+    },
+    "buildAction": {
+      "function": true,
+      "file": "buildAction.js"
+    },
+    "nameAction": {
+      "function": true,
+      "file": "nameAction.js"
+    },
+    "identifyAction": {
+      "function": true,
+      "file": "identifyAction.js"
+    }
+  }
+}
