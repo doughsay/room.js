@@ -1,5 +1,6 @@
 RoomJS 3.x Game Engine
 ======================
+[![Build Status](https://travis-ci.org/doughsay/room.js.svg?branch=master)](https://travis-ci.org/doughsay/room.js) [![Coverage Status](https://coveralls.io/repos/github/doughsay/room.js/badge.svg?branch=master)](https://coveralls.io/github/doughsay/room.js?branch=master)
 
 This repository contains the RoomJS game engine (or server).
 
@@ -12,7 +13,7 @@ Prerequisites
 
 The RoomJS server requires **Node.js 6.0** or upper.
 
-Clone the repository or download a ZIP archive. 
+Clone the repository or download a ZIP archive.
 
 Installation steps are straightforward:
 
