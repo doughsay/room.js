@@ -9,4 +9,8 @@ install:
   - npm install
   - ln -s .env.test .env
 
-script: "npm run lint && npm test && npm run cover && npm run coveralls"
+script:
+  - npm run lint
+  - npm test
+  - npm run cover
+  - npm run coveralls

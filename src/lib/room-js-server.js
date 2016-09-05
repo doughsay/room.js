@@ -54,12 +54,12 @@ class RoomJSServer {
   }
 
   start() {
-    const { port, version } = this.config;
+    const { port, address, version } = this.config;
 
-    this.server.listen(port, err => {
+    this.server.listen(port, address, err => {
       if (err) { throw err; }
       this.world.runHook('system', 'onServerStarted');
-      this.logger.info({ version, port }, 'server started');
+      this.logger.info({ version, port, address }, 'server started');
     });
   }
 

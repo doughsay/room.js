@@ -11,14 +11,14 @@ The engine includes built-in WebSocket (SocketIO) communication, user account ma
 Prerequisites
 =============
 
-The RoomJS server requires **Node.js 6.0** or upper.
+The RoomJS server requires **Node.js 6.0** or newer.
 
 Clone the repository or download a ZIP archive.
 
 Installation steps are straightforward:
 
 1. `npm install`
-2. Edit the `.env` file to customize the server listening port and the debug level (if need be), and just source it. (Also edit the path to the User DB and the path to the world directory, if not using the lightweight demonstration world bundled with the project.)
+2. Create a `.env` file to customize the server's configuration. See `.env.development` for examples and explanations.
 3. `npm start`
 
 To interact with the server, you must use a web client application. The standard [client](https://github.com/doughsay/room.js-client) is provided in a separate repository.
