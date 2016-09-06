@@ -1,4 +1,5 @@
 const chalk = require('chalk');
+
 const color = new chalk.constructor({ enabled: true });
 
 const boldMagenta = color.bold.magenta;

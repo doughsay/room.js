@@ -56,7 +56,7 @@ test('print: prints booleans in magenta', t => {
 });
 
 test('print: prints undefined in gray', t => {
-  const value = void 0;
+  const value = undefined;
   const expected = '\x1b[0m\x1b[90mundefined\x1b[39m\x1b[0m';
   const actual = print(value);
 

@@ -56,9 +56,9 @@ class ProgrammerController extends BaseChildController {
 
   onGetVerb({ objectId, name }, done) {
     const object = this.world.get(objectId);
-    if (!object) { done(void 0); return; }
+    if (!object) { done(undefined); return; }
     const verb = object[name];
-    if (!verb || !verb.verb) { done(void 0); return; }
+    if (!verb || !verb.verb) { done(undefined); return; }
     const verbDescriptor = serialize(verb);
     verbDescriptor.code = verbDescriptor.source;
     verbDescriptor.name = name;
@@ -68,9 +68,9 @@ class ProgrammerController extends BaseChildController {
 
   onGetFunction({ objectId, name }, done) {
     const object = this.world.get(objectId);
-    if (!object) { done(void 0); return; }
+    if (!object) { done(undefined); return; }
     const func = object[name];
-    if (!func || !func.source) { done(void 0); return; }
+    if (!func || !func.source) { done(undefined); return; }
     done({ objectId, src: func.source, name });
   }
 

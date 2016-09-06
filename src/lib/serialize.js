@@ -32,7 +32,8 @@ function serializeFunction(fn) {
   const source = fn.source || fn.toString();
   if (fn.verb) {
     return {
-      verb: true, source,
+      source,
+      verb: true,
       pattern: fn.pattern,
       dobjarg: fn.dobjarg,
       preparg: fn.preparg,

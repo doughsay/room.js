@@ -73,8 +73,7 @@ class World {
       '{\n  \n}\n',
     ].join('');
     return this.deserializer.deserialize({
-      verb: true, source,
-      pattern, dobjarg, preparg, iobjarg,
+      verb: true, source, pattern, dobjarg, preparg, iobjarg,
     });
   }
 

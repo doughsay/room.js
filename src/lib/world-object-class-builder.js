@@ -10,7 +10,7 @@ const PARTIAL_MATCH = 2;
 
 function linearize(object, linearization = new C3(object)) {
   object.traits.forEach((trait, index) => {
-    if (trait !== void 0) {
+    if (trait !== undefined) {
       linearization.add(object, trait);
       linearize(trait, linearization);
     } else {
@@ -23,7 +23,7 @@ function linearize(object, linearization = new C3(object)) {
 }
 
 function match(name, search) {
-  if (search === void 0) {
+  if (search === undefined) {
     return EXACT_MATCH;
   }
 
@@ -40,7 +40,7 @@ function match(name, search) {
 
 function getMatchesWithDeterminer(foundMatches, determiner, ambiguous, fail) {
   const length = foundMatches.length;
-  if (determiner === void 0) { // one, definite
+  if (determiner === undefined) { // one, definite
     if (length === 1) {
       return foundMatches[0][1];
     }
@@ -79,10 +79,8 @@ function matchPattern(pattern, str) {
         return true;
       }
     }
-  } else {
-    if (pattern === str) {
-      return true;
-    }
+  } else if (pattern === str) {
+    return true;
   }
   return false;
 }
@@ -253,7 +251,7 @@ class WorldObjectClassBuilder {
         const object = world.get(id);
 
         for (const key in props) {
-          if (props.hasOwnProperty(key)) {
+          if ({}.hasOwnProperty.call(props, key)) {
             object[key] = props[key];
           }
         }
@@ -412,7 +410,7 @@ class WorldObjectClassBuilder {
             return key;
           }
         }
-        return void 0;
+        return undefined;
       }
     };
   }

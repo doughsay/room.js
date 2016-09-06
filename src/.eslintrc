@@ -5,6 +5,12 @@
     "strict": [2, "never"],
     "no-multiple-empty-lines": [2, {"max": 1}],
     "arrow-parens": [2, "as-needed"],
-    "no-confusing-arrow": [0]
+    "no-confusing-arrow": [0],
+    "no-underscore-dangle": [0],
+    'no-restricted-syntax': [
+      'error',
+      'LabeledStatement',
+      'WithStatement',
+    ],
   }
 }

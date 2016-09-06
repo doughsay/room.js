@@ -6,9 +6,9 @@ test('parse: "look"', t => {
   const value = 'look';
   const expected = {
     verb: 'look',
-    dobjstr: void 0,
-    prepstr: void 0,
-    iobjstr: void 0,
+    dobjstr: undefined,
+    prepstr: undefined,
+    iobjstr: undefined,
     argstr: '',
   };
   const actual = parse(value);
@@ -22,8 +22,8 @@ test('parse: "take yellow bird"', t => {
   const expected = {
     verb: 'take',
     dobjstr: 'yellow bird',
-    prepstr: void 0,
-    iobjstr: void 0,
+    prepstr: undefined,
+    iobjstr: undefined,
     argstr: 'yellow bird',
   };
   const actual = parse(value);
@@ -51,9 +51,9 @@ test('parse: "look at"', t => {
   const value = 'look at';
   const expected = {
     verb: 'look',
-    dobjstr: void 0,
+    dobjstr: undefined,
     prepstr: 'at',
-    iobjstr: void 0,
+    iobjstr: undefined,
     argstr: 'at',
   };
   const actual = parse(value);
@@ -94,7 +94,7 @@ test('parseNoun: "an apple"', t => {
 
 test('parseNoun: "book"', t => {
   const value = 'book';
-  const expected = [void 0, 'book'];
+  const expected = [undefined, 'book'];
 
   const actual = parseNoun(value);
 
@@ -104,7 +104,7 @@ test('parseNoun: "book"', t => {
 
 test('parseNoun: "the book"', t => {
   const value = 'the book';
-  const expected = [void 0, 'book'];
+  const expected = [undefined, 'book'];
 
   const actual = parseNoun(value);
 
@@ -153,8 +153,8 @@ test('parseNoun: "all book"', t => {
 });
 
 test('parseNoun: undefined', t => {
-  const value = void 0;
-  const expected = [void 0, void 0];
+  const value = undefined;
+  const expected = [undefined, undefined];
 
   const actual = parseNoun(value);
 

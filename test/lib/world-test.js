@@ -26,7 +26,7 @@ test('World: get an existing object', t => {
 test('World: get with non-existent id', t => {
   const [world] = setup();
 
-  t.equal(world.get('nope'), void 0);
+  t.equal(world.get('nope'), undefined);
   t.end();
 });
 
@@ -79,7 +79,7 @@ test('World: removeById', t => {
 
   world.removeById('foo');
 
-  t.equal(world.get('foo'), void 0);
+  t.equal(world.get('foo'), undefined);
   t.end();
 });
 

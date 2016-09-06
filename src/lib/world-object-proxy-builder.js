@@ -4,7 +4,7 @@ const serialize = require('./serialize');
 function linearize(target, db, linearization = new C3(target)) {
   target.traitIds.forEach((traitId, index) => {
     const trait = db.findById(traitId);
-    if (trait !== void 0) {
+    if (trait !== undefined) {
       linearization.add(target, trait);
       linearize(trait, db, linearization);
     } else {
@@ -75,7 +75,7 @@ class Handler {
         return this.deserializer.deserialize(tgt.properties[property]);
       }
     }
-    return void 0;
+    return undefined;
   }
 
   has(target, property) {

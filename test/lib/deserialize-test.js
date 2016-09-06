@@ -70,7 +70,7 @@ test('Deserializer: deserializes a regular expression', t => {
 
 test('Deserializer: deserializes undefined', t => {
   const value = { undefined: true };
-  const expected = void 0;
+  const expected = undefined;
   const actual = deserializer.deserialize(value);
 
   t.equal(actual, expected);
@@ -120,7 +120,7 @@ test('Deserializer: deserializes a complex object', t => {
     },
   };
   const expected = {
-    s: 's', n: 2, nl: null, u: void 0, o: { x: 'y', z: null }, a: [1, 't'],
+    s: 's', n: 2, nl: null, u: undefined, o: { x: 'y', z: null }, a: [1, 't'],
   };
   const actual = deserializer.deserialize(value);
 

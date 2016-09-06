@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+
 const DIGEST = 'sha1';
 
 function uid(len) {

@@ -56,7 +56,7 @@ test('idify: ""', t => {
 });
 
 test('idify: `undefined`', t => {
-  const value = void 0;
+  const value = undefined;
   const expected = '';
   const actual = idify(value);
 

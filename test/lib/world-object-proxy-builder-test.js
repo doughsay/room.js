@@ -98,7 +98,7 @@ test('WorldObjectProxyBuilder: delete property', t => {
 
   foo.prop = 'new prop';
   delete foo.prop;
-  t.equal(foo.prop, void 0);
+  t.equal(foo.prop, undefined);
   t.end();
 });
 
@@ -228,7 +228,7 @@ test('WorldObjectProxyBuilder: set location to null', t => {
 test('WorldObjectProxyBuilder: set location to undefined', t => {
   const [{ foo }] = setup();
 
-  foo.location = void 0;
+  foo.location = undefined;
   t.equal(foo.location, null);
   t.end();
 });

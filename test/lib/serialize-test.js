@@ -65,7 +65,7 @@ test('serialize: a regular expression', t => {
 });
 
 test('serialize: undefined', t => {
-  const value = void 0;
+  const value = undefined;
   const expected = { undefined: true };
   const actual = serialize(value);
 
@@ -102,7 +102,7 @@ test('serialize: a simple array', t => {
 
 test('serialize: a complex object', t => {
   const value = {
-    s: 's', n: 2, r: /r/, nl: null, u: void 0, o: { x: 'y', z: null }, a: [1, 't', { r: /r/ }],
+    s: 's', n: 2, r: /r/, nl: null, u: undefined, o: { x: 'y', z: null }, a: [1, 't', { r: /r/ }],
   };
   const expected = {
     object: {

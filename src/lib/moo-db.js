@@ -158,7 +158,8 @@ class MooDB {
       return { function: true, file };
     } else if (value.verb) {
       return {
-        verb: true, file,
+        file,
+        verb: true,
         pattern: value.pattern,
         dobjarg: value.dobjarg,
         preparg: value.preparg,
