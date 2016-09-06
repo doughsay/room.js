@@ -1,8 +1,8 @@
 RoomJS 3.x Game Engine
 ======================
 [![Build Status](https://travis-ci.org/doughsay/room.js.svg?branch=master)](https://travis-ci.org/doughsay/room.js) [![Coverage Status](https://coveralls.io/repos/github/doughsay/room.js/badge.svg?branch=master)](https://coveralls.io/github/doughsay/room.js?branch=master)
-![Dependencies](https://david-dm.org/doughsay/room.js.svg)
-![Dev Dependencies](https://david-dm.org/doughsay/room.js/dev-status.svg)
+[![dependencies Status](https://david-dm.org/doughsay/room.js/status.svg)](https://david-dm.org/doughsay/room.js)
+[![devDependencies Status](https://david-dm.org/doughsay/room.js/dev-status.svg)](https://david-dm.org/doughsay/room.js?type=dev)
 
 This repository contains the RoomJS game engine (or server).
 
