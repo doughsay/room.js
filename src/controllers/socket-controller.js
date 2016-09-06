@@ -95,7 +95,7 @@ class SocketController {
     if (this.authenticateProgrammer()) {
       this.programmerController.onGetVerb(data, done);
     } else {
-      done(void 0);
+      done(undefined);
     }
   }
 
@@ -103,7 +103,7 @@ class SocketController {
     if (this.authenticateProgrammer()) {
       this.programmerController.onGetFunction(data, done);
     } else {
-      done(void 0);
+      done(undefined);
     }
   }
 

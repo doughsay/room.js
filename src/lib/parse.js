@@ -73,7 +73,7 @@ const prepositions = [
 
 const determiners = {
   all: 'all',
-  the: void 0, // assume definite is same as no determiner
+  the: undefined, // assume definite is same as no determiner
   any: 'any',
   a: 'any',
   an: 'any',
@@ -100,9 +100,9 @@ function parsePreposition(text) {
 
   const prepstr = search[0];
   const i = search.index;
-  const dobjstr = i === 0 ? void 0 : text.slice(0, i - 1);
+  const dobjstr = i === 0 ? undefined : text.slice(0, i - 1);
   let iobjstr = text.slice(i + prepstr.length + 1);
-  if (iobjstr === '') { iobjstr = void 0; }
+  if (iobjstr === '') { iobjstr = undefined; }
 
   return [true, [dobjstr, prepstr, iobjstr]];
 }
@@ -128,20 +128,20 @@ function parseSentence(text) {
 
 function parseNoun(text) {
   if (!text) {
-    return [void 0, void 0];
+    return [undefined, undefined];
   }
   const search = text.match(qualex);
   let nounstr;
   if (search === null) {
-    return [void 0, text];
+    return [undefined, text];
   }
 
   let detstr = search[1] || search[2] || search[3];
   const i = search.index;
 
   nounstr = i === 0 ? text.slice(detstr.length + 1) : text.slice(0, i);
-  if (nounstr === '') { nounstr = void 0; }
-  detstr = determiners.hasOwnProperty(detstr) ? determiners[detstr] : detstr;
+  if (nounstr === '') { nounstr = undefined; }
+  detstr = {}.hasOwnProperty.call(determiners, detstr) ? determiners[detstr] : detstr;
 
   return [detstr, nounstr];
 }
@@ -150,4 +150,3 @@ module.exports = {
   parseSentence,
   parseNoun,
 };
-

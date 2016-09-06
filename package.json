@@ -24,7 +24,7 @@
     "chokidar": "^1.6.0",
     "dotenv": "^2.0.0",
     "escodegen": "^1.8.0",
-    "esprima": "^2.7.2",
+    "esprima": "^3.0.0",
     "fuzzaldrin-plus": "^0.3.1",
     "mkdirp": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.5.1.tgz",
     "remove": "^0.1.5",
@@ -32,8 +32,9 @@
   },
   "devDependencies": {
     "coveralls": "^2.11.9",
-    "eslint": "^2.8.0",
-    "eslint-config-airbnb": "^7.0.0",
+    "eslint": "^3.4.0",
+    "eslint-config-airbnb": "^10.0.1",
+    "eslint-plugin-import": "^1.14.0",
     "faucet": "0.0.1",
     "istanbul": "^0.4.3",
     "tape": "^4.5.1"

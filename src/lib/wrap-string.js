@@ -8,6 +8,6 @@ function escapeSlashes(s) {
 
 module.exports = function wrapString(str) {
   return typeof str === 'undefined'
-    ? 'void 0'
+    ? 'undefined'
     : `"${escapeDoubleQuotes(escapeSlashes(str))}"`;
 };

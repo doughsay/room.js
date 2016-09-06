@@ -86,7 +86,7 @@ class FsDb {
 
   getMap(map, key) {
     if (map) { return map.get(key); }
-    return void 0;
+    return undefined;
   }
 
   mapForDir(dirpath) {
@@ -169,7 +169,7 @@ class FsDb {
     const filepath = this.toFilepath(relpath);
     const file = path.basename(filepath);
     const map = this.mapFor(filepath, false);
-    if (!map) { return void 0; }
+    if (!map) { return undefined; }
     return map.get(file);
   }
 

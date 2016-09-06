@@ -20,7 +20,7 @@ class Deserializer {
     }
     if ('value' in object) { return object.value; }
     if ('NaN' in object) { return NaN; }
-    if ('undefined' in object) { return void 0; }
+    if ('undefined' in object) { return undefined; }
     if ('date' in object) { return new Date(object.date); }
     if ('regexp' in object) { return new RegExp(object.regexp, object.flags); }
     if ('ref' in object) { return this.world.get(object.ref); }

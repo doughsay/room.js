@@ -1,5 +1,6 @@
 // This module pretty prints a js object using room.js color markup
 const { color } = require('./colors');
+
 const c = color.reset;
 
 function truncate(s, length = 25) {
@@ -85,7 +86,7 @@ function print(x, maxdepth, depth = 0, prefix = '', parents = []) {
         const xs = [];
         for (const key in x) { // eslint-disable-line guard-for-in
           const value = x[key];
-          const clr = x.hasOwnProperty(key) ? c.blue : c.gray;
+          const clr = {}.hasOwnProperty.call(x, key) ? c.blue : c.gray;
           const pfx = `${clr(key)}: `;
           xs.push(print(value, maxdepth, depth + 1, pfx, parents));
         }

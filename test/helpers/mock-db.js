@@ -39,7 +39,7 @@ function mockDd() {
       } else if (id === 'room') {
         return roomTarget;
       }
-      return void 0;
+      return undefined;
     },
 
     findBy(field, value) {

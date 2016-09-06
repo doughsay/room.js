@@ -92,8 +92,8 @@ class PlayerController extends BaseChildController {
 
   onRunVerb(command, matchedObjects, matchedVerb) {
     const playerId = this.playerId;
-    const dobjId = matchedObjects.dobj ? matchedObjects.dobj.id : 'void 0';
-    const iobjId = matchedObjects.iobj ? matchedObjects.iobj.id : 'void 0';
+    const dobjId = matchedObjects.dobj ? matchedObjects.dobj.id : 'undefined';
+    const iobjId = matchedObjects.iobj ? matchedObjects.iobj.id : 'undefined';
     const verbstr = wrapString(command.verb);
     const argstr = wrapString(command.argstr);
     const dobjstr = wrapString(command.dobjstr);

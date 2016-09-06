@@ -29,8 +29,8 @@ test('wrapString: escapes backslashes', t => {
 });
 
 test('wrapString: handles `undefined`', t => {
-  const value = void 0;
-  const expected = 'void 0';
+  const value = undefined;
+  const expected = 'undefined';
   const actual = wrapString(value);
 
   t.equal(actual, expected);
