@@ -59,7 +59,7 @@ class PlayerController extends BaseChildController {
       matchedVerb = player.matchVerb(command, matchedObjects);
     } catch (err) {
       const output = bgRed(
-        player.programmer ? this.formatError(err) : 'An internal error occurred.'
+        player.programmer ? PlayerController.formatError(err) : 'An internal error occurred.'
       );
       this.emit('output', output);
       this.logger.warn({ err: bunyan.stdSerializers.err(err) }, 'error matching');
@@ -82,7 +82,7 @@ class PlayerController extends BaseChildController {
       }
     } catch (err) {
       const output = bgRed(
-        player.programmer ? this.formatError(err) : 'An internal error occurred.'
+        player.programmer ? PlayerController.formatError(err) : 'An internal error occurred.'
       );
 
       this.emit('output', output);
@@ -118,7 +118,7 @@ class PlayerController extends BaseChildController {
     this.world.run(code, filename);
   }
 
-  formatError(err) {
+  static formatError(err) {
     return err.stack;
   }
 }

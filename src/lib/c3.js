@@ -57,7 +57,7 @@ module.exports = class C3 {
           return results;
         }
 
-        for (let i = 0; i < nonEmptySeqs.length; i++) {
+        for (let i = 0; i < nonEmptySeqs.length; i += 1) {
           candidate = nonEmptySeqs[i][0];
 
           if (notHead(nonEmptySeqs, candidate)) {
@@ -73,7 +73,7 @@ module.exports = class C3 {
 
         results.push(candidate);
 
-        for (let i = 0; i < nonEmptySeqs.length; i++) {
+        for (let i = 0; i < nonEmptySeqs.length; i += 1) {
           if (nonEmptySeqs[i][0] === candidate) {
             nonEmptySeqs[i].shift();
           }

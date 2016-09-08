@@ -76,7 +76,7 @@ class FsDb {
     return path.join(this.directory, relpath);
   }
 
-  createOrGetMap(map, key) {
+  static createOrGetMap(map, key) {
     const existingMap = map.get(key);
     if (existingMap) { return existingMap; }
     const newMap = new Map();
@@ -84,18 +84,18 @@ class FsDb {
     return newMap;
   }
 
-  getMap(map, key) {
+  static getMap(map, key) {
     if (map) { return map.get(key); }
     return undefined;
   }
 
   mapForDir(dirpath) {
     const keys = this.toRelpath(dirpath).split('/').filter(x => x);
-    return keys.reduce((map, key) => this.getMap(map, key), this.db);
+    return keys.reduce((map, key) => FsDb.getMap(map, key), this.db);
   }
 
   mapFor(filepath, create = true) {
-    const getCallback = create ? this.createOrGetMap.bind(this) : this.getMap.bind(this);
+    const getCallback = create ? FsDb.createOrGetMap : FsDb.getMap;
     const keys = this.toRelpath(path.dirname(filepath)).split('/').filter(x => x);
     return keys.reduce((map, key) => getCallback(map, key), this.db);
   }
