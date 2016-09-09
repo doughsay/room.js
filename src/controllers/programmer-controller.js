@@ -26,7 +26,7 @@ class ProgrammerController extends BaseChildController {
 
       this.emit('output', print(retVal, 1));
     } catch (err) {
-      this.emit('output', bgRed(this.formatError(err)));
+      this.emit('output', bgRed(ProgrammerController.formatError(err)));
       this.logger.warn({ err: bunyan.stdSerializers.err(err) }, 'error running eval code');
     }
   }
@@ -95,7 +95,7 @@ class ProgrammerController extends BaseChildController {
     done('saved');
   }
 
-  formatError(err) {
+  static formatError(err) {
     return err.stack;
   }
 }

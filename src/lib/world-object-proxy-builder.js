@@ -42,7 +42,7 @@ class Handler {
     return property in this.worldObject;
   }
 
-  _getBuiltInProperty(target, property) {
+  static _getBuiltInProperty(target, property) {
     if (property === 'aliases') {
       return target[property].slice();
     }
@@ -64,12 +64,12 @@ class Handler {
 
   get(target, property) {
     if (property === '__proxy__') { return true; }
-    if (builtInProperty(property)) { return this._getBuiltInProperty(target, property); }
+    if (builtInProperty(property)) { return Handler._getBuiltInProperty(target, property); }
     if (virtualProperty(property)) { return this._getVirtualProperty(target, property); }
     if (this.worldObjectProperty(property)) { return target[property]; }
 
     const targets = linearize(target, this.db);
-    for (let i = 0; i < targets.length; i++) {
+    for (let i = 0; i < targets.length; i += 1) {
       const tgt = targets[i];
       if (property in tgt.properties) {
         return this.deserializer.deserialize(tgt.properties[property]);
@@ -84,7 +84,7 @@ class Handler {
     if (this.worldObjectProperty(property)) { return true; }
 
     const targets = linearize(target, this.db);
-    for (let i = 0; i < targets.length; i++) {
+    for (let i = 0; i < targets.length; i += 1) {
       const tgt = targets[i];
       if (property in tgt.properties) { return true; }
     }
@@ -102,7 +102,7 @@ class Handler {
     return propertySet.values();
   }
 
-  _setBuiltInProperty(property, target, value) {
+  static _setBuiltInProperty(property, target, value) {
     if (['id', 'userId'].indexOf(property) !== -1) {
       return true;
     } else if (property === 'name') {
@@ -154,7 +154,7 @@ class Handler {
       return retVal;
     };
     if (builtInProperty(property)) {
-      return _s(() => this._setBuiltInProperty(property, target, value));
+      return _s(() => Handler._setBuiltInProperty(property, target, value));
     }
     if (virtualProperty(property)) {
       return _s(() => this._setVirtualProperty(property, target, value));
@@ -170,7 +170,7 @@ class Handler {
     return retVal;
   }
 
-  ownKeys(target) {
+  ownKeys(target) { // eslint-disable-line class-methods-use-this
     return builtInProperties.concat(virtualProperties).concat(Reflect.ownKeys(target.properties));
   }
 

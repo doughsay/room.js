@@ -325,7 +325,7 @@ class WorldObjectClassBuilder {
         const exactMatches = potentialMatches.filter(m => m[0] === EXACT_MATCH);
         const partialMatches = potentialMatches.filter(m => m[0] === PARTIAL_MATCH);
 
-        return this.findMatch(exactMatches, partialMatches, determiner);
+        return WorldObjectClassBuilder.findMatch(exactMatches, partialMatches, determiner);
       }
 
       findInside(search) {
@@ -338,10 +338,10 @@ class WorldObjectClassBuilder {
         const potentialMatches = this.contents.map(object => [object.matches(noun), object]);
         const exactMatches = potentialMatches.filter(m => m[0] === EXACT_MATCH);
         const partialMatches = potentialMatches.filter(m => m[0] === PARTIAL_MATCH);
-        return this.findMatch(exactMatches, partialMatches, determiner);
+        return WorldObjectClassBuilder.findMatch(exactMatches, partialMatches, determiner);
       }
 
-      findMatch(partialMatches, exactMatches, determiner) {
+      static findMatch(partialMatches, exactMatches, determiner) {
         if (exactMatches.length > 0) {
           const result = getMatchesWithDeterminer(exactMatches, determiner,
             world.get('ambiguous'), world.get('fail'));

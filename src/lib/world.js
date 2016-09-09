@@ -52,7 +52,7 @@ class World {
     if (!this.objects[str]) { return str; }
 
     let i = 1;
-    while (this.objects[str + i]) { i++; }
+    while (this.objects[str + i]) { i += 1; }
     return str + i;
   }
 
