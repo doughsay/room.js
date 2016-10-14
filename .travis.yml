@@ -1,14 +1,17 @@
 sudo: false
 language: node_js
 node_js:
-  - "6.5.0"
+  - "6"
 cache:
   directories:
+    - $HOME/.npm
+    - $HOME/.yarn-cache
     - node_modules
+before_install:
+  - npm i -g yarn --cache-min 999999999
 install:
-  - npm install
+  - yarn
   - ln -s .env.test .env
-
 script:
   - npm run lint
   - npm test
