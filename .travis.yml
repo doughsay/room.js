@@ -15,5 +15,6 @@ install:
 script:
   - npm run lint
   - npm test
-  - npm run cover
-  - npm run coveralls
+after_success:
+  - if [ "$TRAVIS_EVENT_TYPE" = "pull_request" ]; then npm run cover && npm run coveralls; fi
+  - if [ "$TRAVIS_EVENT_TYPE" = "push" ] && [ "$TRAVIS_BRANCH" = "master" ]; then npm run cover && npm run coveralls; fi
