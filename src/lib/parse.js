@@ -81,7 +81,7 @@ const determiners = {
 
 const prepex = new RegExp(`\\b(${prepositions.join('|')})\\b`);
 const qualex = new RegExp(
-  `\^(${Object.keys(determiners).join('|')})\\b|^([1-9][0-9]{0,1})\\.|[\\s\\.]([1-9][0-9]{0,1})$`
+  `^(${Object.keys(determiners).join('|')})\\b|^([1-9][0-9]{0,1})\\.|[\\s\\.]([1-9][0-9]{0,1})$`
 );
 
 function sanitize(text) {
