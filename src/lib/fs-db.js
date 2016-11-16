@@ -49,7 +49,7 @@ class FsDb {
 
   setupWatcher() {
     this.watcher = chokidar.watch(this.directory, {
-      ignored: /[\/\\]\./,
+      ignored: /[/\\]\./,
       persistent: true,
     });
 
