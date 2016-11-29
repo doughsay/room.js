@@ -25,7 +25,7 @@
     "dotenv": "^2.0.0",
     "escodegen": "^1.8.0",
     "esprima": "^3.0.0",
-    "fuzzaldrin-plus": "^0.3.1",
+    "fuzzaldrin-plus": "^0.4.0",
     "mkdirp": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.5.1.tgz",
     "remove": "^0.1.5",
     "socket.io": "^1.4.5"
