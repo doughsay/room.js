@@ -128,6 +128,8 @@ class UserController extends BaseChildController {
       const msg = `You're playing as ${player.name} from another login session. Quitting...`;
       controller.emit('output', msg);
       controller.emit('set-prompt', controller.user.id);
+      controller.emit('quit');
+
       controller.playerId = null;
       this.controllerMap.delete(player.id);
     }
