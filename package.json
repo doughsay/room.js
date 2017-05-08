@@ -28,7 +28,7 @@
     "fuzzaldrin-plus": "^0.3.1",
     "mkdirp": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.5.1.tgz",
     "remove": "^0.1.5",
-    "socket.io": "^1.4.5"
+    "socket.io": "^2.0.1"
   },
   "devDependencies": {
     "coveralls": "^2.11.9",
