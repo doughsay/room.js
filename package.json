@@ -1,6 +1,6 @@
 {
   "name": "rjs-server",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "author": "Chris Dosé <chris.dose@gmail.com>",
   "description": "Room.js server",
   "private": true,
