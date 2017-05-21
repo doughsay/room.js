@@ -11,7 +11,7 @@
     "lint": "./node_modules/.bin/standard",
     "test": "node --use_strict --harmony ./node_modules/.bin/tape 'test/**/*.js' | ./node_modules/.bin/faucet",
     "cover": "node --use_strict --harmony ./node_modules/.bin/istanbul cover ./node_modules/.bin/tape -- 'test/**/*.js' > /dev/null",
-    "coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
+    "codecov": "./node_modules/.bin/codecov"
   },
   "main": "src/index.js",
   "license": "MIT",
@@ -36,7 +36,7 @@
     "socket.io": "^1.4.5"
   },
   "devDependencies": {
-    "coveralls": "^2.11.9",
+    "codecov": "^2.2.0",
     "faucet": "0.0.1",
     "istanbul": "^0.4.3",
     "standard": "^10.0.2",
