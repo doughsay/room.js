@@ -1,90 +1,90 @@
 // Adapted to ES6 class from https://github.com/silas/node-c3
 
 module.exports = class C3 {
-  constructor(object) {
-    this.object = object;
-    this.map = new Map();
-    this.map.set(object, []);
+  constructor (object) {
+    this.object = object
+    this.map = new Map()
+    this.map.set(object, [])
   }
 
-  add(object, parent) {
+  add (object, parent) {
     if (!this.map.has(parent)) {
-      this.map.set(parent, []);
+      this.map.set(parent, [])
     }
 
     if (!this.map.has(object)) {
-      this.map.set(object, []);
+      this.map.set(object, [])
     }
 
-    const parents = this.map.get(object);
+    const parents = this.map.get(object)
 
     if (parents.indexOf(parent) >= 0) {
-      throw new Error('Duplicate parent');
+      throw new Error('Duplicate parent')
     }
 
-    parents.push(parent);
+    parents.push(parent)
 
-    return this;
+    return this
   }
 
-  has(object) {
-    return this.map.has(object);
+  has (object) {
+    return this.map.has(object)
   }
 
-  run() {
-    const map = new Map();
+  run () {
+    const map = new Map()
 
     this.map.forEach((parents, object) => {
-      map.set(object, this.map.get(object).slice());
-    });
+      map.set(object, this.map.get(object).slice())
+    })
 
-    function notHead(l, c) {
-      return l.some(s => s.indexOf(c) > 0);
+    function notHead (l, c) {
+      return l.some(s => s.indexOf(c) > 0)
     }
 
-    function empty(s) {
-      return s.length;
+    function empty (s) {
+      return s.length
     }
 
-    function merge(seqs) {
-      const results = [];
+    function merge (seqs) {
+      const results = []
 
       for (;;) {
-        const nonEmptySeqs = seqs.filter(empty);
-        let candidate;
+        const nonEmptySeqs = seqs.filter(empty)
+        let candidate
 
         if (!nonEmptySeqs.length) {
-          return results;
+          return results
         }
 
         for (let i = 0; i < nonEmptySeqs.length; i += 1) {
-          candidate = nonEmptySeqs[i][0];
+          candidate = nonEmptySeqs[i][0]
 
           if (notHead(nonEmptySeqs, candidate)) {
-            candidate = null;
+            candidate = null
           } else {
-            break;
+            break
           }
         }
 
         if (!candidate) {
-          throw new Error('Inconsistent hierarchy');
+          throw new Error('Inconsistent hierarchy')
         }
 
-        results.push(candidate);
+        results.push(candidate)
 
         for (let i = 0; i < nonEmptySeqs.length; i += 1) {
           if (nonEmptySeqs[i][0] === candidate) {
-            nonEmptySeqs[i].shift();
+            nonEmptySeqs[i].shift()
           }
         }
       }
     }
 
-    function run(object) {
-      return merge([[object]].concat(map.get(object).map(run)).concat([map.get(object)]));
+    function run (object) {
+      return merge([[object]].concat(map.get(object).map(run)).concat([map.get(object)]))
     }
 
-    return run(this.object);
+    return run(this.object)
   }
-};
+}
