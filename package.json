@@ -24,22 +24,22 @@
     ]
   },
   "dependencies": {
-    "bunyan": "^1.8.0",
+    "bunyan": "^1.8.10",
     "chalk": "^1.1.3",
-    "chokidar": "^1.6.1",
-    "dotenv": "^2.0.0",
+    "chokidar": "^1.7.0",
+    "dotenv": "^4.0.0",
     "escodegen": "^1.8.0",
-    "esprima": "^3.0.0",
-    "fuzzaldrin-plus": "^0.3.1",
-    "mkdirp": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.5.1.tgz",
+    "esprima": "^3.1.3",
+    "fuzzaldrin-plus": "^0.4.1",
+    "mkdirp": "^0.5.1",
     "remove": "^0.1.5",
-    "socket.io": "^1.4.5"
+    "socket.io": "^2.0.1"
   },
   "devDependencies": {
     "codecov": "^2.2.0",
     "faucet": "0.0.1",
     "istanbul": "^0.4.3",
     "standard": "^10.0.2",
-    "tape": "^4.5.1"
+    "tape": "^4.6.3"
   }
 }
