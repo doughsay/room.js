@@ -68,85 +68,85 @@ const prepositions = [
   'for', 'about',
   'is',
   'as',
-  'off of', 'off',
-];
+  'off of', 'off'
+]
 
 const determiners = {
   all: 'all',
   the: undefined, // assume definite is same as no determiner
   any: 'any',
   a: 'any',
-  an: 'any',
-};
+  an: 'any'
+}
 
-const prepex = new RegExp(`\\b(${prepositions.join('|')})\\b`);
+const prepex = new RegExp(`\\b(${prepositions.join('|')})\\b`)
 const qualex = new RegExp(
   `^(${Object.keys(determiners).join('|')})\\b|^([1-9][0-9]{0,1})\\.|[\\s\\.]([1-9][0-9]{0,1})$`
-);
+)
 
-function sanitize(text) {
-  return text.trim().replace(/\s+/g, ' ');
+function sanitize (text) {
+  return text.trim().replace(/\s+/g, ' ')
 }
 
 // return [first_word, rest]
-function chomp(s) {
-  const i = s.indexOf(' ');
-  return (i !== -1) ? [s.slice(0, i), s.slice(i + 1)] : [s, ''];
+function chomp (s) {
+  const i = s.indexOf(' ')
+  return (i !== -1) ? [s.slice(0, i), s.slice(i + 1)] : [s, '']
 }
 
-function parsePreposition(text) {
-  const search = text.match(prepex);
-  if (search === null) { return [false]; }
+function parsePreposition (text) {
+  const search = text.match(prepex)
+  if (search === null) { return [false] }
 
-  const prepstr = search[0];
-  const i = search.index;
-  const dobjstr = i === 0 ? undefined : text.slice(0, i - 1);
-  let iobjstr = text.slice(i + prepstr.length + 1);
-  if (iobjstr === '') { iobjstr = undefined; }
+  const prepstr = search[0]
+  const i = search.index
+  const dobjstr = i === 0 ? undefined : text.slice(0, i - 1)
+  let iobjstr = text.slice(i + prepstr.length + 1)
+  if (iobjstr === '') { iobjstr = undefined }
 
-  return [true, [dobjstr, prepstr, iobjstr]];
+  return [true, [dobjstr, prepstr, iobjstr]]
 }
 
-function parseSentence(text) {
-  const [verb, rest] = chomp(sanitize(text));
-  const argstr = rest;
-  let dobjstr;
-  let iobjstr;
-  let prepstr;
+function parseSentence (text) {
+  const [verb, rest] = chomp(sanitize(text))
+  const argstr = rest
+  let dobjstr
+  let iobjstr
+  let prepstr
 
   if (rest) {
-    const [found, parts] = parsePreposition(rest);
+    const [found, parts] = parsePreposition(rest)
     if (found) {
-      [dobjstr, prepstr, iobjstr] = parts;
+      [dobjstr, prepstr, iobjstr] = parts
     } else {
-      dobjstr = rest;
+      dobjstr = rest
     }
   }
 
-  return { verb, dobjstr, prepstr, iobjstr, argstr };
+  return { verb, dobjstr, prepstr, iobjstr, argstr }
 }
 
-function parseNoun(text) {
+function parseNoun (text) {
   if (!text) {
-    return [undefined, undefined];
+    return [undefined, undefined]
   }
-  const search = text.match(qualex);
-  let nounstr;
+  const search = text.match(qualex)
+  let nounstr
   if (search === null) {
-    return [undefined, text];
+    return [undefined, text]
   }
 
-  let detstr = search[1] || search[2] || search[3];
-  const i = search.index;
+  let detstr = search[1] || search[2] || search[3]
+  const i = search.index
 
-  nounstr = i === 0 ? text.slice(detstr.length + 1) : text.slice(0, i);
-  if (nounstr === '') { nounstr = undefined; }
-  detstr = {}.hasOwnProperty.call(determiners, detstr) ? determiners[detstr] : detstr;
+  nounstr = i === 0 ? text.slice(detstr.length + 1) : text.slice(0, i)
+  if (nounstr === '') { nounstr = undefined }
+  detstr = {}.hasOwnProperty.call(determiners, detstr) ? determiners[detstr] : detstr
 
-  return [detstr, nounstr];
+  return [detstr, nounstr]
 }
 
 module.exports = {
   parseSentence,
-  parseNoun,
-};
+  parseNoun
+}

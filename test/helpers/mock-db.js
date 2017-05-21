@@ -1,12 +1,12 @@
-const serialize = require('../../src/lib/serialize');
+const serialize = require('../../src/lib/serialize')
 
-function targetFactory(id, traitIds, properties) {
-  const serializedProperties = {};
+function targetFactory (id, traitIds, properties) {
+  const serializedProperties = {}
   for (const key in properties) { // eslint-disable-line guard-for-in
-    serializedProperties[key] = serialize(properties[key]);
+    serializedProperties[key] = serialize(properties[key])
   }
 
-  const locationId = id === 'room' ? null : 'room';
+  const locationId = id === 'room' ? null : 'room'
 
   return {
     id,
@@ -15,54 +15,54 @@ function targetFactory(id, traitIds, properties) {
     traitIds,
     locationId,
     userId: null,
-    properties: serializedProperties,
-  };
+    properties: serializedProperties
+  }
 }
 
-function mockDd() {
-  const baseTarget = targetFactory('base', [], { base: 'base' });
-  const roomTarget = targetFactory('room', ['base'], {});
-  const barTarget = targetFactory('bar', ['base'], { bar: 'bar', shared: 'from-bar' });
-  const bazTarget = targetFactory('baz', ['base'], { baz: 'baz', shared: 'from-baz' });
-  const fooTarget = targetFactory('foo', ['bar', 'baz'], { foo: 'foo' });
+function mockDd () {
+  const baseTarget = targetFactory('base', [], { base: 'base' })
+  const roomTarget = targetFactory('room', ['base'], {})
+  const barTarget = targetFactory('bar', ['base'], { bar: 'bar', shared: 'from-bar' })
+  const bazTarget = targetFactory('baz', ['base'], { baz: 'baz', shared: 'from-baz' })
+  const fooTarget = targetFactory('foo', ['bar', 'baz'], { foo: 'foo' })
 
   return {
-    findById(id) {
+    findById (id) {
       if (id === 'base') {
-        return baseTarget;
+        return baseTarget
       } else if (id === 'bar') {
-        return barTarget;
+        return barTarget
       } else if (id === 'baz') {
-        return bazTarget;
+        return bazTarget
       } else if (id === 'foo') {
-        return fooTarget;
+        return fooTarget
       } else if (id === 'room') {
-        return roomTarget;
+        return roomTarget
       }
-      return undefined;
+      return undefined
     },
 
-    findBy(field, value) {
+    findBy (field, value) {
       return [baseTarget, roomTarget, barTarget, bazTarget, fooTarget]
-        .filter(object => object[field] === value);
+        .filter(object => object[field] === value)
     },
 
-    all() {
-      return [baseTarget, roomTarget, barTarget, bazTarget, fooTarget];
+    all () {
+      return [baseTarget, roomTarget, barTarget, bazTarget, fooTarget]
     },
 
-    ids() {
-      return ['base', 'room', 'bar', 'baz', 'foo'];
+    ids () {
+      return ['base', 'room', 'bar', 'baz', 'foo']
     },
 
-    playerIds() {
-      return [];
+    playerIds () {
+      return []
     },
 
-    on() {},
-    markObjectDirty() {},
-    removeProperty() {},
-  };
+    on () {},
+    markObjectDirty () {},
+    removeProperty () {}
+  }
 }
 
-module.exports = mockDd;
+module.exports = mockDd

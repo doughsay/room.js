@@ -1,9 +1,9 @@
-const test = require('tape');
-const SimpleDb = require('../../src/lib/simple-db');
+const test = require('tape')
+const SimpleDb = require('../../src/lib/simple-db')
 
 test('SimpleDb: can be initialized', t => {
-  const db = new SimpleDb('test-db.json');
+  const db = new SimpleDb('test-db.json')
 
-  t.ok(db);
-  t.end();
-});
+  t.ok(db)
+  t.end()
+})

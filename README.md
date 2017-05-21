@@ -1,6 +1,6 @@
 RoomJS 3.x Game Engine
 ======================
-[![build status](https://img.shields.io/travis/doughsay/room.js.svg?style=flat-square)](https://travis-ci.org/doughsay/room.js) [![dependency status](https://img.shields.io/coveralls/doughsay/room.js/master.svg?style=flat-square)](https://coveralls.io/github/doughsay/room.js?branch=master) [![dependency status](https://img.shields.io/david/doughsay/room.js.svg?style=flat-square)](https://david-dm.org/doughsay/room.js) [![dependency status](https://img.shields.io/david/dev/doughsay/room.js.svg?style=flat-square)](https://david-dm.org/doughsay/room.js)
+[![Travis](https://img.shields.io/travis/doughsay/room.js.svg?style=flat-square)](https://travis-ci.org/doughsay/room.js) [![Code Style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/feross/standard) [![Codecov](https://img.shields.io/codecov/c/github/doughsay/room.js.svg?style=flat-square)](https://codecov.io/gh/doughsay/room.js) [![David](https://img.shields.io/david/doughsay/room.js.svg?style=flat-square)](https://david-dm.org/doughsay/room.js) [![David](https://img.shields.io/david/dev/doughsay/room.js.svg?style=flat-square)](https://david-dm.org/doughsay/room.js?type=dev)
 
 This repository contains the RoomJS game engine (or server).
 
