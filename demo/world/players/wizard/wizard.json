@@ -1,0 +1,20 @@
+{
+  "name": "Wizard",
+  "aliases": [],
+  "traitIds": [
+    "lib_player"
+  ],
+  "locationId": null,
+  "userId": "root",
+  "properties": {
+    "programmer": {
+      "value": true
+    },
+    "previousLocation": {
+      "ref": "areas_city_southstreet1"
+    },
+    "mode": {
+      "ref": "modes_playmode"
+    }
+  }
+}

@@ -15,16 +15,16 @@
       "file": "announceSay.js"
     },
     "chat": {
-      "verb": true,
       "file": "chat.js",
+      "verb": true,
       "pattern": "ch*at",
       "dobjarg": "any",
       "preparg": "any",
       "iobjarg": "any"
     },
     "inventory": {
-      "verb": true,
       "file": "inventory.js",
+      "verb": true,
       "pattern": "i*nventory",
       "dobjarg": "none",
       "preparg": "none",
@@ -43,8 +43,8 @@
       "file": "renderPrompt.js"
     },
     "say": {
-      "verb": true,
       "file": "say.js",
+      "verb": true,
       "pattern": "say \"",
       "dobjarg": "any",
       "preparg": "any",
@@ -55,16 +55,16 @@
       "file": "setMode.js"
     },
     "who": {
-      "verb": true,
       "file": "who.js",
+      "verb": true,
       "pattern": "who",
       "dobjarg": "none",
       "preparg": "none",
       "iobjarg": "none"
     },
     "readHelp": {
-      "verb": true,
       "file": "readHelp.js",
+      "verb": true,
       "pattern": "h*elp ?",
       "dobjarg": "any",
       "preparg": "none",

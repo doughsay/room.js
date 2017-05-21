@@ -1,6 +1,6 @@
 RoomJS 3.x Game Engine
 ======================
-[![Travis](https://img.shields.io/travis/doughsay/room.js.svg?style=flat-square)](https://travis-ci.org/doughsay/room.js) [![Code Style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/feross/standard) [![Codecov](https://img.shields.io/codecov/c/github/doughsay/room.js.svg?style=flat-square)](https://codecov.io/gh/doughsay/room.js) [![David](https://img.shields.io/david/doughsay/room.js.svg?style=flat-square)](https://david-dm.org/doughsay/room.js) [![David](https://img.shields.io/david/dev/doughsay/room.js.svg?style=flat-square)](https://david-dm.org/doughsay/room.js?type=dev)
+[![Travis](https://img.shields.io/travis/doughsay/room.js.svg?style=flat-square)](https://travis-ci.org/doughsay/room.js) [![Code Style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](https://standardjs.com/) [![Codecov](https://img.shields.io/codecov/c/github/doughsay/room.js.svg?style=flat-square)](https://codecov.io/gh/doughsay/room.js) [![David](https://img.shields.io/david/doughsay/room.js.svg?style=flat-square)](https://david-dm.org/doughsay/room.js) [![David](https://img.shields.io/david/dev/doughsay/room.js.svg?style=flat-square)](https://david-dm.org/doughsay/room.js?type=dev)
 
 This repository contains the RoomJS game engine (or server).
 
@@ -17,9 +17,9 @@ Clone the repository or download a ZIP archive.
 
 Installation steps are straightforward:
 
-1. `npm install`
+1. `yarn install`
 2. Create a `.env` file to customize the server's configuration. See `.env.development` for examples and explanations.
-3. `npm start`
+3. `yarn start`
 
 To interact with the server, you must use a web client application. The standard [client](https://github.com/doughsay/room.js-client) is provided in a separate repository.
 
