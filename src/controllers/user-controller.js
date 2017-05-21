@@ -1,69 +1,69 @@
-const BaseChildController = require('./base-child-controller');
-const { boldMagenta, red } = require('../lib/colors');
+const BaseChildController = require('./base-child-controller')
+const { boldMagenta, red } = require('../lib/colors')
 
 class UserController extends BaseChildController {
-  get logger() {
-    return this.parent.logger.child({ component: 'user-controller', user: this.user.id });
+  get logger () {
+    return this.parent.logger.child({ component: 'user-controller', user: this.user.id })
   }
 
-  onInput(input) {
+  onInput (input) {
     if (input === 'help') {
-      this.onHelp();
+      this.onHelp()
     } else if (input === 'logout') {
-      this.onLogout();
+      this.onLogout()
     } else if (input === 'create') {
-      this.onCreatePlayer();
+      this.onCreatePlayer()
     } else if (input === 'play') {
-      this.onPlay();
+      this.onPlay()
     } else {
-      this.emit('output', red('Invalid command.'));
+      this.emit('output', red('Invalid command.'))
     }
   }
 
-  onHelp() {
+  onHelp () {
     this.emit('output', [
       'Available commands:',
       `• ${boldMagenta('logout')} - logout of your account`,
       `• ${boldMagenta('create')} - create a new character`,
       `• ${boldMagenta('play')}   - enter the game`,
-      `• ${boldMagenta('help')}   - show this message`,
-    ].join('\n'));
+      `• ${boldMagenta('help')}   - show this message`
+    ].join('\n'))
   }
 
-  onLogout() {
-    this.emit('output', 'Bye!');
-    this.emit('set-prompt', '');
-    this.emit('logout');
-    this.logger.info('user logged out');
-    this.user = null;
+  onLogout () {
+    this.emit('output', 'Bye!')
+    this.emit('set-prompt', '')
+    this.emit('logout')
+    this.logger.info('user logged out')
+    this.user = null
   }
 
-  onCreatePlayer() {
+  onCreatePlayer () {
     const inputs = [
-      { type: 'text', label: 'player name', name: 'playerName' },
-    ];
+      { type: 'text', label: 'player name', name: 'playerName' }
+    ]
 
     this.emit('request-input', inputs, ({ playerName }) => {
-      const PLAYERS_HIERARCHY = 'players_';
+      const PLAYERS_HIERARCHY = 'players_'
 
       // Create unique ID:
       // We want to place player id under the 'players_' logical hierarchy.
       // Use playerName as base, but remove underscores to disallow additional logical levels.
       // Call nextId() to obtain a unique sanitized ID.
-      const playerId = this.world.nextId(PLAYERS_HIERARCHY + playerName.replace(/_/g, ''));
+      const playerId = this.world.nextId(PLAYERS_HIERARCHY + playerName.replace(/_/g, ''))
       // However, if the playerName is reduced to '' by the sanitizing, the final undescore may get.
       // trimmed.
       if (playerId === '' || playerId.indexOf('_') === -1) {
         // if the name produces an invalid ID, let's just call the name invalid.
-        this.emit('output', red('Sorry, that name is invalid.'));
-        return;
+        this.emit('output', red('Sorry, that name is invalid.'))
+        return
       }
 
-      const playerObj = this.db.findBy('name', playerName)[0];
+      const playerObj = this.db.findBy('name', playerName)[0]
 
       if (playerObj) {
-        this.emit('output', red('Sorry, a character by that name already exists.'));
-        return;
+        this.emit('output', red('Sorry, a character by that name already exists.'))
+        return
       }
 
       const newPlayerObj = {
@@ -73,77 +73,75 @@ class UserController extends BaseChildController {
         traitIds: [],
         locationId: null,
         userId: this.user.id,
-        properties: {},
-      };
+        properties: {}
+      }
 
-      this.db.insert(newPlayerObj);
-      this.world.insert(newPlayerObj);
-      this.world.runHook('system', 'onPlayerCreated', playerId);
+      this.db.insert(newPlayerObj)
+      this.world.insert(newPlayerObj)
+      this.world.runHook('system', 'onPlayerCreated', playerId)
 
-      this.logger.info({ player: playerId }, 'player created');
+      this.logger.info({ player: playerId }, 'player created')
 
-      this.emit('output', `Character created! To start the game now, type ${boldMagenta('play')}!`);
-    });
+      this.emit('output', `Character created! To start the game now, type ${boldMagenta('play')}!`)
+    })
   }
 
-  onPlay() {
-    const players = this.db.findBy('userId', this.user.id);
+  onPlay () {
+    const players = this.db.findBy('userId', this.user.id)
 
     if (players.length === 1) {
-      this.loginPlayer(players[0].id);
+      this.loginPlayer(players[0].id)
     } else if (players.length > 1) {
-      const msg = ['Choose a character to play as:'];
-      const inputs = [{ type: 'text', label: 'character', name: 'selection' }];
+      const msg = ['Choose a character to play as:']
+      const inputs = [{ type: 'text', label: 'character', name: 'selection' }]
 
       players.forEach((p, i) => {
-        msg.push(`${i + 1}. #cmd[${p.name}]`);
-      });
+        msg.push(`${i + 1}. #cmd[${p.name}]`)
+      })
 
-      this.emit('output', msg.join('\n'));
+      this.emit('output', msg.join('\n'))
       this.emit('request-input', inputs, ({ selection }) => {
-        const n = parseInt(selection, 10);
+        const n = parseInt(selection, 10)
 
-        const lowerCaseNames = players.map(p => p.name.toLowerCase());
-        const i = lowerCaseNames.indexOf(selection.toLowerCase());
+        const lowerCaseNames = players.map(p => p.name.toLowerCase())
+        const i = lowerCaseNames.indexOf(selection.toLowerCase())
         if (!isNaN(n) && n > 0 && n <= players.length) {
-          this.loginPlayer(players[n - 1].id);
+          this.loginPlayer(players[n - 1].id)
         } else if (i !== -1) {
-          this.loginPlayer(players[i].id);
+          this.loginPlayer(players[i].id)
         } else {
-          this.emit('output', red('Invalid selection.'));
-          return;
+          this.emit('output', red('Invalid selection.'))
         }
-      });
+      })
     } else {
       const msg =
-        `You have no characters to play as. Create one first with ${boldMagenta('create')}.`;
-      this.emit('output', msg);
-      return;
+        `You have no characters to play as. Create one first with ${boldMagenta('create')}.`
+      this.emit('output', msg)
     }
   }
 
-  logoutOtherInstance(player) {
+  logoutOtherInstance (player) {
     if (this.controllerMap.has(player.id)) {
-      const controller = this.controllerMap.get(player.id);
-      const msg = `You're playing as ${player.name} from another login session. Quitting...`;
-      controller.emit('output', msg);
-      controller.emit('set-prompt', controller.user.id);
-      controller.playerId = null;
-      this.controllerMap.delete(player.id);
+      const controller = this.controllerMap.get(player.id)
+      const msg = `You're playing as ${player.name} from another login session. Quitting...`
+      controller.emit('output', msg)
+      controller.emit('set-prompt', controller.user.id)
+      controller.playerId = null
+      this.controllerMap.delete(player.id)
     }
   }
 
-  loginPlayer(playerId) {
-    const player = this.world.get(playerId);
-    this.logoutOtherInstance(player);
-    this.emit('output', `Now playing as ${player.name}`);
-    this.emit('set-prompt', player.name);
-    this.emit('playing', player.name);
-    this.playerId = playerId;
-    this.controllerMap.set(player.id, this.parent);
-    this.world.runHook('system', 'onPlayerConnected', player.id);
-    this.logger.info({ player: playerId }, 'user playing as player');
+  loginPlayer (playerId) {
+    const player = this.world.get(playerId)
+    this.logoutOtherInstance(player)
+    this.emit('output', `Now playing as ${player.name}`)
+    this.emit('set-prompt', player.name)
+    this.emit('playing', player.name)
+    this.playerId = playerId
+    this.controllerMap.set(player.id, this.parent)
+    this.world.runHook('system', 'onPlayerConnected', player.id)
+    this.logger.info({ player: playerId }, 'user playing as player')
   }
 }
 
-module.exports = UserController;
+module.exports = UserController
