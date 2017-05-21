@@ -357,14 +357,5 @@ Returns:
 - 1 for exact match,
 - 2 for partial match.
 
-##### findMatch( Array, Array, String ) ⇒ WorldObject
-Given an exact-match array of WorldObject's, a partial-match array of WorldObject's and a determiner, returns:
-- the core object **fail** when there is no match,
-- the core object **ambiguous** if there are more than one match,
-- otherwise, the matched object.
-
-The determiner is one of 'all' (for the whole collection), 'any' (for any indefinite random item in a collection),
-undefined (for definiteness), or a string containing an ordinal index (i.e. rank in a collection).
-
 ##### findVerb( Object, Object, WorldObject ) ⇒ String|undefined
 Given a command and a set of matched objects, returns an applicable verb property name (or undefined, if none matches). Internally used by matchVerb(), which applies it to the object first, then to its location, and finally to the command direct and indirect objects.
