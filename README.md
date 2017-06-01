@@ -54,7 +54,7 @@ These are but a few of all the things that you get just out-of-the-box:
 Demonstration world
 ===================
 
-Live demonstration: http://roomjs.tk/
+Live demonstration: http://roomjs.dose.ninja/
 
 Documentation
 =============
