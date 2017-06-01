@@ -4,9 +4,9 @@
     "baker"
   ],
   "traitIds": [
-    "lib_npc_seller"
+    "lib.npcs.seller"
   ],
-  "locationId": "areas_city_baker",
+  "locationId": "areas.city.baker",
   "properties": {
     "description": {
       "value": "Adam Baker, behind his counter."

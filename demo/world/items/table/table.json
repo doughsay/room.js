@@ -2,11 +2,11 @@
   "name": "table",
   "aliases": [],
   "traitIds": [
-    "lib_traits_surface",
-    "lib_root",
-    "lib_traits_describable"
+    "lib.traits.surface",
+    "lib.root",
+    "lib.traits.describable"
   ],
-  "locationId": "areas_city_inn",
+  "locationId": "areas.city.inn",
   "properties": {
     "maxItems": {
       "value": 10

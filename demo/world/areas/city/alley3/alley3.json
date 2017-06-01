@@ -2,17 +2,17 @@
   "name": "Alley",
   "aliases": [],
   "traitIds": [
-    "lib_room"
+    "lib.room"
   ],
   "locationId": null,
   "properties": {
     "exits": {
       "object": {
         "southwest": {
-          "ref": "areas_city_westgate"
+          "ref": "areas.city.westgate"
         },
         "northeast": {
-          "ref": "areas_city_square"
+          "ref": "areas.city.square"
         }
       }
     },

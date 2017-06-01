@@ -30,10 +30,17 @@ test('World: get with non-existent id', t => {
   t.end()
 })
 
+test('World: get nested id', t => {
+  const [world, { namespace: { foo } }] = setup()
+
+  t.equal(world.get('namespace.foo'), foo)
+  t.end()
+})
+
 test('World: all', t => {
   const [world] = setup()
 
-  t.equal(world.all().length, 5)
+  t.equal(world.all().length, 6)
   t.end()
 })
 

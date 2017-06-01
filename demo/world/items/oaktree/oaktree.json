@@ -4,10 +4,10 @@
     "tree"
   ],
   "traitIds": [
-    "lib_root",
-    "lib_traits_describable"
+    "lib.root",
+    "lib.traits.describable"
   ],
-  "locationId": "areas_city_square",
+  "locationId": "areas.city.square",
   "properties": {
     "description": {
       "value": "An old moss-covered oak tree, high and massive."

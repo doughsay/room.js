@@ -6,9 +6,9 @@
     "wine"
   ],
   "traitIds": [
-    "lib_ediblecontainer"
+    "lib.ediblecontainer"
   ],
-  "locationId": "items_waitress",
+  "locationId": "items.waitress",
   "properties": {
     "containedEdible": {
       "value": "wine"

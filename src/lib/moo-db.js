@@ -41,43 +41,43 @@ class MooDB {
     const ids = this.fsdb.lsDirs(dir)
     ids.forEach(id => {
       const filepath = path.posix.join(dir, id)
-      // Recurse
-      this.load(filepath)
+
       // Load object contents
       if (this.fsdb.hasContents(filepath, '.json')) {
         this.loadObject(MooDB.idFromFilepath(filepath))
       }
+
+      // Recurse
+      this.load(filepath)
     })
   }
 
-  static filenameForObj (id, ext = 'json') {
-    const filename = id.split('_').pop()
-    const filepath = id.replace(/_/g, '/')
-    return `${filepath}/${filename}.${ext}`
+  static filenameForId (id) {
+    const filename = id.split('.').slice(-1)
+    const filepath = MooDB.filepathForId(id)
+    return `${filepath}/${filename}.json`
   }
 
-  static filenameForSrc (id, file) {
-    const filepath = id.replace(/_/g, '/')
-    return `${filepath}/${file}`
+  static filenameForSrcFile (id, srcFileName) {
+    const filepath = MooDB.filepathForId(id)
+    return `${filepath}/${srcFileName}`
   }
 
-  static filepathToObj (id) {
-    return id.replace(/_/g, '/')
+  static filepathForId (id) {
+    return id.replace(/\./g, '/')
   }
 
   static idFromFilename (filename) {
-    const fpsplit = filename.split(/\//)
-    fpsplit.pop()
-    return fpsplit.join('_')
+    return filename.split(/\//).slice(0, -1).join('.')
   }
 
   static idFromFilepath (filepath) {
-    return filepath.replace(/\//g, '_')
+    return filepath.replace(/\//g, '.')
   }
 
   loadObject (id) {
     try {
-      const fileContents = this.fsdb.read(MooDB.filenameForObj(id))
+      const fileContents = this.fsdb.read(MooDB.filenameForId(id))
       const object = JSON.parse(fileContents)
       object.id = id
       this.loadCallables(id, object.properties)
@@ -102,7 +102,7 @@ class MooDB {
   }
 
   loadCallable (id, value) {
-    const source = this.fsdb.read(MooDB.filenameForSrc(id, value.file))
+    const source = this.fsdb.read(MooDB.filenameForSrcFile(id, value.file))
     value.source = source
     return value
   }
@@ -127,7 +127,7 @@ class MooDB {
   addOrUpdateObject (id) {
     try {
       const object = this.findById(id)
-      const fileContents = this.fsdb.read(MooDB.filenameForObj(id))
+      const fileContents = this.fsdb.read(MooDB.filenameForId(id))
       const newObjectProperties = JSON.parse(fileContents)
       if (object) {
         object.name = newObjectProperties.name
@@ -152,7 +152,7 @@ class MooDB {
 
   serializeAndSaveCallable (id, key, value) {
     const file = value.file || `${key}.js`
-    const filepath = MooDB.filenameForSrc(id, file)
+    const filepath = MooDB.filenameForSrcFile(id, file)
     this.fsdb.write(filepath, value.source)
     if (value.function) {
       return { function: true, file }
@@ -194,7 +194,7 @@ class MooDB {
   }
 
   saveObject (object) {
-    this.fsdb.write(MooDB.filenameForObj(object.id), this.serializeObject(object))
+    this.fsdb.write(MooDB.filenameForId(object.id), this.serializeObject(object))
     this.logger.trace({ objectId: object.id }, 'saved object')
   }
 
@@ -203,14 +203,14 @@ class MooDB {
     for (const [key, value] of entries(object.properties)) {
       if (value && (value.function || value.verb)) {
         const file = value.file || `${key}.js`
-        const filepath = MooDB.filenameForSrc(id, file)
+        const filepath = MooDB.filenameForSrcFile(id, file)
         this.fsdb.rm(filepath)
       }
     }
-    this.fsdb.rm(MooDB.filenameForObj(id))
+    this.fsdb.rm(MooDB.filenameForId(id))
 
     // cleanup; FsDb should do this for us, but it doesn't.
-    this.fsdb.rmDir(MooDB.filepathToObj(id))
+    this.fsdb.rmDir(MooDB.filepathForId(id))
   }
 
   markObjectDirty (id) {
@@ -220,7 +220,7 @@ class MooDB {
   removeProperty (id, key, value) {
     if (value && (value.function || value.verb)) {
       const file = value.file || `${key}.js`
-      const filepath = MooDB.filenameForSrc(id, file)
+      const filepath = MooDB.filenameForSrcFile(id, file)
       this.fsdb.rm(filepath)
     }
     this.saveObject(this.findById(id))

@@ -2,20 +2,20 @@
   "name": "North street",
   "aliases": [],
   "traitIds": [
-    "lib_room"
+    "lib.room"
   ],
   "locationId": null,
   "properties": {
     "exits": {
       "object": {
         "south": {
-          "ref": "areas_city_greatmarket"
+          "ref": "areas.city.greatmarket"
         },
         "north": {
-          "ref": "areas_city_northstreet1"
+          "ref": "areas.city.northstreet1"
         },
         "west": {
-          "ref": "areas_city_inn"
+          "ref": "areas.city.inn"
         }
       }
     },

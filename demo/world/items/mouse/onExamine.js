@@ -14,7 +14,7 @@ function onExamine(player) {
     this.name = `A panicked ${this.name}`;
 
     // Let's try to escape.
-    // We use the simplest way here, by just calling goDirection from lib_room.
+    // We use the simplest way here, by just calling goDirection from lib.room.
     // Another possibly better way would be to delegate a "go <dir>" command, and
     // let the engine match it (i.e. not rely on the actual function name).
     const argstr = pickedExit;

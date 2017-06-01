@@ -2,14 +2,14 @@
   "name": "Simple house",
   "aliases": [],
   "traitIds": [
-    "lib_room"
+    "lib.room"
   ],
   "locationId": null,
   "properties": {
     "exits": {
       "object": {
         "west": {
-          "ref": "areas_city_alley1"
+          "ref": "areas.city.alley1"
         }
       }
     },

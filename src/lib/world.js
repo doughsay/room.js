@@ -16,7 +16,7 @@ class World {
     this.builder = new WorldObjectProxyBuilder(db, this, WorldObject)
 
     db.all().forEach(object => {
-      this.objects[object.id] = this.builder.build(object)
+      this.insert(object)
     })
 
     this.context = new Context(this)
@@ -27,16 +27,23 @@ class World {
   setupWatchers () {
     this.db.on('object-added', id => {
       const object = this.db.findById(id)
-      this.objects[id] = this.builder.build(object)
+      this.insert(object)
     })
 
     this.db.on('object-removed', id => {
-      delete this.objects[id]
+      this.removeById(id)
     })
   }
 
+  static getDeep (object, keys) {
+    if (!object) { return object }
+    if (keys.length === 0) { return object }
+    return keys.length === 1 ? object[keys[0]] : World.getDeep(object[keys[0]], keys.slice(1))
+  }
+
   get (id) {
-    return this.objects[id]
+    if (!id) { return null }
+    return World.getDeep(this.objects, id.split('.'))
   }
 
   all () {
@@ -48,21 +55,38 @@ class World {
   }
 
   nextId (raw) {
-    const str = idify(raw)
-    if (!this.objects[str]) { return str }
+    const potentialId = idify(raw)
+    if (!this.get(potentialId)) { return potentialId }
 
     let i = 1
-    while (this.objects[str + i]) { i += 1 }
-    return str + i
+    while (this.get(potentialId + i)) { i += 1 }
+    return potentialId + i
+  }
+
+  static deepSet (object, keys, value) {
+    if (keys.length === 1) {
+      object[keys[0]] = value
+      return
+    }
+    if (!object[keys[0]]) {
+      object[keys[0]] = {} // TODO: use a "namespace proxy" maybe?
+    }
+    World.deepSet(object[keys[0]], keys.slice(1), value)
   }
 
   insert (object) {
-    // TODO: protect against bad inserts
-    this.objects[object.id] = this.builder.build(object)
+    // TODO: protect against bad inserts?
+    const obj = this.builder.build(object)
+    World.deepSet(this.objects, object.id.split('.'), obj)
+    return obj
+  }
+
+  static deleteDeep (object, keys) {
+    return keys.length === 1 ? delete object[keys[0]] : World.deleteDeep(object[keys[0]], keys.slice(1))
   }
 
   removeById (id) {
-    delete this.objects[id]
+    return World.deleteDeep(this.objects, id.split('.'))
   }
 
   newVerb (pattern = '', dobjarg = 'none', preparg = 'none', iobjarg = 'none') {
@@ -96,7 +120,7 @@ class World {
     if (this.hookExists(id, hook)) {
       const code = `${id}.${hook}(${args.join(', ')})`
 
-      // vmLogger.debug(code);
+      this.logger.debug({ code }, 'running hook')
 
       try {
         const retval = vm.runInContext(code, this.context, {

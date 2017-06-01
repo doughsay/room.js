@@ -11,7 +11,7 @@ function Context (world) {
   context.noun = noun
   context.color = color
   context.all = () => world.all()
-  context.players = () => world.players()
+  context.allPlayers = () => world.players()
   context.$ = id => world.get(id)
   context.nextId = raw => world.nextId(raw)
 

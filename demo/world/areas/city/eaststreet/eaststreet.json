@@ -2,20 +2,20 @@
   "name": "East street",
   "aliases": [],
   "traitIds": [
-    "lib_room"
+    "lib.room"
   ],
   "locationId": null,
   "properties": {
     "exits": {
       "object": {
         "east": {
-          "ref": "areas_city_tradersgate"
+          "ref": "areas.city.tradersgate"
         },
         "west": {
-          "ref": "areas_city_greatmarket"
+          "ref": "areas.city.greatmarket"
         },
         "south": {
-          "ref": "areas_city_cityhall"
+          "ref": "areas.city.cityhall"
         }
       }
     },

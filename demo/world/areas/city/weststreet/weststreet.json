@@ -2,20 +2,20 @@
   "name": "West street",
   "aliases": [],
   "traitIds": [
-    "lib_room"
+    "lib.room"
   ],
   "locationId": null,
   "properties": {
     "exits": {
       "object": {
         "east": {
-          "ref": "areas_city_greatmarket"
+          "ref": "areas.city.greatmarket"
         },
         "west": {
-          "ref": "areas_city_westgate"
+          "ref": "areas.city.westgate"
         },
         "north": {
-          "ref": "areas_city_inn"
+          "ref": "areas.city.inn"
         }
       }
     },

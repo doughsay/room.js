@@ -2,17 +2,17 @@
   "name": "North street",
   "aliases": [],
   "traitIds": [
-    "lib_room"
+    "lib.room"
   ],
   "locationId": null,
   "properties": {
     "exits": {
       "object": {
         "south": {
-          "ref": "areas_city_northstreet"
+          "ref": "areas.city.northstreet"
         },
         "west": {
-          "ref": "areas_city_square"
+          "ref": "areas.city.square"
         }
       }
     },

@@ -4,9 +4,9 @@
     "lamp"
   ],
   "traitIds": [
-    "lib_item"
+    "lib.item"
   ],
-  "locationId": "items_chest",
+  "locationId": "items.chest",
   "properties": {
     "description": {
       "value": "A portable lamp in a case, protected from the wind and rain"

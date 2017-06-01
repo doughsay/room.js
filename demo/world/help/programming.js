@@ -7,7 +7,7 @@ function programming() {
     'you can use the eval command to prefix code instructions, or preferably cycle to the',
     'EVAL mode.',
     '',
-    'You can reference any object by its ID directly; e.g. "items_chest".',
+    'You can reference any object by its ID directly; e.g. "items.chest".',
     'Invoke all() to retrieve the list of existing objects.',
     '',
     'You can then use any JavaScript construct to start creating new rooms and objects.',
