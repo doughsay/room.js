@@ -4,7 +4,7 @@
     "trap"
   ],
   "traitIds": [
-    "lib_door"
+    "lib.door"
   ],
   "locationId": null,
   "properties": {
@@ -17,10 +17,10 @@
     "sides": {
       "array": [
         {
-          "ref": "areas_start_attic"
+          "ref": "areas.start.attic"
         },
         {
-          "ref": "areas_start_heaven"
+          "ref": "areas.start.heaven"
         }
       ]
     },

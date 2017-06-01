@@ -1,9 +1,8 @@
 {
-  "name": "lib.npc",
+  "name": "tests_lantern",
   "aliases": [],
   "traitIds": [
-    "lib.root",
-    "lib.traits.describable"
+    "lib.item"
   ],
   "locationId": null,
   "properties": {}

@@ -2,15 +2,15 @@
   "name": "Bakery",
   "aliases": [],
   "traitIds": [
-    "lib_room",
-    "lib_traits_commandable"
+    "lib.room",
+    "lib.traits.commandable"
   ],
   "locationId": null,
   "properties": {
     "exits": {
       "object": {
         "west": {
-          "ref": "areas_city_lessermarket"
+          "ref": "areas.city.lessermarket"
         }
       }
     },
@@ -20,7 +20,7 @@
     "extraMatchObjects": {
       "array": [
         {
-          "ref": "items_sellersign"
+          "ref": "items.sellersign"
         }
       ]
     }

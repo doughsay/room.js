@@ -16,6 +16,6 @@ function onPlayerConnected(player) {
   } else if (!player.location) {
     // Safeguard
     player.tell(color.red('What are you doing in the Void? Sending you back to Heaven.'));
-    areas_start_heaven.doEnter(player);
+    areas.start.heaven.doEnter(player);
   }
 }

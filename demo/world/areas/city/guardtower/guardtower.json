@@ -2,17 +2,17 @@
   "name": "Guard tower",
   "aliases": [],
   "traitIds": [
-    "lib_room"
+    "lib.room"
   ],
   "locationId": null,
   "properties": {
     "exits": {
       "object": {
         "north": {
-          "ref": "areas_city_alley1"
+          "ref": "areas.city.alley1"
         },
         "west": {
-          "ref": "areas_city_maingate"
+          "ref": "areas.city.maingate"
         }
       }
     },

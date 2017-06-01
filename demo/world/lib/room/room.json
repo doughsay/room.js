@@ -1,8 +1,8 @@
 {
-  "name": "lib_room",
+  "name": "lib.room",
   "aliases": [],
   "traitIds": [
-    "lib_root"
+    "lib.root"
   ],
   "locationId": null,
   "properties": {

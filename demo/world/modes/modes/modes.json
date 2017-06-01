@@ -2,23 +2,23 @@
   "name": "modes",
   "aliases": [],
   "traitIds": [
-    "lib_root"
+    "lib.root"
   ],
   "locationId": null,
   "properties": {
     "all": {
       "array": [
         {
-          "ref": "modes_playmode"
+          "ref": "modes.playmode"
         },
         {
-          "ref": "modes_saymode"
+          "ref": "modes.saymode"
         },
         {
-          "ref": "modes_chatmode"
+          "ref": "modes.chatmode"
         },
         {
-          "ref": "modes_evalmode"
+          "ref": "modes.evalmode"
         }
       ]
     }

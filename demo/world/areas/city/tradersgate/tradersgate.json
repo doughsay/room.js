@@ -2,14 +2,14 @@
   "name": "Traders gate",
   "aliases": [],
   "traitIds": [
-    "lib_room"
+    "lib.room"
   ],
   "locationId": null,
   "properties": {
     "exits": {
       "object": {
         "west": {
-          "ref": "areas_city_eaststreet"
+          "ref": "areas.city.eaststreet"
         }
       }
     },

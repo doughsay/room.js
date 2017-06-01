@@ -5,10 +5,10 @@
     "bread"
   ],
   "traitIds": [
-    "lib_item",
-    "lib_traits_edible"
+    "lib.item",
+    "lib.traits.edible"
   ],
-  "locationId": "items_baker",
+  "locationId": "items.baker",
   "properties": {
     "description": {
       "value": "A freshly baked stick of bread."
