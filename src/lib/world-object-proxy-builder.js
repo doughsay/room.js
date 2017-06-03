@@ -38,7 +38,7 @@ class Handler {
     this.worldObject = new WorldObject()
   }
 
-  worldObjectProperty (property) {
+  _worldObjectProperty (property) {
     return property in this.worldObject
   }
 
@@ -66,7 +66,7 @@ class Handler {
     if (property === '__proxy__') { return true }
     if (builtInProperty(property)) { return Handler._getBuiltInProperty(target, property) }
     if (virtualProperty(property)) { return this._getVirtualProperty(target, property) }
-    if (this.worldObjectProperty(property)) { return target[property] }
+    if (this._worldObjectProperty(property)) { return target[property] }
 
     const targets = linearize(target, this.db)
     for (let i = 0; i < targets.length; i += 1) {
@@ -81,7 +81,7 @@ class Handler {
   has (target, property) {
     if (builtInProperty(property)) { return true }
     if (virtualProperty(property)) { return true }
-    if (this.worldObjectProperty(property)) { return true }
+    if (this._worldObjectProperty(property)) { return true }
 
     const targets = linearize(target, this.db)
     for (let i = 0; i < targets.length; i += 1) {
@@ -159,7 +159,7 @@ class Handler {
     if (virtualProperty(property)) {
       return _s(() => this._setVirtualProperty(property, target, value))
     }
-    if (this.worldObjectProperty(property)) { return true }
+    if (this._worldObjectProperty(property)) { return true }
     return _s(() => Reflect.set(target.properties, property, serialize(value)))
   }
 

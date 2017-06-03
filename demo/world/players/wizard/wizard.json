@@ -4,17 +4,17 @@
   "traitIds": [
     "lib.player"
   ],
-  "locationId": null,
+  "locationId": "areas.start.heaven",
   "userId": "root",
   "properties": {
     "programmer": {
       "value": true
     },
     "previousLocation": {
-      "ref": "areas.start.heaven"
+      "object": null
     },
     "mode": {
-      "ref": "modes.playmode"
+      "ref": "modes.evalmode"
     }
   }
 }

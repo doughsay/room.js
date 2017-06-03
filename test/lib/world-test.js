@@ -13,7 +13,7 @@ function loggerFactory () {
 function setup () {
   const db = mockDb()
   const world = new World(loggerFactory(), db, new Map())
-  return [world, world.objects, db]
+  return [world, world.global.proxy, db]
 }
 
 test('World: get an existing object', t => {
@@ -75,9 +75,9 @@ test('World: nextId when given `undefined`', t => {
 test('World: insert', t => {
   const [world] = setup()
 
-  world.insert({ id: 'newObj' })
+  world.insert({ id: 'newobj' })
 
-  t.equal(world.get('newObj').id, 'newObj')
+  t.equal(world.get('newobj').id, 'newobj')
   t.end()
 })
 

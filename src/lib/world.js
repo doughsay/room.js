@@ -4,24 +4,39 @@ const WorldObjectClassBuilder = require('./world-object-class-builder')
 const WorldObjectProxyBuilder = require('./world-object-proxy-builder')
 const idify = require('./idify')
 const Deserializer = require('./deserializer')
-const Context = require('./context')
+const parse = require('./parse').parseSentence
+const noun = require('./parse').parseNoun
+const { color } = require('./colors')
+const Namespace = require('./namespace')
 
 class World {
   constructor (logger, db, controllerMap) {
     this.logger = logger
     this.db = db
-    this.objects = {}
     this.deserializer = new Deserializer(this)
     const WorldObject = (new WorldObjectClassBuilder(db, this, controllerMap)).buildClass()
     this.builder = new WorldObjectProxyBuilder(db, this, WorldObject)
 
-    db.all().forEach(object => {
-      this.insert(object)
-    })
-
-    this.context = new Context(this)
-
+    this.setupContext()
+    db.all().forEach(object => { this.insert(object) })
     this.setupWatchers()
+  }
+
+  setupContext () {
+    this.global = new Namespace()
+
+    this.global.target.global = this.global.proxy
+    this.global.target.parse = parse
+    this.global.target.noun = noun
+    this.global.target.color = color
+    this.global.target.all = () => this.all()
+    this.global.target.allPlayers = () => this.players()
+    this.global.target.$ = id => this.get(id)
+    this.global.target.nextId = raw => this.nextId(raw)
+    this.global.target.Verb = (...args) => this.newVerb(...args)
+
+    this.context = this.global.proxy
+    vm.createContext(this.context)
   }
 
   setupWatchers () {
@@ -35,15 +50,11 @@ class World {
     })
   }
 
-  static getDeep (object, keys) {
-    if (!object) { return object }
-    if (keys.length === 0) { return object }
-    return keys.length === 1 ? object[keys[0]] : World.getDeep(object[keys[0]], keys.slice(1))
-  }
-
-  get (id) {
+  get (raw) {
+    const id = idify(raw)
     if (!id) { return null }
-    return World.getDeep(this.objects, id.split('.'))
+
+    return Namespace.get(this.global, id.split('.'))
   }
 
   all () {
@@ -63,30 +74,14 @@ class World {
     return potentialId + i
   }
 
-  static deepSet (object, keys, value) {
-    if (keys.length === 1) {
-      object[keys[0]] = value
-      return
-    }
-    if (!object[keys[0]]) {
-      object[keys[0]] = {} // TODO: use a "namespace proxy" maybe?
-    }
-    World.deepSet(object[keys[0]], keys.slice(1), value)
-  }
-
   insert (object) {
-    // TODO: protect against bad inserts?
     const obj = this.builder.build(object)
-    World.deepSet(this.objects, object.id.split('.'), obj)
+    Namespace.set(this.global, object.id.split('.'), obj)
     return obj
   }
 
-  static deleteDeep (object, keys) {
-    return keys.length === 1 ? delete object[keys[0]] : World.deleteDeep(object[keys[0]], keys.slice(1))
-  }
-
   removeById (id) {
-    return World.deleteDeep(this.objects, id.split('.'))
+    return Namespace.delete(this.global, id.split('.'))
   }
 
   newVerb (pattern = '', dobjarg = 'none', preparg = 'none', iobjarg = 'none') {
