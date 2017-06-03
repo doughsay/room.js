@@ -14,7 +14,7 @@ function titleize (str) {
 
 function classify (str) {
   return titleize(String(str).replace(/[^A-Za-z0-9.]/g, ' '))
-    .replace(/\s/g, '').replace(/[.]+/g, '.').replace(/(^\.|\.$)/g, '')
+    .replace(/\s/g, '').replace(/[.]+/g, '.').replace(/(^\.+|\.+$)/g, '')
 }
 
 function idify (str) {

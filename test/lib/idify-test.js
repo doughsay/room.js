@@ -64,7 +64,7 @@ test('idify: `undefined`', t => {
   t.end()
 })
 
-test('idify: "_hello_to_the__world_', t => {
+test('idify: "__hello_to_the__world_', t => {
   const value = '_hello_to_the__world_'
   const expected = 'helloToTheWorld'
   const actual = idify(value)
