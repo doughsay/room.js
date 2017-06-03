@@ -37,6 +37,41 @@ test('World: get nested id', t => {
   t.end()
 })
 
+test('World: get non-existent nested id', t => {
+  const [world] = setup()
+
+  t.equal(world.get('does.not.exist'), undefined)
+  t.end()
+})
+
+test('World: get badly formatted id', t => {
+  const [world] = setup()
+
+  t.equal(world.get('...foo &^%*&^% bar.baz.   '), undefined)
+  t.end()
+})
+
+test('World: get empty string', t => {
+  const [world] = setup()
+
+  t.equal(world.get(''), undefined)
+  t.end()
+})
+
+test('World: get non-string', t => {
+  const [world] = setup()
+
+  t.equal(world.get({}), undefined)
+  t.end()
+})
+
+test('World: get falsish', t => {
+  const [world] = setup()
+
+  t.equal(world.get(null), undefined)
+  t.end()
+})
+
 test('World: all', t => {
   const [world] = setup()
 
@@ -75,9 +110,9 @@ test('World: nextId when given `undefined`', t => {
 test('World: insert', t => {
   const [world] = setup()
 
-  world.insert({ id: 'newobj' })
+  world.insert({ id: 'newObj' })
 
-  t.equal(world.get('newobj').id, 'newobj')
+  t.equal(world.get('newObj').id, 'newObj')
   t.end()
 })
 

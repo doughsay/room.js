@@ -51,8 +51,9 @@ class World {
   }
 
   get (raw) {
-    const id = idify(raw)
-    if (!id) { return null }
+    if (typeof raw !== 'string') { return }
+    const id = raw.replace(/[.]+/g, '.').replace(/(^\.+|\.+$)/g, '')
+    if (!id) { return }
 
     return Namespace.get(this.global, id.split('.'))
   }
