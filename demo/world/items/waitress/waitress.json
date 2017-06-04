@@ -4,9 +4,9 @@
     "waitress"
   ],
   "traitIds": [
-    "lib_npc_seller"
+    "lib.npcs.seller"
   ],
-  "locationId": "areas_city_inn",
+  "locationId": "areas.city.inn",
   "properties": {
     "description": {
       "value": "Sarah, the waitress."

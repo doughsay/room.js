@@ -4,9 +4,9 @@
     "butcher"
   ],
   "traitIds": [
-    "lib_npc_seller"
+    "lib.npcs.seller"
   ],
-  "locationId": "areas_city_butcher",
+  "locationId": "areas.city.butcher",
   "properties": {
     "description": {
       "value": "Paul Butcher, behind his counter."

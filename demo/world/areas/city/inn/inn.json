@@ -2,18 +2,18 @@
   "name": "The Eagle and Child",
   "aliases": [],
   "traitIds": [
-    "lib_room",
-    "lib_traits_commandable"
+    "lib.room",
+    "lib.traits.commandable"
   ],
   "locationId": null,
   "properties": {
     "exits": {
       "object": {
         "east": {
-          "ref": "areas_city_northstreet"
+          "ref": "areas.city.northstreet"
         },
         "south": {
-          "ref": "areas_city_weststreet"
+          "ref": "areas.city.weststreet"
         }
       }
     },

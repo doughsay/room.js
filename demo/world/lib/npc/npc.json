@@ -1,9 +1,9 @@
 {
-  "name": "lib_npc",
+  "name": "lib.npc",
   "aliases": [],
   "traitIds": [
-    "lib_root",
-    "lib_traits_describable"
+    "lib.root",
+    "lib.traits.describable"
   ],
   "locationId": null,
   "properties": {}

@@ -130,7 +130,7 @@ Returns a list of all existing world objects.
 ##### nextId( String ) ⇒ String
 Returns a new unique identifier from the text provided. Very useful when you create objects, and want an identifier following the same naming scheme, and as long as no one else takes that identifier in the meantime -- So usually, this is used directly in the object creation call.
 
-##### players() ⇒ Array.WorldObject
+##### allPlayers() ⇒ Array.WorldObject
 Returns a list of all existing player world objects (i.e. player characters).
 
 ##### $( String ) ⇒ WorldObject|undefined

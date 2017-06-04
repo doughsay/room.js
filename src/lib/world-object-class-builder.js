@@ -233,7 +233,7 @@ class WorldObjectClassBuilder {
         // Sanitize the id, in case it wasn't previously checked with nextId()
         const id = idify(idraw)
 
-        if (id in world.context) {
+        if (world.get(id) || id in world.context) {
           throw new TypeError(`Identifier '${id}' has already been declared`)
         }
 

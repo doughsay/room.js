@@ -2,7 +2,7 @@
   "name": "Attic",
   "aliases": [],
   "traitIds": [
-    "lib_room"
+    "lib.room"
   ],
   "locationId": null,
   "properties": {
@@ -12,14 +12,14 @@
     "exits": {
       "object": {
         "down": {
-          "ref": "areas_start_door"
+          "ref": "areas.start.door"
         }
       }
     },
     "extraMatchObjects": {
       "array": [
         {
-          "ref": "areas_start_door"
+          "ref": "areas.start.door"
         }
       ]
     }

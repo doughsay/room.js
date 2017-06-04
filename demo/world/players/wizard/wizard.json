@@ -2,19 +2,19 @@
   "name": "Wizard",
   "aliases": [],
   "traitIds": [
-    "lib_player"
+    "lib.player"
   ],
-  "locationId": null,
+  "locationId": "areas.start.heaven",
   "userId": "root",
   "properties": {
     "programmer": {
       "value": true
     },
     "previousLocation": {
-      "ref": "areas_city_southstreet1"
+      "object": null
     },
     "mode": {
-      "ref": "modes_playmode"
+      "ref": "modes.evalmode"
     }
   }
 }

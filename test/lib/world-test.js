@@ -13,7 +13,7 @@ function loggerFactory () {
 function setup () {
   const db = mockDb()
   const world = new World(loggerFactory(), db, new Map())
-  return [world, world.objects, db]
+  return [world, world.global.proxy, db]
 }
 
 test('World: get an existing object', t => {
@@ -30,10 +30,52 @@ test('World: get with non-existent id', t => {
   t.end()
 })
 
+test('World: get nested id', t => {
+  const [world, { namespace: { foo } }] = setup()
+
+  t.equal(world.get('namespace.foo'), foo)
+  t.end()
+})
+
+test('World: get non-existent nested id', t => {
+  const [world] = setup()
+
+  t.equal(world.get('does.not.exist'), undefined)
+  t.end()
+})
+
+test('World: get badly formatted id', t => {
+  const [world] = setup()
+
+  t.equal(world.get('...foo &^%*&^% bar.baz.   '), undefined)
+  t.end()
+})
+
+test('World: get empty string', t => {
+  const [world] = setup()
+
+  t.equal(world.get(''), undefined)
+  t.end()
+})
+
+test('World: get non-string', t => {
+  const [world] = setup()
+
+  t.equal(world.get({}), undefined)
+  t.end()
+})
+
+test('World: get falsish', t => {
+  const [world] = setup()
+
+  t.equal(world.get(null), undefined)
+  t.end()
+})
+
 test('World: all', t => {
   const [world] = setup()
 
-  t.equal(world.all().length, 5)
+  t.equal(world.all().length, 6)
   t.end()
 })
 

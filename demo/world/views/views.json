@@ -2,7 +2,7 @@
   "name": "views",
   "aliases": [],
   "traitIds": [
-    "lib_root"
+    "lib.root"
   ],
   "locationId": null,
   "properties": {

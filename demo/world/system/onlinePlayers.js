@@ -1,3 +1,3 @@
 function onlinePlayers() {
-  return players().filter(p => p.online);
+  return allPlayers().filter(p => p.online);
 }

@@ -25,6 +25,7 @@ function mockDd () {
   const barTarget = targetFactory('bar', ['base'], { bar: 'bar', shared: 'from-bar' })
   const bazTarget = targetFactory('baz', ['base'], { baz: 'baz', shared: 'from-baz' })
   const fooTarget = targetFactory('foo', ['bar', 'baz'], { foo: 'foo' })
+  const nestedTarget = targetFactory('namespace.foo', [], {})
 
   return {
     findById (id) {
@@ -38,6 +39,8 @@ function mockDd () {
         return fooTarget
       } else if (id === 'room') {
         return roomTarget
+      } else if (id === 'namespace.foo') {
+        return nestedTarget
       }
       return undefined
     },
@@ -48,11 +51,11 @@ function mockDd () {
     },
 
     all () {
-      return [baseTarget, roomTarget, barTarget, bazTarget, fooTarget]
+      return [baseTarget, roomTarget, barTarget, bazTarget, fooTarget, nestedTarget]
     },
 
     ids () {
-      return ['base', 'room', 'bar', 'baz', 'foo']
+      return ['base', 'room', 'bar', 'baz', 'foo', 'namespace.foo']
     },
 
     playerIds () {

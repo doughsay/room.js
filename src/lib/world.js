@@ -4,39 +4,58 @@ const WorldObjectClassBuilder = require('./world-object-class-builder')
 const WorldObjectProxyBuilder = require('./world-object-proxy-builder')
 const idify = require('./idify')
 const Deserializer = require('./deserializer')
-const Context = require('./context')
+const parse = require('./parse').parseSentence
+const noun = require('./parse').parseNoun
+const { color } = require('./colors')
+const Namespace = require('./namespace')
 
 class World {
   constructor (logger, db, controllerMap) {
     this.logger = logger
     this.db = db
-    this.objects = {}
     this.deserializer = new Deserializer(this)
     const WorldObject = (new WorldObjectClassBuilder(db, this, controllerMap)).buildClass()
     this.builder = new WorldObjectProxyBuilder(db, this, WorldObject)
 
-    db.all().forEach(object => {
-      this.objects[object.id] = this.builder.build(object)
-    })
-
-    this.context = new Context(this)
-
+    this.setupContext()
+    db.all().forEach(object => { this.insert(object) })
     this.setupWatchers()
+  }
+
+  setupContext () {
+    this.global = new Namespace()
+
+    this.global.target.global = this.global.proxy
+    this.global.target.parse = parse
+    this.global.target.noun = noun
+    this.global.target.color = color
+    this.global.target.all = () => this.all()
+    this.global.target.allPlayers = () => this.players()
+    this.global.target.$ = id => this.get(id)
+    this.global.target.nextId = raw => this.nextId(raw)
+    this.global.target.Verb = (...args) => this.newVerb(...args)
+
+    this.context = this.global.proxy
+    vm.createContext(this.context)
   }
 
   setupWatchers () {
     this.db.on('object-added', id => {
       const object = this.db.findById(id)
-      this.objects[id] = this.builder.build(object)
+      this.insert(object)
     })
 
     this.db.on('object-removed', id => {
-      delete this.objects[id]
+      this.removeById(id)
     })
   }
 
-  get (id) {
-    return this.objects[id]
+  get (raw) {
+    if (typeof raw !== 'string') { return }
+    const id = raw.replace(/[.]+/g, '.').replace(/(^\.+|\.+$)/g, '')
+    if (!id) { return }
+
+    return Namespace.get(this.global, id.split('.'))
   }
 
   all () {
@@ -48,21 +67,22 @@ class World {
   }
 
   nextId (raw) {
-    const str = idify(raw)
-    if (!this.objects[str]) { return str }
+    const potentialId = idify(raw)
+    if (!this.get(potentialId)) { return potentialId }
 
     let i = 1
-    while (this.objects[str + i]) { i += 1 }
-    return str + i
+    while (this.get(potentialId + i)) { i += 1 }
+    return potentialId + i
   }
 
   insert (object) {
-    // TODO: protect against bad inserts
-    this.objects[object.id] = this.builder.build(object)
+    const obj = this.builder.build(object)
+    Namespace.set(this.global, object.id.split('.'), obj)
+    return obj
   }
 
   removeById (id) {
-    delete this.objects[id]
+    return Namespace.delete(this.global, id.split('.'))
   }
 
   newVerb (pattern = '', dobjarg = 'none', preparg = 'none', iobjarg = 'none') {
@@ -96,7 +116,7 @@ class World {
     if (this.hookExists(id, hook)) {
       const code = `${id}.${hook}(${args.join(', ')})`
 
-      // vmLogger.debug(code);
+      this.logger.debug({ code }, 'running hook')
 
       try {
         const retval = vm.runInContext(code, this.context, {
