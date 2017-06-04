@@ -46,7 +46,7 @@ class NamespaceNode {
     } else if (keys.length === 1) {
       return delete node.target[key]
     } else if (!node.children[key]) {
-      return false
+      return true
     }
 
     return NamespaceNode.delete(node.children[key], keys.slice(1))
