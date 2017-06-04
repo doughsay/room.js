@@ -39,7 +39,7 @@ test('NamespaceNode: can delete values', t => {
   const node = new NamespaceNode()
 
   NamespaceNode.set(node, ['foo'], 'bar')
-  NamespaceNode.delete(node, ['foo'])
+  t.true(NamespaceNode.delete(node, ['foo']))
 
   const expected = undefined
   const actual = NamespaceNode.get(node, ['foo'])
@@ -79,12 +79,20 @@ test('NamespaceNode: can delete nested values', t => {
   const node = new NamespaceNode()
 
   NamespaceNode.set(node, ['foo', 'bar'], 'baz')
-  NamespaceNode.delete(node, ['foo', 'bar'])
+  t.true(NamespaceNode.delete(node, ['foo', 'bar']))
 
   const expected = undefined
   const actual = NamespaceNode.get(node, ['foo', 'bar'])
 
   t.equal(actual, expected)
+
+  t.end()
+})
+
+test('NamespaceNode: ignores delete for non-existen nested keys', t => {
+  const node = new NamespaceNode()
+
+  t.true(NamespaceNode.delete(node, ['foo', 'bar']))
 
   t.end()
 })

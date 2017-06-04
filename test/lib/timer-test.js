@@ -1,12 +1,8 @@
 const test = require('tape')
 const Timer = require('../../src/lib/timer')
 
-function setup () {
-  return new Timer()
-}
-
 test('Timer: can set timeout', t => {
-  const timer = setup()
+  const timer = new Timer()
 
   timer.runIn(() => {
     t.end()
@@ -14,7 +10,7 @@ test('Timer: can set timeout', t => {
 })
 
 test('Timer: can set immediate', t => {
-  const timer = setup()
+  const timer = new Timer()
 
   timer.runNext(() => {
     t.end()
@@ -22,7 +18,7 @@ test('Timer: can set immediate', t => {
 })
 
 test('Timer: can set interval and cancel it', t => {
-  const timer = setup()
+  const timer = new Timer()
   let count = 0
 
   const id = timer.runEvery(() => {
@@ -33,4 +29,12 @@ test('Timer: can set interval and cancel it', t => {
       t.end()
     }
   }, 10)
+})
+
+test('Timer: canceling non-existen timer returns false', t => {
+  const timer = new Timer()
+
+  t.false(timer.cancel('nope'))
+
+  t.end()
 })
