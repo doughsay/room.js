@@ -8,6 +8,7 @@ const parse = require('./parse').parseSentence
 const noun = require('./parse').parseNoun
 const { color } = require('./colors')
 const Namespace = require('./namespace')
+const Timer = require('./timer')
 
 class World {
   constructor (logger, db, controllerMap) {
@@ -16,6 +17,7 @@ class World {
     this.deserializer = new Deserializer(this)
     const WorldObject = (new WorldObjectClassBuilder(db, this, controllerMap)).buildClass()
     this.builder = new WorldObjectProxyBuilder(db, this, WorldObject)
+    this.timer = new Timer()
 
     this.setupContext()
     db.all().forEach(object => { this.insert(object) })
@@ -26,14 +28,20 @@ class World {
     this.global = new Namespace()
 
     this.global.target.global = this.global.proxy
-    this.global.target.parse = parse
-    this.global.target.noun = noun
-    this.global.target.color = color
-    this.global.target.all = () => this.all()
-    this.global.target.allPlayers = () => this.players()
-    this.global.target.$ = id => this.get(id)
-    this.global.target.nextId = raw => this.nextId(raw)
-    this.global.target.Verb = (...args) => this.newVerb(...args)
+    this.global.target.parse = Object.freeze(parse)
+    this.global.target.noun = Object.freeze(noun)
+    this.global.target.color = Object.freeze(color)
+    this.global.target.all = Object.freeze(() => this.all())
+    this.global.target.allPlayers = Object.freeze(() => this.players())
+    this.global.target.$ = Object.freeze(id => this.get(id))
+    this.global.target.nextId = Object.freeze(raw => this.nextId(raw))
+    this.global.target.Verb = Object.freeze((...args) => this.newVerb(...args))
+    this.global.target.run = Object.freeze({
+      in: Object.freeze((code, milliseconds) => this.runIn(code, milliseconds)),
+      every: Object.freeze((code, milliseconds) => this.runEvery(code, milliseconds)),
+      next: Object.freeze((code) => this.runNext(code)),
+      cancel: Object.freeze((timerId) => this.timer.cancel(timerId))
+    })
 
     this.context = this.global.proxy
     vm.createContext(this.context)
@@ -119,10 +127,7 @@ class World {
       this.logger.debug({ code }, 'running hook')
 
       try {
-        const retval = vm.runInContext(code, this.context, {
-          filename: `Hook::${id}.${hook}`,
-          timeout: 500
-        })
+        const retval = this.run(code, `Hook::${id}.${hook}`)
         return [true, retval]
       } catch (err) {
         this.logger.warn({ err: bunyan.stdSerializers.err(err) }, 'error running hook')
@@ -131,6 +136,42 @@ class World {
     }
 
     return [false]
+  }
+
+  runIn (code, milliseconds, timeout = 500) {
+    return this.timer.runIn(() => {
+      this.logger.debug({ code }, 'running delayed code')
+
+      try {
+        this.run(code, `Delayed::${milliseconds}`, timeout)
+      } catch (err) {
+        this.logger.warn({ err: bunyan.stdSerializers.err(err) }, 'error running delayed code')
+      }
+    }, milliseconds)
+  }
+
+  runEvery (code, milliseconds, timeout = 500) {
+    return this.timer.runEvery(() => {
+      this.logger.debug({ code }, 'running interval code')
+
+      try {
+        this.run(code, `Interval::${milliseconds}`, timeout)
+      } catch (err) {
+        this.logger.warn({ err: bunyan.stdSerializers.err(err) }, 'error running interval code')
+      }
+    }, milliseconds)
+  }
+
+  runNext (code, timeout = 500) {
+    return this.timer.runNext(() => {
+      this.logger.debug({ code }, 'running immediate code')
+
+      try {
+        this.run(code, 'Immediate', timeout)
+      } catch (err) {
+        this.logger.warn({ err: bunyan.stdSerializers.err(err) }, 'error running immediate code')
+      }
+    })
   }
 }
 

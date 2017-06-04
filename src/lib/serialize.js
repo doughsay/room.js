@@ -15,13 +15,13 @@ function serializeObject (object) {
   } else if (Object.prototype.toString.call(object) === '[object RegExp]') {
     return { regexp: object.source, flags: object.flags }
   } else if (Array.isArray(object)) {
-    return { array: object.map(serialize) } // eslint-disable-line no-use-before-define
+    return { array: object.map(serialize) }
   } else if (object.__proxy__) {
     return { ref: object.id }
   } else if (typeof object.toString === 'function' && object.toString() === '[object Object]') {
     const serializedObject = {}
-    for (const key in object) { // eslint-disable-line guard-for-in
-      serializedObject[key] = serialize(object[key]) // eslint-disable-line no-use-before-define
+    for (const key in object) {
+      serializedObject[key] = serialize(object[key])
     }
     return { object: serializedObject }
   }

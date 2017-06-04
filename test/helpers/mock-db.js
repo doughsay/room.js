@@ -2,7 +2,7 @@ const serialize = require('../../src/lib/serialize')
 
 function targetFactory (id, traitIds, properties) {
   const serializedProperties = {}
-  for (const key in properties) { // eslint-disable-line guard-for-in
+  for (const key in properties) {
     serializedProperties[key] = serialize(properties[key])
   }
 
@@ -42,7 +42,6 @@ function mockDd () {
       } else if (id === 'namespace.foo') {
         return nestedTarget
       }
-      return undefined
     },
 
     findBy (field, value) {

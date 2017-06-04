@@ -15,6 +15,13 @@
     },
     "mode": {
       "ref": "modes.evalmode"
+    },
+    "foo": {
+      "function": true,
+      "file": "foo.js"
+    },
+    "x": {
+      "value": 5
     }
   }
 }

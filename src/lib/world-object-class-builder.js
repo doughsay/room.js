@@ -153,7 +153,7 @@ class WorldObjectClassBuilder {
 
     return class WorldObject {
       constructor (properties) {
-        for (const key in properties) { // eslint-disable-line guard-for-in
+        for (const key in properties) {
           this[key] = properties[key]
         }
       }
@@ -410,7 +410,6 @@ class WorldObjectClassBuilder {
             return key
           }
         }
-        return undefined
       }
     }
   }
