@@ -21,10 +21,6 @@ const namespaceHandler = {
 }
 
 class Namespace {
-  new (id) {
-    return 'TODO'
-  }
-
   toString () {
     return '[object Namespace]'
   }
