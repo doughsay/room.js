@@ -10,11 +10,10 @@ const mkdirp = require('mkdirp')
 const remove = require('remove')
 const chokidar = require('chokidar')
 const EventEmitter = require('events')
-const util = require('util')
 
-class FsDb {
+class FsDb extends EventEmitter {
   constructor (directory, logger) {
-    EventEmitter.call(this)
+    super()
 
     this.directory = path.normalize(directory).replace(/\/$/, '')
     this.logger = logger.child({ component: 'fs-db', directory })
@@ -257,7 +256,5 @@ class FsDb {
     return this._inspectTree().join('\n')
   }
 }
-
-util.inherits(FsDb, EventEmitter)
 
 module.exports = FsDb
