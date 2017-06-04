@@ -1,8 +1,11 @@
+const Hashids = require('hashids')
+
 const clearFns = { timeout: clearTimeout, interval: clearInterval, immediate: clearImmediate }
 const setFns = { timeout: setTimeout, interval: setInterval, immediate: setImmediate }
 
 class Timer {
   constructor () {
+    this.hashids = new Hashids(new Date().toISOString())
     this.counter = 0
     this.map = {}
   }
@@ -42,7 +45,7 @@ class Timer {
   }
 
   _nextId () {
-    return this.counter++
+    return this.hashids.encode(this.counter++)
   }
 }
 
