@@ -10,11 +10,10 @@ const mkdirp = require('mkdirp')
 const remove = require('remove')
 const chokidar = require('chokidar')
 const EventEmitter = require('events')
-const util = require('util')
 
-class FsDb {
+class FsDb extends EventEmitter {
   constructor (directory, logger) {
-    EventEmitter.call(this)
+    super()
 
     this.directory = path.normalize(directory).replace(/\/$/, '')
     this.logger = logger.child({ component: 'fs-db', directory })
@@ -86,7 +85,6 @@ class FsDb {
 
   static getMap (map, key) {
     if (map) { return map.get(key) }
-    return undefined
   }
 
   mapForDir (dirpath) {
@@ -169,7 +167,7 @@ class FsDb {
     const filepath = this.toFilepath(relpath)
     const file = path.basename(filepath)
     const map = this.mapFor(filepath, false)
-    if (!map) { return undefined }
+    if (!map) { return }
     return map.get(file)
   }
 
@@ -258,7 +256,5 @@ class FsDb {
     return this._inspectTree().join('\n')
   }
 }
-
-util.inherits(FsDb, EventEmitter)
 
 module.exports = FsDb

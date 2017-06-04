@@ -8,7 +8,7 @@ class Deserializer {
   _deserializeObject (object) {
     if (object === null) { return null }
     const deserializedObject = {}
-    for (const key in object) { // eslint-disable-line guard-for-in
+    for (const key in object) {
       deserializedObject[key] = this.deserialize(object[key])
     }
     return deserializedObject
@@ -20,14 +20,14 @@ class Deserializer {
     }
     if ('value' in object) { return object.value }
     if ('NaN' in object) { return NaN }
-    if ('undefined' in object) { return undefined }
+    if ('undefined' in object) { return }
     if ('date' in object) { return new Date(object.date) }
     if ('regexp' in object) { return new RegExp(object.regexp, object.flags) }
     if ('ref' in object) { return this.world.get(object.ref) }
     if ('object' in object) { return this._deserializeObject(object.object) }
     if ('array' in object) { return object.array.map(this.deserialize.bind(this)) }
     if ('function' in object) {
-      const script = new vm.Script(`(${object.source})`)
+      const script = new vm.Script(`(${object.source})`, { filename: object.file })
       const world = this.world
       const fn = function fn (...args) {
         return world.runScript(script, this, args)

@@ -75,7 +75,6 @@ class Handler {
         return this.deserializer.deserialize(tgt.properties[property])
       }
     }
-    return undefined
   }
 
   has (target, property) {
@@ -95,7 +94,7 @@ class Handler {
     const targets = linearize(target, this.db)
     const propertySet = new Set(builtInProperties.concat(virtualProperties))
     targets.forEach(tgt => {
-      for (const property in tgt.properties) { // eslint-disable-line guard-for-in
+      for (const property in tgt.properties) {
         propertySet.add(property)
       }
     })
@@ -115,7 +114,7 @@ class Handler {
   }
 
   _setLocation (target, value) {
-    if (value == null) { // eslint-disable-line eqeqeq
+    if (value == null) {
       return Reflect.set(target, 'locationId', null)
     } else if (value.id && this.world.get(toString(value.id))) {
       return Reflect.set(target, 'locationId', toString(value.id))
@@ -170,7 +169,7 @@ class Handler {
     return retVal
   }
 
-  ownKeys (target) { // eslint-disable-line class-methods-use-this
+  ownKeys (target) {
     return builtInProperties.concat(virtualProperties).concat(Reflect.ownKeys(target.properties))
   }
 
