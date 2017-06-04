@@ -165,3 +165,24 @@ test('World: newVerb', t => {
 //   t.ok(world);
 //   t.end();
 // });
+//
+// test('World: runIn', t => {
+//   const [world] = setup();
+//
+//   t.ok(world);
+//   t.end();
+// });
+//
+// test('World: runEvery', t => {
+//   const [world] = setup();
+//
+//   t.ok(world);
+//   t.end();
+// });
+//
+// test('World: runNext', t => {
+//   const [world] = setup();
+//
+//   t.ok(world);
+//   t.end();
+// });
