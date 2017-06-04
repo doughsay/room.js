@@ -1,6 +1,5 @@
 const test = require('tape')
-const parse = require('../../src/lib/parse').parseSentence
-const parseNoun = require('../../src/lib/parse').parseNoun
+const { parseSentence: parse, parseNoun } = require('../../src/lib/parse')
 
 test('parse: "look"', t => {
   const value = 'look'
@@ -125,6 +124,16 @@ test('parseNoun: "1.book"', t => {
 test('parseNoun: "book.1"', t => {
   const value = 'book.1'
   const expected = ['1', 'book']
+
+  const actual = parseNoun(value)
+
+  t.deepEqual(actual, expected)
+  t.end()
+})
+
+test('parseNoun: ""', t => {
+  const value = ''
+  const expected = [undefined, undefined]
 
   const actual = parseNoun(value)
 

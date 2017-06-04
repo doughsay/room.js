@@ -57,7 +57,25 @@ test('idify: ""', t => {
 
 test('idify: `undefined`', t => {
   const value = undefined
-  const expected = ''
+  const expected = 'undefined'
+  const actual = idify(value)
+
+  t.equal(actual, expected)
+  t.end()
+})
+
+test('idify: `null`', t => {
+  const value = null
+  const expected = 'null'
+  const actual = idify(value)
+
+  t.equal(actual, expected)
+  t.end()
+})
+
+test('idify: `false`', t => {
+  const value = false
+  const expected = 'false'
   const actual = idify(value)
 
   t.equal(actual, expected)
@@ -76,6 +94,15 @@ test('idify: "__hello_to_the__world_', t => {
 test('idify: "..foo..bar.baz.', t => {
   const value = '..foo..bar.baz.'
   const expected = 'foo.bar.baz'
+  const actual = idify(value)
+
+  t.equal(actual, expected)
+  t.end()
+})
+
+test('idify: `{}`', t => {
+  const value = {}
+  const expected = 'objectObject'
   const actual = idify(value)
 
   t.equal(actual, expected)
