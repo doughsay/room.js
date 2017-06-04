@@ -1,5 +1,4 @@
 const EventEmitter = require('events')
-const util = require('util')
 const path = require('path')
 const bunyan = require('bunyan')
 const FsDb = require('./fs-db')
@@ -10,9 +9,9 @@ function * entries (obj) {
   }
 }
 
-class MooDB {
+class MooDB extends EventEmitter {
   constructor (directory, logger) {
-    EventEmitter.call(this)
+    super()
 
     this.logger = logger.child({ component: 'moo-db', directory })
     this.fsdb = new FsDb(directory, logger)
@@ -273,6 +272,5 @@ class MooDB {
     })
   }
 }
-util.inherits(MooDB, EventEmitter)
 
 module.exports = MooDB
