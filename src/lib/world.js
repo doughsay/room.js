@@ -7,7 +7,7 @@ const Deserializer = require('./deserializer')
 const parse = require('./parse').parseSentence
 const noun = require('./parse').parseNoun
 const { color } = require('./colors')
-const Namespace = require('./namespace')
+const NamespaceNode = require('./namespace-node')
 const Timer = require('./timer')
 
 class World {
@@ -25,7 +25,7 @@ class World {
   }
 
   setupContext () {
-    this.global = new Namespace()
+    this.global = new NamespaceNode()
 
     this.global.target.global = this.global.proxy
     this.global.target.parse = Object.freeze(parse)
@@ -63,7 +63,7 @@ class World {
     const id = raw.replace(/[.]+/g, '.').replace(/(^\.+|\.+$)/g, '')
     if (!id) { return }
 
-    return Namespace.get(this.global, id.split('.'))
+    return NamespaceNode.get(this.global, id.split('.'))
   }
 
   all () {
@@ -85,12 +85,12 @@ class World {
 
   insert (object) {
     const obj = this.builder.build(object)
-    Namespace.set(this.global, object.id.split('.'), obj)
+    NamespaceNode.set(this.global, object.id.split('.'), obj)
     return obj
   }
 
   removeById (id) {
-    return Namespace.delete(this.global, id.split('.'))
+    return NamespaceNode.delete(this.global, id.split('.'))
   }
 
   newVerb (pattern = '', dobjarg = 'none', preparg = 'none', iobjarg = 'none') {
