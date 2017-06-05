@@ -2,6 +2,7 @@ process.env.NODE_ENV = 'test'
 
 const bunyan = require('bunyan')
 const test = require('tape')
+const stripAnsi = require('strip-ansi')
 const io = require('socket.io-client')
 
 const RoomJSServer = require('../../src/lib/room-js-server')
@@ -48,14 +49,14 @@ function insertTestUser (server, id = 'test') {
   })
 }
 
-function insertTestPlayer (server, id = 'test') {
+function insertTestPlayer (server, id = 'test', userId = id) {
   const newPlayerObj = {
     id: id,
     name: id,
     aliases: [],
     traitIds: [],
     locationId: null,
-    userId: id,
+    userId: userId,
     properties: {
       programmer: { value: true }
     }
@@ -81,7 +82,14 @@ function serverTest (description, run) {
       const socket = io(socketURL, options)
       onTeardown(() => { socket.disconnect() })
 
-      run(t, { server, socket, end })
+      socket.once('output', (msg) => {
+        const expected = 'Welcome to room.js!\nType help for a list of available commands.'
+        const actual = stripAnsi(msg)
+
+        t.equal(actual, expected)
+
+        run(t, { server, socket, end })
+      })
     })
   })
 }
