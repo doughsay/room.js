@@ -2,21 +2,14 @@ const stripAnsi = require('strip-ansi')
 const { unauthenticatedTest, insertTestUser } = require('../helpers/test-server')
 
 unauthenticatedTest('room.js: as an unauthenticated user, help', (t, { server, socket, end }) => {
+  socket.emit('input', 'help')
+
   socket.once('output', (msg) => {
-    const expected = 'Welcome to room.js!\nType help for a list of available commands.'
+    const expected = 'Available commands:\n• login  - login to an existing account\n• create - create a new account\n• help   - show this message'
     const actual = stripAnsi(msg)
 
     t.equal(actual, expected)
-
-    socket.emit('input', 'help')
-
-    socket.once('output', (msg) => {
-      const expected = 'Available commands:\n• login  - login to an existing account\n• create - create a new account\n• help   - show this message'
-      const actual = stripAnsi(msg)
-
-      t.equal(actual, expected)
-      end()
-    })
+    end()
   })
 })
 
@@ -118,5 +111,35 @@ unauthenticatedTest('room.js: as an unauthenticated user, login attempt w/ incor
       t.equal(actual, expected)
       end()
     })
+  })
+})
+
+unauthenticatedTest('room.js: as an unauthenticated user, login attempt for non-existent user', (t, { server, socket, end }) => {
+  insertTestUser(server)
+
+  socket.emit('input', 'login')
+
+  socket.once('request-input', (_, send) => {
+    send({ username: 'nope', password: 'badpass' })
+
+    socket.once('output', (msg) => {
+      const expected = 'Invalid username or password.'
+      const actual = stripAnsi(msg)
+
+      t.equal(actual, expected)
+      end()
+    })
+  })
+})
+
+unauthenticatedTest('room.js: as an unauthenticated user, invalid command', (t, { server, socket, end }) => {
+  socket.emit('input', 'invalidcommand')
+
+  socket.once('output', (msg) => {
+    const expected = 'Invalid command.'
+    const actual = stripAnsi(msg)
+
+    t.equal(actual, expected)
+    end()
   })
 })
