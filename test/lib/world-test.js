@@ -103,7 +103,7 @@ test('World: nextId when the requested id already exists', t => {
 test('World: nextId when given `undefined`', t => {
   const [world] = setup()
 
-  t.equal(world.nextId(), '')
+  t.equal(world.nextId(), 'undefined')
   t.end()
 })
 

@@ -87,7 +87,7 @@ class SocketController {
     if (this.authenticateProgrammer()) {
       this.programmerController.onSearch(query, done)
     } else {
-      done([])
+      done('unauthorized')
     }
   }
 
@@ -95,7 +95,7 @@ class SocketController {
     if (this.authenticateProgrammer()) {
       this.programmerController.onGetVerb(data, done)
     } else {
-      done(undefined)
+      done('unauthorized')
     }
   }
 
@@ -103,7 +103,7 @@ class SocketController {
     if (this.authenticateProgrammer()) {
       this.programmerController.onGetFunction(data, done)
     } else {
-      done(undefined)
+      done('unauthorized')
     }
   }
 
@@ -111,7 +111,7 @@ class SocketController {
     if (this.authenticateProgrammer()) {
       this.programmerController.onSaveFunction(data, done)
     } else {
-      done('Unauthorized')
+      done('unauthorized')
     }
   }
 
@@ -119,7 +119,7 @@ class SocketController {
     if (this.authenticateProgrammer()) {
       this.programmerController.onSaveVerb(data, done)
     } else {
-      done('Unauthorized')
+      done('unauthorized')
     }
   }
 

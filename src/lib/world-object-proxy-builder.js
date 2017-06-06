@@ -90,17 +90,6 @@ class Handler {
     return false
   }
 
-  enumerate (target) {
-    const targets = linearize(target, this.db)
-    const propertySet = new Set(builtInProperties.concat(virtualProperties))
-    targets.forEach(tgt => {
-      for (const property in tgt.properties) {
-        propertySet.add(property)
-      }
-    })
-    return propertySet.values()
-  }
-
   static _setBuiltInProperty (property, target, value) {
     if (['id', 'userId'].indexOf(property) !== -1) {
       return true

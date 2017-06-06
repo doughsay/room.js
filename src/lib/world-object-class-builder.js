@@ -1,6 +1,6 @@
 const C3 = require('./c3')
 const idify = require('./idify')
-const parseNoun = require('./parse').parseNoun
+const { parseNoun } = require('./parse')
 
 // TODO: this file needs some refactoring
 

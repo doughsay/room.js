@@ -62,6 +62,20 @@ test('NamespaceNode: can set nested values', t => {
   t.end()
 })
 
+test('NamespaceNode: for the coverage!', t => {
+  const node = new NamespaceNode()
+
+  NamespaceNode.set(node, ['foo', 'bar'], 'baz')
+  NamespaceNode.set(node, ['foo', 'baz'], 'quux')
+
+  const expected = 'quux'
+  const actual = node.children.foo.target.baz
+
+  t.equal(actual, expected)
+
+  t.end()
+})
+
 test('NamespaceNode: can get nested values', t => {
   const node = new NamespaceNode()
 
