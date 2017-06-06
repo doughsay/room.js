@@ -13,26 +13,14 @@ playingTest('room.js: as player, send an unknown command', (t, { server, socket,
   })
 })
 
-playingTest('room.js: as a player, eval code', (t, { server, socket, end }) => {
-  socket.emit('input', 'eval 2 + 2')
+playingTest('room.js: as player, invoke a verb', (t, { server, socket, end }) => {
+  socket.emit('input', 'echo hello, is anyone there?')
 
   socket.once('output', (msg) => {
-    const expected = '4'
+    const expected = 'hello, is anyone there?'
     const actual = stripAnsi(msg)
 
     t.equal(actual, expected)
-    end()
-  })
-})
-
-playingTest('room.js: as a player, eval code that throws an error', (t, { server, socket, end }) => {
-  socket.emit('input', 'eval asdf')
-
-  socket.once('output', (msg) => {
-    const expected = /ReferenceError: asdf is not defined/
-    const actual = stripAnsi(msg)
-
-    t.ok(expected.test(actual))
     end()
   })
 })
