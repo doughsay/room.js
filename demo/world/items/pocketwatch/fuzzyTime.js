@@ -1,19 +1,25 @@
 function fuzzyTime () {
-  const t = ['', "It's", 'right after', 'about', "o'clock", 'quarter', 'to', 'past', 'half past', 'sharp', 'a']
-  const h = ['twelve', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven']
-  const m = [0, this.minute(), this.hour()]
-  const s = []
+  const [justAfter, about, oClock, quarter, to, past, halfPast, sharp, a] =
+    ['just after', 'about', "o'clock", 'quarter', 'to', 'past', 'half past', 'sharp', 'a']
+  const hours = ['twelve', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven']
 
-  m[0] = m[1] % 7.5
-  s[0] = t[1]
+  const [minute, hour] = [this.minute(), this.hour()]
+  const slice = minute % 7.5 // divide the clock into 8ths / alternating between whole numbers and decimals
+  const output = []
 
-  s.push((m[0] === 0) ? t[0] : (m[0] === parseInt(m[0])) ? t[2] : t[3])
-  s.push((m[1] > 53) ? [ h[(m[2] + 1) % 12], t[4] ]
-          : (m[1] > 37) ? [ t[10], t[5], t[6], h[(m[2] + 1) % 12] ]
-          : (m[1] > 23) ? [ t[8], h[m[2] % 12] ]
-          : (m[1] > 7) ? [ t[10], t[5], t[7], h[m[2] % 12] ]
-          : (m[1] > 0) ? [ h[m[2] % 12], t[4] ]
-          : [ h[m[2] % 12], t[4], t[9] ])
+  const nextHour = hours[(hour + 1) % 12]
+  const thisHour = hours[hour % 12]
 
-  return [].concat.apply([], s).filter(x => x).join(' ')
+  output.push(...(slice === 0) ? []
+               : (slice === Math.floor(slice)) ? [justAfter]
+               : [about])
+
+  output.push(...(minute > 53) ? [ nextHour, oClock ]
+               : (minute > 37) ? [ a, quarter, to, nextHour ]
+               : (minute > 23) ? [ halfPast, thisHour ]
+               : (minute > 7) ? [ a, quarter, past, thisHour ]
+               : (minute > 0) ? [ thisHour, oClock ]
+               : [ thisHour, oClock, sharp ])
+
+  return output.join(' ')
 }
