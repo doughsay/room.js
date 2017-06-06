@@ -7,10 +7,10 @@
   "repository": "https://github.com/doughsay/room.js",
   "scripts": {
     "start": "node src | ./node_modules/.bin/bunyan",
-    "console": "node src/console.js",
+    "console": "node --use-strict src/console.js",
     "lint": "./node_modules/.bin/standard | ./node_modules/.bin/snazzy",
-    "test": "node ./node_modules/.bin/tape 'test/**/*.js' | ./node_modules/.bin/faucet",
-    "cover": "node ./node_modules/.bin/istanbul cover ./node_modules/.bin/tape -- 'test/**/*.js' > /dev/null",
+    "test": "node --use-strict ./node_modules/.bin/tape 'test/**/*.js' | ./node_modules/.bin/faucet",
+    "cover": "node --use-strict ./node_modules/.bin/istanbul cover ./node_modules/.bin/tape -- 'test/**/*.js' > /dev/null",
     "codecov": "./node_modules/.bin/codecov"
   },
   "main": "src/index.js",

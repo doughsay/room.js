@@ -10,16 +10,16 @@ class Timer {
     this.map = {}
   }
 
-  runIn (fn, milliseconds) {
-    return this._schedule(fn, 'timeout', milliseconds)
+  runIn (fn, milliseconds, rethrow = true) {
+    return this._schedule(fn, 'timeout', milliseconds, rethrow)
   }
 
-  runEvery (fn, milliseconds) {
-    return this._schedule(fn, 'interval', milliseconds)
+  runEvery (fn, milliseconds, rethrow = true) {
+    return this._schedule(fn, 'interval', milliseconds, rethrow)
   }
 
-  runNext (fn) {
-    return this._schedule(fn, 'immediate')
+  runNext (fn, rethrow = true) {
+    return this._schedule(fn, 'immediate', undefined, rethrow)
   }
 
   cancel (id) {
@@ -40,14 +40,15 @@ class Timer {
     return Object.keys(this.map)
   }
 
-  _schedule (fn, type, milliseconds = undefined) {
+  _schedule (fn, type, milliseconds, rethrow) {
     const id = this._nextId()
     const timer = setFns[type]((...args) => {
       try {
         fn(...args)
       } catch (err) {
+        if (rethrow) { throw err }
+      } finally {
         if (type !== 'interval') { delete this.map[id] }
-        throw err
       }
     }, milliseconds)
 
