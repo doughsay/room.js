@@ -12,11 +12,11 @@ const namespaceHandler = {
   },
 
   set: function (...args) {
-    return false
+    return true
   },
 
   deleteProperty: function (...args) {
-    return false
+    return true
   }
 }
 
