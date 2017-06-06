@@ -1,3 +1,3 @@
-function onServerStarted() {
-  // NOOP
+function onServerStarted () {
+  items.pocketwatch.start()
 }

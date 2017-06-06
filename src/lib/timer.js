@@ -32,11 +32,23 @@ class Timer {
     return true
   }
 
+  check (id) {
+    return !!this.map[id]
+  }
+
+  list () {
+    return Object.keys(this.map)
+  }
+
   _schedule (fn, type, milliseconds = undefined) {
     const id = this._nextId()
     const timer = setFns[type]((...args) => {
-      fn(...args)
-      if (type !== 'interval') { delete this.map[id] }
+      try {
+        fn(...args)
+      } catch (err) {
+        if (type !== 'interval') { delete this.map[id] }
+        throw err
+      }
     }, milliseconds)
 
     this.map[id] = { timer, type }
