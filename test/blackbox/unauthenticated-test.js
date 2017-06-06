@@ -143,3 +143,13 @@ unauthenticatedTest('room.js: as an unauthenticated user, invalid command', (t, 
     end()
   })
 })
+
+unauthenticatedTest('room.js: as an unauthenticated user, search for a verb or function', (t, { server, socket, end }) => {
+  socket.emit('search', 'ech', (response) => {
+    const expected = 'unauthorized'
+    const actual = response
+
+    t.deepEqual(actual, expected)
+    end()
+  })
+})

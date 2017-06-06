@@ -29,7 +29,13 @@ function testConfig () {
 }
 
 function testServer () {
-  return new RoomJSServer(testLogger(), testConfig())
+  const server = new RoomJSServer(testLogger(), testConfig())
+
+  const root = insertRoot(server)
+  addGreetFuntion(root)
+  addEchoVerb(root, server.world)
+
+  return server
 }
 
 function setupTimeout (t, timeout = 500) {
@@ -43,27 +49,61 @@ function setupTimeout (t, timeout = 500) {
   return [end, onTeardown]
 }
 
+function insertRoot (server) {
+  const root = {
+    id: 'root',
+    name: 'root',
+    aliases: [],
+    traitIds: [],
+    locationId: null,
+    properties: {}
+  }
+
+  server.db.insert(root)
+  return server.world.insert(root)
+}
+
+function addGreetFuntion (object) {
+  object.greet = function greet (player) { player.send(`Hello, ${player.name}!`) }
+}
+
+function addEchoVerb (object, world) {
+  const [name, pattern, dobjarg, preparg, iobjarg] = ['echo', 'echo', 'any', 'any', 'any']
+  const source = [
+    `function ${name}`,
+    '({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr }) ',
+    '{\n  player.send(argstr)\n}\n'
+  ].join('')
+  object.echo = world.deserializer.deserialize({
+    verb: true, source, pattern, dobjarg, preparg, iobjarg
+  })
+}
+
 function insertTestUser (server, id = 'test') {
   server.userDb.insert({
     id, password: 'jAVsDRvHKWu9::v1vJ+yNnKyuHTv4nKLjwECWl/J5IhpUmWHTQ3OI9::30::10000' // "test"
   })
 }
 
-function insertTestPlayer (server, id = 'test', userId = id) {
+function insertTestPlayer (server, id = 'test', userId = id, programmer = false) {
   const newPlayerObj = {
     id: id,
     name: id,
     aliases: [],
-    traitIds: [],
+    traitIds: [ 'root' ],
     locationId: null,
     userId: userId,
     properties: {
-      programmer: { value: true }
+      programmer: { value: programmer }
     }
   }
 
   server.db.insert(newPlayerObj)
   server.world.insert(newPlayerObj)
+}
+
+function insertTestProgrammer (server, id = 'test', userId = id) {
+  insertTestPlayer(server, id, userId, true)
 }
 
 function serverTest (description, run) {
@@ -124,4 +164,16 @@ function playingTest (description, run) {
   })
 }
 
-module.exports = { unauthenticatedTest, authenticatedTest, playingTest, insertTestUser, insertTestPlayer }
+function programmerTest (description, run) {
+  authenticatedTest(description, (t, { server, socket, end }) => {
+    insertTestProgrammer(server)
+
+    socket.emit('input', 'play')
+
+    socket.once('output', () => {
+      run(t, { server, socket, end })
+    })
+  })
+}
+
+module.exports = { unauthenticatedTest, authenticatedTest, playingTest, programmerTest, insertTestUser, insertTestPlayer }
