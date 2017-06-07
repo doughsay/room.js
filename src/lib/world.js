@@ -39,7 +39,9 @@ class World {
       in: Object.freeze((code, milliseconds) => this.runIn(code, milliseconds)),
       every: Object.freeze((code, milliseconds) => this.runEvery(code, milliseconds)),
       next: Object.freeze((code) => this.runNext(code)),
-      cancel: Object.freeze((timerId) => this.timer.cancel(timerId))
+      cancel: Object.freeze((timerId) => this.timer.cancel(timerId)),
+      check: Object.freeze((timerId) => this.timer.check(timerId)),
+      list: Object.freeze(() => this.timer.list())
     })
 
     this.context = this.global.proxy

@@ -111,6 +111,30 @@ programmerTest('room.js: as a programmer, use run.cancel', (t, { server, socket,
   })
 })
 
+programmerTest('room.js: as a programmer, use run.check', (t, { server, socket, end }) => {
+  socket.emit('input', 'eval run.check("bogus")')
+
+  socket.once('output', (msg) => {
+    const expected = 'false'
+    const actual = stripAnsi(msg)
+
+    t.equal(actual, expected)
+    end()
+  })
+})
+
+programmerTest('room.js: as a programmer, use run.list', (t, { server, socket, end }) => {
+  socket.emit('input', 'eval run.list()')
+
+  socket.once('output', (msg) => {
+    const expected = '[]'
+    const actual = stripAnsi(msg)
+
+    t.equal(actual, expected)
+    end()
+  })
+})
+
 programmerTest('room.js: as a programmer, inspect an object', (t, { server, socket, end }) => {
   socket.emit('input', 'eval root')
 

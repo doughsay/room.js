@@ -38,3 +38,36 @@ test('Timer: canceling non-existen timer returns false', t => {
 
   t.end()
 })
+
+test('Timer: can check on timers', t => {
+  const timer = new Timer()
+
+  const id = timer.runIn(() => {
+    t.end()
+  }, 10)
+
+  t.ok(timer.check(id))
+})
+
+test('Timer: can list timers', t => {
+  const timer = new Timer()
+
+  const id = timer.runIn(() => {
+    t.end()
+  }, 10)
+
+  t.deepEqual(timer.list(), [ id ])
+})
+
+test('Timer: a timer that throws an error still removes itself from the timer map', t => {
+  const timer = new Timer()
+
+  const id = timer.runIn(() => {
+    throw new Error('BAH!')
+  }, 10, false)
+
+  setTimeout(() => {
+    t.false(timer.check(id))
+    t.end()
+  }, 20)
+})

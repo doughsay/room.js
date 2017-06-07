@@ -1,0 +1,54 @@
+{
+  "name": "pocket watch",
+  "aliases": [
+    "watch"
+  ],
+  "traitIds": [
+    "lib.item"
+  ],
+  "locationId": "areas.start.heaven",
+  "properties": {
+    "description": {
+      "value": "An old pocket watch."
+    },
+    "tick": {
+      "function": true,
+      "file": "tick.js"
+    },
+    "time": {
+      "value": 0
+    },
+    "start": {
+      "function": true,
+      "file": "start.js"
+    },
+    "stop": {
+      "function": true,
+      "file": "stop.js"
+    },
+    "timeString": {
+      "function": true,
+      "file": "timeString.js"
+    },
+    "describe": {
+      "function": true,
+      "file": "describe.js"
+    },
+    "isRunning": {
+      "function": true,
+      "file": "isRunning.js"
+    },
+    "fuzzyTime": {
+      "function": true,
+      "file": "fuzzyTime.js"
+    },
+    "hour": {
+      "function": true,
+      "file": "hour.js"
+    },
+    "minute": {
+      "function": true,
+      "file": "minute.js"
+    }
+  }
+}
