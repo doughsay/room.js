@@ -6,11 +6,17 @@ cache:
   yarn: true
   directories:
     - node_modules
+before_install:
+  - yarn global add greenkeeper-lockfile@1
 install:
   - yarn install
   - ln -s .env.test .env
+before_script:
+  - greenkeeper-lockfile-update
 script:
   - yarn run lint
   - yarn test
   - yarn run cover
   - yarn run codecov
+after_script:
+  - greenkeeper-lockfile-upload
