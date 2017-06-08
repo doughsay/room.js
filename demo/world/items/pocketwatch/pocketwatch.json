@@ -49,6 +49,10 @@
     "minute": {
       "function": true,
       "file": "minute.js"
+    },
+    "timeToFuzzy": {
+      "function": true,
+      "file": "timeToFuzzy.js"
     }
   }
 }
