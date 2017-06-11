@@ -2,7 +2,7 @@ const serialize = require('../../src/lib/serialize')
 
 function targetFactory (id, traitIds, properties) {
   const serializedProperties = {}
-  for (const key in properties) { // eslint-disable-line guard-for-in
+  for (const key in properties) {
     serializedProperties[key] = serialize(properties[key])
   }
 
@@ -25,6 +25,7 @@ function mockDd () {
   const barTarget = targetFactory('bar', ['base'], { bar: 'bar', shared: 'from-bar' })
   const bazTarget = targetFactory('baz', ['base'], { baz: 'baz', shared: 'from-baz' })
   const fooTarget = targetFactory('foo', ['bar', 'baz'], { foo: 'foo' })
+  const nestedTarget = targetFactory('namespace.foo', [], {})
 
   return {
     findById (id) {
@@ -38,8 +39,9 @@ function mockDd () {
         return fooTarget
       } else if (id === 'room') {
         return roomTarget
+      } else if (id === 'namespace.foo') {
+        return nestedTarget
       }
-      return undefined
     },
 
     findBy (field, value) {
@@ -48,11 +50,11 @@ function mockDd () {
     },
 
     all () {
-      return [baseTarget, roomTarget, barTarget, bazTarget, fooTarget]
+      return [baseTarget, roomTarget, barTarget, bazTarget, fooTarget, nestedTarget]
     },
 
     ids () {
-      return ['base', 'room', 'bar', 'baz', 'foo']
+      return ['base', 'room', 'bar', 'baz', 'foo', 'namespace.foo']
     },
 
     playerIds () {

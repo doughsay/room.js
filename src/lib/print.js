@@ -84,10 +84,9 @@ function print (x, maxdepth, depth = 0, prefix = '', parents = []) {
         }
 
         const xs = []
-        for (const key in x) { // eslint-disable-line guard-for-in
+        for (const key in x) {
           const value = x[key]
-          const clr = {}.hasOwnProperty.call(x, key) ? c.blue : c.gray
-          const pfx = `${clr(key)}: `
+          const pfx = `${c.blue(key)}: `
           xs.push(print(value, maxdepth, depth + 1, pfx, parents))
         }
 

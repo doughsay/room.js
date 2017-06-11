@@ -1,7 +1,9 @@
-RoomJS 3.x Game Engine
+RoomJS Game Engine
 ======================
 
 [![Travis](https://img.shields.io/travis/doughsay/room.js.svg)](https://travis-ci.org/doughsay/room.js) [![Code Style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](https://standardjs.com/) [![Codecov](https://img.shields.io/codecov/c/github/doughsay/room.js.svg)](https://codecov.io/gh/doughsay/room.js) [![David](https://img.shields.io/david/doughsay/room.js.svg)](https://david-dm.org/doughsay/room.js) [![David](https://img.shields.io/david/dev/doughsay/room.js.svg)](https://david-dm.org/doughsay/room.js?type=dev)
+
+> **NOTE:** The master branch represents ongoing work and may have the server in a currently unstable state.  Please check the [releases](https://github.com/doughsay/room.js/releases) to get the most recent stable version.
 
 This repository contains the RoomJS game engine (or server).
 
@@ -12,7 +14,7 @@ The engine includes built-in WebSocket (SocketIO) communication, user account ma
 Prerequisites
 =============
 
-The RoomJS server requires **Node.js 6.0** or newer.
+The RoomJS server requires **Node.js 6.10** or newer.
 
 Clone the repository or download a ZIP archive.
 
@@ -65,12 +67,3 @@ And it even comes with documentation...
 - [Building and programming your own RoomJS MUD/MOO](doc/PROGRAMMING.md)
 - [Organizing and customizing your world objects](doc/CUSTOMIZING.md)
 - [A brief description of the demonstration mudlib](doc/DEMO_MUDLIB.md)
-
-License : MIT
-=======
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

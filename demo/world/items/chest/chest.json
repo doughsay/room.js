@@ -2,18 +2,18 @@
   "name": "chest",
   "aliases": [],
   "traitIds": [
-    "lib_root",
-    "lib_traits_describable",
-    "lib_traits_closeable",
-    "lib_traits_container"
+    "lib.root",
+    "lib.traits.describable",
+    "lib.traits.closeable",
+    "lib.traits.container"
   ],
-  "locationId": "areas_start_heaven",
+  "locationId": "areas.start.heaven",
   "properties": {
     "locked": {
-      "value": true
+      "value": false
     },
     "closed": {
-      "value": true
+      "value": false
     },
     "description": {
       "value": "A small chest with an antique style lock."

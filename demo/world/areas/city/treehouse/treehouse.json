@@ -2,14 +2,14 @@
   "name": "Small tree house",
   "aliases": [],
   "traitIds": [
-    "lib_room"
+    "lib.room"
   ],
   "locationId": null,
   "properties": {
     "exits": {
       "object": {
         "down": {
-          "ref": "areas_city_square"
+          "ref": "areas.city.square"
         }
       }
     },

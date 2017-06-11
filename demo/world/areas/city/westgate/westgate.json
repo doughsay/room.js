@@ -2,17 +2,17 @@
   "name": "West gate",
   "aliases": [],
   "traitIds": [
-    "lib_room"
+    "lib.room"
   ],
   "locationId": null,
   "properties": {
     "exits": {
       "object": {
         "east": {
-          "ref": "areas_city_weststreet"
+          "ref": "areas.city.weststreet"
         },
         "northeast": {
-          "ref": "areas_city_alley3"
+          "ref": "areas.city.alley3"
         }
       }
     },

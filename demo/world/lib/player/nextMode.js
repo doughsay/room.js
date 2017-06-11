@@ -1,5 +1,5 @@
 function nextMode(direction) {
-  let ms = modes_modes.all;
+  let ms = modes.modes.all;
   if (direction === -1) { ms.reverse(); }
   const currentIdx = ms.indexOf(this.mode);
   ms = ms.slice(currentIdx + 1).concat(ms.slice(0, currentIdx));

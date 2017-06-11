@@ -1,6 +1,6 @@
 const C3 = require('./c3')
 const idify = require('./idify')
-const parseNoun = require('./parse').parseNoun
+const { parseNoun } = require('./parse')
 
 // TODO: this file needs some refactoring
 
@@ -153,7 +153,7 @@ class WorldObjectClassBuilder {
 
     return class WorldObject {
       constructor (properties) {
-        for (const key in properties) { // eslint-disable-line guard-for-in
+        for (const key in properties) {
           this[key] = properties[key]
         }
       }
@@ -179,6 +179,15 @@ class WorldObjectClassBuilder {
         const controller = controllerMap.get(this.id)
         if (controller) {
           controller.emit('set-prompt', str)
+          return true
+        }
+        return false
+      }
+
+      setRightPrompt (str) {
+        const controller = controllerMap.get(this.id)
+        if (controller) {
+          controller.emit('set-right-prompt', str)
           return true
         }
         return false
@@ -233,7 +242,7 @@ class WorldObjectClassBuilder {
         // Sanitize the id, in case it wasn't previously checked with nextId()
         const id = idify(idraw)
 
-        if (id in world.context) {
+        if (world.get(id) || id in world.context) {
           throw new TypeError(`Identifier '${id}' has already been declared`)
         }
 
@@ -410,7 +419,6 @@ class WorldObjectClassBuilder {
             return key
           }
         }
-        return undefined
       }
     }
   }

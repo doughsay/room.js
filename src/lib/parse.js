@@ -140,7 +140,6 @@ function parseNoun (text) {
   const i = search.index
 
   nounstr = i === 0 ? text.slice(detstr.length + 1) : text.slice(0, i)
-  if (nounstr === '') { nounstr = undefined }
   detstr = {}.hasOwnProperty.call(determiners, detstr) ? determiners[detstr] : detstr
 
   return [detstr, nounstr]

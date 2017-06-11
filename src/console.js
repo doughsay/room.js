@@ -11,7 +11,7 @@ const server = new RoomJSServer(logger, config)
 
 const local = repl.start('room.js > ')
 
-for (const id in server.world.context) { // eslint-disable-line guard-for-in
+for (const id in server.world.context) {
   local.context[id] = server.world.context[id]
 }
 

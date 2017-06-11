@@ -2,17 +2,17 @@
   "name": "Main gate",
   "aliases": [],
   "traitIds": [
-    "lib_room"
+    "lib.room"
   ],
   "locationId": null,
   "properties": {
     "exits": {
       "object": {
         "north": {
-          "ref": "areas_city_lessermarket"
+          "ref": "areas.city.lessermarket"
         },
         "east": {
-          "ref": "areas_city_guardtower"
+          "ref": "areas.city.guardtower"
         }
       }
     },

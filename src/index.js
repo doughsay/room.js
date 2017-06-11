@@ -7,4 +7,7 @@ const { appName, logLevel } = config
 const logger = bunyan.createLogger({ name: appName, level: logLevel })
 
 const server = new RoomJSServer(logger, config)
-server.start()
+
+server.on('ready', () => {
+  server.start()
+})

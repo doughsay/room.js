@@ -2,13 +2,13 @@
   "name": "player",
   "aliases": [],
   "traitIds": [
-    "lib_root",
-    "lib_traits_describable"
+    "lib.root",
+    "lib.traits.describable"
   ],
   "locationId": null,
   "properties": {
     "mode": {
-      "ref": "modes_playmode"
+      "ref": "modes.playmode"
     },
     "announceSay": {
       "function": true,

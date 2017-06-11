@@ -1,10 +1,10 @@
 {
-  "name": "lib_item",
+  "name": "lib.item",
   "aliases": [],
   "traitIds": [
-    "lib_traits_describable",
-    "lib_traits_gettable",
-    "lib_root"
+    "lib.traits.describable",
+    "lib.traits.gettable",
+    "lib.root"
   ],
   "locationId": null,
   "properties": {
