@@ -1,8 +1,8 @@
 {
-  "name": "lib_npc_seller",
+  "name": "lib.npcs.seller",
   "aliases": [],
   "traitIds": [
-    "lib_npc"
+    "lib.npc"
   ],
   "locationId": null,
   "properties": {

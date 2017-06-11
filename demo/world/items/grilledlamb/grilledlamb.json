@@ -6,10 +6,10 @@
     "meat"
   ],
   "traitIds": [
-    "lib_item",
-    "lib_traits_edible"
+    "lib.item",
+    "lib.traits.edible"
   ],
-  "locationId": "items_butcher",
+  "locationId": "items.butcher",
   "properties": {
     "description": {
       "value": "A set of perfectly grilled lamb chops, marinated with thyme and garlic."

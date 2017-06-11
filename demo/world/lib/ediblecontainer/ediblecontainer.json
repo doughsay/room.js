@@ -1,9 +1,9 @@
 {
-  "name": "lib_ediblecontainer",
+  "name": "lib.ediblecontainer",
   "aliases": [],
   "traitIds": [
-    "lib_item",
-    "lib_traits_edible"
+    "lib.item",
+    "lib.traits.edible"
   ],
   "locationId": null,
   "properties": {

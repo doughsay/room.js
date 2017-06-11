@@ -28,8 +28,8 @@ test('idify: "This is a sentence!"', t => {
   t.end()
 })
 
-test('idify: "!@#$%^&*()+"', t => {
-  const value = '!@#$%^&*()+'
+test('idify: "!@#$%^&*()_+"', t => {
+  const value = '!@#$%^&*()_+'
   const expected = ''
   const actual = idify(value)
 
@@ -37,8 +37,8 @@ test('idify: "!@#$%^&*()+"', t => {
   t.end()
 })
 
-test('idify: "hello !@#$%^&*()+" world', t => {
-  const value = 'hello !@#$%^&*()+ world'
+test('idify: "hello !@#$%^&*()_+" world', t => {
+  const value = 'hello !@#$%^&*()_+ world'
   const expected = 'helloWorld'
   const actual = idify(value)
 
@@ -57,16 +57,52 @@ test('idify: ""', t => {
 
 test('idify: `undefined`', t => {
   const value = undefined
-  const expected = ''
+  const expected = 'undefined'
   const actual = idify(value)
 
   t.equal(actual, expected)
   t.end()
 })
 
-test('idify: "_hello_to_the__world_', t => {
+test('idify: `null`', t => {
+  const value = null
+  const expected = 'null'
+  const actual = idify(value)
+
+  t.equal(actual, expected)
+  t.end()
+})
+
+test('idify: `false`', t => {
+  const value = false
+  const expected = 'false'
+  const actual = idify(value)
+
+  t.equal(actual, expected)
+  t.end()
+})
+
+test('idify: "__hello_to_the__world_', t => {
   const value = '_hello_to_the__world_'
-  const expected = 'hello_to_the_world'
+  const expected = 'helloToTheWorld'
+  const actual = idify(value)
+
+  t.equal(actual, expected)
+  t.end()
+})
+
+test('idify: "..foo..bar.baz.', t => {
+  const value = '..foo..bar.baz.'
+  const expected = 'foo.bar.baz'
+  const actual = idify(value)
+
+  t.equal(actual, expected)
+  t.end()
+})
+
+test('idify: `{}`', t => {
+  const value = {}
+  const expected = 'objectObject'
   const actual = idify(value)
 
   t.equal(actual, expected)

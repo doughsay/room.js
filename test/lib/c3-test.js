@@ -80,3 +80,20 @@ test('C3: inconsistent hierarchy without error', t => {
   t.deepEqual(c.run(), ['b', 'c', 'a'])
   t.end()
 })
+
+test('C3: add in backwards order', t => {
+  const c = new C3('a')
+  c.add('b', 'c')
+  c.add('a', 'b')
+
+  t.deepEqual(c.run(), ['a', 'b', 'c'])
+  t.end()
+})
+
+test('C3: disconnected hierarchy', t => {
+  const c = new C3('a')
+  c.add('b', 'c')
+
+  t.deepEqual(c.run(), ['a'])
+  t.end()
+})

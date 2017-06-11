@@ -2,20 +2,20 @@
   "name": "South street",
   "aliases": [],
   "traitIds": [
-    "lib_room"
+    "lib.room"
   ],
   "locationId": null,
   "properties": {
     "exits": {
       "object": {
         "north": {
-          "ref": "areas_city_southstreet"
+          "ref": "areas.city.southstreet"
         },
         "south": {
-          "ref": "areas_city_lessermarket"
+          "ref": "areas.city.lessermarket"
         },
         "east": {
-          "ref": "areas_city_house"
+          "ref": "areas.city.house"
         }
       }
     },

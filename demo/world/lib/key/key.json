@@ -2,7 +2,7 @@
   "name": "key",
   "aliases": [],
   "traitIds": [
-    "lib_item"
+    "lib.item"
   ],
   "locationId": null,
   "properties": {

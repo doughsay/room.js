@@ -38,7 +38,7 @@ class Handler {
     this.worldObject = new WorldObject()
   }
 
-  worldObjectProperty (property) {
+  _worldObjectProperty (property) {
     return property in this.worldObject
   }
 
@@ -66,7 +66,7 @@ class Handler {
     if (property === '__proxy__') { return true }
     if (builtInProperty(property)) { return Handler._getBuiltInProperty(target, property) }
     if (virtualProperty(property)) { return this._getVirtualProperty(target, property) }
-    if (this.worldObjectProperty(property)) { return target[property] }
+    if (this._worldObjectProperty(property)) { return target[property] }
 
     const targets = linearize(target, this.db)
     for (let i = 0; i < targets.length; i += 1) {
@@ -75,13 +75,12 @@ class Handler {
         return this.deserializer.deserialize(tgt.properties[property])
       }
     }
-    return undefined
   }
 
   has (target, property) {
     if (builtInProperty(property)) { return true }
     if (virtualProperty(property)) { return true }
-    if (this.worldObjectProperty(property)) { return true }
+    if (this._worldObjectProperty(property)) { return true }
 
     const targets = linearize(target, this.db)
     for (let i = 0; i < targets.length; i += 1) {
@@ -89,17 +88,6 @@ class Handler {
       if (property in tgt.properties) { return true }
     }
     return false
-  }
-
-  enumerate (target) {
-    const targets = linearize(target, this.db)
-    const propertySet = new Set(builtInProperties.concat(virtualProperties))
-    targets.forEach(tgt => {
-      for (const property in tgt.properties) { // eslint-disable-line guard-for-in
-        propertySet.add(property)
-      }
-    })
-    return propertySet.values()
   }
 
   static _setBuiltInProperty (property, target, value) {
@@ -115,7 +103,7 @@ class Handler {
   }
 
   _setLocation (target, value) {
-    if (value == null) { // eslint-disable-line eqeqeq
+    if (value == null) {
       return Reflect.set(target, 'locationId', null)
     } else if (value.id && this.world.get(toString(value.id))) {
       return Reflect.set(target, 'locationId', toString(value.id))
@@ -159,7 +147,7 @@ class Handler {
     if (virtualProperty(property)) {
       return _s(() => this._setVirtualProperty(property, target, value))
     }
-    if (this.worldObjectProperty(property)) { return true }
+    if (this._worldObjectProperty(property)) { return true }
     return _s(() => Reflect.set(target.properties, property, serialize(value)))
   }
 
@@ -170,7 +158,7 @@ class Handler {
     return retVal
   }
 
-  ownKeys (target) { // eslint-disable-line class-methods-use-this
+  ownKeys (target) {
     return builtInProperties.concat(virtualProperties).concat(Reflect.ownKeys(target.properties))
   }
 

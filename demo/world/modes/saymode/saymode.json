@@ -2,7 +2,7 @@
   "name": "saymode",
   "aliases": [],
   "traitIds": [
-    "modes_mode"
+    "modes.mode"
   ],
   "locationId": null,
   "properties": {

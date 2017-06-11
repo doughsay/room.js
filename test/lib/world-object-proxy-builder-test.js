@@ -12,7 +12,7 @@ function loggerFactory () {
 function setup () {
   const db = mockDb()
   const world = new World(loggerFactory(), db, new Map())
-  return [world.objects, db]
+  return [world.global.proxy, db]
 }
 
 test('WorldObjectProxyBuilder: has property `foo`', t => {

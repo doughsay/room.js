@@ -4,9 +4,9 @@
     "rodent"
   ],
   "traitIds": [
-    "lib_npc"
+    "lib.npc"
   ],
-  "locationId": "areas_city_baker",
+  "locationId": "areas.city.baker",
   "properties": {
     "description": {
       "value": "A small rodent with a pointed snout, and small rounded ears."

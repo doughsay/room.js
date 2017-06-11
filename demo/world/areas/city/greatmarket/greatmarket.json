@@ -2,23 +2,23 @@
   "name": "Great market",
   "aliases": [],
   "traitIds": [
-    "lib_room"
+    "lib.room"
   ],
   "locationId": null,
   "properties": {
     "exits": {
       "object": {
         "east": {
-          "ref": "areas_city_eaststreet"
+          "ref": "areas.city.eaststreet"
         },
         "west": {
-          "ref": "areas_city_weststreet"
+          "ref": "areas.city.weststreet"
         },
         "south": {
-          "ref": "areas_city_southstreet"
+          "ref": "areas.city.southstreet"
         },
         "north": {
-          "ref": "areas_city_northstreet"
+          "ref": "areas.city.northstreet"
         }
       }
     },

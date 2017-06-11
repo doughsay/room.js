@@ -1,10 +1,10 @@
 {
-  "name": "lib_door",
+  "name": "lib.door",
   "aliases": [],
   "traitIds": [
-    "lib_root",
-    "lib_traits_closeable",
-    "lib_traits_describable"
+    "lib.root",
+    "lib.traits.closeable",
+    "lib.traits.describable"
   ],
   "locationId": null,
   "properties": {

@@ -1,5 +1,4 @@
 const EventEmitter = require('events')
-const util = require('util')
 const http = require('http')
 const socketIo = require('socket.io')
 
@@ -9,8 +8,10 @@ const SimpleDB = require('./simple-db')
 const onExit = require('./on-exit')
 const SocketController = require('../controllers/socket-controller')
 
-class RoomJSServer {
+class RoomJSServer extends EventEmitter {
   constructor (logger, config) {
+    super()
+
     this.config = config
     this.logger = logger
     this.setupState()
@@ -73,6 +74,5 @@ class RoomJSServer {
     this.logger.info('server stopped')
   }
 }
-util.inherits(RoomJSServer, EventEmitter)
 
 module.exports = RoomJSServer
