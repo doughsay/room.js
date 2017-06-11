@@ -3,6 +3,8 @@ RoomJS Game Engine
 
 [![Travis](https://img.shields.io/travis/doughsay/room.js.svg)](https://travis-ci.org/doughsay/room.js) [![Code Style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](https://standardjs.com/) [![Codecov](https://img.shields.io/codecov/c/github/doughsay/room.js.svg)](https://codecov.io/gh/doughsay/room.js) [![David](https://img.shields.io/david/doughsay/room.js.svg)](https://david-dm.org/doughsay/room.js) [![David](https://img.shields.io/david/dev/doughsay/room.js.svg)](https://david-dm.org/doughsay/room.js?type=dev)
 
+> **NOTE:** The master branch represents ongoing work and may have the server in a currently unstable state.  Please check the [releases](https://github.com/doughsay/room.js/releases) to get the most recent stable version.
+
 This repository contains the RoomJS game engine (or server).
 
 RoomJS is a modern Node.js-based [MUD](https://en.wikipedia.org/wiki/MUD)/[MOO](https://en.wikipedia.org/wiki/MOO) engine, where (privileged) players can extend everything while in game. The basic idea is that one can create and edit objects, locations and code from inside the game.
