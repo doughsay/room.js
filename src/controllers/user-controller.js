@@ -93,11 +93,14 @@ class UserController extends BaseChildController {
       this.loginPlayer(players[0].id)
     } else if (players.length > 1) {
       const msg = ['Choose a character to play as:']
-      const inputs = [{ type: 'text', label: 'character', name: 'selection' }]
+      const options = []
 
       players.forEach((p, i) => {
         msg.push(`${i + 1}. #cmd[${p.name}]`)
+        options.push(p.name)
       })
+
+      const inputs = [{ type: 'text', label: 'character', name: 'selection', options }]
 
       this.emit('output', msg.join('\n'))
       this.emit('request-input', inputs, ({ selection }) => {
