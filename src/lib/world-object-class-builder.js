@@ -184,6 +184,15 @@ class WorldObjectClassBuilder {
         return false
       }
 
+      setRightPrompt (str) {
+        const controller = controllerMap.get(this.id)
+        if (controller) {
+          controller.emit('set-right-prompt', str)
+          return true
+        }
+        return false
+      }
+
       addAlias (...args) {
         const aliases = this.aliases
         const ret = aliases.push(...args)
