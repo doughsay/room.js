@@ -10,6 +10,7 @@ const mkdirp = require('mkdirp')
 const remove = require('remove')
 const chokidar = require('chokidar')
 const EventEmitter = require('events')
+const semver = require('semver')
 
 class FsDb extends EventEmitter {
   constructor (directory, logger) {
@@ -47,22 +48,25 @@ class FsDb extends EventEmitter {
   }
 
   setupWatcher () {
-    this.watcher = chokidar.watch(this.directory, {
-      ignored: /[/\\]\./,
+    const options = {
+      ignored: /(^|[/\\])\../,
       persistent: true
-    })
+    }
+
+    // disable FsEvents on OSX when using Node 8 (https://github.com/paulmillr/chokidar/issues/612)
+    if (process.platform === 'darwin' && semver.gte(process.versions.node, '8.0.0')) {
+      options.useFsEvents = false
+    }
+
+    this.watcher = chokidar.watch(this.directory, options)
+
+    this.watcher
+      .on('add', file => this.onFileAdded(file.replace(/[\\]/g, '/')))
+      .on('change', file => this.onFileChanged(file.replace(/[\\]/g, '/')))
+      .on('unlink', file => this.onFileRemoved(file.replace(/[\\]/g, '/')))
+      .on('error', error => this.logger.warn({ error }, 'file watcher error caught'))
 
     this.watcher.on('ready', () => {
-      this.watcher
-        .on('add', file => this.onFileAdded(file.replace(/[\\]/g, '/')))
-        .on('change', file => this.onFileChanged(file.replace(/[\\]/g, '/')))
-        .on('unlink', file => this.onFileRemoved(file.replace(/[\\]/g, '/')))
-        .on('error', error => {
-          // On Windows notabbly, when a file is deleted from an extern process, an EPERM status
-          // may occur here, due to a temporary system file lock.
-          // Attempt at gracefully ignore the error, to avoid an uncaught exception.
-          this.logger.warn({ error }, 'file watcher error caught')
-        })
       this.emit('ready')
     })
   }
