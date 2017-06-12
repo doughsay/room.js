@@ -6,7 +6,7 @@ As noted in the [Customization guide](CUSTOMIZING.md), which the reader is assum
 
 > The term "mudlib" refers to the very basic set of objects and entities that are initally required to make the first real objects in your game (i.e. the base structure for rooms, containers, behaviors, etc.). The demonstration comes with its own mudlib, which you can modify/extend, but it is wholly replaceable -- By nature, the demonstration mudlib has been kept small (no character classes or combat system, for instance -- You'll have to design your owns).
 
-This memorandum describes the demonstration mudlib (i.e. *lib\_xxx* objects), which may be used as a sample for designing and implementing you own game logic. It is indeed a very small library (with only 10 base structures for items/rooms/NPCs, and 7 traits for behaviors).
+This memorandum describes the demonstration mudlib (i.e. *lib.xxx* objects), which may be used as a sample for designing and implementing you own game logic. It is indeed a very small library (with only 10 base structures for items/rooms/NPCs, and 7 traits for behaviors).
 
 ## Introduction
 
@@ -21,10 +21,10 @@ For each objects, this memorandum provides:
 
 ### Pure traits
 
-These objects are purely 'abstract' (i.e. they don't inherit from **lib\_root**), and are
+These objects are purely 'abstract' (i.e. they don't inherit from **lib.root**), and are
 intended to be added to objects, to extend their functionality.
 
-#### lib\_traits\_describable
+#### lib.traits.describable
 
 A trait for items than can be described.
 
@@ -54,7 +54,7 @@ Triggers:
 | --------------------------- | ------------- |
 | onExamine                   | Fired after object is looked at. |
 
-#### lib\_traits\_gettable
+#### lib.traits.gettable
 
 A trait for items that can be taken or dropped.
 
@@ -78,7 +78,7 @@ Properties: none
 
 Triggers: none, but that's probably missing (e.g. onDropItem/onTakeItem)
 
-#### lib\_traits\_closeable
+#### lib.traits.closeable
 
 A trait for items that can be opened/closed/locked/unlocked.
 
@@ -110,7 +110,7 @@ Properties:
 | --------------------------- | ------------- |
 | locked   : Boolean          | True if item is locked. Defaults to true. |
 | closed   : Boolean          | True if item is closed. Defaults to true. |
-| keySet   : Array.String     | Key identifiers (see **lib\_key** below) for locking/unlocking the object. Defaults to [ "masterkey" ]. |
+| keySet   : Array.String     | Key identifiers (see **lib.key** below) for locking/unlocking the object. Defaults to [ "masterkey" ]. |
 | autolocking : Boolean       | Optional flag. If true, the object will lock itself when being closed. |
 
 - If you don't want the object to be lockable/unlockable, set the keySet to an empty array,
@@ -125,7 +125,7 @@ Triggers:
 | onLock                      | Fired after object is locked. |
 | onUnlock                    | Fired after object is unlocked. |
 
-#### lib\_traits\_container
+#### lib.traits.container
 
 A trait for items that can serve as containers.
 
@@ -145,18 +145,18 @@ Functions:
 | --------------------------- | ------------- |
 | announcePutItemContainer    | Defines the message displayed in the room when an object is put into the container. |
 | announceTakeItemContainer   | Defines the message displayed in the room when the object is taken from the container. |
-| canAccept                   | Checks the container interior can be accessed. Currently only checks whether the container is closed, in case it also inherits from *lib\_traits\_closeable*. |
+| canAccept                   | Checks the container interior can be accessed. Currently only checks whether the container is closed, in case it also inherits from *lib.traits.closeable*. |
 | describeContents            | Returns the contents of the container. |
 
 Properties: none
 
-Triggers: none, but that's probably missing (or we should use onDropItem/onTakeItem if the instances has *lib\_traits\_gettable*)
+Triggers: none, but that's probably missing (or we should use onDropItem/onTakeItem if the instances has *lib.traits.gettable*)
 
-#### lib\_traits\_surface
+#### lib.traits.surface
 
 A trait for items that can serve as surfaces (e.g. a table).
 
-Traits: none (but overloads some methods from **lib\_traits\_describable**).
+Traits: none (but overloads some methods from **lib.traits.describable**).
 
 Verbs:
 
@@ -184,10 +184,10 @@ Properties:
 | maxItems                    | Maximum items that can be stored on the surface. Defaults to 10. |
 | destroyOnUse : Boolean      | True if the object should be destroyed after use. Defaults to false. |
 
-Triggers: none, but that's probably missing (or we should use onDropItem/onTakeItem if the instances has *lib\_traits\_gettable*)
+Triggers: none, but that's probably missing (or we should use onDropItem/onTakeItem if the instances has *lib.traits.gettable*)
 
 
-#### lib\_traits\_edible
+#### lib.traits.edible
 
 A trait for items that can be eaten or drunk.
 
@@ -204,7 +204,7 @@ Functions:
 | Function                    | Description   |
 | --------------------------- | ------------- |
 | doUse                       | Drinking/eating logic.  |
-| canUse                      | Check if eating/drinking is possible. Returns true, but intended to be overloaded by derived objects, e.g. see **lib\_ediblecontainer**. |
+| canUse                      | Check if eating/drinking is possible. Returns true, but intended to be overloaded by derived objects, e.g. see **lib.ediblecontainer**. |
 
 Properties:
 
@@ -215,7 +215,7 @@ Properties:
 | destroyOnUse : Boolean      | True if the object should be destroyed after use. Defaults to false. |
 
 - To keep this as simple as possible, edibled object are either single use (when destroyOnUse is true) or inexhaustible (when false).
-- See also **lib\_ediblecontainer** below, which is not destroyed when used, but handles its own exhaustion state.
+- See also **lib.ediblecontainer** below, which is not destroyed when used, but handles its own exhaustion state.
 
 Triggers:
 
@@ -223,7 +223,7 @@ Triggers:
 | --------------------------- | ------------- |
 | onUse                       | Fired after object is eaten or drunk. |
 
-#### lib\_traits\_commandable
+#### lib.traits.commandable
 
 A trait for locations (as opposed to the previous ones), using the special "verbMissing" property on locations, invoked by the game engine when a matching verb cannot be found according to the usual command processing rules. 
 
@@ -252,7 +252,7 @@ Properties:
 
 ### Root object
 
-#### lib\_root
+#### lib.root
 
 A base parent trait for all other objects.
 
@@ -269,11 +269,11 @@ Functions:
 
 ### Rooms and doors
 
-#### lib\_room
+#### lib.room
 
 The base structure for rooms.
 
-Traits: **lib\_root**
+Traits: **lib.root**
 
 Verbs:
 
@@ -311,13 +311,13 @@ Triggers:
 | onEnter                     | Fired after the room is entered. |
 | onLeave                     | Fired when the room is left. |
 
-#### lib\_door
+#### lib.door
 
 A door is a two-way traversable entity.
 
 For the reminder, once you have connected rooms via a door, you will very likely want to add the door to the extraMatchObjects property of each room, so that players can operate upon the door (since it is not an item in the room's contents).
 
-Traits: **lib\_root**, **lib\_traits\_describable**, **lib\_traits\_closeable**
+Traits: **lib.root**, **lib.traits.describable**, **lib.traits.closeable**
 
 Verbs: none
 
@@ -357,11 +357,11 @@ function onTraversal(player) {
 
 ### Items
 
-#### lib\_item
+#### lib.item
 
 The base structure for items.
 
-Traits: **lib\_root**, **lib\_traits\_describable**, **lib\_traits\_gettable**
+Traits: **lib.root**, **lib.traits.describable**, **lib.traits.gettable**
 
 Verbs: none
 
@@ -373,11 +373,11 @@ Properties:
 | --------------------------- | ------------- |
 | description : String        | Default textual description ("An undescript item.") |
 
-#### lib\_key
+#### lib.key
 
 A base object for designing key-like items, allowing to lock/unlock closeable objects.
 
-Traits: **lib\_item**
+Traits: **lib.item**
 
 Verbs: none
 
@@ -390,13 +390,13 @@ Properties:
 | description : String        | Default textual description ("An undescript key.") |
 | keyId : String              | Default key identifier for matching closeable objects ("masterkey") |
 
-- The key identifier is set to "masterkey", which is also the initial setting for **lib\_traits\_closeable**, so any derived object will by default be an all-purpose master key. It is up to you to change it, following you own identification pattern.
+- The key identifier is set to "masterkey", which is also the initial setting for **lib.traits.closeable**, so any derived object will by default be an all-purpose master key. It is up to you to change it, following you own identification pattern.
  
-#### lib\_ediblecontainer
+#### lib.ediblecontainer
 
 A base object for designing single use items containing edible things, such as a cup of tea, a plate of potatoes, etc. When used, they become an empty cup, an empty plate, etc.
 
-Traits: **lib\_item**, **lib\_traits\_edible**
+Traits: **lib.item**, **lib.traits.edible**
 
 Verbs: none
 
@@ -420,11 +420,11 @@ Properties:
 
 ### Living things
 
-#### lib\_player
+#### lib.player
 
 The base structure for players.
 
-Traits: **lib\_root**, **lib\_traits\_describable**
+Traits: **lib.root**, **lib.traits.describable**
 
 Verbs:
 
@@ -454,13 +454,13 @@ Properties:
 | --------------------------- | ------------- |
 | mode : WorldObject          | Current mode (play, say, chat, eval). |
 
-#### lib\_npc
+#### lib.npc
 
 The base structure for non-player characters. This is just a demonstration, so we do not
 really know what NPCs are - but we will eventually want them to have extra features in the
 future, so this object is kind of a place holder for now.
 
-Traits: **lib\_root**, **lib\_traits\_describable**
+Traits: **lib.root**, **lib.traits.describable**
 
 Verbs: none
 
@@ -468,15 +468,15 @@ Functions: none
 
 Properties: none
 
-#### lib\_npc\_seller
+#### lib.npcs.seller
 
 The base structure for (very simple) NPC sellers. The 'list' command allows getting the list of goods, and the 'order' command to obtain one of the listed goods.
 
 The goods available for sale are those in the object's contents (so logically you would want to have different types of items there). Upon order, the required object is cloned and the newly created instance is given to the player (i.e. placed in the player's contents).
 
-For this to work, the NPC must be in a room that has the **lib\_traits\_commandable** trait, for the player commands to be delegated to the NPC.
+For this to work, the NPC must be in a room that has the **lib.traits.commandable** trait, for the player commands to be delegated to the NPC.
 
-Traits: **lib\_npc**
+Traits: **lib.npc**
 
 Verbs:
 
