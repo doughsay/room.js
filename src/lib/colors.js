@@ -1,6 +1,6 @@
 const chalk = require('chalk')
 
-const color = new chalk.constructor({ enabled: true })
+const color = new chalk.constructor({ level: 3 })
 
 const boldMagenta = color.bold.magenta
 const boldBlue = color.bold.blue
