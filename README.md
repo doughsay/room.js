@@ -1,9 +1,7 @@
 RoomJS Game Engine
 ======================
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/doughsay/room.js.svg)](https://greenkeeper.io/)
-
-[![Travis](https://img.shields.io/travis/doughsay/room.js.svg)](https://travis-ci.org/doughsay/room.js) [![Code Style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](https://standardjs.com/) [![Codecov](https://img.shields.io/codecov/c/github/doughsay/room.js.svg)](https://codecov.io/gh/doughsay/room.js) [![David](https://img.shields.io/david/doughsay/room.js.svg)](https://david-dm.org/doughsay/room.js) [![David](https://img.shields.io/david/dev/doughsay/room.js.svg)](https://david-dm.org/doughsay/room.js?type=dev)
+[![Greenkeeper badge](https://badges.greenkeeper.io/doughsay/room.js.svg)](https://greenkeeper.io/) [![Travis](https://img.shields.io/travis/doughsay/room.js.svg)](https://travis-ci.org/doughsay/room.js) [![Code Style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](https://standardjs.com/) [![Codecov](https://img.shields.io/codecov/c/github/doughsay/room.js.svg)](https://codecov.io/gh/doughsay/room.js) [![David](https://img.shields.io/david/doughsay/room.js.svg)](https://david-dm.org/doughsay/room.js) [![David](https://img.shields.io/david/dev/doughsay/room.js.svg)](https://david-dm.org/doughsay/room.js?type=dev)
 
 > **NOTE:** The master branch represents ongoing work and may have the server in a currently unstable state.  Please check the [releases](https://github.com/doughsay/room.js/releases) to get the most recent stable version.
 
