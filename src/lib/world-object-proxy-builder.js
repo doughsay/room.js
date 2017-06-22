@@ -38,6 +38,12 @@ class Handler {
     this.worldObject = new WorldObject()
   }
 
+  withHook (fn, id, hook, ...args) {
+    const res = fn()
+    this.world.runHook(id, hook, ...args)
+    return res
+  }
+
   _worldObjectProperty (property) {
     return property in this.worldObject
   }
@@ -104,9 +110,14 @@ class Handler {
 
   _setLocation (target, value) {
     if (value == null) {
-      return Reflect.set(target, 'locationId', null)
+      return this.withHook(() =>
+        Reflect.set(target, 'locationId', null),
+      target.id, 'onLocationChanged', target.locationId || 'null', 'null')
     } else if (value.id && this.world.get(toString(value.id))) {
-      return Reflect.set(target, 'locationId', toString(value.id))
+      const newLocationId = toString(value.id)
+      return this.withHook(() =>
+        Reflect.set(target, 'locationId', newLocationId),
+      target.id, 'onLocationChanged', target.locationId || 'null', newLocationId)
     }
     throw new Error('Invalid location object')
   }
