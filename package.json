@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "bunyan": "^1.8.10",
-    "chalk": "https://github.com/chalk/chalk.git#256-truecolor",
+    "chalk": "https://github.com/chalk/chalk.git#master",
     "chokidar": "^1.7.0",
     "dotenv": "^4.0.0",
     "escodegen": "^1.8.0",
