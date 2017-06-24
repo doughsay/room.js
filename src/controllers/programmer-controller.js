@@ -43,6 +43,8 @@ class ProgrammerController extends BaseChildController {
           const objectId = object.id
           if (value.verb) {
             candidates.push({ searchStr, objectId, verb: key })
+          } else if (value.text) {
+            candidates.push({ searchStr, objectId, text: key })
           } else {
             candidates.push({ searchStr, objectId, function: key })
           }
@@ -74,6 +76,14 @@ class ProgrammerController extends BaseChildController {
     done({ objectId, src: func.source, name })
   }
 
+  onGetText ({ objectId, name }, done) {
+    const object = this.world.get(objectId)
+    if (!object) { done(undefined); return }
+    const text = object[name]
+    if (!text || text.source === undefined) { done(undefined); return }
+    done({ objectId, src: text.source, name })
+  }
+
   onSaveVerb ({ objectId, verb }, done) {
     const dbObject = this.db.findById(objectId)
     if (!dbObject) { done('no such object'); return }
@@ -90,6 +100,16 @@ class ProgrammerController extends BaseChildController {
     if (!dbObject) { done('no such object'); return }
 
     dbObject.properties[name] = { function: true, source }
+    this.db.markObjectDirty(objectId)
+
+    done('saved')
+  }
+
+  onSaveText ({ objectId, src: source, name }, done) {
+    const dbObject = this.db.findById(objectId)
+    if (!dbObject) { done('no such object'); return }
+
+    dbObject.properties[name] = { text: true, source }
     this.db.markObjectDirty(objectId)
 
     done('saved')

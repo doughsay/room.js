@@ -138,6 +138,14 @@ test('World: newVerb', t => {
   t.end()
 })
 
+test('World: newText', t => {
+  const [world] = setup()
+  const text = world.newText('long text string')
+
+  t.equal(typeof text, 'function')
+  t.equal(text.text, true)
+  t.end()
+})
 // test('World: run', t => {
 //   const [world] = setup();
 //

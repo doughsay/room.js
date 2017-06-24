@@ -89,6 +89,17 @@ test('print: prints verbs in cyan', t => {
   t.end()
 })
 
+test('print: prints texts in cyan', t => {
+  const value = function foo () {}
+
+  value.text = true
+
+  const expected = '\x1b[0m\x1b[1m\x1b[36m[Text]\x1b[39m\x1b[22m\x1b[0m'
+  const actual = print(value)
+
+  t.equal(actual, expected)
+  t.end()
+})
 test('print: prints null in gray', t => {
   const value = null
   const expected = '\x1b[0m\x1b[90mnull\x1b[39m\x1b[0m'

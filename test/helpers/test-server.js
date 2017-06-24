@@ -34,6 +34,8 @@ function testServer () {
   const root = insertRoot(server)
   addGreetFuntion(root)
   addEchoVerb(root, server.world)
+  addDescText(root, server.world)
+  addEmptyText(root, server.world)
 
   return server
 }
@@ -76,6 +78,20 @@ function addEchoVerb (object, world) {
   ].join('')
   object.echo = world.deserializer.deserialize({
     verb: true, source, pattern, dobjarg, preparg, iobjarg
+  })
+}
+
+function addDescText (object, world) {
+  const source = 'long text string'
+  object.desc = world.deserializer.deserialize({
+    text: true, source
+  })
+}
+
+function addEmptyText (object, world) {
+  const source = ''
+  object.empty = world.deserializer.deserialize({
+    text: true, source
   })
 }
 

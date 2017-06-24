@@ -29,6 +29,13 @@ function serializeObject (object) {
 }
 
 function serializeFunction (fn) {
+  if (fn.text) {
+    return {
+      source: fn.source,
+      text: true
+    }
+  }
+
   const source = fn.source || fn.toString()
   if (fn.verb) {
     return {

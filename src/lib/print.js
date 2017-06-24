@@ -37,6 +37,9 @@ function print (x, maxdepth, depth = 0, prefix = '', parents = []) {
           const args = [x.dobjarg, x.preparg, x.iobjarg].join(', ')
           return c.bold.cyan(`[Verb ${x.pattern}(${args})]`)
         }
+        if (x.text) {
+          return c.bold.cyan('[Text]')
+        }
         return c.cyan('[Function]')
       }
 

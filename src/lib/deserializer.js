@@ -50,6 +50,14 @@ class Deserializer {
       verbFn.iobjarg = object.iobjarg
       return verbFn
     }
+    if ('text' in object) {
+      const fn = function fn (...args) {
+        return object.source
+      }
+      fn.text = true
+      fn.source = object.source
+      return fn
+    }
     throw new Error(`Unable to deserialize object: ${object}`)
   }
 }
