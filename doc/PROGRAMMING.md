@@ -1,4 +1,4 @@
-# Building and programming your own RoomJS MUD/MOO world
+# Building and programming your own Room.JS MUD/MOO world
 
 This guide is intended for players with developer privileges in the game.
 
@@ -6,23 +6,23 @@ This guide is intended for players with developer privileges in the game.
 
 Once you have been given developer privileges (or by default, on the demonstration), you can use the **eval** command to prefix code instructions, or preferably cycle to the EVAL mode.
 
-> For the reminder, you can cycle between different modes by hitting TAB. 
+> For the reminder, in the game client, you can cycle between different modes by hitting TAB. 
 > Modes effectively just prefix whatever you type with another word. 
  
-You can then use any JavaScript (ES6) construct to start creating new rooms and objects. This document therefore assumes the reader has pre-existing JavaScript knowledge. You will need to learn but a few basic RoomJS-specific concepts only:
+You can then use any JavaScript (ES6) construct to start creating new rooms and objects. This document therefore assumes the reader has pre-existing JavaScript knowledge. You will need to learn but a few basic Room.JS-specific concepts only:
 
 - Toplevel functions: there are a few global functions, such as **all()**. Some are seldom used in actual code, but are provided as utilities for you to invoke on the command line. Others, such as **nextId()**, will be of more frequent use.
 - World objects:
   - Each object in the world has a unique identifier, which also corresponds to its name in the global scope.
     - You may reference an object by its identifier: `$('lib.room')`
     - Or rather, directy by its global variable:  `lib.room`
-    - Identifiers are internally mapped to a file path by the DB, with the underscore character corresponding to the path separator (e.g. "lib.room" will be mapped to "lib/room"). This allows  organizing the objects logically -- You can create objects at any level, but it is a **good practice** to enquire your game administrator regarding the recommended naming scheme. Please also refer to the [Customization guide](CUSTOMIZING.md)
+    - Identifiers are internally mapped to a file path by the DB (e.g. "lib.room" will be mapped to "lib/room"). This allows  organizing the objects logically -- You can create objects at any level, but it is a **good practice** to enquire your game administrator regarding the recommended naming scheme. Please also refer to the [Customization guide](CUSTOMIZING.md)
   - Objects can include, as usual, properties and functions, but they can also have verbs.
     - To add a new function: `obj.foo = function foo()` {} 
     - To add a new verb: `obj.bar = Verb("bar")`
     - In the web client, to edit verbs and functions, use **Ctrl-p** (or **Cmd-p**) to open the fuzzy-search. Search for a function or verb by name and hit enter to start editing.
 - Verbs: these are special functions invoked when a corresponding command from the player has succesfully been parsed.
-- Traits: the object-oriented programming in RoomJS relies on traits. Any world object can be used as a trait in other objects, and can have several traits. This is how an object can be used to extend the functionality of another object.
+- Traits: the object-oriented programming in Room.JS relies on traits. Any world object can be used as a trait in other objects, and can have several traits. This is how an object can be used to extend the functionality of another object.
 
 For more details, see also the [Reference guide](#reference-guide) further below.
 
@@ -197,6 +197,33 @@ var boldBlueText = color.bold.blue("Some text");
 
 The available features are those provided by [Chalk](https://github.com/chalk/chalk).
 
+##### run.in( String, Integer ) ⇒ Timer
+Schedules code for delayed execution (delay in ms). That's Room.JS friendly way of exposing a setTimeout-like method, persisting across server restarts.
+
+##### run.every( String, Integer ) ⇒ Timer
+Schedules code for periodical execution (interval in ms). That's Room.JS friendly way of exposing a setInterval-like method, persisting across server restarts.
+
+```javascript
+// Call this object's ticks() method every 500ms.
+this.timerId = run.every(this.id + '.ticks()', 500);
+```
+
+##### run.next( String ) ⇒ Timer
+Schedules code for immediate execution at the end of this turn of the internal event loop. That's Room.JS friendly way of exposing a setImmediate-like method, persisting across server restarts.
+
+##### run.cancel( Timer ) ⇒ Boolean
+Cancels a timer, returning true on success or false if the timer no longer exists.
+
+##### run.check( Timer ) ⇒ Boolean
+Checks if a timer exists.
+
+##### run.list() ⇒ Timer
+Lists all timers currently running.
+ 
+##### global
+
+The global namespace, i.e. an object containing all of the above functions, and all toplevel objects or namespaces.
+
 ### World objects
 
 #### Base properties
@@ -224,8 +251,10 @@ Moreover, there are a few optional properties used by the game engine:
 | ---------- | ------------------- | ------------ |
 | userId     | String              | (On a player.) User login name. |
 | programmer | Boolean             | (On a player.) True if the player has programmer privileges. |
-| extraMatchObjects | Array.WorldObject\|Function | (On a location.) See look-up functions below. For a somewhat advanced usage. |
-| verbMissing | Verb               | (On a location.) For advanced usage. |
+| extraMatchObjects | Array.WorldObject\|Function | (On a location.) Hook, see look-up functions below. For a somewhat advanced usage. |
+| verbMissing | Verb               | (On a location.) Hook, see [Customization guide](CUSTOMIZING.md) |
+| onLocationChanged | Function     | (On any object.) Hook, see [Customization guide](CUSTOMIZING.md) |
+| onTabKeyPress | Function         | (On a player.) Hook, see [Customization guide](CUSTOMIZING.md) |
 
 #### Base methods
 As a programmer, these are the methods you will most likely use very often.
@@ -251,8 +280,7 @@ Removes an object from the world and its database. Currently returns true.
 ##### addAlias( ...String ) ⇒ Integer
 Adds alias strings to the object and returns the number of aliases.
 
-> Warning: it doesn't prevent from adding an existing alias. Maybe it should, there's
-> no real point having the same alias declared more than once.
+> Warning: For efficiency, it doesn't prevent from adding an existing alias. There's no real point having the same alias declared more than once, but it is left to the in-game code to performs the relevant checks, if need be.
 
 ##### rmAlias( ...String ) ⇒ Integer
 Removes alias strings from the object (any duplicates will be removed), and returns the number of aliases.
@@ -260,13 +288,12 @@ Removes alias strings from the object (any duplicates will be removed), and retu
 ##### addTrait( ...WorldObject ) ⇒ Integer
 Adds traits to the object and returns the number of traits. Traits are what makes the object inherit properties and methods.
 
-> Warning: it doesn't prevent from adding an already existing trait. Maybe it should, 
-> otherwise the object gets broken, with a 'duplicate parent'.
+> Warning: Use with caution. For efficiency, it doesn't prevent from adding an already existing trait. There are cases where duplicate traits will result in the object being broken (with a 'duplicate parent'), and no longer useable. You might have to edit the on-disk object file to fix such situations.
 
 ##### rmTrait( ...String ) ⇒ Integer
 Removes traits from the object and returns the number of traits.
 
-> Warning: removing an object used as trait in other objects may lead to bad things. 
+> Warning: Use with caution. Removing an object used as trait in other objects may lead to bad things. 
 > Anyhow, it is probably a bad idea to remove a parent trait object, as the inheriting objects may likely be broken afterwards.
 
 #### Look-up methods
@@ -329,10 +356,15 @@ Returns the trait inheritance hierarchy. It could be useful to check if an objec
 ##### instanceOf( WorldObject ) ⇒ Boolean
 Checks if the object is an instance of another object, i.e. if the former has the latter in its trait inheritance hierarchy.
 
-Basically, it just linearizes the object, and checks whether the other object is in the returned list of traits. (Obviously, since the object-oriented programming in RoomJS is trait-based, the usual JavaScript `instanceof` operator, which operates on object's prototypes, would not work as intended.)
+Basically, it just linearizes the object, and checks whether the other object is in the returned list of traits. (Obviously, since the object-oriented programming in Room.JS is trait-based, the usual JavaScript `instanceof` operator, which operates on object's prototypes, would not work as intended.)
 
 ##### setPrompt( String ) ⇒ Boolean
 Notifies the user to change his/her prompt. This is used by the mode system, when cycling between the modes (normal, say, chat, programming).
+
+Returns true upon success, false upon failure (no controller, e.g. not a player, or player not connected).
+
+##### setRightPrompt( String ) ⇒ Boolean
+Notifies the user to change his/her right prompt. It is left to the game client to interpret what the 'right prompt' is -- Possibly some extra information, whole the regular prompt is usually reserved for notifying the player name (usually displayed on the left of the input field, hence the name of this other prompt).
 
 Returns true upon success, false upon failure (no controller, e.g. not a player, or player not connected).
 
