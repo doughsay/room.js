@@ -43,13 +43,19 @@ class UserController extends BaseChildController {
       { type: 'text', label: 'player name', name: 'playerName' }
     ]
 
-    this.emit('request-input', inputs, ({ playerName }) => {
+    this.emit('request-input', inputs, reply => {
+      if (!reply || typeof reply.playerName !== 'string') {
+        this.emit('output', red('Invalid client response.'))
+        return
+      }
+
       const PLAYERS_HIERARCHY = 'players.'
 
       // Create unique ID:
       // We want to place player id under the 'players.' logical hierarchy.
       // Use playerName as base, but remove dots to disallow additional logical levels.
       // Call nextId() to obtain a unique sanitized ID.
+      const { playerName } = reply
       const playerId = this.world.nextId(PLAYERS_HIERARCHY + playerName.replace(/\./g, ''))
       // However, if the playerName is reduced to '' by the sanitizing, the final dot may get.
       // trimmed.
@@ -100,7 +106,13 @@ class UserController extends BaseChildController {
       })
 
       this.emit('output', msg.join('\n'))
-      this.emit('request-input', inputs, ({ selection }) => {
+      this.emit('request-input', inputs, reply => {
+        if (!reply || typeof reply.selection !== 'string') {
+          this.emit('output', red('Invalid client response.'))
+          return
+        }
+
+        const { selection } = reply
         const n = parseInt(selection, 10)
 
         const lowerCaseNames = players.map(p => p.name.toLowerCase())
