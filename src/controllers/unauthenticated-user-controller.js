@@ -32,7 +32,15 @@ class UnauthenticatedUserController extends BaseChildController {
       { type: 'password', label: 'repeat password', name: 'password2' }
     ]
 
-    this.emit('request-input', inputs, ({ username, password, password2 }) => {
+    this.emit('request-input', inputs, reply => {
+      if (!reply ||
+          typeof reply.password !== 'string' || typeof reply.username !== 'string') {
+        this.emit('output', red('Invalid client response.'))
+        return
+      }
+
+      const { username, password, password2 } = reply
+
       const sanitizedUsername = username.trim()
       const user = this.userDb.findById(sanitizedUsername)
 
@@ -82,7 +90,15 @@ class UnauthenticatedUserController extends BaseChildController {
       { type: 'password', label: 'password', name: 'password' }
     ]
 
-    this.emit('request-input', inputs, ({ username, password }) => {
+    this.emit('request-input', inputs, reply => {
+      if (!reply ||
+          typeof reply.password !== 'string' || typeof reply.username !== 'string') {
+        this.emit('output', red('Invalid client response.'))
+        return
+      }
+
+      const { password, username } = reply
+
       const sanitizedUsername = username.trim()
       const user = this.userDb.findById(sanitizedUsername)
 

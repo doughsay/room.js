@@ -170,3 +170,87 @@ programmerTest('room.js: as a programmer, eval code that throws an error', (t, {
     end()
   })
 })
+
+programmerTest('room.js: as a programmer, eval code that creates/destroys an object', (t, { server, socket, end }) => {
+  socket.emit('input', 'eval root.new(\'rootx\')')
+
+  socket.once('output', (msg) => {
+    const expected = '{ id: \'rootx\',\n  name: \'rootx\',\n  aliases: [],\n  traits: [Array(1)],\n  location: null,\n  contents: [] }'
+    const actual = stripAnsi(msg)
+
+    t.equal(actual, expected)
+
+    socket.emit('input', 'eval rootx.id')
+
+    socket.once('output', (msg) => {
+      const expected = '\'rootx\''
+      const actual = stripAnsi(msg)
+
+      t.equal(actual, expected)
+
+      socket.emit('input', 'eval rootx.destroy()')
+
+      socket.once('output', (msg) => {
+        const expected = 'true'
+        const actual = stripAnsi(msg)
+
+        t.equal(actual, expected)
+        end()
+      })
+    })
+  })
+})
+
+programmerTest('room.js: as a programmer, eval code that creates/destroys an object; with properties', (t, { server, socket, end }) => {
+  socket.emit('input', 'eval root.new(\'rootx\', { prop: 1234 })')
+
+  socket.once('output', (msg) => {
+    const expected = '{ id: \'rootx\',\n  name: \'rootx\',\n  aliases: [],\n  traits: [Array(1)],\n  location: null,\n  contents: [],\n  prop: 1234 }'
+    const actual = stripAnsi(msg)
+
+    t.equal(actual, expected)
+
+    socket.emit('input', 'eval rootx.id')
+
+    socket.once('output', (msg) => {
+      const expected = '\'rootx\''
+      const actual = stripAnsi(msg)
+
+      t.equal(actual, expected)
+
+      socket.emit('input', 'eval rootx.destroy()')
+
+      socket.once('output', (msg) => {
+        const expected = 'true'
+        const actual = stripAnsi(msg)
+
+        t.equal(actual, expected)
+        end()
+      })
+    })
+  })
+})
+
+programmerTest('room.js: as a programmer, eval code that creates an object; id already exists', (t, { server, socket, end }) => {
+  socket.emit('input', 'eval root.new(\'root\')')
+
+  socket.once('output', (msg) => {
+    const expected = /TypeError: Identifier 'root' has already been declared/
+    const actual = stripAnsi(msg)
+
+    t.ok(expected.test(actual))
+    end()
+  })
+})
+
+programmerTest('room.js: as a programmer, eval code that destroys an object; cannot destroy online player', (t, { server, socket, end }) => {
+  socket.emit('input', 'eval this.destroy()')
+
+  socket.once('output', (msg) => {
+    const expected = /Error: test is a player and is online/
+    const actual = stripAnsi(msg)
+
+    t.ok(expected.test(actual))
+    end()
+  })
+})
