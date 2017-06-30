@@ -49,6 +49,10 @@ function print (x, maxdepth, depth = 0, prefix = '', parents = []) {
           return c.yellow(x.toString())
         }
 
+        if (Object.prototype.toString.call(x) === '[object String]') {
+          return c.yellow('[String]')
+        }
+
         if (Object.prototype.toString.call(x) === '[object RegExp]') {
           return c.red(x.toString())
         }

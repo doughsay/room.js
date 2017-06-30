@@ -1,0 +1,63 @@
+{
+  "name": "guitar",
+  "aliases": [],
+  "traitIds": [
+    "lib.item"
+  ],
+  "locationId": "areas.start.heaven",
+  "properties": {
+    "play": {
+      "file": "play.js",
+      "verb": true,
+      "pattern": "play",
+      "dobjarg": "this",
+      "preparg": "none",
+      "iobjarg": "none"
+    },
+    "song": {
+      "file": "song.txt",
+      "text": true
+    },
+    "announcePlayStart": {
+      "function": true,
+      "file": "announcePlayStart.js"
+    },
+    "announcePlayEnd": {
+      "function": true,
+      "file": "announcePlayEnd.js"
+    },
+    "announcePlayInterlude": {
+      "function": true,
+      "file": "announcePlayInterlude.js"
+    },
+    "playStrophe": {
+      "function": true,
+      "file": "playStrophe.js"
+    },
+    "stropheIndex": {
+      "value": 0
+    },
+    "halt": {
+      "file": "halt.js",
+      "verb": true,
+      "pattern": "halt stop",
+      "dobjarg": "this",
+      "preparg": "none",
+      "iobjarg": "none"
+    },
+    "playing": {
+      "object": null
+    },
+    "playEmote": {
+      "function": true,
+      "file": "playEmote.js"
+    },
+    "onLocationChanged": {
+      "function": true,
+      "file": "onLocationChanged.js"
+    },
+    "description": {
+      "value": "An uncommon twelve-string guitar."
+    }
+  }
+}
