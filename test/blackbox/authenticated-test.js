@@ -257,7 +257,7 @@ authenticatedTest('room.js: as an authenticated user, play w/ multiple character
     t.equal(actual, expected)
 
     socket.once('request-input', (inputs, send) => {
-      const expectedInputs = [ { type: 'text', label: 'character', name: 'selection' } ]
+      const expectedInputs = [ { type: 'text', label: 'character', options: [ 'test', 'bob' ], name: 'selection' } ]
 
       t.deepEqual(inputs, expectedInputs)
 
@@ -287,7 +287,7 @@ authenticatedTest('room.js: as an authenticated user, play w/ multiple character
     t.equal(actual, expected)
 
     socket.once('request-input', (inputs, send) => {
-      const expectedInputs = [ { type: 'text', label: 'character', name: 'selection' } ]
+      const expectedInputs = [ { type: 'text', label: 'character', options: [ 'test', 'bob' ], name: 'selection' } ]
 
       t.deepEqual(inputs, expectedInputs)
 
