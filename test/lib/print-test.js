@@ -89,7 +89,7 @@ test('print: prints verbs in cyan', t => {
   t.end()
 })
 
-test('print: prints texts in cyan', t => {
+test('print: prints texts in yellow', t => {
   // eslint-disable-next-line no-new-wrappers
   const value = new String('some long string')
   const expected = '\x1b[0m\x1b[33m[String]\x1b[39m\x1b[0m'
