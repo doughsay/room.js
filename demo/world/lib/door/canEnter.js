@@ -1,6 +1,6 @@
 function canEnter(player) {
   if (this.closed) {
-    // From lib_closeable
+    // From lib.closeable
     player.tell(`The ${this.name} is closed.`);
     return false;
   }

@@ -74,6 +74,48 @@ authenticatedTest('room.js: as an authenticated user, create player; existing na
   })
 })
 
+authenticatedTest('room.js: as an authenticated user, create player; robustness check (non-string name)', (t, { server, socket, end }) => {
+  insertTestPlayer(server)
+  socket.emit('input', 'create')
+
+  socket.once('request-input', (inputs, send) => {
+    const expectedInputs = [ { label: 'player name', name: 'playerName', type: 'text' } ]
+
+    t.deepEqual(inputs, expectedInputs)
+
+    send({ playerName: null })
+
+    socket.once('output', (msg) => {
+      const expected = 'Invalid client response.'
+      const actual = stripAnsi(msg)
+
+      t.equal(actual, expected)
+      end()
+    })
+  })
+})
+
+authenticatedTest('room.js: as an authenticated user, create player; robustness check (invalid reply)', (t, { server, socket, end }) => {
+  insertTestPlayer(server)
+  socket.emit('input', 'create')
+
+  socket.once('request-input', (inputs, send) => {
+    const expectedInputs = [ { label: 'player name', name: 'playerName', type: 'text' } ]
+
+    t.deepEqual(inputs, expectedInputs)
+
+    send(1234)
+
+    socket.once('output', (msg) => {
+      const expected = 'Invalid client response.'
+      const actual = stripAnsi(msg)
+
+      t.equal(actual, expected)
+      end()
+    })
+  })
+})
+
 authenticatedTest('room.js: as an authenticated user, invalid command', (t, { server, socket, end }) => {
   socket.emit('input', 'invalidcommand')
 
@@ -193,6 +235,66 @@ authenticatedTest('room.js: as an authenticated user, play w/ multiple character
 
       socket.once('output', (msg) => {
         const expected = 'Invalid selection.'
+        const actual = stripAnsi(msg)
+
+        t.equal(actual, expected)
+        end()
+      })
+    })
+  })
+})
+
+authenticatedTest('room.js: as an authenticated user, play w/ multiple characters to pick from; robustness check (non-string selection)', (t, { server, socket, end }) => {
+  insertTestPlayer(server)
+  insertTestPlayer(server, 'bob', 'test')
+
+  socket.emit('input', 'play')
+
+  socket.once('output', (msg) => {
+    const expected = 'Choose a character to play as:\n1. #cmd[test]\n2. #cmd[bob]'
+    const actual = msg
+
+    t.equal(actual, expected)
+
+    socket.once('request-input', (inputs, send) => {
+      const expectedInputs = [ { type: 'text', label: 'character', name: 'selection' } ]
+
+      t.deepEqual(inputs, expectedInputs)
+
+      send({ selection: 1 })
+
+      socket.once('output', (msg) => {
+        const expected = 'Invalid client response.'
+        const actual = stripAnsi(msg)
+
+        t.equal(actual, expected)
+        end()
+      })
+    })
+  })
+})
+
+authenticatedTest('room.js: as an authenticated user, play w/ multiple characters to pick from; robustness check (invalid reply)', (t, { server, socket, end }) => {
+  insertTestPlayer(server)
+  insertTestPlayer(server, 'bob', 'test')
+
+  socket.emit('input', 'play')
+
+  socket.once('output', (msg) => {
+    const expected = 'Choose a character to play as:\n1. #cmd[test]\n2. #cmd[bob]'
+    const actual = msg
+
+    t.equal(actual, expected)
+
+    socket.once('request-input', (inputs, send) => {
+      const expectedInputs = [ { type: 'text', label: 'character', name: 'selection' } ]
+
+      t.deepEqual(inputs, expectedInputs)
+
+      send(1234)
+
+      socket.once('output', (msg) => {
+        const expected = 'Invalid client response.'
         const actual = stripAnsi(msg)
 
         t.equal(actual, expected)

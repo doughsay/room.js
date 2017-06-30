@@ -21,7 +21,7 @@ function buildAction(player, direction) {
   }
 
   // Build room
-  const idScheme = 'areas_instances_room';
+  const idScheme = 'areas.instances.room';
   const id = nextId(idScheme);
 
   const created = lib.room.new(id);

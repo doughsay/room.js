@@ -71,6 +71,54 @@ unauthenticatedTest('room.js: as an unauthenticated user, attempt to create a us
   })
 })
 
+unauthenticatedTest('room.js: as an unauthenticated user, attempt to create a user, robustness check (non-string password)', (t, { server, socket, end }) => {
+  socket.emit('input', 'create')
+
+  socket.once('request-input', (inputs, send) => {
+    send({ username: 'testbadpass', password: null, password2: null })
+
+    socket.once('output', (msg) => {
+      const expected = 'Invalid client response.'
+      const actual = stripAnsi(msg)
+
+      t.equal(actual, expected)
+      end()
+    })
+  })
+})
+
+unauthenticatedTest('room.js: as an unauthenticated user, attempt to create a user, robustness check (non-string username)', (t, { server, socket, end }) => {
+  socket.emit('input', 'create')
+
+  socket.once('request-input', (inputs, send) => {
+    send({ username: null, password: 'testbaduser', password2: 'testbaduser' })
+
+    socket.once('output', (msg) => {
+      const expected = 'Invalid client response.'
+      const actual = stripAnsi(msg)
+
+      t.equal(actual, expected)
+      end()
+    })
+  })
+})
+
+unauthenticatedTest('room.js: as an unauthenticated user, attempt to create a user, robustness check (invalid reply)', (t, { server, socket, end }) => {
+  socket.emit('input', 'create')
+
+  socket.once('request-input', (inputs, send) => {
+    send(1234)
+
+    socket.once('output', (msg) => {
+      const expected = 'Invalid client response.'
+      const actual = stripAnsi(msg)
+
+      t.equal(actual, expected)
+      end()
+    })
+  })
+})
+
 unauthenticatedTest('room.js: as an unauthenticated user, login', (t, { server, socket, end }) => {
   insertTestUser(server)
 
@@ -124,6 +172,60 @@ unauthenticatedTest('room.js: as an unauthenticated user, login attempt for non-
 
     socket.once('output', (msg) => {
       const expected = 'Invalid username or password.'
+      const actual = stripAnsi(msg)
+
+      t.equal(actual, expected)
+      end()
+    })
+  })
+})
+
+unauthenticatedTest('room.js: as an unauthenticated user, login attempt, robustness check (non-string password)', (t, { server, socket, end }) => {
+  insertTestUser(server)
+
+  socket.emit('input', 'login')
+
+  socket.once('request-input', (_, send) => {
+    send({ username: 'test', password: null })
+
+    socket.once('output', (msg) => {
+      const expected = 'Invalid client response.'
+      const actual = stripAnsi(msg)
+
+      t.equal(actual, expected)
+      end()
+    })
+  })
+})
+
+unauthenticatedTest('room.js: as an unauthenticated user, login attempt, robustness check (non-string username)', (t, { server, socket, end }) => {
+  insertTestUser(server)
+
+  socket.emit('input', 'login')
+
+  socket.once('request-input', (_, send) => {
+    send({ username: null, password: 'test' })
+
+    socket.once('output', (msg) => {
+      const expected = 'Invalid client response.'
+      const actual = stripAnsi(msg)
+
+      t.equal(actual, expected)
+      end()
+    })
+  })
+})
+
+unauthenticatedTest('room.js: as an unauthenticated user, login attempt, robustness check (invalid reply)', (t, { server, socket, end }) => {
+  insertTestUser(server)
+
+  socket.emit('input', 'login')
+
+  socket.once('request-input', (_, send) => {
+    send(1234)
+
+    socket.once('output', (msg) => {
+      const expected = 'Invalid client response.'
       const actual = stripAnsi(msg)
 
       t.equal(actual, expected)

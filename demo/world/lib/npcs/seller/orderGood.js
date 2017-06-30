@@ -14,7 +14,7 @@ function order({ player, dobj, iobj, verbstr, argstr, dobjstr, prepstr, iobjstr 
     player.tell(`${this.name} says: "You are welcome!"`);
 
     // Clone the good
-    const created = target.clone('instances_' + target.id.split('_').pop());
+    const created = target.clone('instances.' + target.id.split('.').pop());
 
     if (this !== player) {
       // Give to player

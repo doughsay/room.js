@@ -22,7 +22,7 @@ function cloneAction(player, argstr) {
   }
 
   // Now, we can proceed to CREATION
-  const idScheme = 'instances_' + target.id.split('_').pop();
+  const idScheme = 'instances.' + target.id.split('.').pop();
   const created = target.clone(idScheme);
 
   // Special flag to track objects created with the staff.

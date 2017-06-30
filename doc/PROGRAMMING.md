@@ -14,9 +14,9 @@ You can then use any JavaScript (ES6) construct to start creating new rooms and 
 - Toplevel functions: there are a few global functions, such as **all()**. Some are seldom used in actual code, but are provided as utilities for you to invoke on the command line. Others, such as **nextId()**, will be of more frequent use.
 - World objects:
   - Each object in the world has a unique identifier, which also corresponds to its name in the global scope.
-    - You may reference an object by its identifier: `$('lib_room')`
-    - Or rather, directy by its global variable:  `lib_room`
-    - Identifiers are internally mapped to a file path by the DB, with the underscore character corresponding to the path separator (e.g. "lib\_room" will be mapped to "lib/room"). This allows  organizing the objects logically -- You can create objects at any level, but it is a **good practice** to enquire your game administrator regarding the recommended naming scheme. Please also refer to the [Customization guide](CUSTOMIZING.md)
+    - You may reference an object by its identifier: `$('lib.room')`
+    - Or rather, directy by its global variable:  `lib.room`
+    - Identifiers are internally mapped to a file path by the DB, with the underscore character corresponding to the path separator (e.g. "lib.room" will be mapped to "lib/room"). This allows  organizing the objects logically -- You can create objects at any level, but it is a **good practice** to enquire your game administrator regarding the recommended naming scheme. Please also refer to the [Customization guide](CUSTOMIZING.md)
   - Objects can include, as usual, properties and functions, but they can also have verbs.
     - To add a new function: `obj.foo = function foo()` {} 
     - To add a new verb: `obj.bar = Verb("bar")`
@@ -31,29 +31,29 @@ For more details, see also the [Reference guide](#reference-guide) further below
 But for now, let's create our first object: a (very) basic lantern!
 First, switch to EVAL mode, so that you do not have to prefix every JavaScript command.
 
-- Create a new object. In the demonstration mudlib, **lib\_item** is a gettable and describable object. So we will start from it (i.e. it will be the base trait for our object)
+- Create a new object. In the demonstration mudlib, **lib.item** is a gettable and describable object. So we will start from it (i.e. it will be the base trait for our object)
 ```javascript
-lib_item.new('tests_lantern');
+lib.item.new('tests.lantern');
 ```
 - By default, its short name is the same as its identifier, and it doesn't have a long description. It doesn't have aliases either. This is not very convenient, so let's add all these things:
 ```javascript
-tests_lantern.name = "lantern";
-tests_lantern.addAlias("lamp");
-tests_lantern.description = "a portable lamp in a case, protected from the wind and rain";
+tests.lantern.name = "lantern";
+tests.lantern.addAlias("lamp");
+tests.lantern.description = "a portable lamp in a case, protected from the wind and rain";
 ```
 - Since it is intended for being lit, let's add a boolean property to keep track of that state:
 ```javascript
-tests_lantern.lighted = false; 
+tests.lantern.lighted = false; 
 ```
 - This is a step-by-step example, but actually note that we could rather have added most of the properties directly at creation, specified as options:
 ```javascript
-lib_item.new('tests_lantern', { name: "lantern", lighted: false });
+lib.item.new('tests.lantern', { name: "lantern", lighted: false });
 ```
 
 - Anyhow, let's now declare the available command verbs:
 ```javascript
-tests_lantern.light = Verb("light", "this", "none", "none");
-tests_lantern.extinguish = Verb("extinguish", "this", "none", "none");
+tests.lantern.light = Verb("light", "this", "none", "none");
+tests.lantern.extinguish = Verb("extinguish", "this", "none", "none");
 ```
 - Hit Ctrl-p and look for our newly created "light" verb. In the editor, copy the following function body into the default template (i.e. keep the surrounding function definition!)
 ```javascript
@@ -73,8 +73,8 @@ tests_lantern.extinguish = Verb("extinguish", "this", "none", "none");
 ```
 - Close the editing tabs and return to the MUD tab. Here, for the sake of illustration, we decided to use two additional functions, that will be responsible for changing the state flag and announce something to other people in the room. So let's first create them:
 ```javascript
-tests_lantern.doLight = function(player) {};
-tests_lantern.doExtinguish = function(player) {};
+tests.lantern.doLight = function(player) {};
+tests.lantern.doExtinguish = function(player) {};
 ```
 - And again, hit Ctrl-p and look for these functions. Insert the following content inside the body for the doLight method, and save with Ctrl-s:
 ```javascript
@@ -106,7 +106,7 @@ tests_lantern.doExtinguish = function(player) {};
 ```
 - Go back to the MUD tab. We will want to test our new object, so let's bring it to our current room (and notice how the *this* object conveniently here points to you, the player/builder):
 ```javascript
-tests_lantern.location = this.location
+tests.lantern.location = this.location
 ```
 
 - Leave the EVAL mode, and play:
@@ -240,7 +240,7 @@ Creates a new world object, deriving from its parent (i.e. having it in its trai
 
 Example:
 ```javascript
-lib_chest.new("items_chest2", { name: "large chest", opened: false, locked: false });
+lib.chest.new("items.chest2", { name: "large chest", opened: false, locked: false });
 ```
 
 Note: The identifier is 'sanitized', i.e. non-authorized characters are removed or replaced.
@@ -303,7 +303,7 @@ Returns:
 #### Verb related methods
 For advanced usage. 
 
-Check the **items\_builderstaff** item or the **lib\_traits\_commandable** trait in the demonstration for possible use cases. 
+Check the **items.builderstaff** item or the **lib.traits.commandable** trait in the demonstration for possible use cases. 
 
 ##### matchObjects( command : String ) ⇒ Object
 Given a command, returns { dobj : WorldObject, iobj : WorldObject }, containing the matched objects in the environment.
@@ -317,7 +317,7 @@ They exist in the execution context, but are probably of lower interest.
 ##### send( String\|Object ) ⇒ Boolean
 Sends a message to the client.
 
-This is normally not intended to be used directly (e.g. check the **tell()** method, defined by the **lib\_root** object inherited by allmost all objects in the demo mudlib).
+This is normally not intended to be used directly (e.g. check the **tell()** method, defined by the **lib.root** object inherited by allmost all objects in the demo mudlib).
 
 Returns true upon success, false upon failure (no controller, e.g. not a player, or player not connected). 
 
