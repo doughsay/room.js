@@ -32,8 +32,10 @@ class SocketController {
     socket.on('search', this.onSearch.bind(this))
     socket.on('get-verb', this.onGetVerb.bind(this))
     socket.on('get-function', this.onGetFunction.bind(this))
+    socket.on('get-text', this.onGetText.bind(this))
     socket.on('save-verb', this.onSaveVerb.bind(this))
     socket.on('save-function', this.onSaveFunction.bind(this))
+    socket.on('save-text', this.onSaveText.bind(this))
     socket.on('error', this.onError.bind(this))
   }
 
@@ -91,14 +93,6 @@ class SocketController {
     }
   }
 
-  onGetVerb (data, done) {
-    if (this.authenticateProgrammer()) {
-      this.programmerController.onGetVerb(data, done)
-    } else {
-      done('unauthorized')
-    }
-  }
-
   onGetFunction (data, done) {
     if (this.authenticateProgrammer()) {
       this.programmerController.onGetFunction(data, done)
@@ -107,9 +101,33 @@ class SocketController {
     }
   }
 
+  onGetText (data, done) {
+    if (this.authenticateProgrammer()) {
+      this.programmerController.onGetText(data, done)
+    } else {
+      done('unauthorized')
+    }
+  }
+
+  onGetVerb (data, done) {
+    if (this.authenticateProgrammer()) {
+      this.programmerController.onGetVerb(data, done)
+    } else {
+      done('unauthorized')
+    }
+  }
+
   onSaveFunction (data, done) {
     if (this.authenticateProgrammer()) {
       this.programmerController.onSaveFunction(data, done)
+    } else {
+      done('unauthorized')
+    }
+  }
+
+  onSaveText (data, done) {
+    if (this.authenticateProgrammer()) {
+      this.programmerController.onSaveText(data, done)
     } else {
       done('unauthorized')
     }

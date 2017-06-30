@@ -22,6 +22,8 @@ class Deserializer {
     if ('NaN' in object) { return NaN }
     if ('undefined' in object) { return }
     if ('date' in object) { return new Date(object.date) }
+    // eslint-disable-next-line no-new-wrappers
+    if ('text' in object) { return new String(object.source) }
     if ('regexp' in object) { return new RegExp(object.regexp, object.flags) }
     if ('ref' in object) { return this.world.get(object.ref) }
     if ('object' in object) { return this._deserializeObject(object.object) }
