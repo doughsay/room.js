@@ -14,6 +14,8 @@ function serializeObject (object) {
     return { date: object.toISOString() }
   } else if (Object.prototype.toString.call(object) === '[object RegExp]') {
     return { regexp: object.source, flags: object.flags }
+  } else if (Object.prototype.toString.call(object) === '[object String]') {
+    return { text: true, source: object.valueOf() }
   } else if (Array.isArray(object)) {
     return { array: object.map(serialize) }
   } else if (object.__proxy__) {
@@ -29,13 +31,6 @@ function serializeObject (object) {
 }
 
 function serializeFunction (fn) {
-  if (fn.text) {
-    return {
-      source: fn.source,
-      text: true
-    }
-  }
-
   const source = fn.source || fn.toString()
   if (fn.verb) {
     return {

@@ -41,7 +41,7 @@ programmerTest('room.js: as a programmer, find object using $', (t, { server, so
   socket.emit('input', 'eval $("root")')
 
   socket.once('output', (msg) => {
-    const expected = '{ id: \'root\',\n  name: \'root\',\n  aliases: [],\n  traits: [],\n  location: null,\n  contents: [],\n  greet: [Function],\n  echo: [Verb echo(any, any, any)],\n  desc: [Text],\n  empty: [Text] }'
+    const expected = '{ id: \'root\',\n  name: \'root\',\n  aliases: [],\n  traits: [],\n  location: null,\n  contents: [],\n  greet: [Function],\n  echo: [Verb echo(any, any, any)],\n  desc: [String],\n  empty: [String] }'
     const actual = stripAnsi(msg)
 
     t.equal(actual, expected)
@@ -139,7 +139,7 @@ programmerTest('room.js: as a programmer, inspect an object', (t, { server, sock
   socket.emit('input', 'eval root')
 
   socket.once('output', (msg) => {
-    const expected = '{ id: \'root\',\n  name: \'root\',\n  aliases: [],\n  traits: [],\n  location: null,\n  contents: [],\n  greet: [Function],\n  echo: [Verb echo(any, any, any)],\n  desc: [Text],\n  empty: [Text] }'
+    const expected = '{ id: \'root\',\n  name: \'root\',\n  aliases: [],\n  traits: [],\n  location: null,\n  contents: [],\n  greet: [Function],\n  echo: [Verb echo(any, any, any)],\n  desc: [String],\n  empty: [String] }'
     const actual = stripAnsi(msg)
 
     t.equal(actual, expected)

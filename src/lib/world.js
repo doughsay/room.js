@@ -35,7 +35,6 @@ class World {
     this.global.target.$ = Object.freeze(id => this.get(id))
     this.global.target.nextId = Object.freeze(raw => this.nextId(raw))
     this.global.target.Verb = Object.freeze((...args) => this.newVerb(...args))
-    this.global.target.Text = Object.freeze((...args) => this.newText(...args))
     this.global.target.run = Object.freeze({
       in: Object.freeze((code, milliseconds) => this.runIn(code, milliseconds)),
       every: Object.freeze((code, milliseconds) => this.runEvery(code, milliseconds)),
@@ -104,12 +103,6 @@ class World {
     ].join('')
     return this.deserializer.deserialize({
       verb: true, source, pattern, dobjarg, preparg, iobjarg
-    })
-  }
-
-  newText (source = '') {
-    return this.deserializer.deserialize({
-      text: true, source
     })
   }
 

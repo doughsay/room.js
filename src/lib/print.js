@@ -37,9 +37,6 @@ function print (x, maxdepth, depth = 0, prefix = '', parents = []) {
           const args = [x.dobjarg, x.preparg, x.iobjarg].join(', ')
           return c.bold.cyan(`[Verb ${x.pattern}(${args})]`)
         }
-        if (x.text) {
-          return c.bold.cyan('[Text]')
-        }
         return c.cyan('[Function]')
       }
 
@@ -50,6 +47,10 @@ function print (x, maxdepth, depth = 0, prefix = '', parents = []) {
 
         if (Object.prototype.toString.call(x) === '[object Date]') {
           return c.yellow(x.toString())
+        }
+
+        if (Object.prototype.toString.call(x) === '[object String]') {
+          return c.yellow('[String]')
         }
 
         if (Object.prototype.toString.call(x) === '[object RegExp]') {
