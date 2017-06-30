@@ -94,7 +94,7 @@ class MooDB extends EventEmitter {
 
   loadCallables (id, properties) {
     for (const [key, value] of entries(properties)) {
-      if (value.verb || value.function) {
+      if (value.verb || value.function || value.text) {
         properties[key] = this.loadCallable(id, value)
       }
     }
@@ -108,7 +108,7 @@ class MooDB extends EventEmitter {
 
   onFileAddedOrChanged (file) {
     const id = MooDB.idFromFilename(file)
-    if (file.endsWith('.json') || file.endsWith('.js')) {
+    if (file.endsWith('.json') || file.endsWith('.js') || file.endsWith('.txt')) {
       this.addOrUpdateObject(id)
     }
   }
@@ -118,7 +118,7 @@ class MooDB extends EventEmitter {
     if (file.endsWith('.json')) {
       this.removeById(id)
       this.emit('object-removed', id)
-    } else if (file.endsWith('.js')) {
+    } else if (file.endsWith('.js') || file.endsWith('.txt')) {
       this.addOrUpdateObject(id)
     }
   }
@@ -150,7 +150,7 @@ class MooDB extends EventEmitter {
   }
 
   serializeAndSaveCallable (id, key, value) {
-    const file = value.file || `${key}.js`
+    const file = value.file || (value.text ? `${key}.txt` : `${key}.js`)
     const filepath = MooDB.filenameForSrcFile(id, file)
     this.fsdb.write(filepath, value.source)
     if (value.function) {
@@ -164,6 +164,11 @@ class MooDB extends EventEmitter {
         preparg: value.preparg,
         iobjarg: value.iobjarg
       }
+    } else if (value.text) {
+      return {
+        file,
+        text: true
+      }
     }
     throw new Error('invalid callable')
   }
@@ -171,7 +176,7 @@ class MooDB extends EventEmitter {
   savableProperties (object) {
     const properties = {}
     for (const [key, value] of entries(object.properties)) {
-      if (value.verb || value.function) {
+      if (value.verb || value.function || value.text) {
         properties[key] = this.serializeAndSaveCallable(object.id, key, value)
       } else {
         properties[key] = value
@@ -205,6 +210,11 @@ class MooDB extends EventEmitter {
         const filepath = MooDB.filenameForSrcFile(id, file)
         this.fsdb.rm(filepath)
       }
+      if (value && value.text) {
+        const file = value.file || `${key}.txt`
+        const filepath = MooDB.filenameForSrcFile(id, file)
+        this.fsdb.rm(filepath)
+      }
     }
     this.fsdb.rm(MooDB.filenameForId(id))
 
@@ -219,6 +229,11 @@ class MooDB extends EventEmitter {
   removeProperty (id, key, value) {
     if (value && (value.function || value.verb)) {
       const file = value.file || `${key}.js`
+      const filepath = MooDB.filenameForSrcFile(id, file)
+      this.fsdb.rm(filepath)
+    }
+    if (value && value.text) {
+      const file = value.file || `${key}.txt`
       const filepath = MooDB.filenameForSrcFile(id, file)
       this.fsdb.rm(filepath)
     }

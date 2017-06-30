@@ -38,9 +38,14 @@ class ProgrammerController extends BaseChildController {
     this.world.all().forEach(object => {
       Reflect.ownKeys(object).forEach(key => {
         const value = object[key]
+        const searchStr = `${object.id}.${key}`
+        const objectId = object.id
+
+        if (typeof value === 'object' &&
+            Object.prototype.toString.call(value) === '[object String]') {
+          candidates.push({ searchStr, objectId, text: key })
+        } else
         if (value && typeof value === 'function') {
-          const searchStr = `${object.id}.${key}`
-          const objectId = object.id
           if (value.verb) {
             candidates.push({ searchStr, objectId, verb: key })
           } else {
@@ -74,6 +79,16 @@ class ProgrammerController extends BaseChildController {
     done({ objectId, src: func.source, name })
   }
 
+  onGetText ({ objectId, name }, done) {
+    const object = this.world.get(objectId)
+    if (!object) { done(undefined); return }
+    const text = object[name]
+
+    if (typeof text !== 'object' ||
+       Object.prototype.toString.call(text) !== '[object String]') { done(undefined); return }
+    done({ objectId, src: text.valueOf(), name })
+  }
+
   onSaveVerb ({ objectId, verb }, done) {
     const dbObject = this.db.findById(objectId)
     if (!dbObject) { done('no such object'); return }
@@ -90,6 +105,16 @@ class ProgrammerController extends BaseChildController {
     if (!dbObject) { done('no such object'); return }
 
     dbObject.properties[name] = { function: true, source }
+    this.db.markObjectDirty(objectId)
+
+    done('saved')
+  }
+
+  onSaveText ({ objectId, src: source, name }, done) {
+    const dbObject = this.db.findById(objectId)
+    if (!dbObject) { done('no such object'); return }
+
+    dbObject.properties[name] = { text: true, source }
     this.db.markObjectDirty(objectId)
 
     done('saved')
