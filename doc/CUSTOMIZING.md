@@ -1,14 +1,14 @@
 # Organizing and customizing your world objects
 
-This guide is intended for administrators and game builders, when setting up the initial instance for their own game based on the RoomJS MUD/MOO engine.
+This guide is intended for administrators and game builders, when setting up the initial instance for their own game based on the Room.JS MUD/MOO engine.
 
 ## Introduction
 We will deal here with both the object identifiers and the underlying on-disk file hierarchy, as there is a one-to-one mapping between them -- For details, refer to the [Programming guide](PROGRAMMING.md):
 
-> Identifiers are internally mapped to a file path by the DB, with the underscore character
-> corresponding to the path separator (e.g. "lib.room" will be mapped to "lib/room"). This allows
-> organizing the objects logically -- You can create objects at any level, but it is a **good practice**
->to enquire your game administrator regarding the recommended naming scheme.
+> Identifiers are internally mapped to a file path by the DB (e.g. "lib.room" will be mapped
+> to "lib/room"). This allows organizing the objects logically -- You can create objects at
+> any level, but it is a **good practice** to enquire your game administrator regarding the
+> recommended naming scheme.
 
 World objects can be created at any logical level. In this document, the demonstration world is used as a sample -- your own world may end up with a different structure.
 
@@ -24,6 +24,8 @@ The following objects shall always be present, as they are internally used by th
 | ambiguous  | An object used by search functions, when several matches are possible. |
 | nothing    | Another object used by search functions, when no object is specified. |
 
+## Customizable hooks (adaptable)
+
 The **system** object is where several customizable hooks are defined (besides a few other utility functions, which are not described in this document).
 
 | Customizable hook    | comment |
@@ -33,8 +35,15 @@ The **system** object is where several customizable hooks are defined (besides a
 | onPlayerConnected | Invoked when a player character enters the world: this is where you can restore his/her previous location, and possibly announce his/her arrival to other players (at least in the room, if not to all) -- The demonstration relies on the doEnter() method, from the mudlib **lib.room** object, and obviously refers to a demonstration-specific initial location. |
 | onPlayerDisconnected | Invoked when a player character quits the world: this is where you can reset his/her location, and possibly announce his/her leaving to other players (at least in the room, if not to all). |
 | onPlayerCommandFailed | Invoked when a player command could not be matched: this is where you can possibly interpret the failure reason, allowing for more precise messages and game-specific decisions, suggesting help, etc. |
+| preprocessCommand | Invoked before any command processing takes placed: this is where the mode system is usually applied, therefore its implementation relies on the player and mode objects. |
 
-For the record here, as far as customizable hooks are concerned, the game engine also invokes onTabKeyPress() on the player object when the TAB key event is received. In the demonstration, this is used to cycle through the different modes (a.k.a. PLAY, CHAT, SAY, EVAL), and implemented in the **lib.player** object.
+Additionaly, a few other hooks are invoked by the game engine:
+
+| Customizable hook    | comment |
+| -------------------- | ------- |
+| onTabKeyPress | Invoked on the player object when the TAB key event is received. In the demonstration, this is used to cycle through the different modes (a.k.a. PLAY, CHAT, SAY, EVAL), and implemented in the **lib.player** object. |
+| onLocationChanged | If present on an object, invoked whenever its location changes. |
+| verbMissing | If present on a location object (room), invoked when a player command could not be matched. In that case, the system.onPlayerCommandFailed() hook is not invoked, but the command is delegated to the room for in-game interpretation. |
 
 ## Useful objects (recommended)
 The following objects are not mandatory *per se* but are probably best keeping (and customized, if need really be).
@@ -42,9 +51,9 @@ The following objects are not mandatory *per se* but are probably best keeping (
 | Object     | Comment |
 | ---------- | ------- |
 | help       | The in-game help system: may be used as a basis for designing your own. |
-| modes      | (Along with several mode objects located in sub-directories.) The mode system (a.k.a. PLAY, CHAT, SAY, EVAL): may be modified according to your needs. |
+| modes      | (Several mode objects located in sub-directories.) The mode system (a.k.a. PLAY, CHAT, SAY, EVAL): may be modified according to your needs. |
 | util       | Several useful functions (e.g. for normalizing directions, capitalizing strings, etc.): may be extended, obviously. |
-| views      | Some other useful methods. |
+| views      | Some other useful methods (e.g. generic helpers for announcement formatting). |
 
 ## Mudlib objects (replaceable)
 
@@ -59,7 +68,7 @@ You may replace it by your own.
 Player objects (i.e. characters) are normally all located under the *players/* directory.
 The demonstration should not come with any, since you will just create them when playing :)
 
-For the record, player accounts (i.e. login credentials etc.) are stored in another DB.
+For the record, player accounts (i.e. login credentials etc.) are stored in another DB (defined via environment variables and/or in the `.env` file).
 
 ## All other objects (removable)
 

@@ -6,7 +6,7 @@ As noted in the [Customization guide](CUSTOMIZING.md), which the reader is assum
 
 > The term "mudlib" refers to the very basic set of objects and entities that are initally required to make the first real objects in your game (i.e. the base structure for rooms, containers, behaviors, etc.). The demonstration comes with its own mudlib, which you can modify/extend, but it is wholly replaceable -- By nature, the demonstration mudlib has been kept small (no character classes or combat system, for instance -- You'll have to design your owns).
 
-This memorandum describes the demonstration mudlib (i.e. *lib.xxx* objects), which may be used as a sample for designing and implementing you own game logic. It is indeed a very small library (with only 10 base structures for items/rooms/NPCs, and 7 traits for behaviors).
+This memorandum describes the demonstration mudlib (i.e. *lib.xxx* objects), which may be used as a sample for designing and implementing your own game logic. It is indeed a very small library (with only 10 base structures for items/rooms/NPCs, and 7 traits for behaviors).
 
 ## Introduction
 
@@ -214,7 +214,7 @@ Properties:
 | foodType : Integer          | Current type. Defaults to DRINK (1). |
 | destroyOnUse : Boolean      | True if the object should be destroyed after use. Defaults to false. |
 
-- To keep this as simple as possible, edibled object are either single use (when destroyOnUse is true) or inexhaustible (when false).
+- To keep this as simple as possible, edible object are either single use (when destroyOnUse is true) or inexhaustible (when false).
 - See also **lib.ediblecontainer** below, which is not destroyed when used, but handles its own exhaustion state.
 
 Triggers:
@@ -470,7 +470,7 @@ Properties: none
 
 #### lib.npcs.seller
 
-The base structure for (very simple) NPC sellers. The 'list' command allows getting the list of goods, and the 'order' command to obtain one of the listed goods.
+The base structure for (very simple) NPC sellers. The 'list' command lists available goods, and the 'order' command allows the player to obtain one.
 
 The goods available for sale are those in the object's contents (so logically you would want to have different types of items there). Upon order, the required object is cloned and the newly created instance is given to the player (i.e. placed in the player's contents).
 
