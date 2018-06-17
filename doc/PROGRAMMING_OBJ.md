@@ -88,7 +88,6 @@ On-disk serialization:
 
 ## 3. Dates and regular expressions
 
-
 ```javascript
 items.test.someDate = new Date()
 items.test.someRegexp = /abc/i
@@ -174,6 +173,19 @@ On-disk serialization:
     }
   }
 }
+```
+
+**Notice**
+
+World objects are automatically saved whenever one of their base or toplevel properties changes. However, the saving logic doesn't do a deep check, so directly changing the value of a field in a custom nested object or array property won't trigger saving. The workaround is to work with a reference, and then reassign the toplevel property which is being changed.
+
+```javascript
+// Don't do:
+items.test.someObject.a = 2
+items.test.someArray[0] = 2
+// But:
+let oref = items.test.someObject; oref.a = 2; items.test.someObject = oref
+let aref = items.test.someArray; aref[0] = 2; items.test.someArray = aref
 ```
 
 ## 5. World object references
