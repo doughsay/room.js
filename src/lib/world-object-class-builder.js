@@ -350,7 +350,7 @@ class WorldObjectClassBuilder {
         return WorldObject.findMatch(exactMatches, partialMatches, determiner)
       }
 
-      static findMatch (partialMatches, exactMatches, determiner) {
+      static findMatch (exactMatches, partialMatches, determiner) {
         if (exactMatches.length > 0) {
           const result = getMatchesWithDeterminer(exactMatches, determiner,
             world.get('ambiguous'), world.get('fail'))
