@@ -41,7 +41,7 @@
     "codecov": "^3.0.0",
     "faucet": "0.0.1",
     "istanbul": "^0.4.3",
-    "snazzy": "^7.0.0",
+    "snazzy": "^8.0.0",
     "standard": "^10.0.2",
     "strip-ansi": "^4.0.0",
     "tape": "^4.6.3"
