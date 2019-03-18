@@ -43,7 +43,7 @@
     "istanbul": "^0.4.3",
     "snazzy": "^7.0.0",
     "standard": "^10.0.2",
-    "strip-ansi": "^4.0.0",
+    "strip-ansi": "^5.2.0",
     "tape": "^4.6.3"
   }
 }
