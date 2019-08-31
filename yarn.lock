@@ -1032,9 +1032,10 @@ function-bind@^1.0.2, function-bind@^1.1.0, function-bind@^1.1.1, function-bind@
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/function-bind/-/function-bind-1.1.1.tgz#a56899d3ea3c9bab874bb9773b7c5ede92f4895d"
 
-fuzzaldrin-plus@0.6.0:
+fuzzaldrin-plus@^0.6.0:
   version "0.6.0"
   resolved "https://registry.yarnpkg.com/fuzzaldrin-plus/-/fuzzaldrin-plus-0.6.0.tgz#832f6489fbe876769459599c914a670ec22947ee"
+  integrity sha1-gy9kifvodnaUWVmckUpnDsIpR+4=
 
 gauge@~2.7.3:
   version "2.7.4"
@@ -1187,9 +1188,10 @@ has@^1.0.1, has@~1.0.1:
   dependencies:
     function-bind "^1.0.2"
 
-hashids@^1.1.1:
-  version "1.1.4"
-  resolved "https://registry.yarnpkg.com/hashids/-/hashids-1.1.4.tgz#e4ff92ad66b684a3bd6aace7c17d66618ee5fa21"
+hashids@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/hashids/-/hashids-2.0.0.tgz#8a3ad77598233e399594b73ad5fdb3c2c880528e"
+  integrity sha512-URg7dQlk6wQS9WqhQwKBC0cT/G0JMaEcwlHTvtRNB45JcIrr6mxY7dXiCUJwESf+tXnyaFdz7C8ETDYrQsyY1A==
 
 "hashish@>=0.0.2 <0.1":
   version "0.0.4"
