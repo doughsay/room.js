@@ -35,7 +35,7 @@
     "mkdirp": "^0.5.1",
     "remove": "^0.1.5",
     "semver": "^5.3.0",
-    "socket.io": "^2.0.2"
+    "socket.io": "^2.3.0"
   },
   "devDependencies": {
     "codecov": "^3.0.0",
