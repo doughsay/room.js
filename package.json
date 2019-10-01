@@ -26,7 +26,7 @@
   "dependencies": {
     "bunyan": "^1.8.10",
     "chalk": "^2.0.1",
-    "chokidar": "^1.7.0",
+    "chokidar": "^3.2.0",
     "dotenv": "^4.0.0",
     "escodegen": "^1.8.0",
     "esprima": "^4.0.0",
