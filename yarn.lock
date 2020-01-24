@@ -1032,9 +1032,10 @@ function-bind@^1.0.2, function-bind@^1.1.0, function-bind@^1.1.1, function-bind@
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/function-bind/-/function-bind-1.1.1.tgz#a56899d3ea3c9bab874bb9773b7c5ede92f4895d"
 
-fuzzaldrin-plus@0.6.0:
+fuzzaldrin-plus@^0.6.0:
   version "0.6.0"
   resolved "https://registry.yarnpkg.com/fuzzaldrin-plus/-/fuzzaldrin-plus-0.6.0.tgz#832f6489fbe876769459599c914a670ec22947ee"
+  integrity sha1-gy9kifvodnaUWVmckUpnDsIpR+4=
 
 gauge@~2.7.3:
   version "2.7.4"
@@ -1597,6 +1598,11 @@ mkdirp@0.5.x, "mkdirp@>=0.5 0", mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@~0.5.1:
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-0.5.1.tgz#30057438eac6cf7f8c4767f38648d6697d75c903"
   dependencies:
     minimist "0.0.8"
+
+mkdirp@^1.0.0:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-1.0.1.tgz#57828231711628a8a303f455bb7d79b32d9c9d4f"
+  integrity sha512-epSaAwmT1sXxKNHFtzxrNEepE0qneey1uVReE15tN3Zvba3ifzx01eStvvvyb8dQeI50CVuGZ5qnSk2wMtsysg==
 
 moment@^2.10.6:
   version "2.19.2"
