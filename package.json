@@ -31,7 +31,7 @@
     "escodegen": "^1.8.0",
     "esprima": "^4.0.0",
     "fuzzaldrin-plus": "^0.6.0",
-    "hashids": "^1.1.1",
+    "hashids": "^2.2.0",
     "mkdirp": "^0.5.1",
     "remove": "^0.1.5",
     "semver": "^5.3.0",
